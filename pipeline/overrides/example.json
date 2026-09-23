@@ -1,0 +1,6 @@
+{
+  "cuts": [
+    { "start": 12.4, "end": 13.1, "keep": false, "note": "false start - cut it" },
+    { "start": 26.2, "end": 26.9, "keep": true, "note": "keep this pause for effect" }
+  ]
+}
