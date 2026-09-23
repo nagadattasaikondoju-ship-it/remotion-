@@ -13,3 +13,4 @@ python3 pipeline/transcribe.py "$OUT/$NAME.mp4" "$OUT/$NAME.words.json"
 python3 pipeline/build_edl.py "$OUT/$NAME.mp4" "$OUT/$NAME.words.json" "$OUT/$NAME.edl.json" \
   --overrides "pipeline/overrides/$NAME.json"
 python3 pipeline/detect_faces.py "$OUT/$NAME.mp4" "$OUT/$NAME.faces.json" 2> >(grep -vE '^(W0000|I0000|INFO:|WARNING: Logging)' >&2)
+[ -f "$OUT/music.wav" ] || python3 pipeline/make_beat.py "$OUT/music.wav"
