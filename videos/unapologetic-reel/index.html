@@ -39,6 +39,11 @@
       }
 
       /* ---------- camera (punch-ins live here, never on the timed clips) ---------- */
+      #camfx {
+        position: absolute;
+        inset: 0;
+        transform-origin: 50% 35%;
+      }
       #cam {
         position: absolute;
         inset: 0;
@@ -281,7 +286,7 @@
       }
       #s4-strip {
         left: 80px;
-        top: 1170px;
+        top: 1330px;
         width: 920px;
         height: 330px;
       }
@@ -315,8 +320,8 @@
         mix-blend-mode: multiply;
       }
       .key {
-        left: 640px;
-        top: 1030px;
+        left: 660px;
+        top: 1165px;
         width: 300px;
         height: 150px;
         perspective: 800px;
@@ -592,10 +597,12 @@
       </svg>
 
       <!-- ================= PICTURE: three cuts of one take ================= -->
+      <div id="camfx">
       <div id="cam">
         <video id="v1" src="assets/take.mp4" data-start="0" data-duration="16.55" data-media-start="1.65" data-track-index="0" muted playsinline></video>
         <video id="v2" src="assets/take.mp4" data-start="16.55" data-duration="6.1" data-media-start="20.15" data-track-index="0" muted playsinline></video>
         <video id="v3" src="assets/take.mp4" data-start="22.65" data-duration="12.65" data-media-start="30.25" data-track-index="0" muted playsinline></video>
+      </div>
       </div>
       <div id="grade"></div>
       <div id="flash" class="layer"></div>
@@ -690,7 +697,7 @@
           <div id="s4-stamp" class="abs h">Erased</div>
         </div>
         <!-- caption in the gap between SAFE and ERASED -->
-        <div id="c1" class="cap" style="top: 930px">
+        <div id="c1" class="cap" style="top: 1000px">
           <div class="cap-line"><span class="cw cs">doesn't</span><span class="cw cb">protect</span></div>
           <div class="cap-line"><span class="cw cl">the</span><span class="cw cm">brand</span></div>
         </div>
@@ -726,9 +733,16 @@
 
       <!-- ================= C3 · captions: "So when a brand comes to us wanting to play it safe, we tell them the opposite." (22.65 – 27.5) ================= -->
       <div id="s-c3" class="clip layer" data-start="22.65" data-duration="4.85" data-track-index="6">
-        <div id="c3a" class="cap" style="top: 1140px">
-          <div class="cap-line"><span class="cw cl">so</span><span class="cw cl">when</span><span class="cw cl">a</span><span class="cw cb">brand</span></div>
-          <div class="cap-line"><span class="cw cm">comes to us</span></div>
+        <div id="c3-dim" class="layer" style="background: #030407"></div>
+        <div id="c3-lines" class="abs" style="left: 0; top: 640px; width: 1080px; text-align: center">
+          <div class="h glow" style="font-size: 124px; line-height: 1.05"><span class="word c3w">So</span> <span class="word c3w">when</span> <span class="word c3w">a</span></div>
+          <div class="h" style="font-size: 200px; line-height: 1.05">
+            <span class="ghost-wrap c3w">
+              <span class="ghost glow red">Brand</span><span class="ghost glow red">Brand</span
+              ><span class="glow red" style="position: relative">Brand</span>
+            </span>
+          </div>
+          <div class="h glow" style="font-size: 124px; line-height: 1.05"><span class="word c3w">comes</span> <span class="word c3w">to us</span></div>
         </div>
         <div id="c3b" class="cap" style="top: 1140px">
           <div class="cap-line"><span class="cw cs">wanting to</span></div>
@@ -824,6 +838,8 @@
       <audio id="sfx-pop-count" src="assets/audio/ui-pop.wav" data-start="5.9" data-duration="0.14" data-track-index="23" data-volume="0.7"></audio>
       <audio id="sfx-slide" src="assets/audio/down-slide.wav" data-start="6.75" data-duration="0.9" data-track-index="24" data-volume="0.7"></audio>
       <audio id="sfx-click-overnight" src="assets/audio/ui-click.wav" data-start="7.78" data-duration="0.06" data-track-index="22" data-volume="0.7"></audio>
+      <audio id="sfx-whoosh-zoomout" src="assets/audio/whoosh.wav" data-start="7.35" data-duration="0.55" data-track-index="25" data-volume="0.45"></audio>
+      <audio id="sfx-subdrop-bw" src="assets/audio/sub-drop.wav" data-start="6.4" data-duration="1.4" data-track-index="26" data-volume="0.5"></audio>
       <audio id="sfx-chime" src="assets/audio/chime.wav" data-start="9.72" data-duration="1.6" data-track-index="23" data-volume="0.6"></audio>
       <audio id="sfx-whoosh-dark" src="assets/audio/whoosh.wav" data-start="10.85" data-duration="0.55" data-track-index="24" data-volume="0.7"></audio>
       <audio id="sfx-click-strike" src="assets/audio/ui-click.wav" data-start="13.77" data-duration="0.06" data-track-index="22" data-volume="0.8"></audio>
@@ -865,6 +881,27 @@
         .to("#cam", { scale: 1.0, duration: 0.35, ease: "power2.inOut" }, 28.9)
         .fromTo("#cam", { scale: 1.06 }, { scale: 1.0, duration: 3.7, ease: "sine.inOut", immediateRender: false }, 31.35);
       tl.fromTo("#flash", { opacity: 0.35 }, { opacity: 0, duration: 0.18, ease: "power2.out", immediateRender: false }, 16.55);
+
+      /* ---------- B&W beat 1: "this clip ended a career for three weeks" (1.9 – 3.9) ---------- */
+      tl.set("#camfx", { filter: "grayscale(0) contrast(1) brightness(1)", scale: 1 }, 0);
+      tl.to("#camfx", { filter: "grayscale(1) contrast(1.35) brightness(0.9)", duration: 0.06, ease: "none" }, 1.9);
+      tl.to("#camfx", { scale: 1.08, duration: 0.08, ease: "power4.out" }, 1.9);
+      tl.to("#camfx", { scale: 1.16, duration: 0.1, ease: "power4.out" }, 2.95); // "career"
+      tl.to("#camfx", { scale: 1.1, duration: 0.3, ease: "power2.out" }, 3.45); // "three weeks"
+      [2.3, 2.55, 3.2].forEach((t) => {
+        tl.to("#camfx", { filter: "grayscale(1) contrast(1.5) brightness(1.25)", duration: 0.03, ease: "none" }, t);
+        tl.to("#camfx", { filter: "grayscale(1) contrast(1.35) brightness(0.9)", duration: 0.05, ease: "none" }, t + 0.04);
+      });
+      tl.to("#camfx", { filter: "grayscale(0) contrast(1) brightness(1)", scale: 1, duration: 0.15, ease: "power2.out" }, 3.85);
+
+      /* ---------- B&W beat 2: "brand nearly collapsed overnight" (6.4 – 8.4): crash-zoom in, snap out ---------- */
+      tl.to("#camfx", { filter: "grayscale(1) contrast(1.35) brightness(0.9)", duration: 0.08, ease: "none" }, 6.4);
+      tl.to("#camfx", { scale: 1.18, duration: 0.95, ease: "power2.in" }, 6.4); // push into "collapsed"
+      tl.to("#camfx", { x: 14, duration: 0.04, yoyo: true, repeat: 5, ease: "none" }, 7.33);
+      tl.to("#camfx", { scale: 0.96, duration: 0.22, ease: "power3.out" }, 7.4); // snap back out
+      tl.to("#camfx", { scale: 1.0, duration: 0.6, ease: "sine.out" }, 7.62);
+      tl.to("#camfx", { filter: "grayscale(0) contrast(1) brightness(1)", duration: 0.12, ease: "power2.out" }, 8.4); // colour returns with the rebound
+      tl.fromTo("#flash", { opacity: 0.25 }, { opacity: 0, duration: 0.2, ease: "power2.out", immediateRender: false }, 8.4);
       tl.fromTo("#flash", { opacity: 0.35 }, { opacity: 0, duration: 0.18, ease: "power2.out", immediateRender: false }, 22.65);
 
       /* helpers (all positions are root-seconds) */
@@ -978,7 +1015,14 @@
       tl.to("#s5-ribbon", { opacity: 0, duration: 0.2 }, 22.4);
 
       /* ---------- C3 captions over the solution beat ---------- */
-      caption("#c3a", [22.83, 23.15, 23.31, 23.35, 23.8], 24.45);
+      // full-screen dark beat, same language as "here's what nobody tells you"
+      tl.fromTo("#c3-dim", { opacity: 0 }, { opacity: 0.86, duration: 0.15 }, 22.7);
+      [22.83, 23.15, 23.31, 23.35, 23.8, 24.01].forEach((t, i) => {
+        tl.fromTo(document.querySelectorAll(".c3w")[i], { opacity: 0, scale: 1.5, filter: "blur(12px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.26, ease: SPRING }, t);
+      });
+      tl.fromTo("#s-c3 .ghost", { opacity: 0.5, y: 0 }, { opacity: 0, y: (i) => (i + 1) * 40, duration: 0.55, stagger: 0.06, ease: "power2.out" }, 23.42);
+      tl.to("#c3-lines", { opacity: 0, scale: 0.92, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, 24.3);
+      tl.to("#c3-dim", { opacity: 0, duration: 0.25 }, 24.35);
       caption("#c3b", [24.56, 25.03, 25.27], 25.9);
       tl.fromTo("#c3b-bar", { scaleX: 0 }, { scaleX: 1, duration: 0.35, ease: "power3.out" }, 25.43);
       caption("#c3c", [25.99, 26.18, 26.38, 26.76, 26.84], 27.38);
