@@ -131,17 +131,6 @@
       }
 
       /* ---------- S1 hook ---------- */
-      #s1-slab {
-        left: 90px;
-        top: 1130px;
-        width: 900px;
-        padding: 56px 60px 60px;
-        transform-origin: 50% 100%;
-      }
-      #s1-slab .h {
-        font-size: 128px;
-        line-height: 1.1;
-      }
       #s1-alert {
         left: 110px;
         top: 1110px;
@@ -611,14 +600,6 @@
       <!-- ================= S1 · hook (0 – 3.95) ================= -->
       <!-- hook clip "Would you rather…" · "This clip ended a career for three weeks." -->
       <div id="s1" class="clip layer" data-start="0" data-duration="3.95" data-track-index="1">
-        <div id="s1-slab" class="abs paper">
-          <div class="tape" style="left: -40px; top: -20px; transform: rotate(-24deg)"></div>
-          <div class="tape" style="right: -40px; top: -18px; transform: rotate(22deg)"></div>
-          <div class="h">
-            <span class="word s1w">Would</span> <span class="word s1w">you</span>
-            <span class="word s1w red">rather…</span>
-          </div>
-        </div>
         <div id="s1-alert" class="abs">
           <div class="rgb c"></div>
           <div class="rgb m"></div>
@@ -934,11 +915,6 @@
       }
 
       /* ---------- S1 hook ---------- */
-      cardIn("#s1-slab", 0.55, { rotation: -6 }, -1);
-      [0.69, 0.97, 1.21].forEach((t, i) => {
-        tl.fromTo(document.querySelectorAll(".s1w")[i], { opacity: 0, scale: 1.6, filter: "blur(10px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 0.3, ease: SPRING }, t);
-      });
-      tl.to("#s1-slab", { rotation: 6, y: 260, opacity: 0, duration: 0.22, ease: "power3.in" }, 1.7);
       tl.fromTo("#s1-alert", { opacity: 0, scale: 1.08 }, { opacity: 1, scale: 1, duration: 0.08 }, 1.93);
       tl.fromTo("#s1-alert .alert-core", { x: -30, clipPath: "inset(0 0 60% 0)" }, { x: 0, clipPath: "inset(0 0 0% 0)", duration: 0.26, ease: "steps(6)" }, 1.93);
       tl.fromTo("#s1-alert .rgb.c", { opacity: 0.55, x: -18 }, { opacity: 0, x: 0, duration: 0.3, ease: "steps(5)" }, 1.93);
