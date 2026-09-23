@@ -5,3 +5,8 @@ dist
 
 # Ignore the output video from Git but not videos you import into src/.
 out
+
+# Pipeline: downloaded models and per-video media/data (regenerate with pipeline/run.sh)
+pipeline/models/
+public/media/
+__pycache__/
