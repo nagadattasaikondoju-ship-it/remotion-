@@ -28,8 +28,7 @@ SEGMENTS = [
     ("scroll-bar", 326, 355, True),
     ("skeleton", 359, 391, True),
     ("faqs", 395, 437, True),  # "and" before "password" is dropped
-    ("password", 448, 479, True),
-    ("outro", 479, 524, False),  # silent smile hold under the CTA
+    ("password", 448, 479, True),  # ends ~0.1 s after "visibility" so the loop back to "Ten" breathes
 ]
 
 

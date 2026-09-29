@@ -458,74 +458,6 @@
         right: 14px;
         top: 17px;
       }
-
-      /* outro prompt card */
-      .pr-box {
-        position: absolute;
-        left: 16px;
-        right: 16px;
-        top: 50px;
-        height: 170px;
-        border-radius: 18px;
-        background: #fff;
-        border: 2px solid #e6e1d6;
-      }
-      .pr-text {
-        position: absolute;
-        left: 16px;
-        right: 16px;
-        top: 14px;
-        font-size: 23px;
-        font-weight: 700;
-        line-height: 1.25;
-        color: #1f1e1b;
-      }
-      .pr-text i {
-        font-style: normal;
-        opacity: 0;
-      }
-      .pr-send {
-        position: absolute;
-        right: 12px;
-        bottom: 12px;
-        width: 46px;
-        height: 46px;
-        border-radius: 50%;
-        background: var(--claude);
-      }
-      .pr-send svg {
-        position: absolute;
-        left: 11px;
-        top: 11px;
-      }
-
-      /* CTA */
-      #cta {
-        position: absolute;
-        left: 540px;
-        top: 1500px;
-        height: 96px;
-        padding: 0 38px 0 30px;
-        border-radius: 48px;
-        background: var(--yellow);
-        color: #111;
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        white-space: nowrap;
-        font-size: 38px;
-        font-weight: 900;
-        letter-spacing: -0.02em;
-        box-shadow:
-          0 0 0 5px #000,
-          0 16px 30px rgba(0, 0, 0, 0.4);
-        opacity: 0;
-        visibility: hidden;
-      }
-      #cta small {
-        font-size: 38px;
-        font-weight: 700;
-      }
     </style>
   </head>
   <body>
@@ -533,19 +465,19 @@
       id="root"
       data-composition-id="main"
       data-start="0"
-      data-duration="14.1667"
+      data-duration="12.6667"
       data-width="1080"
       data-height="1920"
     >
       <!-- ================= PICTURE: one pre-cut take (scripts/build_cut.py) ================= -->
       <div id="cam">
-        <video id="take" src="assets/cut.mp4" data-start="0" data-duration="14.1667" data-media-start="0" data-track-index="0" muted playsinline></video>
+        <video id="take" src="assets/cut.mp4" data-start="0" data-duration="12.6667" data-media-start="0" data-track-index="0" muted playsinline></video>
       </div>
 
       <!-- ================= static title ================= -->
       <div id="title">
-        <div><span id="t10">10</span> things <span id="tClaude">Claude</span> should add</div>
-        <div>to your <span class="hl" id="tVibe">Vibe Coded</span> website</div>
+        <div><span id="t10">10</span> things <span class="hl" id="tClaude">Claude</span> should add</div>
+        <div>to your website</div>
       </div>
 
       <!-- ================= numbered list ================= -->
@@ -554,7 +486,7 @@
         <div class="row" id="r2" style="top: 558px"><div class="num">2.</div><div class="txt"><span>Cookie banner</span></div></div>
         <div class="row" id="r3" style="top: 646px"><div class="num">3.</div><div class="txt"><span>Back-to-top button</span></div></div>
         <div class="row" id="r4" style="top: 734px"><div class="num">4.</div><div class="txt"><span>Mobile menu</span></div></div>
-        <div class="row" id="r5" style="top: 822px"><div class="num">5.</div><div class="txt"><span>Keyboard shortcuts</span></div></div>
+        <div class="row" id="r5" style="top: 822px"><div class="num">5.</div><div class="txt"><span>Shortcuts</span></div></div>
         <div class="row" id="r6" style="top: 910px"><div class="num">6.</div><div class="txt"><span>Hover effects</span></div></div>
         <div class="row" id="r7" style="top: 998px"><div class="num">7.</div><div class="txt"><span>Scroll progress bar</span></div></div>
         <div class="row" id="r8" style="top: 1086px"><div class="num">8.</div><div class="txt"><span>Skeleton loader</span></div></div>
@@ -758,7 +690,7 @@
             <div class="abs" style="left: 24px; top: 32px; font-size: 18px; font-weight: 800; color: #5b606b">Password</div>
             <div class="pw-in" id="c10-in">
               <div class="dots" id="c10-dots">••••••••••</div>
-              <div class="clear" id="c10-clear">vibe_c0ded!</div>
+              <div class="clear" id="c10-clear">MyP@ssw0rd!</div>
               <svg id="c10-off" width="32" height="28" viewBox="0 0 32 28">
                 <path d="M2 14s5-9 14-9 14 9 14 9-5 9-14 9S2 14 2 14z" stroke="#5b606b" stroke-width="2.6" fill="none" />
                 <circle cx="16" cy="14" r="4.5" fill="#5b606b" />
@@ -772,29 +704,10 @@
             <div class="btn" style="left: 20px; right: 20px; top: 152px; height: 58px; line-height: 58px; border-radius: 14px; background: #16181d; color: #fff; font-size: 20px">Sign in</div>
           </div>
         </div>
-
-        <!-- outro · tell Claude -->
-        <div class="card" id="c11" style="background: #faf9f5">
-          <div class="abs" style="left: 20px; top: 16px; font-size: 19px; font-weight: 800; color: #8a857a">Tell Claude:</div>
-          <div class="pr-box">
-            <div class="pr-text" id="c11-text"></div>
-            <div class="pr-send" id="c11-send">
-              <svg width="24" height="24" viewBox="0 0 24 24"><path d="M12 20V5M5 11l7-7 7 7" stroke="#fff" stroke-width="3.2" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            </div>
-          </div>
-          <div class="bar" style="left: 20px; top: 240px; width: 120px; background: #e9e5da"></div>
-          <div class="bar" style="left: 150px; top: 240px; width: 70px; background: #e9e5da"></div>
-        </div>
-      </div>
-
-      <!-- ================= CTA ================= -->
-      <div id="cta">
-        <svg width="40" height="46" viewBox="0 0 40 46"><path d="M5 4h30v38L20 32 5 42z" fill="#111" /></svg>
-        <span>SAVE THIS <small>for your next build</small></span>
       </div>
 
       <!-- ================= AUDIO ================= -->
-      <audio id="voice" src="assets/audio/voice.wav" data-start="0" data-duration="14.1667" data-media-start="0" data-track-index="10" data-volume="1"></audio>
+      <audio id="voice" src="assets/audio/voice.wav" data-start="0" data-duration="12.6667" data-media-start="0" data-track-index="10" data-volume="1"></audio>
 
       <audio id="tick-1" src="assets/audio/tick.wav" data-start="0.34" data-duration="0.05" data-track-index="11" data-volume="0.22"></audio>
       <audio id="tick-2" src="assets/audio/tick.wav" data-start="0.405" data-duration="0.05" data-track-index="12" data-volume="0.22"></audio>
@@ -833,9 +746,7 @@
       <audio id="click-top" src="assets/audio/click.wav" data-start="5.3" data-duration="0.04" data-track-index="15" data-volume="0.3"></audio>
       <audio id="click-eye" src="assets/audio/click.wav" data-start="11.96" data-duration="0.04" data-track-index="15" data-volume="0.35"></audio>
 
-      <audio id="chime-outro" src="assets/audio/chime.wav" data-start="12.6667" data-duration="1.2" data-track-index="16" data-volume="0.4"></audio>
-      <audio id="pop-cta" src="assets/audio/pop.wav" data-start="12.8" data-duration="0.14" data-track-index="13" data-volume="0.5"></audio>
-      <audio id="click-send" src="assets/audio/click.wav" data-start="13.62" data-duration="0.04" data-track-index="15" data-volume="0.3"></audio>
+      <audio id="swish-loop" src="assets/audio/swish.wav" data-start="12.3667" data-duration="0.22" data-track-index="14" data-volume="0.2"></audio>
     </div>
 
     <script>
@@ -843,17 +754,16 @@
       const F = (f) => f / 30;
       /* item starts on the cut (frames of the 30 fps edit, from scripts/build_cut.py) */
       const T = [75, 107, 140, 171, 200, 226, 246, 275, 307, 349].map(F);
-      const OUT = F(380);
-      const END = F(425);
+      const END = F(380);
       const POP = "back.out(2)";
 
       /* ---------- camera: slow push on the hook, alternate framing on every cut ---------- */
       tl.fromTo("#cam", { scale: 1.0 }, { scale: 1.035, duration: T[0], ease: "none" }, 0);
-      const cuts = T.concat([OUT]);
-      cuts.forEach((t, i) => {
+      T.forEach((t, i) => {
         const base = i % 2 === 0 ? 1.07 : 1.0;
-        const next = i + 1 < cuts.length ? cuts[i + 1] : END;
-        tl.fromTo("#cam", { scale: base }, { scale: base + 0.012, duration: next - t, ease: "none", immediateRender: false }, t);
+        const last = i + 1 === T.length; /* last item holds 1.0 so the loop lands on frame 0's framing */
+        const next = last ? END : T[i + 1];
+        tl.fromTo("#cam", { scale: base }, { scale: last ? base : base + 0.012, duration: next - t, ease: "none", immediateRender: false }, t);
       });
 
       /* ---------- hook: title beats + numbers counting in ---------- */
@@ -861,7 +771,6 @@
       tl.to(".num", { opacity: 1, scale: 1, duration: 0.22, ease: POP, stagger: 0.065 }, 0.34);
       tl.fromTo("#t10", { scale: 1 }, { scale: 1.18, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 0.12);
       tl.fromTo("#tClaude", { scale: 1 }, { scale: 1.12, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 1.0);
-      tl.fromTo("#tVibe", { scale: 1 }, { scale: 1.12, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 1.86);
 
       /* ---------- list rows: text pops on the cut, active row in yellow ---------- */
       T.forEach((t, i) => {
@@ -869,17 +778,16 @@
         tl.fromTo(`${row} .txt span`, { opacity: 0, x: -26, scale: 0.7 }, { opacity: 1, x: 0, scale: 1, duration: 0.22, ease: POP, immediateRender: false }, t);
         tl.set(`${row} .txt, ${row} .num`, { color: "#ffd60a" }, t);
         tl.fromTo(`${row} .num`, { scale: 1.35 }, { scale: 1, duration: 0.25, ease: POP, immediateRender: false }, t);
-        const off = i + 1 < T.length ? T[i + 1] : OUT;
-        tl.to(`${row} .txt, ${row} .num`, { color: "#ffffff", duration: 0.12, ease: "none" }, off);
+        if (i + 1 < T.length) tl.to(`${row} .txt, ${row} .num`, { color: "#ffffff", duration: 0.12, ease: "none" }, T[i + 1]);
       });
       gsap.set(".txt span", { opacity: 0 });
       gsap.set(".txt, .num", { color: "#ffffff" });
 
       /* ---------- cards: pop in with the line, hard-swap on the next item ---------- */
-      const cardIds = ["#c1", "#c2", "#c3", "#c4", "#c5", "#c6", "#c7", "#c8", "#c9", "#c10", "#c11"];
+      const cardIds = ["#c1", "#c2", "#c3", "#c4", "#c5", "#c6", "#c7", "#c8", "#c9", "#c10"];
       gsap.set(cardIds.join(","), { autoAlpha: 0 });
       cardIds.forEach((id, i) => {
-        const t = i < T.length ? T[i] : OUT;
+        const t = T[i];
         const tilt = i % 2 === 0 ? -2.5 : 2.5;
         if (i > 0) tl.set(cardIds[i - 1], { autoAlpha: 0 }, t);
         tl.set(id, { autoAlpha: 1 }, t);
@@ -957,23 +865,13 @@
         tl.fromTo("#c10-clear", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out", immediateRender: false }, t + 0.06);
       }
 
-      /* ---------- outro: whole list lit, prompt typed, CTA ---------- */
+      /* ---------- loop: clear back to the opening frame so the end flows into "Ten things…" ---------- */
       {
-        const msg = "Add all 10 of these to my website.";
-        const box = document.getElementById("c11-text");
-        box.innerHTML = msg
-          .split("")
-          .map((ch) => `<i>${ch === " " ? "&nbsp;" : ch}</i>`)
-          .join("")
-          .replace(/<i>&nbsp;<\/i>/g, "<i> </i>");
-        const chars = box.querySelectorAll("i");
-        gsap.set(chars, { opacity: 0 });
-        tl.to(chars, { opacity: 1, duration: 0.01, stagger: 0.022, ease: "none" }, OUT + 0.18);
-        tl.to("#c11-send", { scale: 0.85, duration: 0.07, yoyo: true, repeat: 1, ease: "power2.in" }, OUT + 0.95);
-        tl.to(".txt", { color: "#ffd60a", duration: 0.08, stagger: 0.045, yoyo: true, repeat: 1, ease: "none" }, OUT);
-        tl.set("#cta", { autoAlpha: 1, xPercent: -50 }, OUT + 0.13);
-        tl.fromTo("#cta", { scale: 0.4, rotation: -6 }, { scale: 1, rotation: -2, duration: 0.34, ease: "back.out(2)", immediateRender: false }, OUT + 0.13);
-        gsap.set("#cta", { autoAlpha: 0, xPercent: -50 });
+        const R = END - 0.3;
+        tl.to("#c10", { scale: 0.6, autoAlpha: 0, duration: 0.14, ease: "power2.in" }, R);
+        tl.to(".txt span", { opacity: 0, x: -26, duration: 0.12, ease: "power2.in", stagger: { each: 0.008, from: "end" } }, R);
+        tl.to(".num", { opacity: 0, scale: 0.4, duration: 0.12, ease: "power2.in", stagger: { each: 0.008, from: "end" } }, R + 0.04);
+        tl.to(".txt, .num", { color: "#ffffff", duration: 0.05, ease: "none" }, R);
       }
 
       window.__timelines = window.__timelines || {};

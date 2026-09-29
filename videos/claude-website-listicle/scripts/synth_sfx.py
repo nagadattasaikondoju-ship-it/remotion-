@@ -70,19 +70,10 @@ def click(dur=0.04):
     )
 
 
-def chime(dur=1.2):
-    t = t_axis(dur)
-    x = np.zeros_like(t)
-    for f, a, tau in [(1318.5, 1.0, 0.45), (1975.5, 0.6, 0.35), (2637, 0.25, 0.2), (659.3, 0.3, 0.6)]:
-        x += a * np.sin(2 * np.pi * f * t) * env(len(t), 0.002, tau)
-    return x * (1 + 0.04 * np.sin(2 * np.pi * 6 * t))
-
-
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     save("pop.wav", pop())
     save("tick.wav", tick(), 0.7)
     save("swish.wav", swish(), 0.7)
     save("click.wav", click(), 0.8)
-    save("chime.wav", chime(), 0.8)
     print("wrote", sorted(f for f in os.listdir(OUT) if f.endswith(".wav")))
