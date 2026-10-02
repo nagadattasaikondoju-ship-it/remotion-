@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>AI Voice Agent Reel</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      :root {
+        --yellow: #ffd60a;
+        --red: #ff453a;
+        --green: #30d158;
+        --blue: #3b82f6;
+        --violet: #7c6cff;
+        --ink: #0d0f14;
+        --ol4: 4px 0 #000, -4px 0 #000, 0 4px #000, 0 -4px #000, 2.8px 2.8px #000, -2.8px 2.8px #000, 2.8px -2.8px #000,
+          -2.8px -2.8px #000, 3.7px 1.5px #000, -3.7px 1.5px #000, 3.7px -1.5px #000, -3.7px -1.5px #000, 1.5px 3.7px #000,
+          -1.5px 3.7px #000, 1.5px -3.7px #000, -1.5px -3.7px #000, 0 8px 14px rgba(0, 0, 0, 0.5);
+        --ol5: 5px 0 #000, -5px 0 #000, 0 5px #000, 0 -5px #000, 3.5px 3.5px #000, -3.5px 3.5px #000, 3.5px -3.5px #000,
+          -3.5px -3.5px #000, 4.6px 1.9px #000, -4.6px 1.9px #000, 4.6px -1.9px #000, -4.6px -1.9px #000, 1.9px 4.6px #000,
+          -1.9px 4.6px #000, 1.9px -4.6px #000, -1.9px -4.6px #000, 0 10px 16px rgba(0, 0, 0, 0.5);
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0b0c10; }
+      #root {
+        position: relative; width: 100%; height: 100%; overflow: hidden;
+        font-family: "Liberation Sans", Arial, "Helvetica Neue", Helvetica, sans-serif; color: #fff;
+      }
+      .abs { position: absolute; }
+
+      /* ---------- footage: #grade (colour hook) > #punch (key-word punch-ins) > #cam (cut framing + slow push) ---------- */
+      #grade, #punch, #cam { position: absolute; inset: 0; }
+      #punch { transform-origin: 50% 20%; }
+      #cam { transform-origin: 50% 15%; }
+      #cam video { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }
+      #shade {
+        position: absolute; left: 0; right: 0; bottom: 0; height: 900px;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0));
+      }
+      #flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+
+      /* ---------- top zone: hook + b-roll graphics ---------- */
+      .zone { position: absolute; left: 70px; top: 128px; width: 940px; height: 270px; }
+      #hook { text-align: center; }
+      #hookPill {
+        display: inline-block; background: var(--yellow); color: #000; font-weight: 900; font-size: 27px; letter-spacing: 4px;
+        padding: 9px 24px; border-radius: 40px; margin-bottom: 12px;
+      }
+      #hookTitle { font-weight: 900; font-size: 94px; line-height: 0.98; text-transform: uppercase; text-shadow: var(--ol5); }
+      #hookTitle .y { color: var(--yellow); }
+      .card {
+        position: absolute; left: 0; top: 0; width: 940px; height: 250px; border-radius: 44px; padding: 26px 34px;
+        background: rgba(14, 16, 22, 0.82); border: 2px solid rgba(255, 255, 255, 0.16);
+        box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45); display: flex; align-items: center; gap: 30px;
+      }
+      .h1 { font-weight: 900; font-size: 58px; line-height: 1.04; }
+      .sub { font-weight: 700; font-size: 34px; color: #b9bfcc; margin-top: 8px; }
+
+      /* missed call */
+      .avatar { position: relative; width: 150px; height: 150px; flex: none; }
+      .avatar .disc { position: absolute; inset: 0; border-radius: 50%; background: #3a3f4d; display: flex; align-items: center; justify-content: center; }
+      .ring { position: absolute; inset: 0; border-radius: 50%; border: 5px solid var(--green); opacity: 0; }
+      #callA, #callB { position: absolute; left: 0; top: 0; width: 100%; white-space: nowrap; }
+      #callTxt { position: relative; flex: 1; height: 150px; }
+      #callA .h1 { color: #fff; } #callB .h1 { color: var(--red); }
+      #badge { margin-left: auto; background: var(--red); color: #fff; font-weight: 900; font-size: 44px; padding: 14px 24px; border-radius: 30px; flex: none; }
+
+      /* equation */
+      #cEq { justify-content: center; gap: 22px; }
+      .chip { font-weight: 900; font-size: 40px; padding: 22px 28px; border-radius: 26px; white-space: nowrap; }
+      .chip.r { background: var(--red); color: #fff; } .chip.y { background: var(--yellow); color: #000; }
+      .eq { font-weight: 900; font-size: 64px; color: #fff; }
+
+      /* AI voice agent */
+      #wave { display: flex; align-items: center; gap: 8px; height: 170px; width: 360px; flex: none; }
+      #wave i { display: block; width: 12px; height: 30px; border-radius: 8px; background: linear-gradient(var(--violet), var(--blue)); }
+      #cAI .h1 { font-size: 54px; }
+      .live { display: inline-flex; align-items: center; gap: 10px; font-weight: 900; font-size: 28px; color: var(--green); margin-top: 10px; }
+      .live b { width: 18px; height: 18px; border-radius: 50%; background: var(--green); display: block; }
+
+      /* chat */
+      #cChat { flex-direction: column; align-items: stretch; justify-content: center; gap: 14px; }
+      .bub { font-weight: 800; font-size: 40px; padding: 16px 28px; border-radius: 30px; max-width: 640px; }
+      .bub.c { background: #3a3f4d; align-self: flex-start; border-bottom-left-radius: 8px; }
+      .bub.a { background: var(--blue); align-self: flex-end; border-bottom-right-radius: 8px; }
+      #bolt { position: absolute; right: 34px; top: 24px; background: var(--yellow); color: #000; font-weight: 900; font-size: 30px; padding: 10px 20px; border-radius: 26px; display: flex; gap: 8px; align-items: center; }
+
+      /* checklist */
+      #cList { flex-direction: column; align-items: stretch; justify-content: center; gap: 10px; padding: 18px 34px; height: 262px; background: rgba(14, 16, 22, 0.85); }
+      .row { display: flex; align-items: center; gap: 22px; font-weight: 900; font-size: 46px; }
+      .row .ck { width: 56px; height: 56px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; flex: none; }
+
+      /* clock */
+      #cClock .time { font-weight: 900; font-size: 112px; line-height: 1; letter-spacing: -2px; }
+      #cClock .time small { font-size: 52px; letter-spacing: 0; color: #b9bfcc; margin-left: 8px; }
+
+      /* CTA */
+      #cCta { background: none; border: none; box-shadow: none; flex-direction: column; justify-content: center; gap: 14px; padding: 0; }
+      #pill {
+        background: var(--yellow); color: #000; font-weight: 900; font-size: 72px; border-radius: 80px; padding: 26px 56px;
+        display: flex; align-items: center; gap: 22px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+      }
+      #ctaSub { font-weight: 900; font-size: 46px; text-shadow: var(--ol4); text-align: center; }
+
+      /* ---------- captions: word-by-word kinetic, lower third ---------- */
+      #cap { position: absolute; left: 0; top: 1318px; width: 1080px; height: 260px; }
+      .chunk { position: absolute; left: 0; top: 0; width: 1080px; text-align: center; }
+      .line { display: block; font-weight: 900; font-size: 86px; line-height: 1.04; text-transform: uppercase; white-space: nowrap; }
+      .word { display: inline-block; margin: 0 12px; color: #fff; text-shadow: var(--ol5); will-change: transform; }
+      .word.k { color: var(--yellow); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="21.0667" data-width="1080" data-height="1920">
+      <!-- PICTURE: one pre-cut take (scripts/build_cut.py) -->
+      <div id="grade"><div id="punch"><div id="cam">
+        <video id="take" src="assets/cut.mp4" data-start="0" data-duration="21.0667" data-media-start="0" data-track-index="0" muted playsinline></video>
+      </div></div></div>
+      <div id="shade"></div>
+
+      <!-- HOOK (0-2.7 s): who it is for + the stakes, readable with sound off -->
+      <div class="zone" id="hook">
+        <div id="hookPill">FOR BUSINESS OWNERS</div>
+        <div id="hookTitle"><div>MISSED CALLS =</div><div class="y">LOST MONEY</div></div>
+      </div>
+
+      <!-- b-roll graphics (top zone, each under ~3 s, only on the beats that lose people) -->
+      <div class="zone">
+        <div class="card" id="cMiss">
+          <div class="avatar"><span class="ring"></span><span class="ring"></span>
+            <div class="disc"><svg width="76" height="76" viewBox="0 0 24 24" fill="#fff"><path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg></div></div>
+          <div id="callTxt">
+            <div id="callA"><div class="h1">Incoming call…</div><div class="sub">Customer · your business line</div></div>
+            <div id="callB"><div class="h1">Missed call</div><div class="sub">Nobody picked up</div></div>
+          </div>
+          <div id="badge">3 missed</div>
+        </div>
+
+        <div class="card" id="cEq">
+          <div class="chip r" id="eq1">MISSED CALL</div><div class="eq" id="eqSign">=</div><div class="chip y" id="eq2">MISSED CUSTOMER</div>
+        </div>
+
+        <div class="card" id="cAI">
+          <div id="wave"></div>
+          <div><div class="h1">AI VOICE AGENT</div><div class="sub">Answers every single call</div><div class="live"><b id="liveDot"></b>LIVE 24/7</div></div>
+        </div>
+
+        <div class="card" id="cChat">
+          <div class="bub c" id="b1">Can I book for tomorrow?</div>
+          <div class="bub a" id="b2">Yes! 4 PM works for you.</div>
+          <div id="bolt"><svg width="26" height="26" viewBox="0 0 24 24" fill="#000"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>INSTANT</div>
+        </div>
+
+        <div class="card" id="cList">
+          <div class="row" id="r1"><span class="ck"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6"/></svg></span>Qualify leads</div>
+          <div class="row" id="r2"><span class="ck"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6"/></svg></span>Book appointments</div>
+          <div class="row" id="r3"><span class="ck"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6"/></svg></span>Answer common questions</div>
+        </div>
+
+        <div class="card" id="cClock">
+          <svg width="170" height="170" viewBox="0 0 100 100" style="flex:none">
+            <circle cx="50" cy="50" r="46" fill="#1b2030" stroke="#7c6cff" stroke-width="5"/>
+            <g id="hHand" style="transform-origin:50px 50px"><rect x="47.5" y="22" width="5" height="30" rx="2.5" fill="#fff"/></g>
+            <g id="mHand" style="transform-origin:50px 50px"><rect x="48.5" y="10" width="3" height="42" rx="1.5" fill="#ffd60a"/></g>
+            <circle cx="50" cy="50" r="4.5" fill="#fff"/>
+          </svg>
+          <div><div class="time">11:47<small>PM</small></div><div class="live" style="font-size:34px"><b id="liveDot2"></b>AI is still picking up</div></div>
+        </div>
+
+        <div class="card" id="cCta">
+          <div id="pill"><span>COMMENT “VOICE”</span>
+            <svg id="arrow" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+          <div id="ctaSub">free demo, straight to your DMs</div>
+        </div>
+      </div>
+
+      <!-- captions -->
+      <div id="cap"></div>
+      <div id="flash"></div>
+
+      <!-- AUDIO: cleaned voice, ducked music bed, SFX -->
+      <audio id="voice" src="assets/audio/voice.wav" data-start="0" data-duration="21.0667" data-media-start="0" data-track-index="10" data-volume="1"></audio>
+      <audio id="bed" src="assets/audio/bed.wav" data-start="0" data-duration="21.0667" data-media-start="0" data-track-index="8" data-volume="1"></audio>
+      <audio id="sfx-1" src="assets/audio/impact.wav" data-start="0.0" data-duration="0.9" data-track-index="11" data-volume="0.7"></audio>
+      <audio id="sfx-2" src="assets/audio/whoosh-down.wav" data-start="2.62" data-duration="0.35" data-track-index="11" data-volume="0.3"></audio>
+      <audio id="sfx-3" src="assets/audio/whoosh.wav" data-start="2.78" data-duration="0.4" data-track-index="12" data-volume="0.28"></audio>
+      <audio id="sfx-4" src="assets/audio/pop.wav" data-start="2.86" data-duration="0.14" data-track-index="13" data-volume="0.5"></audio>
+      <audio id="sfx-5" src="assets/audio/missed.wav" data-start="3.5" data-duration="0.7" data-track-index="11" data-volume="0.5"></audio>
+      <audio id="sfx-6" src="assets/audio/impact.wav" data-start="2.957" data-duration="0.9" data-track-index="14" data-volume="0.4"></audio>
+      <audio id="sfx-7" src="assets/audio/whoosh.wav" data-start="3.84" data-duration="0.4" data-track-index="12" data-volume="0.28"></audio>
+      <audio id="sfx-8" src="assets/audio/pop.wav" data-start="3.97" data-duration="0.14" data-track-index="13" data-volume="0.5"></audio>
+      <audio id="sfx-9" src="assets/audio/pop.wav" data-start="5.487" data-duration="0.14" data-track-index="11" data-volume="0.55"></audio>
+      <audio id="sfx-10" src="assets/audio/impact.wav" data-start="5.467" data-duration="0.9" data-track-index="12" data-volume="0.4"></audio>
+      <audio id="sfx-11" src="assets/audio/whoosh.wav" data-start="5.98" data-duration="0.4" data-track-index="11" data-volume="0.3"></audio>
+      <audio id="sfx-12" src="assets/audio/pop.wav" data-start="6.43" data-duration="0.14" data-track-index="11" data-volume="0.5"></audio>
+      <audio id="sfx-13" src="assets/audio/pop.wav" data-start="7.01" data-duration="0.14" data-track-index="11" data-volume="0.5"></audio>
+      <audio id="sfx-14" src="assets/audio/whoosh.wav" data-start="8.7" data-duration="0.4" data-track-index="11" data-volume="0.28"></audio>
+      <audio id="sfx-15" src="assets/audio/pop.wav" data-start="9.0" data-duration="0.14" data-track-index="12" data-volume="0.5"></audio>
+      <audio id="sfx-16" src="assets/audio/pop.wav" data-start="9.95" data-duration="0.14" data-track-index="11" data-volume="0.5"></audio>
+      <audio id="sfx-17" src="assets/audio/impact.wav" data-start="11.05" data-duration="0.9" data-track-index="11" data-volume="0.4"></audio>
+      <audio id="sfx-18" src="assets/audio/whoosh.wav" data-start="11.62" data-duration="0.4" data-track-index="12" data-volume="0.28"></audio>
+      <audio id="sfx-19" src="assets/audio/ding.wav" data-start="12.453" data-duration="0.5" data-track-index="11" data-volume="0.45"></audio>
+      <audio id="sfx-20" src="assets/audio/ding.wav" data-start="13.097" data-duration="0.5" data-track-index="11" data-volume="0.45"></audio>
+      <audio id="sfx-21" src="assets/audio/ding.wav" data-start="14.657" data-duration="0.5" data-track-index="11" data-volume="0.45"></audio>
+      <audio id="sfx-22" src="assets/audio/whoosh.wav" data-start="15.02" data-duration="0.4" data-track-index="12" data-volume="0.28"></audio>
+      <audio id="sfx-23" src="assets/audio/tock.wav" data-start="15.3" data-duration="0.09" data-track-index="11" data-volume="0.4"></audio>
+      <audio id="sfx-24" src="assets/audio/tock.wav" data-start="15.6" data-duration="0.09" data-track-index="11" data-volume="0.4"></audio>
+      <audio id="sfx-25" src="assets/audio/tock.wav" data-start="15.9" data-duration="0.09" data-track-index="11" data-volume="0.4"></audio>
+      <audio id="sfx-26" src="assets/audio/whoosh-down.wav" data-start="17.2" data-duration="0.35" data-track-index="11" data-volume="0.25"></audio>
+      <audio id="sfx-27" src="assets/audio/impact.wav" data-start="18.77" data-duration="0.9" data-track-index="11" data-volume="0.5"></audio>
+      <audio id="sfx-28" src="assets/audio/chime.wav" data-start="18.857" data-duration="1.1" data-track-index="12" data-volume="0.55"></audio>
+      <audio id="sfx-29" src="assets/audio/impact.wav" data-start="20.347" data-duration="0.9" data-track-index="11" data-volume="0.45"></audio>
+    </div>
+
+    <script>
+      const D = {"chunks": [{"lines": [[{"w": "HOW", "t": 0.177, "k": false}, {"w": "MANY", "t": 0.397, "k": false}, {"w": "CUSTOMERS", "t": 0.697, "k": true}]], "t0": 0.177, "t1": 1.217}, {"lines": [[{"w": "ARE", "t": 1.237, "k": false}, {"w": "CALLING", "t": 1.367, "k": false}], [{"w": "YOUR", "t": 1.737, "k": false}, {"w": "BUSINESS", "t": 1.837, "k": false}]], "t0": 1.237, "t1": 2.217}, {"lines": [[{"w": "RIGHT", "t": 2.237, "k": false}, {"w": "NOW", "t": 2.447, "k": false}]], "t0": 2.237, "t1": 2.797}, {"lines": [[{"w": "AND", "t": 2.817, "k": false}, {"w": "NOBODY'S", "t": 2.977, "k": true}], [{"w": "PICKING", "t": 3.387, "k": false}, {"w": "UP", "t": 3.687, "k": false}]], "t0": 2.817, "t1": 3.953}, {"lines": [[{"w": "THAT", "t": 3.973, "k": false}, {"w": "MISSED", "t": 4.273, "k": true}, {"w": "CALL", "t": 4.493, "k": false}]], "t0": 3.973, "t1": 4.743}, {"lines": [[{"w": "COULD", "t": 4.763, "k": false}, {"w": "BE", "t": 4.927, "k": false}, {"w": "A", "t": 5.147, "k": false}], [{"w": "MISSED", "t": 5.177, "k": true}, {"w": "CUSTOMER", "t": 5.487, "k": true}]], "t0": 4.763, "t1": 6.037}, {"lines": [[{"w": "WE", "t": 6.14, "k": false}, {"w": "BUILD", "t": 6.43, "k": false}, {"w": "AI", "t": 6.74, "k": false}], [{"w": "VOICE", "t": 7.01, "k": true}, {"w": "AGENTS", "t": 7.35, "k": true}]], "t0": 6.14, "t1": 7.76}, {"lines": [[{"w": "THAT", "t": 7.78, "k": false}, {"w": "CAN", "t": 7.97, "k": false}], [{"w": "ANSWER", "t": 8.1, "k": false}, {"w": "CALLS", "t": 8.41, "k": false}]], "t0": 7.78, "t1": 8.77}, {"lines": [[{"w": "AND", "t": 8.79, "k": false}, {"w": "UNDERSTAND", "t": 8.88, "k": false}]], "t0": 8.79, "t1": 9.28}, {"lines": [[{"w": "WHAT", "t": 9.3, "k": false}, {"w": "THE", "t": 9.6, "k": false}], [{"w": "CUSTOMER", "t": 9.66, "k": false}, {"w": "NEEDS", "t": 10.14, "k": false}]], "t0": 9.3, "t1": 10.49}, {"lines": [[{"w": "AND", "t": 10.51, "k": false}, {"w": "RESPOND", "t": 10.67, "k": false}], [{"w": "INSTANTLY", "t": 11.07, "k": true}]], "t0": 10.51, "t1": 11.62}, {"lines": [[{"w": "THEY", "t": 11.723, "k": false}, {"w": "CAN", "t": 11.803, "k": false}, {"w": "QUALIFY", "t": 12.003, "k": false}], [{"w": "LEADS", "t": 12.453, "k": true}]], "t0": 11.723, "t1": 12.827}, {"lines": [[{"w": "BOOK", "t": 12.847, "k": false}], [{"w": "APPOINTMENTS", "t": 13.077, "k": true}]], "t0": 12.847, "t1": 13.627}, {"lines": [[{"w": "AND", "t": 13.717, "k": false}, {"w": "HANDLE", "t": 13.897, "k": false}], [{"w": "COMMON", "t": 14.307, "k": false}, {"w": "QUESTIONS", "t": 14.637, "k": true}]], "t0": 13.717, "t1": 15.117}, {"lines": [[{"w": "EVEN", "t": 15.137, "k": false}, {"w": "AFTER", "t": 15.497, "k": false}, {"w": "HOURS", "t": 15.847, "k": true}]], "t0": 15.137, "t1": 16.27}, {"lines": [[{"w": "YOUR", "t": 16.29, "k": false}, {"w": "BUSINESS", "t": 16.52, "k": false}], [{"w": "SHOULDN'T", "t": 17.16, "k": false}, {"w": "STOP", "t": 17.44, "k": false}]], "t0": 16.29, "t1": 17.69}, {"lines": [[{"w": "ANSWERING", "t": 17.71, "k": false}, {"w": "WHEN", "t": 18.04, "k": false}], [{"w": "YOU", "t": 18.17, "k": false}, {"w": "GO", "t": 18.31, "k": false}, {"w": "HOME", "t": 18.52, "k": true}]], "t0": 17.71, "t1": 18.837}, {"lines": [[{"w": "COMMENT", "t": 18.857, "k": false}, {"w": "VOICE", "t": 19.157, "k": true}]], "t0": 18.857, "t1": 19.577}, {"lines": [[{"w": "AND", "t": 19.597, "k": false}, {"w": "I'LL", "t": 19.837, "k": false}, {"w": "SEND", "t": 20.007, "k": false}, {"w": "YOU", "t": 20.187, "k": false}], [{"w": "THE", "t": 20.287, "k": false}, {"w": "DEMO", "t": 20.367, "k": true}]], "t0": 19.597, "t1": 21.067}], "cam": [{"id": "hook-a", "t": 0.0, "d": 2.7}, {"id": "hook-b", "t": 2.7, "d": 1.1666666666666667}, {"id": "miss-a", "t": 3.8666666666666667, "d": 0.9333333333333333}, {"id": "miss-b", "t": 4.8, "d": 1.2333333333333334}, {"id": "build", "t": 6.033333333333333, "d": 5.6}, {"id": "does-a", "t": 11.633333333333333, "d": 1.2}, {"id": "does-b", "t": 12.833333333333334, "d": 3.4}, {"id": "home", "t": 16.233333333333334, "d": 2.533333333333333}, {"id": "cta", "t": 18.766666666666666, "d": 2.3}], "total": 21.066666666666666};
+      const tl = gsap.timeline({ paused: true });
+      const POP = "back.out(2.2)";
+      const T = {
+        nobody: 2.977, up: 3.687, customer: 5.487, voice: 7.010, instantly: 11.070,
+        qualify: 12.453, book: 13.077, questions: 14.637, comment: 18.857, demo: 20.367,
+      };
+
+      /* ---------- captions: build DOM from the word map ---------- */
+      const cap = document.getElementById("cap");
+      D.chunks.forEach((c, ci) => {
+        const el = document.createElement("div");
+        el.className = "chunk";
+        el.id = "ch" + ci;
+        c.lines.forEach((ln) => {
+          const l = document.createElement("span");
+          l.className = "line";
+          ln.forEach((w) => {
+            const s = document.createElement("span");
+            s.className = "word" + (w.k ? " k" : "");
+            s.textContent = w.w;
+            l.appendChild(s);
+          });
+          el.appendChild(l);
+        });
+        cap.appendChild(el);
+      });
+      gsap.set(".chunk", { autoAlpha: 0 });
+      gsap.set(".word", { opacity: 0 });
+      D.chunks.forEach((c, ci) => {
+        const words = document.querySelectorAll("#ch" + ci + " .word");
+        tl.set("#ch" + ci, { autoAlpha: 1 }, c.t0);
+        let n = 0;
+        c.lines.forEach((ln) => ln.forEach((w) => {
+          const el = words[n++];
+          tl.fromTo(el, { opacity: 0, scale: 0.55, y: 22 }, { opacity: 1, scale: 1, y: 0, duration: 0.15, ease: "back.out(2.6)", immediateRender: false }, w.t);
+          if (w.k) tl.fromTo(el, { scale: 1.16 }, { scale: 1, duration: 0.22, ease: "power2.out", immediateRender: false }, w.t + 0.15);
+        }));
+        tl.set("#ch" + ci, { autoAlpha: 0 }, c.t1);
+      });
+
+      /* ---------- camera: alternate framing on every cut (hides the jump) + slow crop push ---------- */
+      D.cam.forEach((s, i) => {
+        const odd = i % 2 === 1;
+        const from = odd ? 1.12 : 1.0;
+        const to = odd ? 1.14 : (s.d > 4 ? 1.07 : 1.04);
+        tl.fromTo("#cam", { scale: from }, { scale: to, duration: s.d, ease: "none", immediateRender: false }, s.t);
+      });
+      /* punch-ins (15-25 %) on the four lines that matter, then ease back */
+      [[T.nobody - 0.02, 1.18], [T.customer - 0.02, 1.2], [T.instantly - 0.02, 1.16], [T.demo - 0.02, 1.2]].forEach(([t, k]) => {
+        tl.fromTo("#punch", { scale: 1 }, { scale: k, duration: 0.12, ease: "power3.out", immediateRender: false }, t);
+        tl.to("#punch", { scale: 1, duration: 0.55, ease: "power2.inOut" }, t + 0.55);
+      });
+
+      /* ---------- colour hook: monochrome -> vibrant, + 2-frame flash on the CTA ---------- */
+      tl.fromTo("#grade", { filter: "grayscale(1) contrast(1.18)" }, { filter: "grayscale(0) contrast(1)", duration: 0.5, ease: "power1.out" }, 0);
+      tl.fromTo("#flash", { opacity: 0.85 }, { opacity: 0, duration: 0.07, ease: "none", immediateRender: false }, 18.77);
+
+      /* ---------- hook ---------- */
+      tl.fromTo("#hookTitle", { scale: 1.28 }, { scale: 1, duration: 0.26, ease: "power4.out" }, 0);
+      tl.fromTo("#hookPill", { y: -20, scale: 0.9 }, { y: 0, scale: 1, duration: 0.2, ease: POP }, 0.04);
+      tl.fromTo("#hookTitle .y", { scale: 1 }, { scale: 1.1, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, 0.5);
+      tl.to("#hook", { autoAlpha: 0, y: -40, duration: 0.16, ease: "power2.in" }, 2.62);
+
+      /* ---------- cards ---------- */
+      gsap.set(".card", { autoAlpha: 0 });
+      const cardIn = (id, t) => tl.fromTo(id, { autoAlpha: 0, y: -34, scale: 0.9 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.24, ease: POP, immediateRender: false }, t);
+      const cardOut = (id, t) => tl.to(id, { autoAlpha: 0, y: -22, scale: 0.96, duration: 0.14, ease: "power2.in" }, t);
+
+      /* missed call (2.82 - 3.92) */
+      gsap.set("#callB", { autoAlpha: 0 }); gsap.set("#badge", { autoAlpha: 0, scale: 0.5 });
+      cardIn("#cMiss", 2.82);
+      tl.fromTo(".ring", { scale: 1, opacity: 0.7 }, { scale: 1.8, opacity: 0, duration: 0.42, repeat: 1, ease: "power1.out", stagger: 0.16, immediateRender: false }, 2.9);
+      tl.set("#callA", { autoAlpha: 0 }, T.up - 0.05);
+      tl.set("#callB", { autoAlpha: 1 }, T.up - 0.05);
+      tl.fromTo("#badge", { autoAlpha: 0, scale: 0.5 }, { autoAlpha: 1, scale: 1, duration: 0.2, ease: POP, immediateRender: false }, T.up - 0.03);
+      cardOut("#cMiss", 3.84);
+
+      /* missed call = missed customer (3.95 - 5.95) */
+      gsap.set("#eqSign", { autoAlpha: 0 }); gsap.set("#eq2", { autoAlpha: 0, scale: 0.6 });
+      cardIn("#cEq", 3.95);
+      tl.fromTo("#eq1", { scale: 0.6 }, { scale: 1, duration: 0.2, ease: POP, immediateRender: false }, 4.0);
+      tl.fromTo("#eqSign", { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.18, ease: POP, immediateRender: false }, 4.6);
+      tl.fromTo("#eq2", { autoAlpha: 0, scale: 1.5 }, { autoAlpha: 1, scale: 1, duration: 0.22, ease: "power3.out", immediateRender: false }, T.customer - 0.02);
+      cardOut("#cEq", 5.9);
+
+      /* AI voice agent (6.1 - 8.7): live waveform */
+      const wave = document.getElementById("wave");
+      const bars = [];
+      for (let i = 0; i < 24; i++) { const b = document.createElement("i"); wave.appendChild(b); bars.push(b); }
+      gsap.set(bars, { height: 26 });
+      cardIn("#cAI", 6.1);
+      bars.forEach((b, i) => {
+        const dd = 0.16 + ((i * 37) % 11) * 0.018;
+        const reps = Math.floor(2.5 / dd) - 1;
+        tl.fromTo(b, { height: 24 }, { height: 40 + ((i * 53) % 9) * 14, duration: dd, repeat: reps % 2 ? reps : reps - 1, yoyo: true, ease: "sine.inOut", immediateRender: false }, 6.15 + i * 0.012);
+      });
+      tl.fromTo("#liveDot", { opacity: 1 }, { opacity: 0.25, duration: 0.3, repeat: 7, yoyo: true, ease: "sine.inOut", immediateRender: false }, 6.2);
+      cardOut("#cAI", 8.66);
+
+      /* understands + responds instantly (8.75 - 11.6) */
+      gsap.set("#b1, #b2", { autoAlpha: 0 }); gsap.set("#bolt", { autoAlpha: 0, scale: 0.4 });
+      cardIn("#cChat", 8.75);
+      tl.fromTo("#b1", { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.22, ease: POP, immediateRender: false }, 9.0);
+      tl.fromTo("#b2", { autoAlpha: 0, x: 40 }, { autoAlpha: 1, x: 0, duration: 0.22, ease: POP, immediateRender: false }, 9.95);
+      tl.fromTo("#bolt", { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.2, ease: POP, immediateRender: false }, T.instantly - 0.02);
+      cardOut("#cChat", 11.56);
+
+      /* the list: qualify leads / book appointments / questions (11.65 - 15.05) */
+      gsap.set("#r1, #r2, #r3", { autoAlpha: 0, x: -50 });
+      cardIn("#cList", 11.65);
+      [["#r1", T.qualify], ["#r2", T.book], ["#r3", T.questions]].forEach(([id, t]) => {
+        tl.fromTo(id, { autoAlpha: 0, x: -50 }, { autoAlpha: 1, x: 0, duration: 0.22, ease: POP, immediateRender: false }, t - 0.05);
+        tl.fromTo(id + " .ck", { scale: 0.3 }, { scale: 1, duration: 0.22, ease: POP, immediateRender: false }, t + 0.06);
+      });
+      cardOut("#cList", 15.0);
+
+      /* after hours (15.1 - 17.2) */
+      cardIn("#cClock", 15.1);
+      tl.fromTo("#mHand", { rotation: 280 }, { rotation: 282 + 72, duration: 1.9, ease: "power1.inOut", immediateRender: false }, 15.15);
+      gsap.set("#hHand", { rotation: 330 });
+      tl.fromTo("#liveDot2", { opacity: 1 }, { opacity: 0.25, duration: 0.3, repeat: 5, yoyo: true, ease: "sine.inOut", immediateRender: false }, 15.2);
+      cardOut("#cClock", 17.14);
+
+      /* CTA: stays to the last frame */
+      gsap.set("#pill, #ctaSub", { autoAlpha: 0 });
+      tl.fromTo("#cCta", { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01, immediateRender: false }, T.comment - 0.12);
+      tl.fromTo("#pill", { autoAlpha: 0, y: 40, scale: 0.7 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.3, ease: "back.out(2.4)", immediateRender: false }, T.comment - 0.1);
+      tl.fromTo("#ctaSub", { autoAlpha: 0, y: 20 }, { autoAlpha: 1, y: 0, duration: 0.25, ease: "power2.out", immediateRender: false }, T.comment + 0.5);
+      tl.fromTo("#arrow", { x: 0 }, { x: 12, duration: 0.28, repeat: 5, yoyo: true, ease: "sine.inOut", immediateRender: false }, T.comment + 0.4);
+      tl.fromTo("#pill", { scale: 1 }, { scale: 1.1, duration: 0.14, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, T.demo - 0.02);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
