@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./assets/vendor/three.module.js",
+          "three/addons/": "./assets/vendor/jsm/"
+        }
+      }
+    </script>
+    <style>
+      :root {
+        --bg: #000000;
+        --fg: #f5f5f7;
+        --mute: #86868b;
+        --accent: #8fb3ff; /* cool night-sky blue, from the "night sky" finish */
+        --warm: #e8e3da; /* star white titanium */
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--bg);
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: var(--bg);
+        font-family: Inter, "Helvetica Neue", Helvetica, sans-serif;
+        color: var(--fg);
+      }
+      .layer {
+        position: absolute;
+        inset: 0;
+      }
+      #glow {
+        background: radial-gradient(ellipse 40% 60% at 72% 52%, rgba(95, 120, 190, 0.22) 0%, rgba(0, 0, 0, 0) 70%);
+      }
+      #three-layer {
+        position: absolute;
+        inset: 0;
+        width: 1920px;
+        height: 1080px;
+        display: block;
+      }
+      .center {
+        position: absolute;
+        left: 140px;
+        width: 900px;
+        text-align: left;
+      }
+      .mid {
+        left: 0 !important;
+        width: 1920px !important;
+        text-align: center !important;
+      }
+      .t-xl {
+        font-size: 168px;
+        font-weight: 900;
+        letter-spacing: -0.05em;
+        line-height: 1;
+      }
+      .t-l {
+        font-size: 112px;
+        font-weight: 900;
+        letter-spacing: -0.045em;
+        line-height: 1.02;
+      }
+      .t-m {
+        font-size: 64px;
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+      }
+      .t-s {
+        font-size: 40px;
+        font-weight: 400;
+        letter-spacing: -0.01em;
+        line-height: 1.3;
+        color: var(--mute);
+      }
+      .shine {
+        background: linear-gradient(100deg, #f5f5f7 0%, #f5f5f7 44%, #ffffff 49%, #bcd0ff 52%, #6e6e73 58%, #6e6e73 100%);
+        background-size: 300% 100%;
+        background-position: 100% 0;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .ti {
+        display: inline-block;
+      }
+      .num {
+        font-variant-numeric: tabular-nums;
+      }
+      /* chip card */
+      #chip {
+        position: absolute;
+        left: 300px;
+        top: 360px;
+        width: 400px;
+        height: 400px;
+        border-radius: 56px;
+        background: linear-gradient(145deg, #2c2c2e 0%, #0b0b0c 100%);
+        box-shadow:
+          0 0 0 2px rgba(255, 255, 255, 0.08) inset,
+          0 0 120px rgba(143, 179, 255, 0.35),
+          0 40px 80px rgba(0, 0, 0, 0.8);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      #chip .brand {
+        font-size: 52px;
+        font-weight: 700;
+        color: #d1d1d6;
+        letter-spacing: -0.02em;
+      }
+      #chip .model {
+        font-size: 120px;
+        font-weight: 900;
+        letter-spacing: -0.05em;
+        line-height: 1;
+      }
+      .pins {
+        position: absolute;
+        inset: -26px;
+        border-radius: 72px;
+        border: 6px dashed rgba(200, 200, 210, 0.25);
+      }
+      .stat {
+        position: absolute;
+        left: 1000px;
+        width: 780px;
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        border-top: 2px solid rgba(255, 255, 255, 0.14);
+        padding-top: 22px;
+      }
+      .stat .v {
+        font-size: 96px;
+        font-weight: 900;
+        letter-spacing: -0.04em;
+      }
+      .stat .k {
+        font-size: 40px;
+        font-weight: 500;
+        color: var(--mute);
+      }
+      /* camera rings */
+      .ring {
+        position: absolute;
+        border-radius: 50%;
+        border: 3px solid rgba(143, 179, 255, 0.55);
+      }
+      /* battery */
+      #batt {
+        position: absolute;
+        left: 660px;
+        top: 560px;
+        width: 600px;
+        height: 150px;
+        border-radius: 40px;
+        border: 5px solid rgba(255, 255, 255, 0.6);
+        padding: 14px;
+      }
+      #batt::after {
+        content: "";
+        position: absolute;
+        right: -26px;
+        top: 50px;
+        width: 14px;
+        height: 50px;
+        border-radius: 0 8px 8px 0;
+        background: rgba(255, 255, 255, 0.6);
+      }
+      #batt-fill {
+        width: 100%;
+        height: 100%;
+        border-radius: 26px;
+        background: linear-gradient(90deg, #34c759, #9cf29a);
+        transform-origin: 0 50%;
+      }
+      #legal {
+        position: absolute;
+        left: 0;
+        bottom: 40px;
+        width: 1920px;
+        text-align: center;
+        font-size: 24px;
+        color: #6e6e73;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="30" data-width="1920" data-height="1080">
+      <div id="glow" class="layer"></div>
+      <canvas id="three-layer" width="1920" height="1080"></canvas>
+
+      <!-- S1 0–3 · intro -->
+      <div id="s1" class="clip layer" data-start="0" data-duration="3" data-track-index="1">
+        <div id="s1-intro" class="center t-s" style="top: 500px; color: #a1a1a6">Introducing</div>
+      </div>
+
+      <!-- S2 3–7 · title + unfold -->
+      <div id="s2" class="clip layer" data-start="3" data-duration="4" data-track-index="2">
+        <div id="s2-title" class="center t-xl shine" style="top: 370px">iPhone Duo</div>
+        <div id="s2-sub" class="center t-m" style="top: 570px">Our first foldable iPhone.</div>
+      </div>
+
+      <!-- S3 7–11 · two displays -->
+      <div id="s3" class="clip layer" data-start="7" data-duration="4" data-track-index="3">
+        <div class="center" style="top: 330px">
+          <div class="t-s" id="s3-lab">Closed</div>
+          <div class="t-xl num" style="margin-top: 6px"><span id="s3-num">5.4</span><span style="color: var(--mute)">″</span></div>
+        </div>
+        <div id="s3-sub" class="center t-s" style="top: 620px; color: #d1d1d6">Super Retina XDR · ProMotion · 3000 nits</div>
+      </div>
+
+      <!-- S4 11–15 · thin + titanium -->
+      <div id="s4" class="clip layer" data-start="11" data-duration="4" data-track-index="4">
+        <div class="center t-l" style="top: 330px">
+          <span class="ti s4w">Thinnest</span> <span class="ti s4w">iPhone</span>
+          <div><span class="ti s4w shine" id="s4-ever">ever.</span></div>
+        </div>
+        <div id="s4-sub" class="center t-s" style="top: 600px; width: 800px; color: #d1d1d6">Grade 5 titanium. A hinge built from 100+ parts.</div>
+      </div>
+
+      <!-- S5 15–19 · A20 Pro -->
+      <div id="s5" class="clip layer" data-start="15" data-duration="4" data-track-index="5">
+        <div id="s5-head" class="center mid t-m" style="top: 130px">Pro power. Folded.</div>
+        <div id="chip"><div class="pins"></div><div class="brand">A20</div><div class="model">Pro</div></div>
+        <div class="stat" id="st1" style="top: 360px"><span class="v num"><span id="c1">0</span>%</span><span class="k">faster CPU</span></div>
+        <div class="stat" id="st2" style="top: 510px"><span class="v num"><span id="c2">0</span>%</span><span class="k">faster GPU</span></div>
+        <div class="stat" id="st3" style="top: 660px"><span class="v num"><span id="c3">0</span>×</span><span class="k">Neural Engine</span></div>
+      </div>
+
+      <!-- S6 19–23 · camera -->
+      <div id="s6" class="clip layer" data-start="19" data-duration="4" data-track-index="6">
+        <div class="ring" id="r1" style="left: 1335px; top: 390px; width: 300px; height: 300px"></div>
+        <div class="ring" id="r2" style="left: 1235px; top: 290px; width: 500px; height: 500px"></div>
+        <div class="ring" id="r3" style="left: 1135px; top: 190px; width: 700px; height: 700px"></div>
+        <div class="center" style="top: 330px">
+          <div class="t-xl num"><span id="c4">0</span><span style="font-size: 96px">MP</span></div>
+          <div class="t-m" style="margin-top: 10px">Fusion cameras.</div>
+        </div>
+        <div id="s6-sub" class="center t-s" style="top: 640px; color: #d1d1d6">4K120 Dolby Vision. Zero shutter lag.</div>
+      </div>
+
+      <!-- S7 23–26 · battery -->
+      <div id="s7" class="clip layer" data-start="23" data-duration="3" data-track-index="7">
+        <div class="center mid" style="top: 150px">
+          <div class="t-s">Up to</div>
+          <div class="t-xl num"><span id="c5">0</span> hrs</div>
+          <div class="t-s">battery life</div>
+        </div>
+        <div id="batt"><div id="batt-fill"></div></div>
+        <div id="s7-sub" class="center mid t-m" style="top: 790px">50% in 20 min.</div>
+      </div>
+
+      <!-- S8 26–30 · end card -->
+      <div id="s8" class="clip layer" data-start="26" data-duration="4" data-track-index="8">
+        <div id="s8-title" class="center t-xl shine" style="top: 330px">iPhone Duo</div>
+        <div id="s8-line" class="center t-m" style="top: 530px">Unfold what's next.</div>
+        <div id="s8-date" class="center t-s" style="top: 630px; width: 1000px; color: #d1d1d6">Pre-order Oct 16 · Available Oct 23 · From $1,999</div>
+        <div id="legal">Unofficial explainer. Specs from apple.com.</div>
+      </div>
+
+      <!-- sound -->
+      <audio id="music" src="assets/audio/music.wav" data-start="0" data-duration="30" data-track-index="20" data-volume="0.9"></audio>
+      <audio id="sfx-whoosh-1" src="assets/audio/whoosh.wav" data-start="2.8" data-duration="0.6" data-track-index="21" data-volume="0.6"></audio>
+      <audio id="sfx-shimmer-1" src="assets/audio/shimmer.wav" data-start="3.5" data-duration="1.8" data-track-index="22" data-volume="0.45"></audio>
+      <audio id="sfx-riser" src="assets/audio/riser.wav" data-start="5.0" data-duration="2.0" data-track-index="23" data-volume="0.5"></audio>
+      <audio id="sfx-impact-1" src="assets/audio/impact.wav" data-start="7.0" data-duration="0.9" data-track-index="21" data-volume="0.8"></audio>
+      <audio id="sfx-whoosh-2" src="assets/audio/whoosh.wav" data-start="10.8" data-duration="0.6" data-track-index="22" data-volume="0.5"></audio>
+      <audio id="sfx-whoosh-3" src="assets/audio/whoosh.wav" data-start="14.8" data-duration="0.6" data-track-index="23" data-volume="0.5"></audio>
+      <audio id="sfx-tick-1" src="assets/audio/tick.wav" data-start="16.0" data-duration="0.05" data-track-index="21" data-volume="0.6"></audio>
+      <audio id="sfx-tick-2" src="assets/audio/tick.wav" data-start="16.5" data-duration="0.05" data-track-index="22" data-volume="0.6"></audio>
+      <audio id="sfx-tick-3" src="assets/audio/tick.wav" data-start="17.0" data-duration="0.05" data-track-index="23" data-volume="0.6"></audio>
+      <audio id="sfx-whoosh-4" src="assets/audio/whoosh.wav" data-start="18.8" data-duration="0.6" data-track-index="21" data-volume="0.5"></audio>
+      <audio id="sfx-whoosh-5" src="assets/audio/whoosh.wav" data-start="22.8" data-duration="0.6" data-track-index="22" data-volume="0.5"></audio>
+      <audio id="sfx-impact-2" src="assets/audio/impact.wav" data-start="26.0" data-duration="0.9" data-track-index="23" data-volume="0.8"></audio>
+      <audio id="sfx-shimmer-2" src="assets/audio/shimmer.wav" data-start="26.3" data-duration="1.8" data-track-index="24" data-volume="0.4"></audio>
+    </div>
+
+    <!-- ================= 3D: foldable phone (Three.js, rendered from HyperFrames time) ================= -->
+    <script type="module">
+      import * as THREE from "three";
+      import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+      import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+
+      const W = 1920, H = 1080;
+      const canvas = document.getElementById("three-layer");
+      const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, preserveDrawingBuffer: true });
+      renderer.setSize(W, H, false);
+      renderer.setPixelRatio(1);
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+      const scene = new THREE.Scene();
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+      const camera = new THREE.PerspectiveCamera(30, W / H, 0.1, 100);
+
+      // ---- iPhone Duo model, matched to the reference photos: book-style fold, big rounded corners,
+      //      horizontal camera plateau with two large lenses + flash, star white titanium ----
+      const w = 1.12, h = 1.6, d = 0.03, CR = 0.17;
+
+      function roundedShape(sw, sh, rr) {
+        const [tl, tr, br, bl] = Array.isArray(rr) ? rr : [rr, rr, rr, rr];
+        const s = new THREE.Shape();
+        const x = -sw / 2, y = -sh / 2;
+        s.moveTo(x + bl, y);
+        s.lineTo(x + sw - br, y);
+        s.quadraticCurveTo(x + sw, y, x + sw, y + br);
+        s.lineTo(x + sw, y + sh - tr);
+        s.quadraticCurveTo(x + sw, y + sh, x + sw - tr, y + sh);
+        s.lineTo(x + tl, y + sh);
+        s.quadraticCurveTo(x, y + sh, x, y + sh - tl);
+        s.lineTo(x, y + bl);
+        s.quadraticCurveTo(x, y, x + bl, y);
+        return s;
+      }
+      // corners rounded on the outer edge only; the hinge edge stays nearly square
+      const corners = (side, big, small) => (side < 0 ? [big, small, small, big] : [small, big, big, small]);
+      // flat rounded-rect with 0..1 UVs (optionally a horizontal slice of the texture)
+      function roundedPlane(sw, sh, rr, u0 = 0, u1 = 1) {
+        const geo = new THREE.ShapeGeometry(roundedShape(sw, sh, rr), 24);
+        const pos = geo.attributes.position, uv = geo.attributes.uv;
+        for (let i = 0; i < pos.count; i++) {
+          uv.setXY(i, u0 + ((pos.getX(i) + sw / 2) / sw) * (u1 - u0), (pos.getY(i) + sh / 2) / sh);
+        }
+        return geo;
+      }
+      function slab(sw, sh, rr, depth, bevel) {
+        const geo = new THREE.ExtrudeGeometry(roundedShape(sw, sh, rr), {
+          depth: depth - bevel * 2, bevelEnabled: true, bevelThickness: bevel, bevelSize: bevel, bevelSegments: 5, curveSegments: 28,
+        });
+        geo.translate(0, 0, -(depth - bevel * 2) / 2);
+        return geo;
+      }
+
+      const loader = new THREE.TextureLoader();
+      function tex(url) {
+        const t = loader.load(url);
+        t.colorSpace = THREE.SRGBColorSpace;
+        t.anisotropy = 8;
+        return t;
+      }
+      const innerTex = tex("assets/images/inner.jpg"); // desert-dune wallpaper from the product photo
+      const outerTex = tex("assets/images/outer.jpg"); // home screen from the product photo (with hole-punch)
+
+      const frameMat = new THREE.MeshPhysicalMaterial({ color: 0xe8e5df, metalness: 1, roughness: 0.3, clearcoat: 0.5, clearcoatRoughness: 0.2 });
+      const bezelMat = new THREE.MeshStandardMaterial({ color: 0x030303, roughness: 0.25, metalness: 0.1 });
+      const backMat = new THREE.MeshPhysicalMaterial({ color: 0xf1f0ec, metalness: 0, roughness: 0.55, clearcoat: 0.35, clearcoatRoughness: 0.5 });
+      const plateauMat = new THREE.MeshPhysicalMaterial({ color: 0xf4f3ef, metalness: 0.05, roughness: 0.3, clearcoat: 0.8, clearcoatRoughness: 0.15 });
+      const ringMat = new THREE.MeshPhysicalMaterial({ color: 0xd6d2cb, metalness: 1, roughness: 0.16 });
+      const lensMat = new THREE.MeshPhysicalMaterial({ color: 0x06070d, metalness: 0.4, roughness: 0.04, clearcoat: 1, sheen: 1, sheenColor: 0x3a4aa0 });
+      const flashMat = new THREE.MeshStandardMaterial({ color: 0xfff4d8, roughness: 0.4, emissive: 0x33301f });
+      const screenMat = (t) => new THREE.MeshBasicMaterial({ map: t, toneMapped: false });
+
+      function half(side) {
+        const g = new THREE.Group();
+        g.add(new THREE.Mesh(slab(w, h, corners(side, CR, 0.012), d, 0.008), frameMat));
+        const face = new THREE.Mesh(roundedPlane(w - 0.018, h - 0.018, corners(side, CR - 0.01, 0.006)), bezelMat);
+        face.position.z = d / 2 + 0.0006;
+        g.add(face);
+        return g;
+      }
+      // inner display page: inset on the outer edges, runs right up to the hinge (one continuous screen)
+      function innerPage(side, u0, u1) {
+        const pw = w - 0.036, ph = h - 0.07;
+        const m = new THREE.Mesh(roundedPlane(pw, ph, corners(side, CR - 0.04, 0.0), u0, u1), screenMat(innerTex));
+        m.position.set(-side * 0.018, 0, d / 2 + 0.0012);
+        return m;
+      }
+
+      // right half (fixed) — right page of the inner display, cameras on the back
+      const right = half(1);
+      right.position.set(w / 2, 0, 0);
+      right.add(innerPage(1, 0.5, 1));
+      const punch = new THREE.Mesh(new THREE.CircleGeometry(0.022, 32), bezelMat);
+      punch.position.set(w / 2 - 0.12, h / 2 - 0.12, d / 2 + 0.0018);
+      right.add(punch);
+      const back = new THREE.Mesh(roundedPlane(w - 0.018, h - 0.018, corners(-1, CR - 0.01, 0.006)), backMat);
+      back.rotation.y = Math.PI; back.position.z = -d / 2 - 0.0006;
+      right.add(back);
+      // camera plateau: horizontal pill across the top, flush to the outer edge (seen top-left from behind)
+      const PW = 0.8, PH = 0.27, PD = 0.03;
+      const plateau = new THREE.Mesh(slab(PW, PH, PH / 2, PD, 0.006), plateauMat);
+      const px = w / 2 - 0.07 - PW / 2, py = h / 2 - 0.07 - PH / 2;
+      plateau.position.set(px, py, -d / 2 - PD / 2);
+      right.add(plateau);
+      const lensZ = -d / 2 - PD;
+      for (const lx of [px + PW / 2 - 0.15, px + PW / 2 - 0.41]) {
+        const ring = new THREE.Mesh(new THREE.CylinderGeometry(0.105, 0.105, 0.03, 64), ringMat);
+        ring.rotation.x = Math.PI / 2; ring.position.set(lx, py, lensZ - 0.012);
+        const glass = new THREE.Mesh(new THREE.CylinderGeometry(0.082, 0.082, 0.032, 64), lensMat);
+        glass.rotation.x = Math.PI / 2; glass.position.set(lx, py, lensZ - 0.014);
+        right.add(ring, glass);
+      }
+      const flash = new THREE.Mesh(new THREE.CircleGeometry(0.03, 32), flashMat);
+      flash.rotation.y = Math.PI; flash.position.set(px - PW / 2 + 0.15, py + 0.05, lensZ - 0.0015);
+      const mic = new THREE.Mesh(new THREE.CircleGeometry(0.012, 24), bezelMat);
+      mic.rotation.y = Math.PI; mic.position.set(px - PW / 2 + 0.15, py - 0.06, lensZ - 0.0015);
+      right.add(flash, mic);
+
+      // left half on a hinge pivot at the right half's front edge (x=0, z=+d/2)
+      const pivot = new THREE.Group();
+      pivot.position.set(0, 0, d / 2);
+      const left = half(-1);
+      left.position.set(-w / 2, 0, -d / 2);
+      left.add(innerPage(-1, 0, 0.5));
+      // cover display on the outside of the left half
+      const coverBezel = new THREE.Mesh(roundedPlane(w - 0.018, h - 0.018, corners(1, CR - 0.01, 0.006)), bezelMat);
+      coverBezel.rotation.y = Math.PI; coverBezel.position.z = -d / 2 - 0.0006;
+      const cover = new THREE.Mesh(roundedPlane(w - 0.07, h - 0.07, corners(1, CR - 0.04, 0.03)), screenMat(outerTex));
+      cover.rotation.y = Math.PI; cover.position.z = -d / 2 - 0.0012;
+      left.add(coverBezel, cover);
+      pivot.add(left);
+
+      const phone = new THREE.Group();
+      phone.add(right, pivot);
+      const rig = new THREE.Group(); // positions/rotates the whole device
+      rig.add(phone);
+      scene.add(rig);
+
+      const key = new THREE.DirectionalLight(0xffffff, 2.2);
+      key.position.set(2, 3, 4);
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0x8fb3ff, 3.0);
+      rim.position.set(-3, 1, -2);
+      scene.add(rim);
+
+      // ---- keyframe tracks (time → value), eased ----
+      const E = {
+        io: (x) => (x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2),
+        out: (x) => 1 - Math.pow(1 - x, 4),
+        lin: (x) => x,
+      };
+      function track(keys) {
+        return (t) => {
+          if (t <= keys[0][0]) return keys[0][1];
+          for (let i = 1; i < keys.length; i++) {
+            const [t1, v1, e] = keys[i];
+            const [t0, v0] = keys[i - 1];
+            if (t <= t1) {
+              const p = (E[e || "io"])((t - t0) / (t1 - t0));
+              return v0 + (v1 - v0) * p;
+            }
+          }
+          return keys[keys.length - 1][1];
+        };
+      }
+      const P = Math.PI;
+      const open = track([[0, 0], [4.5, 0], [5.6, 1], [7.0, 1], [7.7, 0], [9.0, 0], [9.8, 1], [19.0, 1], [19.6, 0], [26.0, 0], [26.9, 1]]);
+      const rotY = track([[0, P / 2], [2.8, 1.25], [4.0, 0.0], [7.0, -0.3], [7.7, 0.0], [9.8, 0.0], [11.0, 0.25], [12.0, P / 2 - 0.05], [15.0, P / 2 + 0.55], [15.6, 0.4], [19.0, -0.4], [19.8, P], [23.0, P + 0.12], [23.6, 0.3], [26.0, -0.3], [27.2, 0.12, "out"], [30, -0.15]]);
+      const rotX = track([[0, 0.25], [4.0, 0.05], [11, 0.05], [12, 0.18], [15, 0.1], [19.8, 0.0], [23, -0.05], [26, 0.08], [30, 0.04]]);
+      const camZ = track([[0, 4.6], [3.0, 5.0], [5.6, 7.2], [11, 7.2], [12, 5.8], [15, 5.4], [15.6, 11.0], [19, 11.0], [19.8, 3.4], [23, 2.9], [23.6, 10.5], [26, 10.5], [27.2, 7.6, "out"], [30, 7.2]]);
+      const posY = track([[0, 0], [11, 0], [12, -0.05], [15, -0.05], [19, 0], [19.8, -0.6], [23, -0.6], [23.6, 0], [26, 0], [27.2, 0.02, "out"], [30, 0.02]]);
+      const posX = track([[0, 0], [19, 0], [19.8, 0.23], [23, 0.23], [23.6, 0], [30, 0]]);
+      const expo = track([[0, 0.0], [0.4, 0.0], [2.2, 0.9], [3.0, 1.05], [14.7, 1.05], [15.2, 0.0], [19.0, 0.0], [19.5, 1.05], [22.9, 1.05], [23.3, 0.0], [25.9, 0.0], [26.5, 1.1], [30, 1.1]]);
+      const envRot = track([[0, -1.2], [30, 4.2, "lin"]]);
+
+      function renderAt(t) {
+        const a = open(t);
+        pivot.rotation.y = P * (1 - a); // 0 = open flat, π = folded shut
+        phone.position.x = -(w / 2) * (1 - a); // keep the folded device centred
+        phone.position.z = -d * (1 - a) * 0.5;
+        rig.rotation.y = rotY(t);
+        rig.rotation.x = rotX(t);
+        rig.position.y = posY(t);
+        rig.position.x = posX(t);
+        const z = camZ(t);
+        const camX = -z * Math.tan((15 * Math.PI) / 180) * 2 * (W / H) * (480 / W); // put the device ~420px right of centre
+        camera.position.set(camX, 0, z);
+        camera.lookAt(camX, 0, 0);
+        renderer.toneMappingExposure = Math.max(expo(t), 0.0001);
+        rig.visible = expo(t) > 0.01;
+        scene.environmentRotation.y = envRot(t);
+        key.position.set(Math.cos(t * 0.35) * 4, 3, Math.sin(t * 0.35) * 4 + 2);
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", (e) => renderAt(e.detail.time));
+      renderAt(window.__hfThreeTime || 0);
+    </script>
+
+    <!-- ================= type, counters, graphics (GSAP) ================= -->
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const SMOOTH = "power3.out";
+      const SOFT = "expo.out";
+      function riseIn(sel, at, dur) {
+        tl.fromTo(sel, { opacity: 0, y: 60, filter: "blur(16px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: dur || 0.9, ease: SOFT }, at);
+      }
+      function fadeOut(sel, at) {
+        tl.to(sel, { opacity: 0, y: -30, filter: "blur(12px)", duration: 0.35, ease: "power2.in" }, at);
+      }
+      function sweep(sel, at) {
+        tl.fromTo(sel, { backgroundPosition: "100% 0" }, { backgroundPosition: "0% 0", duration: 1.6, ease: "power2.inOut" }, at);
+      }
+      function count(id, to, at, dur, dec) {
+        const o = { v: 0 };
+        tl.to(o, { v: to, duration: dur, ease: "power2.out", onUpdate: () => { document.getElementById(id).textContent = o.v.toFixed(dec || 0); } }, at);
+      }
+
+      // S1
+      riseIn("#s1-intro", 1.0, 1.2);
+      fadeOut("#s1-intro", 2.6);
+
+      // S2 — title with a light sweep, sub on the unfold
+      tl.fromTo("#s2-title", { opacity: 0, scale: 1.08, filter: "blur(20px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1.2, ease: SOFT, immediateRender: false }, 3.0);
+      sweep("#s2-title", 3.4);
+      riseIn("#s2-sub", 5.5, 0.8);
+      fadeOut(["#s2-title", "#s2-sub"], 6.65);
+
+      // S3 — 5.4″ closed → 7.6″ open
+      riseIn("#s3 .center", 7.0, 0.8);
+      tl.set("#s3-num", { textContent: "5.4" }, 7.0);
+      const disp = { v: 5.4 };
+      tl.to(disp, { v: 7.6, duration: 0.8, ease: "power2.inOut", onUpdate: () => { document.getElementById("s3-num").textContent = disp.v.toFixed(1); } }, 9.0);
+      tl.to("#s3-lab", { opacity: 0, duration: 0.15 }, 8.9).set("#s3-lab", { textContent: "Open" }, 9.05).to("#s3-lab", { opacity: 1, duration: 0.3 }, 9.05);
+      riseIn("#s3-sub", 7.6, 0.8);
+      fadeOut(["#s3 .center", "#s3-sub"], 10.65);
+
+      // S4 — word by word on the beat
+      [11.0, 11.5, 12.0].forEach((t, i) => {
+        tl.fromTo(document.querySelectorAll(".s4w")[i], { opacity: 0, y: 70, filter: "blur(14px)" }, { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.7, ease: SOFT }, t);
+      });
+      sweep("#s4-ever", 12.4);
+      riseIn("#s4-sub", 12.8, 0.8);
+      fadeOut(["#s4 .center", "#s4-sub"], 14.65);
+
+      // S5 — chip + stats count-ups
+      riseIn("#s5-head", 15.1, 0.8);
+      tl.fromTo("#chip", { opacity: 0, scale: 0.7, rotationX: 40, transformPerspective: 1200 }, { opacity: 1, scale: 1, rotationX: 0, duration: 1.0, ease: SOFT }, 15.3);
+      tl.fromTo(".pins", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.8, ease: SMOOTH }, 15.6);
+      [["#st1", "c1", 20, 16.0], ["#st2", "c2", 40, 16.5], ["#st3", "c3", 2, 17.0]].forEach(([sel, id, to, t]) => {
+        riseIn(sel, t, 0.6);
+        count(id, to, t, 0.7);
+      });
+      fadeOut(["#s5-head", "#chip", "#st1", "#st2", "#st3"], 18.65);
+
+      // S6 — camera rings + 48MP
+      [["#r1", 19.5], ["#r2", 19.65], ["#r3", 19.8]].forEach(([sel, t]) => {
+        tl.fromTo(sel, { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.9, ease: SOFT }, t);
+      });
+      tl.to(["#r1", "#r2", "#r3"], { scale: 1.08, opacity: 0.4, duration: 2.4, ease: "sine.inOut", stagger: 0.1 }, 20.4);
+      riseIn("#s6 .center", 19.6, 0.8);
+      count("c4", 48, 19.6, 1.0);
+      riseIn("#s6-sub", 20.6, 0.8);
+      fadeOut(["#s6 .center", "#s6-sub", "#r1", "#r2", "#r3"], 22.65);
+
+      // S7 — battery
+      riseIn("#s7 .center", 23.0, 0.7);
+      count("c5", 24, 23.1, 1.0);
+      tl.fromTo("#batt", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: SOFT }, 23.3);
+      tl.fromTo("#batt-fill", { scaleX: 0 }, { scaleX: 1, duration: 1.4, ease: "power2.inOut" }, 23.5);
+      riseIn("#s7-sub", 24.0, 0.7);
+      fadeOut(["#s7 .center", "#batt", "#s7-sub"], 25.65);
+
+      // S8 — end card
+      tl.fromTo("#s8-title", { opacity: 0, scale: 1.1, filter: "blur(22px)" }, { opacity: 1, scale: 1, filter: "blur(0px)", duration: 1.3, ease: SOFT, immediateRender: false }, 26.1);
+      sweep("#s8-title", 26.5);
+      riseIn("#s8-line", 27.2, 0.9);
+      riseIn("#s8-date", 27.8, 0.9);
+      tl.fromTo("#legal", { opacity: 0 }, { opacity: 1, duration: 0.8 }, 28.2);
+
+      // background glow breathes with the scenes
+      tl.fromTo("#glow", { opacity: 0 }, { opacity: 1, duration: 2.0, ease: "sine.inOut" }, 1.0);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>

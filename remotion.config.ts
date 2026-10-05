@@ -10,3 +10,9 @@ Config.setRspack(true);
 Config.setVideoImageFormat("jpeg");
 Config.setOverwriteOutput(true);
 Config.overrideBundlerConfig(enableTailwind);
+
+// Use a local Chrome/headless-shell when Remotion can't download its own
+// (e.g. REMOTION_BROWSER_EXECUTABLE=/opt/pw-browsers/.../headless_shell).
+if (process.env.REMOTION_BROWSER_EXECUTABLE) {
+  Config.setBrowserExecutable(process.env.REMOTION_BROWSER_EXECUTABLE);
+}

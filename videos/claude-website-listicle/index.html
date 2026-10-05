@@ -1,0 +1,881 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      :root {
+        --yellow: #ffd60a;
+        --ink: #16181d;
+        --white: #ffffff;
+        --bar: #e7e9ee;
+        --violet: #6d5dfc;
+        --blue: #2563eb;
+        --claude: #d97757;
+        /* 5px black outline + soft drop, built from shadows so it renders the same everywhere */
+        --ol5: 5px 0 #000, -5px 0 #000, 0 5px #000, 0 -5px #000, 3.5px 3.5px #000, -3.5px 3.5px #000, 3.5px -3.5px #000,
+          -3.5px -3.5px #000, 4.6px 1.9px #000, -4.6px 1.9px #000, 4.6px -1.9px #000, -4.6px -1.9px #000, 1.9px 4.6px #000,
+          -1.9px 4.6px #000, 1.9px -4.6px #000, -1.9px -4.6px #000, 0 10px 16px rgba(0, 0, 0, 0.45);
+        --ol4: 4px 0 #000, -4px 0 #000, 0 4px #000, 0 -4px #000, 2.8px 2.8px #000, -2.8px 2.8px #000, 2.8px -2.8px #000,
+          -2.8px -2.8px #000, 3.7px 1.5px #000, -3.7px 1.5px #000, 3.7px -1.5px #000, -3.7px -1.5px #000, 1.5px 3.7px #000,
+          -1.5px 3.7px #000, 1.5px -3.7px #000, -1.5px -3.7px #000, 0 7px 12px rgba(0, 0, 0, 0.45);
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #0b0c10;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        font-family: Inter, "Helvetica Neue", Helvetica, sans-serif;
+        color: var(--ink);
+      }
+      .abs {
+        position: absolute;
+      }
+
+      /* ---------- footage ---------- */
+      #cam {
+        position: absolute;
+        inset: 0;
+        transform-origin: 50% 46%;
+      }
+      #cam video {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        object-fit: cover;
+      }
+
+      /* ---------- static title ---------- */
+      #title {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 236px;
+        text-align: center;
+        color: var(--white);
+        font-weight: 900;
+        font-size: 60px;
+        line-height: 1.12;
+        letter-spacing: -0.015em;
+        word-spacing: 0.1em;
+        text-shadow: var(--ol5);
+      }
+      #title span {
+        display: inline-block;
+      }
+      #title .hl {
+        color: var(--yellow);
+        position: relative;
+      }
+
+      /* ---------- numbered list ---------- */
+      #list {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 360px;
+        height: 1920px;
+      }
+      .row {
+        position: absolute;
+        left: 0;
+        width: 360px;
+        height: 80px;
+      }
+      .num {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        width: 70px;
+        margin-top: -27px;
+        text-align: right;
+        color: var(--white);
+        font-weight: 900;
+        font-size: 48px;
+        line-height: 54px;
+        letter-spacing: -0.03em;
+        text-shadow: var(--ol4);
+        transform-origin: 80% 50%;
+      }
+      .txt {
+        position: absolute;
+        left: 102px;
+        top: 50%;
+        width: 224px;
+        transform: translateY(-50%);
+        color: var(--white);
+        font-weight: 800;
+        font-size: 33px;
+        word-spacing: 0.06em;
+        line-height: 1.04;
+        letter-spacing: -0.015em;
+        text-shadow: var(--ol4);
+      }
+      .txt span {
+        display: inline-block;
+        transform-origin: 0% 60%;
+        opacity: 0;
+      }
+
+      /* ---------- right-side UI cards ---------- */
+      #cards {
+        position: absolute;
+        left: 742px;
+        top: 510px;
+        width: 320px;
+        height: 300px;
+        transform: scale(1.1);
+        transform-origin: 100% 0;
+      }
+      .card {
+        position: absolute;
+        inset: 0;
+        border-radius: 26px;
+        background: #fff;
+        overflow: hidden;
+        box-shadow:
+          0 0 0 4px rgba(255, 255, 255, 0.95),
+          0 26px 50px rgba(0, 0, 0, 0.38);
+        opacity: 0;
+        visibility: hidden;
+        transform-origin: 20% 60%;
+      }
+      .chrome {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        height: 32px;
+        background: #eceef2;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0 12px;
+      }
+      .chrome i {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ff5f57;
+      }
+      .chrome i:nth-child(2) {
+        background: #febc2e;
+      }
+      .chrome i:nth-child(3) {
+        background: #28c840;
+      }
+      .chrome b {
+        flex: 1;
+        height: 14px;
+        margin-left: 8px;
+        border-radius: 7px;
+        background: #fff;
+      }
+      .body {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 32px;
+        bottom: 0;
+        overflow: hidden;
+      }
+      .bar {
+        position: absolute;
+        height: 13px;
+        border-radius: 7px;
+        background: var(--bar);
+      }
+      .blk {
+        position: absolute;
+        border-radius: 12px;
+        background: var(--bar);
+      }
+      svg {
+        display: block;
+      }
+
+      /* 1 dark mode */
+      .dm-track {
+        position: absolute;
+        left: 76px;
+        top: 96px;
+        width: 168px;
+        height: 84px;
+        border-radius: 42px;
+        background: #dfe3ea;
+      }
+      .dm-knob {
+        position: absolute;
+        left: 8px;
+        top: 8px;
+        width: 68px;
+        height: 68px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.18);
+      }
+      .dm-knob svg {
+        position: absolute;
+        left: 14px;
+        top: 14px;
+      }
+      .dm-label {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 198px;
+        text-align: center;
+        font-size: 22px;
+        font-weight: 800;
+      }
+      .dm-label span {
+        position: absolute;
+        left: 0;
+        right: 0;
+      }
+
+      /* 2 cookie banner */
+      .ck-banner {
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        bottom: 14px;
+        height: 124px;
+        border-radius: 18px;
+        background: var(--ink);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
+      }
+      .ck-title {
+        position: absolute;
+        left: 70px;
+        top: 18px;
+        color: #fff;
+        font-size: 20px;
+        font-weight: 800;
+      }
+      .btn {
+        position: absolute;
+        height: 40px;
+        border-radius: 11px;
+        font-size: 17px;
+        font-weight: 800;
+        line-height: 40px;
+        text-align: center;
+      }
+
+      /* 3 back to top */
+      .btt {
+        position: absolute;
+        right: 18px;
+        bottom: 18px;
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: var(--blue);
+        box-shadow: 0 10px 22px rgba(37, 99, 235, 0.45);
+      }
+      .btt svg {
+        position: absolute;
+        left: 16px;
+        top: 16px;
+      }
+
+      /* 4 mobile menu */
+      .ph {
+        position: absolute;
+        left: 84px;
+        top: 12px;
+        width: 152px;
+        height: 250px;
+        border-radius: 28px;
+        border: 5px solid var(--ink);
+        background: #fff;
+        overflow: hidden;
+      }
+      .hb {
+        position: absolute;
+        right: 14px;
+        width: 24px;
+        height: 3.5px;
+        border-radius: 2px;
+        background: var(--ink);
+      }
+      .mm {
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 42px;
+        height: 210px;
+        background: var(--ink);
+      }
+      .mm div {
+        position: absolute;
+        left: 18px;
+        color: #fff;
+        font-size: 17px;
+        font-weight: 800;
+      }
+
+      /* 5 shortcuts */
+      .key {
+        position: absolute;
+        top: 22px;
+        height: 76px;
+        border-radius: 14px;
+        background: #fff;
+        border: 2px solid #d4d7de;
+        box-shadow: 0 7px 0 #c3c7d0;
+        font-size: 28px;
+        font-weight: 800;
+        line-height: 72px;
+        text-align: center;
+        color: #222;
+      }
+      .pal {
+        opacity: 0;
+        position: absolute;
+        left: 20px;
+        right: 20px;
+        top: 124px;
+        height: 128px;
+        border-radius: 14px;
+        background: var(--ink);
+        box-shadow: 0 12px 26px rgba(0, 0, 0, 0.3);
+      }
+
+      /* 6 hover */
+      .hv-btn {
+        position: absolute;
+        left: 50px;
+        top: 96px;
+        width: 220px;
+        height: 66px;
+        border-radius: 16px;
+        background: var(--ink);
+        color: #fff;
+        font-size: 21px;
+        font-weight: 800;
+        line-height: 66px;
+        text-align: center;
+      }
+
+      /* 7 scroll progress */
+      .sp-fill {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 10px;
+        background: linear-gradient(90deg, #ffd60a, #ff7a00);
+        transform-origin: 0 50%;
+      }
+
+      /* 8 skeleton */
+      .sk-sh {
+        position: absolute;
+        top: -40px;
+        width: 110px;
+        height: 360px;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0));
+        transform: rotate(14deg);
+      }
+
+      /* 9 faq */
+      .fq {
+        position: absolute;
+        left: 18px;
+        right: 18px;
+        height: 60px;
+        border-bottom: 2px solid #eceef2;
+      }
+      .fq .q {
+        position: absolute;
+        left: 4px;
+        top: 18px;
+        font-size: 19px;
+        font-weight: 800;
+      }
+      .fq .pl {
+        position: absolute;
+        right: 2px;
+        top: 14px;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: #eef0f3;
+      }
+      .fq .pl svg {
+        position: absolute;
+        left: 7px;
+        top: 7px;
+      }
+
+      /* 10 password */
+      .pw-in {
+        position: absolute;
+        left: 20px;
+        right: 20px;
+        top: 66px;
+        height: 66px;
+        border-radius: 14px;
+        background: #fff;
+        border: 2.5px solid #d9dce3;
+      }
+      .pw-in .dots,
+      .pw-in .clear {
+        position: absolute;
+        left: 18px;
+        top: 0;
+        line-height: 62px;
+        font-weight: 800;
+        color: var(--ink);
+      }
+      .pw-in .dots {
+        font-size: 30px;
+        letter-spacing: 3px;
+      }
+      .pw-in .clear {
+        font-size: 23px;
+        opacity: 0;
+      }
+      .pw-in svg {
+        position: absolute;
+        right: 14px;
+        top: 17px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="12.6667"
+      data-width="1080"
+      data-height="1920"
+    >
+      <!-- ================= PICTURE: one pre-cut take (scripts/build_cut.py) ================= -->
+      <div id="cam">
+        <video id="take" src="assets/cut.mp4" data-start="0" data-duration="12.6667" data-media-start="0" data-track-index="0" muted playsinline></video>
+      </div>
+
+      <!-- ================= static title ================= -->
+      <div id="title">
+        <div><span id="t10">10</span> things <span class="hl" id="tClaude">Claude</span> should add</div>
+        <div>to your website</div>
+      </div>
+
+      <!-- ================= numbered list ================= -->
+      <div id="list">
+        <div class="row" id="r1" style="top: 470px"><div class="num">1.</div><div class="txt"><span>Dark mode toggle</span></div></div>
+        <div class="row" id="r2" style="top: 558px"><div class="num">2.</div><div class="txt"><span>Cookie banner</span></div></div>
+        <div class="row" id="r3" style="top: 646px"><div class="num">3.</div><div class="txt"><span>Back-to-top button</span></div></div>
+        <div class="row" id="r4" style="top: 734px"><div class="num">4.</div><div class="txt"><span>Mobile menu</span></div></div>
+        <div class="row" id="r5" style="top: 822px"><div class="num">5.</div><div class="txt"><span>Shortcuts</span></div></div>
+        <div class="row" id="r6" style="top: 910px"><div class="num">6.</div><div class="txt"><span>Hover effects</span></div></div>
+        <div class="row" id="r7" style="top: 998px"><div class="num">7.</div><div class="txt"><span>Scroll progress bar</span></div></div>
+        <div class="row" id="r8" style="top: 1086px"><div class="num">8.</div><div class="txt"><span>Skeleton loader</span></div></div>
+        <div class="row" id="r9" style="top: 1174px"><div class="num">9.</div><div class="txt"><span>Expandable FAQs</span></div></div>
+        <div class="row" id="r10" style="top: 1262px"><div class="num">10.</div><div class="txt"><span>Password visibility</span></div></div>
+      </div>
+
+      <!-- ================= right-side UI cards ================= -->
+      <div id="cards">
+        <!-- 1 · dark mode toggle -->
+        <div class="card" id="c1">
+          <div class="chrome" id="c1-chrome"><i></i><i></i><i></i><b></b></div>
+          <div class="body" id="c1-body" style="background: #f5f6f8">
+            <div class="bar c1-bar" style="left: 28px; top: 26px; width: 170px"></div>
+            <div class="bar c1-bar" style="left: 28px; top: 50px; width: 110px"></div>
+            <div class="dm-track" id="c1-track">
+              <div class="dm-knob" id="c1-knob">
+                <svg id="c1-sun" width="40" height="40" viewBox="0 0 40 40">
+                  <circle cx="20" cy="20" r="8" fill="#ffb300" />
+                  <g stroke="#ffb300" stroke-width="3.5" stroke-linecap="round">
+                    <line x1="20" y1="3" x2="20" y2="7" /><line x1="20" y1="33" x2="20" y2="37" />
+                    <line x1="3" y1="20" x2="7" y2="20" /><line x1="33" y1="20" x2="37" y2="20" />
+                    <line x1="8" y1="8" x2="10.8" y2="10.8" /><line x1="29.2" y1="29.2" x2="32" y2="32" />
+                    <line x1="8" y1="32" x2="10.8" y2="29.2" /><line x1="29.2" y1="10.8" x2="32" y2="8" />
+                  </g>
+                </svg>
+                <svg id="c1-moon" width="40" height="40" viewBox="0 0 40 40" style="opacity: 0">
+                  <path d="M26 6a14 14 0 1 0 8 23A12 12 0 0 1 26 6z" fill="#c7d2fe" />
+                </svg>
+              </div>
+            </div>
+            <div class="dm-label"><span id="c1-l1" style="color: #16181d">Light</span><span id="c1-l2" style="color: #fff; opacity: 0">Dark</span></div>
+          </div>
+        </div>
+
+        <!-- 2 · cookie banner -->
+        <div class="card" id="c2">
+          <div class="chrome"><i></i><i></i><i></i><b></b></div>
+          <div class="body">
+            <div class="bar" style="left: 22px; top: 22px; width: 190px; height: 16px"></div>
+            <div class="bar" style="left: 22px; top: 48px; width: 250px"></div>
+            <div class="bar" style="left: 22px; top: 70px; width: 210px"></div>
+            <div class="blk" style="left: 22px; right: 22px; top: 96px; height: 50px"></div>
+            <div class="ck-banner" id="c2-banner">
+              <svg class="abs" style="left: 16px; top: 14px" width="42" height="42" viewBox="0 0 42 42">
+                <path d="M21 3a18 18 0 1 0 18 18 6 6 0 0 1-7-6 6 6 0 0 1-6-7 6 6 0 0 1-5-5z" fill="#d9a066" />
+                <circle cx="14" cy="16" r="3" fill="#5b3a1e" /><circle cx="24" cy="26" r="3.2" fill="#5b3a1e" />
+                <circle cx="13" cy="28" r="2.4" fill="#5b3a1e" /><circle cx="30" cy="18" r="2" fill="#5b3a1e" />
+              </svg>
+              <div class="ck-title">We use cookies</div>
+              <div class="bar" style="left: 70px; top: 48px; width: 150px; height: 10px; background: #3a3e48"></div>
+              <div class="btn" id="c2-accept" style="left: 16px; bottom: 12px; width: 124px; background: #ffd60a; color: #111">Accept</div>
+              <div class="btn" style="left: 150px; bottom: 12px; width: 112px; border: 2px solid #4a4e58; color: #fff; line-height: 36px">Decline</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 · back-to-top button -->
+        <div class="card" id="c3">
+          <div class="chrome"><i></i><i></i><i></i><b></b></div>
+          <div class="body">
+            <div class="abs" id="c3-page" style="left: 0; right: 0; top: 0; height: 640px">
+              <div class="bar" style="left: 22px; top: 22px; width: 200px; height: 18px; background: #d5d9e0"></div>
+              <div class="bar" style="left: 22px; top: 52px; width: 260px"></div>
+              <div class="bar" style="left: 22px; top: 74px; width: 230px"></div>
+              <div class="blk" style="left: 22px; right: 22px; top: 100px; height: 90px"></div>
+              <div class="bar" style="left: 22px; top: 206px; width: 250px"></div>
+              <div class="bar" style="left: 22px; top: 228px; width: 200px"></div>
+              <div class="blk" style="left: 22px; right: 22px; top: 256px; height: 90px"></div>
+              <div class="bar" style="left: 22px; top: 362px; width: 260px"></div>
+              <div class="bar" style="left: 22px; top: 384px; width: 180px"></div>
+              <div class="blk" style="left: 22px; right: 22px; top: 412px; height: 90px"></div>
+              <div class="bar" style="left: 22px; top: 518px; width: 240px"></div>
+              <div class="bar" style="left: 22px; top: 540px; width: 210px"></div>
+            </div>
+            <div class="btt" id="c3-btn">
+              <svg width="32" height="32" viewBox="0 0 32 32"><path d="M16 26V7M7 15l9-9 9 9" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4 · mobile menu -->
+        <div class="card" id="c4">
+          <div class="chrome"><i></i><i></i><i></i><b></b></div>
+          <div class="body" style="background: linear-gradient(160deg, #eef2ff, #f8f9fb)">
+            <div class="ph">
+              <div class="abs" style="left: 14px; top: 13px; width: 16px; height: 16px; border-radius: 50%; background: #6d5dfc"></div>
+              <div class="hb" id="c4-h1" style="top: 13px"></div>
+              <div class="hb" id="c4-h2" style="top: 20px"></div>
+              <div class="hb" id="c4-h3" style="top: 27px"></div>
+              <div class="bar" style="left: 14px; top: 58px; width: 110px"></div>
+              <div class="blk" style="left: 14px; right: 14px; top: 82px; height: 70px"></div>
+              <div class="bar" style="left: 14px; top: 166px; width: 100px"></div>
+              <div class="bar" style="left: 14px; top: 188px; width: 80px"></div>
+              <div class="mm" id="c4-menu">
+                <div class="c4-item" style="top: 20px">Home</div>
+                <div class="c4-item" style="top: 62px">Pricing</div>
+                <div class="c4-item" style="top: 104px">Docs</div>
+                <div class="c4-item" style="top: 146px">Contact</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5 · keyboard shortcuts -->
+        <div class="card" id="c5">
+          <div class="chrome"><i></i><i></i><i></i><b></b></div>
+          <div class="body" style="background: #f4f5f7">
+            <div class="key c5-key" style="left: 38px; width: 110px">Ctrl</div>
+            <div class="abs" style="left: 156px; top: 36px; font-size: 32px; font-weight: 900; color: #9aa0ab">+</div>
+            <div class="key c5-key" style="left: 190px; width: 84px">K</div>
+            <div class="pal" id="c5-pal">
+              <svg class="abs" style="left: 16px; top: 13px" width="22" height="22" viewBox="0 0 22 22"><circle cx="9" cy="9" r="6.5" stroke="#9aa0ab" stroke-width="2.6" fill="none" /><path d="M14 14l5 5" stroke="#9aa0ab" stroke-width="2.6" stroke-linecap="round" /></svg>
+              <div class="abs" style="left: 48px; top: 12px; font-size: 18px; font-weight: 700; color: #9aa0ab">Search commands…</div>
+              <div class="abs" style="left: 8px; right: 8px; top: 48px; height: 34px; border-radius: 9px; background: #2b2f3a"></div>
+              <div class="abs" style="left: 18px; top: 57px; width: 16px; height: 16px; border-radius: 4px; background: #6d5dfc"></div>
+              <div class="bar" style="left: 46px; top: 59px; width: 130px; height: 11px; background: #cfd3dc"></div>
+              <div class="abs" style="left: 18px; top: 95px; width: 16px; height: 16px; border-radius: 4px; background: #4a4e58"></div>
+              <div class="bar" style="left: 46px; top: 97px; width: 100px; height: 11px; background: #4a4e58"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6 · hover effects -->
+        <div class="card" id="c6">
+          <div class="chrome"><i></i><i></i><i></i><b></b></div>
+          <div class="body" style="background: #f6f7fb">
+            <div class="bar" style="left: 60px; top: 30px; width: 200px; height: 16px"></div>
+            <div class="bar" style="left: 90px; top: 58px; width: 140px"></div>
+            <div class="hv-btn" id="c6-btn">Get started →</div>
+            <svg class="abs" id="c6-cur" style="left: 0; top: 0" width="34" height="40" viewBox="0 0 34 40">
+              <path d="M3 3l0 29 8-7 5 12 6-3-5-11 11-1z" fill="#111" stroke="#fff" stroke-width="2.5" stroke-linejoin="round" />
+            </svg>
+          </div>
+        </div>
+
+        <!-- 7 · scroll progress bar -->
+        <div class="card" id="c7">
+          <div class="chrome"><i></i><i></i><i></i><b></b></div>
+          <div class="body">
+            <div class="abs" id="c7-page" style="left: 0; right: 0; top: 10px; height: 640px">
+              <div class="bar" style="left: 22px; top: 20px; width: 220px; height: 20px; background: #d5d9e0"></div>
+              <div class="bar" style="left: 22px; top: 54px; width: 270px"></div>
+              <div class="bar" style="left: 22px; top: 76px; width: 250px"></div>
+              <div class="bar" style="left: 22px; top: 98px; width: 262px"></div>
+              <div class="bar" style="left: 22px; top: 120px; width: 180px"></div>
+              <div class="blk" style="left: 22px; right: 22px; top: 148px; height: 96px"></div>
+              <div class="bar" style="left: 22px; top: 260px; width: 270px"></div>
+              <div class="bar" style="left: 22px; top: 282px; width: 240px"></div>
+              <div class="bar" style="left: 22px; top: 304px; width: 262px"></div>
+              <div class="bar" style="left: 22px; top: 326px; width: 150px"></div>
+              <div class="blk" style="left: 22px; right: 22px; top: 354px; height: 96px"></div>
+              <div class="bar" style="left: 22px; top: 466px; width: 270px"></div>
+              <div class="bar" style="left: 22px; top: 488px; width: 220px"></div>
+            </div>
+            <div class="abs" style="left: 0; right: 0; top: 0; height: 10px; background: #eef0f3"></div>
+            <div class="sp-fill" id="c7-fill"></div>
+          </div>
+        </div>
+
+        <!-- 8 · skeleton loader -->
+        <div class="card" id="c8">
+          <div class="chrome"><i></i><i></i><i></i><b></b></div>
+          <div class="body">
+            <div class="blk" style="left: 22px; top: 20px; width: 58px; height: 58px; border-radius: 50%"></div>
+            <div class="bar" style="left: 94px; top: 30px; width: 160px; height: 15px"></div>
+            <div class="bar" style="left: 94px; top: 56px; width: 104px"></div>
+            <div class="blk" style="left: 22px; right: 22px; top: 96px; height: 92px"></div>
+            <div class="bar" style="left: 22px; top: 204px; width: 262px"></div>
+            <div class="bar" style="left: 22px; top: 228px; width: 200px"></div>
+            <div class="sk-sh" id="c8-sh"></div>
+          </div>
+        </div>
+
+        <!-- 9 · expandable FAQs -->
+        <div class="card" id="c9">
+          <div class="chrome"><i></i><i></i><i></i><b></b></div>
+          <div class="body">
+            <div class="fq" style="top: 8px">
+              <div class="q">Is it free?</div>
+              <div class="pl"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 2v12M2 8h12" stroke="#16181d" stroke-width="2.6" stroke-linecap="round" /></svg></div>
+            </div>
+            <div class="fq" id="c9-open" style="top: 68px; overflow: hidden">
+              <div class="q">How does it work?</div>
+              <div class="pl" id="c9-pl"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 2v12M2 8h12" stroke="#16181d" stroke-width="2.6" stroke-linecap="round" /></svg></div>
+              <div class="bar" style="left: 4px; top: 62px; width: 240px; height: 11px"></div>
+              <div class="bar" style="left: 4px; top: 82px; width: 260px; height: 11px"></div>
+              <div class="bar" style="left: 4px; top: 102px; width: 180px; height: 11px"></div>
+            </div>
+            <div class="fq" id="c9-last" style="top: 128px">
+              <div class="q">Can I cancel?</div>
+              <div class="pl"><svg width="16" height="16" viewBox="0 0 16 16"><path d="M8 2v12M2 8h12" stroke="#16181d" stroke-width="2.6" stroke-linecap="round" /></svg></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 10 · password visibility -->
+        <div class="card" id="c10">
+          <div class="chrome"><i></i><i></i><i></i><b></b></div>
+          <div class="body" style="background: #f6f7fb">
+            <div class="abs" style="left: 24px; top: 32px; font-size: 18px; font-weight: 800; color: #5b606b">Password</div>
+            <div class="pw-in" id="c10-in">
+              <div class="dots" id="c10-dots">••••••••••</div>
+              <div class="clear" id="c10-clear">MyP@ssw0rd!</div>
+              <svg id="c10-off" width="32" height="28" viewBox="0 0 32 28">
+                <path d="M2 14s5-9 14-9 14 9 14 9-5 9-14 9S2 14 2 14z" stroke="#5b606b" stroke-width="2.6" fill="none" />
+                <circle cx="16" cy="14" r="4.5" fill="#5b606b" />
+                <path d="M4 25L28 3" stroke="#5b606b" stroke-width="2.8" stroke-linecap="round" />
+              </svg>
+              <svg id="c10-on" width="32" height="28" viewBox="0 0 32 28" style="opacity: 0">
+                <path d="M2 14s5-9 14-9 14 9 14 9-5 9-14 9S2 14 2 14z" stroke="#6d5dfc" stroke-width="2.6" fill="none" />
+                <circle cx="16" cy="14" r="4.5" fill="#6d5dfc" />
+              </svg>
+            </div>
+            <div class="btn" style="left: 20px; right: 20px; top: 152px; height: 58px; line-height: 58px; border-radius: 14px; background: #16181d; color: #fff; font-size: 20px">Sign in</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= AUDIO ================= -->
+      <audio id="voice" src="assets/audio/voice.wav" data-start="0" data-duration="12.6667" data-media-start="0" data-track-index="10" data-volume="1"></audio>
+
+      <audio id="tick-1" src="assets/audio/tick.wav" data-start="0.34" data-duration="0.05" data-track-index="11" data-volume="0.22"></audio>
+      <audio id="tick-2" src="assets/audio/tick.wav" data-start="0.405" data-duration="0.05" data-track-index="12" data-volume="0.22"></audio>
+      <audio id="tick-3" src="assets/audio/tick.wav" data-start="0.47" data-duration="0.05" data-track-index="11" data-volume="0.22"></audio>
+      <audio id="tick-4" src="assets/audio/tick.wav" data-start="0.535" data-duration="0.05" data-track-index="12" data-volume="0.22"></audio>
+      <audio id="tick-5" src="assets/audio/tick.wav" data-start="0.6" data-duration="0.05" data-track-index="11" data-volume="0.22"></audio>
+      <audio id="tick-6" src="assets/audio/tick.wav" data-start="0.665" data-duration="0.05" data-track-index="12" data-volume="0.22"></audio>
+      <audio id="tick-7" src="assets/audio/tick.wav" data-start="0.73" data-duration="0.05" data-track-index="11" data-volume="0.22"></audio>
+      <audio id="tick-8" src="assets/audio/tick.wav" data-start="0.795" data-duration="0.05" data-track-index="12" data-volume="0.22"></audio>
+      <audio id="tick-9" src="assets/audio/tick.wav" data-start="0.86" data-duration="0.05" data-track-index="11" data-volume="0.22"></audio>
+      <audio id="tick-10" src="assets/audio/tick.wav" data-start="0.925" data-duration="0.05" data-track-index="12" data-volume="0.22"></audio>
+
+      <audio id="pop-1" src="assets/audio/pop.wav" data-start="2.5" data-duration="0.14" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="pop-2" src="assets/audio/pop.wav" data-start="3.5667" data-duration="0.14" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="pop-3" src="assets/audio/pop.wav" data-start="4.6667" data-duration="0.14" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="pop-4" src="assets/audio/pop.wav" data-start="5.7" data-duration="0.14" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="pop-5" src="assets/audio/pop.wav" data-start="6.6667" data-duration="0.14" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="pop-6" src="assets/audio/pop.wav" data-start="7.5333" data-duration="0.14" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="pop-7" src="assets/audio/pop.wav" data-start="8.2" data-duration="0.14" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="pop-8" src="assets/audio/pop.wav" data-start="9.1667" data-duration="0.14" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="pop-9" src="assets/audio/pop.wav" data-start="10.2333" data-duration="0.14" data-track-index="13" data-volume="0.6"></audio>
+      <audio id="pop-10" src="assets/audio/pop.wav" data-start="11.6333" data-duration="0.14" data-track-index="13" data-volume="0.6"></audio>
+
+      <audio id="swish-1" src="assets/audio/swish.wav" data-start="2.5" data-duration="0.22" data-track-index="14" data-volume="0.22"></audio>
+      <audio id="swish-2" src="assets/audio/swish.wav" data-start="3.5667" data-duration="0.22" data-track-index="14" data-volume="0.22"></audio>
+      <audio id="swish-3" src="assets/audio/swish.wav" data-start="4.6667" data-duration="0.22" data-track-index="14" data-volume="0.22"></audio>
+      <audio id="swish-4" src="assets/audio/swish.wav" data-start="5.7" data-duration="0.22" data-track-index="14" data-volume="0.22"></audio>
+      <audio id="swish-5" src="assets/audio/swish.wav" data-start="6.6667" data-duration="0.22" data-track-index="14" data-volume="0.22"></audio>
+      <audio id="swish-6" src="assets/audio/swish.wav" data-start="7.5333" data-duration="0.22" data-track-index="14" data-volume="0.22"></audio>
+      <audio id="swish-7" src="assets/audio/swish.wav" data-start="8.2" data-duration="0.22" data-track-index="14" data-volume="0.22"></audio>
+      <audio id="swish-8" src="assets/audio/swish.wav" data-start="9.1667" data-duration="0.22" data-track-index="14" data-volume="0.22"></audio>
+      <audio id="swish-9" src="assets/audio/swish.wav" data-start="10.2333" data-duration="0.22" data-track-index="14" data-volume="0.22"></audio>
+      <audio id="swish-10" src="assets/audio/swish.wav" data-start="11.6333" data-duration="0.22" data-track-index="14" data-volume="0.22"></audio>
+
+      <audio id="click-dark" src="assets/audio/click.wav" data-start="2.83" data-duration="0.04" data-track-index="15" data-volume="0.35"></audio>
+      <audio id="click-top" src="assets/audio/click.wav" data-start="5.3" data-duration="0.04" data-track-index="15" data-volume="0.3"></audio>
+      <audio id="click-eye" src="assets/audio/click.wav" data-start="11.96" data-duration="0.04" data-track-index="15" data-volume="0.35"></audio>
+
+      <audio id="swish-loop" src="assets/audio/swish.wav" data-start="12.3667" data-duration="0.22" data-track-index="14" data-volume="0.2"></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+      const F = (f) => f / 30;
+      /* item starts on the cut (frames of the 30 fps edit, from scripts/build_cut.py) */
+      const T = [75, 107, 140, 171, 200, 226, 246, 275, 307, 349].map(F);
+      const END = F(380);
+      const POP = "back.out(2)";
+
+      /* ---------- camera: slow push on the hook, alternate framing on every cut ---------- */
+      tl.fromTo("#cam", { scale: 1.0 }, { scale: 1.035, duration: T[0], ease: "none" }, 0);
+      T.forEach((t, i) => {
+        const base = i % 2 === 0 ? 1.07 : 1.0;
+        const last = i + 1 === T.length; /* last item holds 1.0 so the loop lands on frame 0's framing */
+        const next = last ? END : T[i + 1];
+        tl.fromTo("#cam", { scale: base }, { scale: last ? base : base + 0.012, duration: next - t, ease: "none", immediateRender: false }, t);
+      });
+
+      /* ---------- hook: title beats + numbers counting in ---------- */
+      gsap.set(".num", { opacity: 0, scale: 0.4 });
+      tl.to(".num", { opacity: 1, scale: 1, duration: 0.22, ease: POP, stagger: 0.065 }, 0.34);
+      tl.fromTo("#t10", { scale: 1 }, { scale: 1.18, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 0.12);
+      tl.fromTo("#tClaude", { scale: 1 }, { scale: 1.12, duration: 0.1, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, 1.0);
+
+      /* ---------- list rows: text pops on the cut, active row in yellow ---------- */
+      T.forEach((t, i) => {
+        const row = `#r${i + 1}`;
+        tl.fromTo(`${row} .txt span`, { opacity: 0, x: -26, scale: 0.7 }, { opacity: 1, x: 0, scale: 1, duration: 0.22, ease: POP, immediateRender: false }, t);
+        tl.set(`${row} .txt, ${row} .num`, { color: "#ffd60a" }, t);
+        tl.fromTo(`${row} .num`, { scale: 1.35 }, { scale: 1, duration: 0.25, ease: POP, immediateRender: false }, t);
+        if (i + 1 < T.length) tl.to(`${row} .txt, ${row} .num`, { color: "#ffffff", duration: 0.12, ease: "none" }, T[i + 1]);
+      });
+      gsap.set(".txt span", { opacity: 0 });
+      gsap.set(".txt, .num", { color: "#ffffff" });
+
+      /* ---------- cards: pop in with the line, hard-swap on the next item ---------- */
+      const cardIds = ["#c1", "#c2", "#c3", "#c4", "#c5", "#c6", "#c7", "#c8", "#c9", "#c10"];
+      gsap.set(cardIds.join(","), { autoAlpha: 0 });
+      cardIds.forEach((id, i) => {
+        const t = T[i];
+        const tilt = i % 2 === 0 ? -2.5 : 2.5;
+        if (i > 0) tl.set(cardIds[i - 1], { autoAlpha: 0 }, t);
+        tl.set(id, { autoAlpha: 1 }, t);
+        tl.fromTo(id, { scale: 0.55, rotation: tilt * 3, x: 50, y: 20 }, { scale: 1, rotation: tilt, x: 0, y: 0, duration: 0.3, ease: "back.out(1.7)", immediateRender: false }, t);
+      });
+
+      /* 1 dark mode: flip the switch */
+      {
+        const t = T[0] + 0.33;
+        tl.to("#c1-knob", { x: 84, backgroundColor: "#1d2029", duration: 0.24, ease: "power3.inOut" }, t);
+        tl.to("#c1-track", { backgroundColor: "#3a3f4d", duration: 0.24, ease: "none" }, t);
+        tl.to("#c1-body", { backgroundColor: "#111318", duration: 0.24, ease: "none" }, t);
+        tl.to("#c1-chrome", { backgroundColor: "#1b1d24", duration: 0.24, ease: "none" }, t);
+        tl.to(".c1-bar", { backgroundColor: "#2a2e38", duration: 0.24, ease: "none" }, t);
+        tl.to("#c1-sun", { opacity: 0, rotation: 90, duration: 0.18, ease: "power2.in" }, t);
+        tl.to("#c1-moon", { opacity: 1, duration: 0.18, ease: "power2.out" }, t + 0.08);
+        tl.to("#c1-l1", { opacity: 0, duration: 0.15 }, t);
+        tl.to("#c1-l2", { opacity: 1, duration: 0.15 }, t + 0.08);
+      }
+
+      /* 2 cookie banner: slides up, Accept gets pressed */
+      tl.fromTo("#c2-banner", { y: 150 }, { y: 0, duration: 0.34, ease: "back.out(1.5)", immediateRender: false }, T[1] + 0.06);
+      tl.to("#c2-accept", { scale: 0.88, duration: 0.07, ease: "power2.in", yoyo: true, repeat: 1 }, T[1] + 0.72);
+
+      /* 3 back to top: scroll down, button appears, zip back up */
+      tl.fromTo("#c3-page", { y: 0 }, { y: -300, duration: 0.45, ease: "power1.in", immediateRender: false }, T[2]);
+      tl.fromTo("#c3-btn", { scale: 0 }, { scale: 1, duration: 0.24, ease: POP, immediateRender: false }, T[2] + 0.3);
+      tl.to("#c3-btn", { scale: 0.86, duration: 0.07, yoyo: true, repeat: 1, ease: "power2.in" }, T[2] + 0.63);
+      tl.to("#c3-page", { y: 0, duration: 0.3, ease: "power3.out" }, T[2] + 0.7);
+
+      /* 4 mobile menu: burger to X, menu drops */
+      {
+        const t = T[3] + 0.22;
+        tl.to("#c4-h1", { y: 7, rotation: 45, duration: 0.2, ease: "power2.inOut" }, t);
+        tl.to("#c4-h2", { opacity: 0, duration: 0.1 }, t);
+        tl.to("#c4-h3", { y: -7, rotation: -45, duration: 0.2, ease: "power2.inOut" }, t);
+        tl.fromTo("#c4-menu", { yPercent: -100 }, { yPercent: 0, duration: 0.3, ease: "power3.out", immediateRender: false }, t);
+        tl.fromTo(".c4-item", { opacity: 0, x: -14 }, { opacity: 1, x: 0, duration: 0.16, stagger: 0.05, ease: "power2.out", immediateRender: false }, t + 0.12);
+      }
+      gsap.set("#c4-menu", { yPercent: -100 });
+      gsap.set(".c4-item", { opacity: 0 });
+
+      /* 5 shortcuts: Ctrl+K pressed, palette opens */
+      tl.to(".c5-key", { y: 6, boxShadow: "0 1px 0 #c3c7d0", duration: 0.07, ease: "power2.in" }, T[4] + 0.1);
+      tl.to(".c5-key", { y: 0, boxShadow: "0 7px 0 #c3c7d0", duration: 0.1, ease: "power2.out" }, T[4] + 0.32);
+      tl.fromTo("#c5-pal", { opacity: 0, scale: 0.85, y: 16 }, { opacity: 1, scale: 1, y: 0, duration: 0.22, ease: POP, immediateRender: false }, T[4] + 0.2);
+      gsap.set("#c5-pal", { opacity: 0 });
+
+      /* 6 hover: cursor glides onto the button, it lifts and glows */
+      tl.fromTo("#c6-cur", { x: 250, y: 214 }, { x: 186, y: 124, duration: 0.24, ease: "power2.out", immediateRender: false }, T[5]);
+      gsap.set("#c6-cur", { x: 250, y: 214 });
+      tl.to("#c6-btn", { y: -7, scale: 1.05, backgroundColor: "#6d5dfc", boxShadow: "0 16px 32px rgba(109,93,252,0.55)", duration: 0.16, ease: "power2.out" }, T[5] + 0.2);
+
+      /* 7 scroll progress: bar fills while the page scrolls */
+      tl.fromTo("#c7-fill", { scaleX: 0 }, { scaleX: 0.78, duration: 0.9, ease: "power1.inOut", immediateRender: false }, T[6]);
+      tl.fromTo("#c7-page", { y: 0 }, { y: -250, duration: 0.9, ease: "power1.inOut", immediateRender: false }, T[6]);
+      gsap.set("#c7-fill", { scaleX: 0 });
+
+      /* 8 skeleton: shimmer sweeps */
+      tl.fromTo("#c8-sh", { x: -170 }, { x: 400, duration: 0.5, ease: "none", repeat: 1, immediateRender: false }, T[7]);
+      gsap.set("#c8-sh", { x: -170 });
+
+      /* 9 FAQ: second row expands, + turns to x */
+      tl.to("#c9-open", { height: 124, duration: 0.3, ease: "power3.out" }, T[8] + 0.25);
+      tl.to("#c9-last", { y: 64, duration: 0.3, ease: "power3.out" }, T[8] + 0.25);
+      tl.to("#c9-pl", { rotation: 45, backgroundColor: "#ffd60a", duration: 0.25, ease: "back.out(2)" }, T[8] + 0.25);
+
+      /* 10 password: eye tapped, text revealed */
+      {
+        const t = T[9] + 0.33;
+        tl.to("#c10-in", { borderColor: "#6d5dfc", duration: 0.15 }, T[9] + 0.1);
+        tl.to("#c10-off", { opacity: 0, scale: 0.7, duration: 0.12 }, t);
+        tl.fromTo("#c10-on", { opacity: 0, scale: 0.7 }, { opacity: 1, scale: 1, duration: 0.18, ease: POP, immediateRender: false }, t + 0.06);
+        tl.to("#c10-dots", { opacity: 0, y: -10, duration: 0.14 }, t);
+        tl.fromTo("#c10-clear", { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out", immediateRender: false }, t + 0.06);
+      }
+
+      /* ---------- loop: clear back to the opening frame so the end flows into "Ten things…" ---------- */
+      {
+        const R = END - 0.3;
+        tl.to("#c10", { scale: 0.6, autoAlpha: 0, duration: 0.14, ease: "power2.in" }, R);
+        tl.to(".txt span", { opacity: 0, x: -26, duration: 0.12, ease: "power2.in", stagger: { each: 0.008, from: "end" } }, R);
+        tl.to(".num", { opacity: 0, scale: 0.4, duration: 0.12, ease: "power2.in", stagger: { each: 0.008, from: "end" } }, R + 0.04);
+        tl.to(".txt, .num", { color: "#ffffff", duration: 0.05, ease: "none" }, R);
+      }
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
