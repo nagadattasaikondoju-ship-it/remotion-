@@ -6,114 +6,146 @@
     <title>One Loop Client One</title>
     <script src="assets/vendor/gsap.min.js"></script>
     <style>
+      @font-face { font-family: "Mont"; font-weight: 700; src: url("assets/fonts/Montserrat-normal-700.ttf"); }
+      @font-face { font-family: "Mont"; font-weight: 800; src: url("assets/fonts/Montserrat-normal-800.ttf"); }
+      @font-face { font-family: "Mont"; font-weight: 900; src: url("assets/fonts/Montserrat-normal-900.ttf"); }
       @font-face { font-family: "Playfair"; font-style: italic; font-weight: 600; src: url("assets/fonts/PlayfairDisplay-italic-600.ttf"); }
+      @font-face { font-family: "Baskerville"; font-weight: 700; src: url("assets/fonts/LibreBaskerville-normal-700.ttf"); }
       @font-face { font-family: "Josefin"; font-weight: 400; src: url("assets/fonts/JosefinSans-normal-400.ttf"); }
       @font-face { font-family: "Josefin"; font-weight: 600; src: url("assets/fonts/JosefinSans-normal-600.ttf"); }
-      @font-face { font-family: "Caveat"; font-weight: 500; src: url("assets/fonts/Caveat-normal-500.ttf"); }
-      @font-face { font-family: "Elite"; font-weight: 400; src: url("assets/fonts/SpecialElite-normal-400.ttf"); }
-      @font-face { font-family: "Baskerville"; font-weight: 700; src: url("assets/fonts/LibreBaskerville-normal-700.ttf"); }
       :root {
-        --cu1: #f2b88c; /* One Loop copper, light */
-        --cu2: #c97a4a; /* One Loop copper, deep */
-        --ink: #17130f;
+        --copper: #e39a68;     /* One Loop logo copper (light end of the logo gradient) */
+        --copper2: #c8784a;    /* logo copper, deep */
+        --terra: #8f432e;      /* dark terracotta */
+        --cream: #f7e8da;
+        --char: #1e1a18;
+        --off: #f9f6f1;
       }
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
       #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
       .full { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
       video.full { object-fit: cover; }
+      .layer { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; }
 
-      /* ---------- paper "One Loop" text match cut ---------- */
-      #paper { opacity: 0; background: #0b0908; }
-      .pg { position: absolute; left: -40px; top: -40px; width: 1160px; height: 2000px; opacity: 0; overflow: hidden; }
-      .pg .body { position: absolute; left: 120px; right: 120px; filter: blur(2.2px); }
-      .pg .anchor { position: absolute; left: 0; right: 0; top: 900px; height: 0; text-align: center; }
-      .pg .anchor span { display: inline-block; transform: translateY(-50%); padding: 0.04em 0.22em 0.08em; }
-      .hl { background: linear-gradient(transparent 12%, rgba(242, 184, 140, 0.95) 12%, rgba(242, 184, 140, 0.95) 88%, transparent 88%); }
-      .ln { height: 18px; margin: 0 0 30px; border-radius: 4px; background: rgba(40, 30, 22, 0.42); }
-      #pg1 { background: radial-gradient(ellipse at 40% 35%, #f6efe2, #e6dccb); }
-      #pg1 .head { position: absolute; left: 0; right: 0; top: 330px; text-align: center; font: 700 50px/1.1 "Baskerville"; color: #2a2119; letter-spacing: 0.01em; filter: blur(1.6px); }
-      #pg1 .anchor span { font: 700 128px/1 "Baskerville"; color: #17130f; }
-      #pg2 { background: repeating-linear-gradient(#fbf8ef 0 62px, #9fb9d8 62px 64px); }
-      #pg2:before { content: ""; position: absolute; left: 200px; top: 0; bottom: 0; width: 3px; background: #e08a8a; }
-      #pg2 .body { font: 500 64px/64px "Caveat"; color: #2b3a66; }
-      #pg2 .anchor span { font: 500 150px/1 "Caveat"; color: #1d2a55; }
-      #pg3 { background: radial-gradient(ellipse at 50% 40%, #caa27a, #a97f58); }
-      #pg3 .body { font: 400 50px/1.5 "Elite"; color: #3a2a1c; text-align: center; }
-      #pg3 .anchor span { font: 400 132px/1 "Elite"; color: #22170f; letter-spacing: 0.04em; }
-      #pg4 { background-color: #f7f7f2; background-image: linear-gradient(#cfe0e6 2px, transparent 2px), linear-gradient(90deg, #cfe0e6 2px, transparent 2px); background-size: 48px 48px; }
-      #pg4 .body { font: 400 50px/1.5 "Josefin"; color: #3d4448; }
-      #pg4 .anchor span { font: 600 136px/1 "Josefin"; color: #1b2226; letter-spacing: 0.02em; }
-      #pg5 { background: linear-gradient(180deg, #ffffff, #f1eeea); }
-      #pg5 .body { font: 400 38px/1.6 "Josefin"; color: #55504a; text-align: center; letter-spacing: 0.14em; white-space: nowrap; left: 0; right: 0; }
-      #pg5 .anchor span { font: 400 112px/1 "Josefin"; color: #17130f; letter-spacing: 0.3em; padding-left: 0.52em; }
-      #pg6 { background: #000; }
-      #pg6 img { position: absolute; left: 150px; top: 497px; width: 860px; }
+      /* ---------- captions ---------- */
+      .cw { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; }
+      .c3 { position: absolute; left: 0; top: 0; transform-style: preserve-3d; }
+      .ci { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); text-align: center; white-space: nowrap; }
+      .ln { display: block; line-height: 0.98; text-transform: uppercase; font-family: "Mont"; font-weight: 900; letter-spacing: -0.012em; }
+      .ln.sm { font-weight: 800; letter-spacing: 0.02em; }
+      .ln.kw { font-family: "Playfair"; font-style: italic; font-weight: 600; text-transform: none; letter-spacing: -0.01em; line-height: 1.04; }
+      .ln .k { color: var(--copper); }
+      .light .ln { color: var(--cream); text-shadow: 1px 1px 0 #6e3a28, 2px 2px 0 #6e3a28, 3px 3px 0 #4a2418, 0 4px 6px rgba(0, 0, 0, 0.28); }
+      .light .ln.kw, .light .ln .k { color: var(--copper); }
+      .dark .ln { color: var(--char); text-shadow: 1.5px 0 0 var(--off), -1.5px 0 0 var(--off), 0 1.5px 0 var(--off), 0 -1.5px 0 var(--off),
+        2px 3px 0 rgba(249, 246, 241, 0.75); }
+      .dark .ln.kw, .dark .ln .k { color: var(--terra); }
+      .lower .ln { text-shadow: 0 2px 0 rgba(20, 14, 10, 0.75), 0 3px 4px rgba(0, 0, 0, 0.35); }
+
+      /* ---------- newspaper "OneLoop" text match cut ---------- */
+      #mc { opacity: 0; background: #e9e1d2; overflow: hidden; }
+      .np { position: absolute; left: -70px; top: -60px; width: 1220px; height: 2040px; opacity: 0; overflow: hidden; }
+      .np .mast { position: absolute; left: 0; right: 0; text-align: center; }
+      .np .hd { position: absolute; left: 130px; right: 130px; }
+      /* the highlighted word is pinned to the frame centre; the words either side spill off the page edges */
+      .np .row { position: absolute; left: -400px; right: -400px; top: 880px; height: 0; display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); white-space: nowrap; }
+      .np .row span { display: flex; transform: translateY(-50%); }
+      .np .row span:first-child { justify-content: flex-end; }
+      .np .row span:last-child { justify-content: flex-start; }
+      .np .hl { padding: 0.02em 0.16em 0.06em; background: linear-gradient(transparent 8%, #eaa877 8%, #eaa877 92%, transparent 92%); color: #17120e; }
+      .np .bd { position: absolute; left: 130px; right: 130px; }
+      .np .cols { position: absolute; left: 70px; right: 70px; display: flex; gap: 34px; }
+      .np .cols div { flex: 1; }
+      .bar { height: 15px; margin: 0 0 21px; border-radius: 3px; }
+      #np1 { background: radial-gradient(ellipse at 45% 35%, #f3ead9, #dccfb8); }
+      #np1 .hd { top: 190px; font: 700 128px/1.08 "Baskerville"; color: #26201a; text-align: center; }
+      #np1 .row { font: 700 132px/1 "Baskerville"; color: #2a231c; }
+      #np1 .bd { top: 1010px; font: 400 64px/1.55 "Josefin"; color: #3b342c; }
+      #np2 { background: linear-gradient(180deg, #f6f4ef, #e7e3da); }
+      #np2 .mast { top: 120px; font: 600 30px/1 "Josefin"; letter-spacing: 0.3em; color: #555; }
+      #np2 .mast b { display: block; margin-top: 18px; font: 700 52px/1 "Baskerville"; letter-spacing: 0.04em; color: #1d1b18; }
+      #np2 .row { font: 700 118px/1 "Baskerville"; color: #222; }
+      #np2 .cols { top: 300px; height: 520px; }
+      #np2 .cols.b2 { top: 960px; height: 900px; }
+      #np2 .bar { background: #8b8678; }
+      #np3 { background: radial-gradient(ellipse at 40% 30%, #ffffff, #e9e9e6); }
+      #np3 .hd { top: 160px; font: 800 118px/1.06 "Mont"; color: #1f1f22; text-align: left; letter-spacing: -0.01em; }
+      #np3 .row { font: 700 126px/1 "Mont"; color: #222; }
+      #np3 .bd { top: 990px; font: 400 58px/1.5 "Mont"; color: #333; }
+      #np4 { background: radial-gradient(ellipse at 50% 40%, #ece2cd, #d3c5a8); }
+      #np4 .hd { top: 260px; font: 700 104px/1.12 "Baskerville"; color: #2b241b; text-align: center; }
+      #np4 .row { font: 400 124px/1 "Baskerville"; color: #2b241b; }
+      #np4 .bd { top: 1020px; left: 220px; right: 220px; font: 400 62px/1.55 "Baskerville"; color: #3a3125; }
+      #np5 { background: #000; }
+      #np5 img { position: absolute; width: 900px; }
 
       /* ---------- proof screens ---------- */
-      #pay { opacity: 0; background: radial-gradient(ellipse at 50% 42%, #2a211b, #0b0908 70%); }
-      #payCard { position: absolute; left: 110px; top: 470px; width: 860px; height: 940px; border-radius: 40px; overflow: hidden;
+      #pay { opacity: 0; background: radial-gradient(ellipse at 50% 46%, #2a211b, #0b0908 72%); }
+      #payCard { position: absolute; left: 110px; top: 560px; width: 860px; height: 940px; border-radius: 40px; overflow: hidden;
         box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08); transform-origin: 82% 26%; }
       #payCard img { width: 860px; display: block; }
       #notpub { opacity: 0; background: #e9e9e9; }
-      #notpub img { position: absolute; left: 70px; top: 640px; width: 940px; transform-origin: 50% 40%; }
+      #notpub img { position: absolute; left: 70px; top: 760px; width: 940px; transform-origin: 50% 40%; }
+      #npTag { position: absolute; left: 0; right: 0; top: 1420px; text-align: center; font: 800 34px/1 "Mont"; letter-spacing: 0.22em; color: var(--terra); }
+      #npTag i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--terra); margin-right: 16px; transform: translateY(-3px); }
 
+      /* ---------- transitions ---------- */
+      #dip { opacity: 0; background: #070504; }
+      .wipe { opacity: 0; background: linear-gradient(90deg, rgba(5, 4, 3, 0) 0%, rgba(5, 4, 3, 0.94) 30%, rgba(5, 4, 3, 0.94) 70%, rgba(5, 4, 3, 0) 100%); width: 2200px; left: -2200px; }
       #flash { opacity: 0; background: #000; }
-
-      /* ---------- keyword lockups ---------- */
-      .cap { position: absolute; left: 90px; right: 90px; text-align: center; opacity: 0; isolation: isolate;
-        filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.6)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7)); }
-      .cap:before { content: ""; position: absolute; left: 6%; right: 6%; top: -6%; bottom: -10%; z-index: -1; border-radius: 50%;
-        background: radial-gradient(ellipse at 50% 55%, rgba(10, 7, 5, 0.5), rgba(10, 7, 5, 0) 70%); }
-      .cap.top { top: 250px; }
-      .cap.low { top: 1150px; }
-      .cap .sm { display: block; font: 400 44px/1.1 "Josefin"; color: rgba(255, 255, 255, 0.94); letter-spacing: 0.06em; text-transform: lowercase; }
-      .cap .kw { display: inline-block; margin-top: 2px; font: italic 600 150px/1.12 "Playfair"; letter-spacing: -0.01em; padding: 0 0.08em 0.06em;
-        background: linear-gradient(180deg, var(--cu1) 0%, #e09a68 55%, var(--cu2) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
-      .cap .kw.long { font-size: 112px; }
-      .cap .dot { color: var(--cu1); -webkit-text-fill-color: var(--cu1); }
     </style>
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="%%TOTAL%%" data-width="1080" data-height="1920">
       <video id="base" class="full" src="assets/base.mp4" data-start="0" data-duration="%%TOTAL%%" data-media-start="0" data-track-index="0" muted playsinline></video>
 
-      <!-- One Loop text match cut: the same word in the same place, page after page (their own notes, no press) -->
-      <div id="paper" class="full">
-        <div class="pg" id="pg1">
-          <div class="head">Audit. Build. Market. Automate.</div>
-          <div class="body" style="top: 520px"><div class="ln" style="width:92%"></div><div class="ln" style="width:84%"></div><div class="ln" style="width:88%"></div></div>
-          <div class="anchor"><span class="hl">One Loop</span></div>
-          <div class="body" style="top: 1040px"><div class="ln" style="width:90%"></div><div class="ln" style="width:76%"></div><div class="ln" style="width:86%"></div><div class="ln" style="width:64%"></div></div>
+      <!-- captions that sit BEHIND the speaker -->
+      <div id="behind" class="layer"></div>
+
+      <!-- the speaker cut out (alpha), laid back over the behind-captions -->
+%%CUTOUTS%%
+
+      <!-- captions in front: environment-anchored and lower-third -->
+      <div id="front" class="layer"></div>
+
+      <!-- newspaper "OneLoop" text match cut (rebuilt at full resolution after the supplied reference) -->
+      <div id="mc" class="full">
+        <div class="np" id="np1">
+          <div class="hd">We Had Just<br />Started</div>
+          <div class="row"><span>we had just started&nbsp;</span><span class="hl">OneLoop</span><span>&nbsp;and that money</span></div>
+          <div class="bd">Our first client agreed<br />to pay us ₹10,000<br />for a website.</div>
         </div>
-        <div class="pg" id="pg2">
-          <div class="body" style="left: 240px; top: 572px">client #1 — website<br />₹10,000 · Hyderabad</div>
-          <div class="anchor"><span class="hl">one loop</span></div>
-          <div class="body" style="left: 240px; top: 1022px">door to door — every<br />local business</div>
+        <div class="np" id="np2">
+          <div class="mast">ONE LOOP · NOTES<b>THE FIRST CLIENT</b></div>
+          <div class="cols">%%COLS1%%</div>
+          <div class="row"><span>we had just started&nbsp;</span><span class="hl">OneLoop</span><span>&nbsp;with one website</span></div>
+          <div class="cols b2">%%COLS2%%</div>
         </div>
-        <div class="pg" id="pg3">
-          <div class="body" style="top: 600px">websites · marketing · automation</div>
-          <div class="anchor"><span class="hl">ONE LOOP</span></div>
-          <div class="body" style="top: 1030px">est. Hyderabad</div>
+        <div class="np" id="np3">
+          <div class="hd">Door To Door,<br />Hyderabad</div>
+          <div class="row"><span>had just started&nbsp;</span><span class="hl">OneLoop</span><span>&nbsp;and went</span></div>
+          <div class="bd">Audit. Build. Market.<br />Automate. Small local<br />businesses to large<br />enterprises.</div>
         </div>
-        <div class="pg" id="pg4">
-          <div class="body" style="top: 620px">audit → build → market → automate</div>
-          <div class="anchor"><span class="hl">one loop</span></div>
-          <div class="body" style="top: 1040px">first client · first website</div>
+        <div class="np" id="np4">
+          <div class="hd">Client<br />Number One</div>
+          <div class="row"><span>we had just started&nbsp;</span><span class="hl">OneLoop</span><span>&nbsp;that year</span></div>
+          <div class="bd">That money mattered<br />a lot to us.</div>
         </div>
-        <div class="pg" id="pg5">
-          <div class="body" style="top: 650px">AUDIT. BUILD. MARKET. AUTOMATE.</div>
-          <div class="anchor"><span class="hl">ONELOOP</span></div>
-        </div>
-        <div class="pg" id="pg6"><img src="assets/img/logo.png" alt="" /></div>
+        <div class="np" id="np5"><img src="assets/img/logo.png" alt="" /></div>
       </div>
 
       <!-- proof: the real ₹1,500 receipt, personal and client details redacted -->
       <div id="pay" class="full"><div id="payCard"><img src="assets/img/payment-1500.png" alt="" /></div></div>
-      <!-- proof: the site stayed offline -->
-      <div id="notpub" class="full"><img src="assets/img/not-published.png" alt="" /></div>
+      <!-- proof: the website was held offline -->
+      <div id="notpub" class="full"><img src="assets/img/not-published.png" alt="" /><div id="npTag"><i></i>WEBSITE HELD OFFLINE</div></div>
 
-      <div id="caps"></div>
+      <!-- proof-screen captions sit above the proof -->
+      <div id="top" class="layer"></div>
+
+      <div id="dip" class="full"></div>
+      <div id="wipeA" class="full wipe"></div>
       <div id="flash" class="full"></div>
 
       <audio id="mix" src="assets/audio/master.wav" data-start="0" data-duration="%%TOTAL%%" data-media-start="0" data-track-index="1" data-volume="1"></audio>
@@ -124,55 +156,79 @@
       const tl = gsap.timeline({ paused: true });
       const FR = 1 / 30;
 
-      /* ---------- paper match cut: hard page swaps on exact frames, each page settles slightly ---------- */
-      const [p0, p1] = D.paper;
-      const pages = [0, 6, 12, 17, 22, 26];
-      const tilt = [-1.6, 1.3, -0.9, 1.7, -1.1, 0];
-      tl.set("#paper", { opacity: 1 }, p0);
-      tl.set("#paper", { opacity: 0 }, p1);
-      pages.forEach((f, k) => {
-        const t = p0 + f * FR;
-        const end = k + 1 < pages.length ? p0 + pages[k + 1] * FR : p1;
-        tl.set(`#pg${k + 1}`, { opacity: 1 }, t);
-        if (k + 1 < pages.length) tl.set(`#pg${k + 1}`, { opacity: 0 }, end);
-        tl.fromTo(`#pg${k + 1}`, { scale: k < 5 ? 1.05 : 1.02, rotation: tilt[k] * 1.6, x: (k % 2 ? 14 : -14) },
-          { scale: 1, rotation: tilt[k], x: 0, duration: end - t, ease: "power2.out", immediateRender: false }, t);
+      /* ---------- captions ---------- */
+      D.caps.forEach((c, k) => {
+        const host = document.getElementById(c.layer);
+        const w = document.createElement("div");
+        w.className = `cw ${c.scheme}${c.mode === "lower" ? " lower" : ""}`;
+        w.id = `c${k}`;
+        w.style.left = c.x + "px";
+        w.style.top = c.y + "px";
+        const lines = c.lines.map((l) => `<span class="ln ${l.cls}" style="font-size:${l.size}px">${l.html}</span>`).join("");
+        w.innerHTML = `<div class="c3" style="transform:${c.t3d || "none"}"><div class="ci">${lines}</div></div>`;
+        host.appendChild(w);
+        const inner = `#c${k} .ci`;
+        tl.set(w, { opacity: 1 }, c.t0);
+        if (c.gentle) {
+          tl.fromTo(inner, { opacity: 0 }, { opacity: 1, duration: 12 * FR, ease: "sine.out", immediateRender: false }, c.t0);
+        } else if (c.emph) {
+          tl.fromTo(inner, { opacity: 0, scale: 0.86, y: 22, filter: "blur(6px)" },
+            { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 9 * FR, ease: "back.out(1.5)", immediateRender: false }, c.t0);
+        } else {
+          tl.fromTo(inner, { opacity: 0, scale: 0.88, y: 16 },
+            { opacity: 1, scale: 1, y: 0, duration: 8 * FR, ease: "power3.out", immediateRender: false }, c.t0);
+        }
+        if (c.t1 < D.total - 0.02) {
+          tl.to(inner, { opacity: 0, y: -10, duration: 4 * FR, ease: "power1.in" }, c.t1 - 4 * FR);
+          tl.set(w, { opacity: 0 }, c.t1);
+        }
+        // planar / damped subject tracking: one set per frame
+        if (c.track) c.track.forEach(([f, x, y, s, r]) => tl.set(w, { x, y, scale: s, rotation: r }, f * FR));
       });
+      gsap.set(".ci", { opacity: 0 });
 
-      /* ---------- ₹1,500 receipt ---------- */
+      /* ---------- newspaper match cut: hard page swaps, each page lands with a 3-frame blur/scale settle ---------- */
+      const [m0, m1] = D.paper;
+      tl.set("#mc", { opacity: 1 }, m0);
+      tl.set("#mc", { opacity: 0 }, m1);
+      D.pages.forEach((f, k) => {
+        const t = m0 + f * FR;
+        const end = k + 1 < D.pages.length ? m0 + D.pages[k + 1] * FR : m1;
+        tl.set(`#np${k + 1}`, { opacity: 1 }, t);
+        if (k + 1 < D.pages.length) tl.set(`#np${k + 1}`, { opacity: 0 }, end);
+        const last = k === D.pages.length - 1;
+        tl.fromTo(`#np${k + 1}`, { scale: last ? 1.045 : 1.06, filter: `blur(${last ? 3 : 7}px)` },
+          { scale: 1, filter: "blur(0px)", duration: (last ? 5 : 3) * FR, ease: "power2.out", immediateRender: false }, t);
+      });
+      gsap.set("#np5 img", { left: D.logo.x, top: D.logo.y });
+
+      /* ---------- ₹1,500 receipt (L-cut under Prahalad's voice) ---------- */
       const [a0, a1] = D.pay;
       tl.fromTo("#pay", { opacity: 0 }, { opacity: 1, duration: 3 * FR, ease: "none", immediateRender: false }, a0);
-      tl.fromTo("#payCard", { y: 46, scale: 0.97 }, { y: 0, scale: 1, duration: 0.22, ease: "power3.out", immediateRender: false }, a0);
-      tl.to("#payCard", { scale: 1.06, duration: a1 - a0 - 0.22, ease: "sine.inOut" }, a0 + 0.22);
-      tl.set("#pay", { opacity: 0 }, a1);
+      tl.fromTo("#payCard", { y: 40, scale: 0.97 }, { y: 0, scale: 1, duration: 0.22, ease: "power3.out", immediateRender: false }, a0);
+      tl.to("#payCard", { scale: 1.05, duration: a1 - a0 - 0.22, ease: "sine.inOut" }, a0 + 0.22);
+      tl.to("#pay", { opacity: 0, duration: 2 * FR, ease: "none" }, a1 - 2 * FR);
 
-      /* ---------- site stays offline ---------- */
+      /* ---------- website held offline (clean factual cut, 3-4 frame settle) ---------- */
       const [n0, n1] = D.notpub;
       tl.set("#notpub", { opacity: 1 }, n0);
-      tl.fromTo("#notpub img", { scale: 1.0 }, { scale: 1.05, duration: n1 - n0, ease: "none", immediateRender: false }, n0);
+      tl.fromTo("#notpub img", { scale: 1.035, y: 8 }, { scale: 1, y: 0, duration: 4 * FR, ease: "power2.out", immediateRender: false }, n0);
+      tl.fromTo("#npTag", { opacity: 0 }, { opacity: 1, duration: 4 * FR, ease: "none", immediateRender: false }, n0 + 3 * FR);
       tl.set("#notpub", { opacity: 0 }, n1);
 
-      /* ---------- 2-frame black between "the other." and "So what did we do next?" ---------- */
+      /* ---------- transitions ---------- */
+      // Prahalad → Tarun: 6-frame dark exposure dip centred on the picture cut
+      tl.fromTo("#dip", { opacity: 0 }, { opacity: 0.6, duration: 3 * FR, ease: "sine.in", immediateRender: false }, D.dip1 - 3 * FR);
+      tl.to("#dip", { opacity: 0, duration: 3 * FR, ease: "sine.out" }, D.dip1);
+      // day → night (7 frames) and Prahalad → Tarun (5 frames): soft shadow wipes across the cut
+      [[D.wipe2, 7], [D.wipe3, 5]].forEach(([t, n]) => {
+        tl.set("#wipeA", { opacity: 1, x: 0 }, t - (n / 2) * FR);
+        tl.to("#wipeA", { x: 3280, duration: n * FR, ease: "none" }, t - (n / 2) * FR);
+        tl.set("#wipeA", { opacity: 0 }, t + (n / 2) * FR);
+      });
+      // 2-frame black between "something or the other." and "So what did we do next?"
       tl.set("#flash", { opacity: 1 }, D.flash[0]);
       tl.set("#flash", { opacity: 0 }, D.flash[1]);
-
-      /* ---------- keyword lockups ---------- */
-      const host = document.getElementById("caps");
-      D.caps.forEach((c, k) => {
-        const el = document.createElement("div");
-        el.className = `cap ${c.pos}`;
-        el.id = `cap${k}`;
-        const dot = c.kw.endsWith(".");
-        const word = dot ? c.kw.slice(0, -1) : c.kw;
-        el.innerHTML = `<span class="sm">${c.sm}</span><span class="kw${word.length > 11 ? " long" : ""}">${word}${dot ? '<span class="dot">.</span>' : ""}</span>`;
-        host.appendChild(el);
-        tl.set(el, { opacity: 1 }, c.t0);
-        tl.fromTo(`#cap${k} .sm`, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out", immediateRender: false }, c.t0);
-        tl.fromTo(`#cap${k} .kw`, { opacity: 0, y: 22, filter: "blur(8px)" },
-          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.28, ease: "power3.out", immediateRender: false }, c.t0 + 0.06);
-        if (c.t1 < D.total - 0.05) tl.to(el, { opacity: 0, duration: 0.14, ease: "power1.in" }, c.t1 - 0.14);
-      });
-      gsap.set(".cap .sm, .cap .kw", { opacity: 0 });
 
       window.__timelines = window.__timelines || {};
       window.__timelines["main"] = tl;

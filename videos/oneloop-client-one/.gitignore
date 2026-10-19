@@ -6,3 +6,6 @@ snapshots/
 sources/
 assets/base.mp4
 assets/audio/*.wav
+assets/cut/
+assets/_base_tmp.mp4
+assets/audio/_tmp/

@@ -10,7 +10,7 @@ FPS = 30
 UP = "/root/.claude/uploads/b8e0fea9-ddb3-5f50-9983-de131f1aa53e"
 SCR = "/tmp/claude-0/-home-user-remotion-/b8e0fea9-ddb3-5f50-9983-de131f1aa53e/scratchpad"
 BROLL = os.path.join(SCR, "broll")
-CLEAN = os.path.join(SCR, "ol", "audio")  # *_dn.wav from DeepFilterNet3
+CLEAN = os.path.join(SCR, "ol", "audio2")  # *_dn.wav from DeepFilterNet3, full suppression
 
 # camera sources: path, rotate (Canon bodies were shot sideways), grade, denoise
 SRC = {
@@ -23,30 +23,30 @@ for n in ("0422", "0425", "0431", "0432", "0434", "0436", "0446", "0447", "0457"
     SRC[n] = (f"{BROLL}/MVI_{n}.MP4", True, "broll", "hqdn3d=1:1:4:4")
 
 # dialogue: (audio track, in, out, picture source, picture offset = video time - audio time)
+# every in/out sits in a measured silence (no clipped words, no dragged "and" fragments)
 SEGS = [
     ("0647", 0.86, 3.84, "0647", 0.0),    # 0 Our first client agreed to pay us ₹10,000 for a website,
-    ("0647", 4.46, 8.20, "0647", 0.0),    # 1 and we had just started One Loop, and that money mattered a lot to us.
+    ("0647", 4.56, 8.20, "0647", 0.0),    # 1 and we had just started One Loop, and that money mattered a lot to us.
     ("AUD", 0.00, 4.36, "0658", 1.91),    # 2 We went to every door in Hyderabad, from small-scale … enterprises.
-    ("AUD", 4.52, 6.92, "0658", 1.91),    # 3 We pitched our idea on how to develop their business and
-    ("AUD", 7.22, 8.90, "0658", 1.91),    # 4 one client [said yes / chose us] for a website.
-    ("AUD", 9.32, 10.42, "0658", 1.91),   # 5 We built the demo and
-    ("AUD", 10.70, 12.10, "0658", 1.91),  # 6 when we were ready to publish it.
-    ("0662", 1.44, 5.40, "0662", 0.0),    # 7 And then the payments slowed down. At the beginning he paid us ₹1,500,
-    ("0662", 6.10, 7.45, "0662", 0.0),    # 8 then nothing happened.
-    ("0662", 7.60, 12.50, "0662", 0.0),   # 9 So we tried calling him … something or the other.
-    ("0662", 12.62, 14.30, "0662", 0.0),  # 10 So what did we do next?
-    ("VID", 0.78, 3.06, "VID", 0.0),      # 11 You would expect us to publish it anyway,
-    ("VID", 3.44, 7.00, "VID", 0.0),      # 12 or to walk away, but we did neither. We wanted to handle it professionally,
-    ("VID", 7.04, 9.70, "VID", 0.0),      # 13 but that was not the same case from the client's side. (+ whip start)
-    ("VID", 10.00, 12.30, "VID", 0.0),    # 14 (whip end) That was about our first client,
-    ("VID", 12.62, 15.04, "VID", 0.0),    # 15 and thankfully not every client is like that.
-    ("VID", 15.10, 18.62, "VID", 0.0),    # 16 And in part 2, we'll talk about some of the best clients we've worked with.
+    ("AUD", 4.52, 8.90, "0658", 1.91),    # 3 We pitched our idea … their business, and one client said yes for a website.
+    ("AUD", 9.32, 10.25, "0658", 1.91),   # 4 We built the demo
+    ("AUD", 10.74, 12.22, "0658", 1.91),  # 5 when we were ready to publish it.   ("it" lands at 12.00-12.12)
+    ("0662", 1.44, 5.30, "0662", 0.0),    # 6 And then the payments slowed down. At the beginning he paid us ₹1,500,
+    ("0662", 5.95, 7.45, "0662", 0.0),    # 7 and then nothing happened.
+    ("0662", 7.60, 12.50, "0662", 0.0),   # 8 So we tried calling him … something or the other.
+    ("0662", 12.62, 14.30, "0662", 0.0),  # 9 So what did we do next?
+    ("VID", 0.78, 3.06, "VID", 0.0),      # 10 You would expect us to publish it anyway,
+    ("VID", 3.44, 7.00, "VID", 0.0),      # 11 or to walk away, but we did neither. We wanted to handle it professionally,
+    ("VID", 7.04, 9.70, "VID", 0.0),      # 12 but that was not the same case from the client's side. (+ whip start)
+    ("VID", 10.00, 18.93, "VID", 0.0),    # 13 (whip end) That was about our first client, … we've worked with.
 ]
+FREEZE_F = 21  # end hold on Prahalad's last clean frame for the Part 2 lockup
 
 # frame-quantised segment lengths and timeline starts
 LEN = [round((b - a) * FPS) for _, a, b, _, _ in SEGS]
 START = [sum(LEN[:i]) for i in range(len(SEGS))]
-TOTAL_F = sum(LEN)
+SPEECH_F = sum(LEN)
+TOTAL_F = SPEECH_F + FREEZE_F
 TOTAL = TOTAL_F / FPS
 
 
@@ -62,49 +62,60 @@ def T(seg, t):
 # picture track: each shot runs from its anchor to the next shot's anchor.
 #   A-roll: ("A", seg, t, zoom | (z0, z1))   zoom on the speaker, face-centred
 #   B-roll: ("B", seg, t, src, src_in, zoom, (cx, cy) or None)
+#   J-cut:  ("J", seg)  previous speaker's picture carries on while the next speaker's audio starts
 SHOTS = [
     ("A", 0, 0.86, 1.15),
     ("A", 0, 2.86, 1.24),                          # punch-in on "₹10,000"
     ("A", 1, 5.88, 1.34),                          # closer crop after the One Loop match cut
-    ("A", 2, 0.00, 1.38),                          # R: "We went to every door in Hyderabad,"
+    ("J", 2),                                      # Tarun's "We…" starts 0.2 s before his picture
+    ("A", 2, 0.20, 1.38),                          # Tarun: "We went to every door in Hyderabad,"
     ("B", 2, 1.80, "0436", 2.2, 1.0, None),        # feet: "from small-scale"
     ("B", 2, 2.62, "0458", 1.0, 1.0, None),        # street shops: "local business"
-    ("B", 2, 3.30, "0457", 31.0, 1.0, None),       # large building: "to large-scale enterprises"
+    ("B", 2, 3.18, "0457", 30.9, 1.0, None),       # large building: cut on "to large-scale enterprises"
     ("B", 3, 4.52, "0447", 5.4, 1.0, None),        # pitching at a cafe table
-    ("A", 3, 6.40, 1.45),                          # R: "and one client … for a website."
-    ("B", 5, 9.32, "0422", 4.1, 1.0, None),        # hand pulls the laptop out → match cut
-    ("B", 5, 9.90, "0431", 1.0, 1.0, None),        # typing close-up: "We built the demo"
-    ("B", 6, 10.70, "0425", 0.4, 1.0, None),       # "when we were ready to publish it"
-    ("A", 7, 1.44, 1.20),                          # Y night: "And then the payments slowed down."
-    ("A", 7, 3.28, (1.30, 1.40)),                  # single push across "he paid us ₹1,500"
-    ("A", 8, 6.10, 1.40),                          # "then nothing happened." (payment insert overlays first)
-    ("B", 9, 7.60, "0432", 2.9, 1.0, None),        # phone to ear: "So we tried calling him"
-    ("B", 9, 9.96, "0432", 10.4, 1.0, None),       # phone lowered, checked
-    ("B", 9, 11.30, "0434", 0.3, 1.0, None),       # standing, looking away: "something or the other"
-    ("A", 10, 12.62, 1.32),                        # eye contact: "So what did we do next?"
-    ("A", 11, 0.78, 1.00),                         # R wide: "You would expect us to publish it anyway,"
-    ("B", 12, 3.44, "0467", 6.3, 1.0, None),       # "or to walk away"
-    ("A", 12, 4.22, 1.32),                         # tightest: "but we did neither."
-    ("A", 12, 5.26, 1.15),                         # "We wanted to handle it professionally,"
-    ("B", 13, 8.20, "0446", 1.45, 1.0, None),       # laptop lid closes (after the not-published insert)
-    ("A", 13, 8.90, 1.15),                         # R: "client's side." → real whip begins
-    ("A", 14, 10.00, 1.10),                        # whip lands on Y selfie
-    ("A", 15, 12.62, (1.10, 1.00)),                # slow pull-out
-    ("A", 16, 15.10, 1.00),                        # "And in part 2 …" cut out on "with."
+    ("A", 3, 6.40, 1.45),                          # Tarun: "and one client said yes for a website."
+    ("B", 4, 9.32, "0422", 4.1, 1.0, None),        # hand pulls the laptop out → match cut
+    ("B", 4, 9.90, "0431", 1.0, 1.0, None),        # typing close-up: "We built the demo"
+    ("B", 5, 10.74, "0425", 0.4, 1.0, None),       # "when we were ready to publish it"
+    ("A", 6, 1.62, 1.20),                          # J-cut: "And…" heard over the laptop, then night Prahalad
+    ("A", 6, 3.28, (1.30, 1.40)),                  # single push across "he paid us ₹1,500"
+    ("A", 7, 5.95, 1.40, 0.43),                    # "and then nothing happened." held on the face (headroom for the line)
+    ("B", 8, 7.60, "0432", 2.9, 1.0, None),        # phone to ear: "So we tried calling him"
+    ("B", 8, 9.96, "0432", 10.4, 1.0, None),       # phone lowered, checked
+    ("B", 8, 11.30, "0434", 0.3, 1.0, None),       # standing, looking away: "something or the other"
+    ("A", 9, 12.62, 1.32),                         # eye contact: "So what did we do next?"
+    ("J", 10),                                     # Tarun's "You…" starts under Prahalad
+    ("A", 10, 0.98, 1.00),                         # Tarun wide: "You would expect us to publish it anyway,"
+    ("B", 11, 3.44, "0467", 6.3, 1.0, None),       # "or to walk away"
+    ("A", 11, 4.22, 1.32),                         # tightest: "but we did neither."
+    ("A", 11, 5.26, 1.15),                         # "We wanted to handle it professionally,"
+    ("B", 12, 8.20, "0446", 1.45, 1.0, None),      # laptop lid closes (after the not-published insert)
+    ("A", 12, 8.90, 1.15),                         # Tarun: "client's side." → real whip begins
+    ("A", 13, 10.00, 1.10),                        # whip lands on Prahalad's selfie
+    ("A", 13, 12.62, (1.10, 1.00)),                # slow pull-out
+    ("A", 13, 15.10, 1.00),                        # "And in part 2 …"
 ]
+J_LEN = 0.20
+# directional whip blur, one featured transition: (timeline frame, blur radius px)
+WHIP_CUT = START[13]
+WHIP = [(WHIP_CUT + k, r) for k, r in zip(range(-6, 5), (6, 12, 22, 34, 46, 56, 50, 38, 26, 14, 6))]
 
 # overlays drawn in HyperFrames (timeline seconds)
 OVER = {
     "paper": (T(1, 4.78), T(1, 5.88)),             # One Loop text match cut, lands on "One Loop"
-    "pay": (T(7, 4.80), T(8, 6.45)),               # blurred ₹1,500 receipt
-    "flash": (T(9, 12.43), T(10, 12.62)),          # 2-frame black between the clauses
-    "notpub": (T(13, 7.30), T(13, 8.20)),          # "Webpage not available"
+    "pay": (T(6, 4.28), T(7, 6.30)),               # blurred ₹1,500 receipt, L-cut under Prahalad's voice
+    "flash": (T(8, 12.43), T(9, 12.62)),           # 2-frame black between the clauses
+    "notpub": (T(12, 7.30), T(12, 8.20)),          # "Webpage not available" — website held offline
+    "dip1": T(2, 0.20),                            # dark exposure dip on Prahalad → Tarun
+    "wipe2": T(6, 1.62),                           # shadow wipe day B-roll → night Prahalad
+    "wipe3": T(10, 0.98),                          # shadow pass Prahalad → Tarun ("You'd expect us")
+    "end": (T(13, 18.55), TOTAL),                  # "Next in Part 2" lockup on the held face
 }
-# keyword lockups: (small words, keyword, t0, t1, position)
-CAPS = [
-    ("agreed to pay us", "₹10,000", T(0, 2.86), T(0, 3.84), "low"),
-    ("we went to", "every door", T(2, 0.30), T(2, 1.80), "top"),
-    ("and then", "nothing.", T(8, 6.50), T(8, 7.45), "low"),
-    ("we wanted to handle it", "professionally.", T(12, 5.40), T(12, 7.00), "low"),
-    ("next, in", "part 2", T(16, 15.30), T(16, 18.62), "top"),
-]
+# One Loop newspaper text match cut (after the supplied reference): page changes, in frames from OVER["paper"][0]
+MATCH_PAGES = [0, 5, 10, 20, 27]  # last page = One Loop logo card, 4-6 frame settle
+# voice groups for tonal matching (Prahalad's camera-mic voice is the reference)
+VOICE = ["P_cam", "P_cam", "T_aud", "T_aud", "T_aud", "T_aud", "P_cam", "P_cam", "P_cam", "P_cam",
+         "T_vid", "T_vid", "T_vid", "P_vid"]
+# ambience beds follow the picture's location changes: (start, kind)
+AMBIENCE = [(0.0, "day"), (OVER_DIP := T(2, 0.20), "dusk"), (T(6, 1.62), "night"), (T(10, 0.98), "night2"),
+            (WHIP_CUT / FPS, "street")]
