@@ -13,7 +13,7 @@ Timeline seconds. Every spoken phrase has a card; gaps are measured against the 
 | 7 | 7.66–8.53 | 7.70–8.33 | in Hyderabad, | upper | clean phrase in the open space above the head (front, never touches face/hands) |
 | 8 | 8.53–9.23 | 8.57–9.23 | from small-scale | env | pinned to 0436 surface, planar track damped to 12 % (fast camera move); surface angle rotateX(48deg) |
 | 9 | 9.23–9.77 | 9.23–9.77 | local businesses | env | pinned to 0458 surface, planar track damped to 15 % (fast camera move) |
-| 10 | 9.77–11.03 | 9.77–10.80 | to large-scale / enterprises. | env | pinned to 0457 surface, planar track damped to 10 % (fast camera move); surface angle rotateY(-14deg) |
+| 10 | 9.77–11.03 | 9.77–10.80 | to large-scale / enterprises. | env | pinned to 0457 surface, planar track damped to 4 % (fast camera move); surface angle rotateY(-14deg) |
 | 11 | 11.03–11.73 | 11.07–11.77 | We pitched / our idea | env | pinned to 0447 surface, planar track |
 | 12 | 11.73–12.83 | 11.77–13.07 | on how to develop / their business, | env | pinned to 0447 surface, planar track |
 | 13 | 13.26–14.23 | 13.30–14.27 | and one client | upper | clean phrase in the open space above the head (front, never touches face/hands) |

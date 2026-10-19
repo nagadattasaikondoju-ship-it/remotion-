@@ -71,7 +71,7 @@ SHOTS = [
     ("A", 2, 0.20, 1.38),                          # Tarun: "We went to every door in Hyderabad,"
     ("B", 2, 1.80, "0436", 2.2, 1.0, None),        # feet: "from small-scale"
     ("B", 2, 2.62, "0458", 1.0, 1.0, None),        # street shops: "local business"
-    ("B", 2, 3.18, "0457", 30.9, 1.0, None),       # large building: cut on "to large-scale enterprises"
+    ("B", 2, 3.18, "0457", 31.2, 1.0, None),       # large building: cut on "to large-scale enterprises"
     ("B", 3, 4.52, "0447", 5.4, 1.0, None),        # pitching at a cafe table
     ("A", 3, 6.40, 1.45),                          # Tarun: "and one client said yes for a website."
     ("B", 4, 9.32, "0422", 4.1, 1.0, None),        # hand pulls the laptop out → match cut
