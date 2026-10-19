@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>One Loop Client One</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Playfair"; font-style: italic; font-weight: 600; src: url("assets/fonts/PlayfairDisplay-italic-600.ttf"); }
+      @font-face { font-family: "Josefin"; font-weight: 400; src: url("assets/fonts/JosefinSans-normal-400.ttf"); }
+      @font-face { font-family: "Josefin"; font-weight: 600; src: url("assets/fonts/JosefinSans-normal-600.ttf"); }
+      @font-face { font-family: "Caveat"; font-weight: 500; src: url("assets/fonts/Caveat-normal-500.ttf"); }
+      @font-face { font-family: "Elite"; font-weight: 400; src: url("assets/fonts/SpecialElite-normal-400.ttf"); }
+      @font-face { font-family: "Baskerville"; font-weight: 700; src: url("assets/fonts/LibreBaskerville-normal-700.ttf"); }
+      :root {
+        --cu1: #f2b88c; /* One Loop copper, light */
+        --cu2: #c97a4a; /* One Loop copper, deep */
+        --ink: #17130f;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+      .full { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      video.full { object-fit: cover; }
+
+      /* ---------- paper "One Loop" text match cut ---------- */
+      #paper { opacity: 0; background: #0b0908; }
+      .pg { position: absolute; left: -40px; top: -40px; width: 1160px; height: 2000px; opacity: 0; overflow: hidden; }
+      .pg .body { position: absolute; left: 120px; right: 120px; filter: blur(2.2px); }
+      .pg .anchor { position: absolute; left: 0; right: 0; top: 900px; height: 0; text-align: center; }
+      .pg .anchor span { display: inline-block; transform: translateY(-50%); padding: 0.04em 0.22em 0.08em; }
+      .hl { background: linear-gradient(transparent 12%, rgba(242, 184, 140, 0.95) 12%, rgba(242, 184, 140, 0.95) 88%, transparent 88%); }
+      .ln { height: 18px; margin: 0 0 30px; border-radius: 4px; background: rgba(40, 30, 22, 0.42); }
+      #pg1 { background: radial-gradient(ellipse at 40% 35%, #f6efe2, #e6dccb); }
+      #pg1 .head { position: absolute; left: 0; right: 0; top: 330px; text-align: center; font: 700 50px/1.1 "Baskerville"; color: #2a2119; letter-spacing: 0.01em; filter: blur(1.6px); }
+      #pg1 .anchor span { font: 700 128px/1 "Baskerville"; color: #17130f; }
+      #pg2 { background: repeating-linear-gradient(#fbf8ef 0 62px, #9fb9d8 62px 64px); }
+      #pg2:before { content: ""; position: absolute; left: 200px; top: 0; bottom: 0; width: 3px; background: #e08a8a; }
+      #pg2 .body { font: 500 64px/64px "Caveat"; color: #2b3a66; }
+      #pg2 .anchor span { font: 500 150px/1 "Caveat"; color: #1d2a55; }
+      #pg3 { background: radial-gradient(ellipse at 50% 40%, #caa27a, #a97f58); }
+      #pg3 .body { font: 400 50px/1.5 "Elite"; color: #3a2a1c; text-align: center; }
+      #pg3 .anchor span { font: 400 132px/1 "Elite"; color: #22170f; letter-spacing: 0.04em; }
+      #pg4 { background-color: #f7f7f2; background-image: linear-gradient(#cfe0e6 2px, transparent 2px), linear-gradient(90deg, #cfe0e6 2px, transparent 2px); background-size: 48px 48px; }
+      #pg4 .body { font: 400 50px/1.5 "Josefin"; color: #3d4448; }
+      #pg4 .anchor span { font: 600 136px/1 "Josefin"; color: #1b2226; letter-spacing: 0.02em; }
+      #pg5 { background: linear-gradient(180deg, #ffffff, #f1eeea); }
+      #pg5 .body { font: 400 38px/1.6 "Josefin"; color: #55504a; text-align: center; letter-spacing: 0.14em; white-space: nowrap; left: 0; right: 0; }
+      #pg5 .anchor span { font: 400 112px/1 "Josefin"; color: #17130f; letter-spacing: 0.3em; padding-left: 0.52em; }
+      #pg6 { background: #000; }
+      #pg6 img { position: absolute; left: 150px; top: 497px; width: 860px; }
+
+      /* ---------- proof screens ---------- */
+      #pay { opacity: 0; background: radial-gradient(ellipse at 50% 42%, #2a211b, #0b0908 70%); }
+      #payCard { position: absolute; left: 110px; top: 470px; width: 860px; height: 940px; border-radius: 40px; overflow: hidden;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08); transform-origin: 82% 26%; }
+      #payCard img { width: 860px; display: block; }
+      #notpub { opacity: 0; background: #e9e9e9; }
+      #notpub img { position: absolute; left: 70px; top: 640px; width: 940px; transform-origin: 50% 40%; }
+
+      #flash { opacity: 0; background: #000; }
+
+      /* ---------- keyword lockups ---------- */
+      .cap { position: absolute; left: 90px; right: 90px; text-align: center; opacity: 0; isolation: isolate;
+        filter: drop-shadow(0 6px 16px rgba(0, 0, 0, 0.6)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.7)); }
+      .cap:before { content: ""; position: absolute; left: 6%; right: 6%; top: -6%; bottom: -10%; z-index: -1; border-radius: 50%;
+        background: radial-gradient(ellipse at 50% 55%, rgba(10, 7, 5, 0.5), rgba(10, 7, 5, 0) 70%); }
+      .cap.top { top: 250px; }
+      .cap.low { top: 1150px; }
+      .cap .sm { display: block; font: 400 44px/1.1 "Josefin"; color: rgba(255, 255, 255, 0.94); letter-spacing: 0.06em; text-transform: lowercase; }
+      .cap .kw { display: inline-block; margin-top: 2px; font: italic 600 150px/1.12 "Playfair"; letter-spacing: -0.01em; padding: 0 0.08em 0.06em;
+        background: linear-gradient(180deg, var(--cu1) 0%, #e09a68 55%, var(--cu2) 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+      .cap .kw.long { font-size: 112px; }
+      .cap .dot { color: var(--cu1); -webkit-text-fill-color: var(--cu1); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="46.3000" data-width="1080" data-height="1920">
+      <video id="base" class="full" src="assets/base.mp4" data-start="0" data-duration="46.3000" data-media-start="0" data-track-index="0" muted playsinline></video>
+
+      <!-- One Loop text match cut: the same word in the same place, page after page (their own notes, no press) -->
+      <div id="paper" class="full">
+        <div class="pg" id="pg1">
+          <div class="head">Audit. Build. Market. Automate.</div>
+          <div class="body" style="top: 520px"><div class="ln" style="width:92%"></div><div class="ln" style="width:84%"></div><div class="ln" style="width:88%"></div></div>
+          <div class="anchor"><span class="hl">One Loop</span></div>
+          <div class="body" style="top: 1040px"><div class="ln" style="width:90%"></div><div class="ln" style="width:76%"></div><div class="ln" style="width:86%"></div><div class="ln" style="width:64%"></div></div>
+        </div>
+        <div class="pg" id="pg2">
+          <div class="body" style="left: 240px; top: 572px">client #1 — website<br />₹10,000 · Hyderabad</div>
+          <div class="anchor"><span class="hl">one loop</span></div>
+          <div class="body" style="left: 240px; top: 1022px">door to door — every<br />local business</div>
+        </div>
+        <div class="pg" id="pg3">
+          <div class="body" style="top: 600px">websites · marketing · automation</div>
+          <div class="anchor"><span class="hl">ONE LOOP</span></div>
+          <div class="body" style="top: 1030px">est. Hyderabad</div>
+        </div>
+        <div class="pg" id="pg4">
+          <div class="body" style="top: 620px">audit → build → market → automate</div>
+          <div class="anchor"><span class="hl">one loop</span></div>
+          <div class="body" style="top: 1040px">first client · first website</div>
+        </div>
+        <div class="pg" id="pg5">
+          <div class="body" style="top: 650px">AUDIT. BUILD. MARKET. AUTOMATE.</div>
+          <div class="anchor"><span class="hl">ONELOOP</span></div>
+        </div>
+        <div class="pg" id="pg6"><img src="assets/img/logo.png" alt="" /></div>
+      </div>
+
+      <!-- proof: the real ₹1,500 receipt, personal and client details redacted -->
+      <div id="pay" class="full"><div id="payCard"><img src="assets/img/payment-1500.png" alt="" /></div></div>
+      <!-- proof: the site stayed offline -->
+      <div id="notpub" class="full"><img src="assets/img/not-published.png" alt="" /></div>
+
+      <div id="caps"></div>
+      <div id="flash" class="full"></div>
+
+      <audio id="mix" src="assets/audio/master.wav" data-start="0" data-duration="46.3000" data-media-start="0" data-track-index="1" data-volume="1"></audio>
+    </div>
+
+    <script>
+      const D = {"total": 46.3, "paper": [3.3, 4.4], "pay": [21.0, 21.9667], "notpub": [35.6333, 36.5333], "flash": [27.8, 27.8667], "caps": [{"sm": "agreed to pay us", "kw": "₹10,000", "t0": 2.0, "t1": 2.9667, "pos": "low"}, {"sm": "we went to", "kw": "every door", "t0": 7.0, "t1": 8.5, "pos": "top"}, {"sm": "and then", "kw": "nothing.", "t0": 22.0, "t1": 22.9667, "pos": "low"}, {"sm": "we wanted to handle it", "kw": "professionally.", "t0": 33.7667, "t1": 35.3667, "pos": "low"}, {"sm": "next, in", "kw": "part 2", "t0": 42.9667, "t1": 46.3, "pos": "top"}]};
+      const tl = gsap.timeline({ paused: true });
+      const FR = 1 / 30;
+
+      /* ---------- paper match cut: hard page swaps on exact frames, each page settles slightly ---------- */
+      const [p0, p1] = D.paper;
+      const pages = [0, 6, 12, 17, 22, 26];
+      const tilt = [-1.6, 1.3, -0.9, 1.7, -1.1, 0];
+      tl.set("#paper", { opacity: 1 }, p0);
+      tl.set("#paper", { opacity: 0 }, p1);
+      pages.forEach((f, k) => {
+        const t = p0 + f * FR;
+        const end = k + 1 < pages.length ? p0 + pages[k + 1] * FR : p1;
+        tl.set(`#pg${k + 1}`, { opacity: 1 }, t);
+        if (k + 1 < pages.length) tl.set(`#pg${k + 1}`, { opacity: 0 }, end);
+        tl.fromTo(`#pg${k + 1}`, { scale: k < 5 ? 1.05 : 1.02, rotation: tilt[k] * 1.6, x: (k % 2 ? 14 : -14) },
+          { scale: 1, rotation: tilt[k], x: 0, duration: end - t, ease: "power2.out", immediateRender: false }, t);
+      });
+
+      /* ---------- ₹1,500 receipt ---------- */
+      const [a0, a1] = D.pay;
+      tl.fromTo("#pay", { opacity: 0 }, { opacity: 1, duration: 3 * FR, ease: "none", immediateRender: false }, a0);
+      tl.fromTo("#payCard", { y: 46, scale: 0.97 }, { y: 0, scale: 1, duration: 0.22, ease: "power3.out", immediateRender: false }, a0);
+      tl.to("#payCard", { scale: 1.06, duration: a1 - a0 - 0.22, ease: "sine.inOut" }, a0 + 0.22);
+      tl.set("#pay", { opacity: 0 }, a1);
+
+      /* ---------- site stays offline ---------- */
+      const [n0, n1] = D.notpub;
+      tl.set("#notpub", { opacity: 1 }, n0);
+      tl.fromTo("#notpub img", { scale: 1.0 }, { scale: 1.05, duration: n1 - n0, ease: "none", immediateRender: false }, n0);
+      tl.set("#notpub", { opacity: 0 }, n1);
+
+      /* ---------- 2-frame black between "the other." and "So what did we do next?" ---------- */
+      tl.set("#flash", { opacity: 1 }, D.flash[0]);
+      tl.set("#flash", { opacity: 0 }, D.flash[1]);
+
+      /* ---------- keyword lockups ---------- */
+      const host = document.getElementById("caps");
+      D.caps.forEach((c, k) => {
+        const el = document.createElement("div");
+        el.className = `cap ${c.pos}`;
+        el.id = `cap${k}`;
+        const dot = c.kw.endsWith(".");
+        const word = dot ? c.kw.slice(0, -1) : c.kw;
+        el.innerHTML = `<span class="sm">${c.sm}</span><span class="kw${word.length > 11 ? " long" : ""}">${word}${dot ? '<span class="dot">.</span>' : ""}</span>`;
+        host.appendChild(el);
+        tl.set(el, { opacity: 1 }, c.t0);
+        tl.fromTo(`#cap${k} .sm`, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.2, ease: "power2.out", immediateRender: false }, c.t0);
+        tl.fromTo(`#cap${k} .kw`, { opacity: 0, y: 22, filter: "blur(8px)" },
+          { opacity: 1, y: 0, filter: "blur(0px)", duration: 0.28, ease: "power3.out", immediateRender: false }, c.t0 + 0.06);
+        if (c.t1 < D.total - 0.05) tl.to(el, { opacity: 0, duration: 0.14, ease: "power1.in" }, c.t1 - 0.14);
+      });
+      gsap.set(".cap .sm, .cap .kw", { opacity: 0 });
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

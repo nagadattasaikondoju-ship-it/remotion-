@@ -1,0 +1,72 @@
+[
+ {
+  "sfx": "paper flick",
+  "t": 3.3,
+  "peak_db": -30
+ },
+ {
+  "sfx": "paper flick",
+  "t": 3.5,
+  "peak_db": -30
+ },
+ {
+  "sfx": "paper flick",
+  "t": 3.7,
+  "peak_db": -30
+ },
+ {
+  "sfx": "paper flick",
+  "t": 3.867,
+  "peak_db": -30
+ },
+ {
+  "sfx": "paper flick",
+  "t": 4.033,
+  "peak_db": -30
+ },
+ {
+  "sfx": "paper flick",
+  "t": 4.167,
+  "peak_db": -27
+ },
+ {
+  "sfx": "payment chime",
+  "t": 21.567,
+  "peak_db": -24
+ },
+ {
+  "sfx": "low sub impact",
+  "t": 22.067,
+  "peak_db": -20
+ },
+ {
+  "sfx": "clock tick",
+  "t": 25.167,
+  "peak_db": -30
+ },
+ {
+  "sfx": "clock tick",
+  "t": 27.767,
+  "peak_db": -31
+ },
+ {
+  "sfx": "micro hit",
+  "t": 32.557,
+  "peak_db": -22
+ },
+ {
+  "sfx": "UI power-down",
+  "t": 35.683,
+  "peak_db": -27
+ },
+ {
+  "sfx": "air whoosh (real whip)",
+  "t": 37.733,
+  "peak_db": -24
+ },
+ {
+  "sfx": "micro riser",
+  "t": 45.58,
+  "peak_db": -26
+ }
+]

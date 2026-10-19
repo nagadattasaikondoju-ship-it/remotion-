@@ -1,0 +1,8 @@
+node_modules/
+renders/
+snapshots/
+.hyperframes/
+# raw inputs (unredacted payment screenshot, client footage) and large derived media
+sources/
+assets/base.mp4
+assets/audio/*.wav
