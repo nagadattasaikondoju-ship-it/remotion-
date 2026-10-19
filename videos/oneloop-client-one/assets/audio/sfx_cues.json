@@ -31,12 +31,6 @@
    "peak_db": -29
   },
   {
-   "moment": 2,
-   "sfx": "short airy whoosh (Prahalad → Tarun)",
-   "t": 6.62,
-   "peak_db": -36
-  },
-  {
    "moment": 3,
    "sfx": "muted phone notification (₹1,500 proof)",
    "t": 20.607,
@@ -65,6 +59,150 @@
    "sfx": "short hopeful micro-riser (Part 2)",
    "t": 46.0,
    "peak_db": -30
+  },
+  {
+   "moment": "paper",
+   "sfx": "paper cut L1 (Prahalad → OneLoop newspaper match cut)",
+   "t": 3.165,
+   "peak_db": -13.6
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L2 (OneLoop logo card → Prahalad)",
+   "t": 4.23,
+   "peak_db": -17.2
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L3 (speaker: Prahalad → Tarun)",
+   "t": 6.73,
+   "peak_db": -13.3
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L2 (Tarun → feet B-roll)",
+   "t": 8.33,
+   "peak_db": -15.9
+  },
+  {
+   "moment": "paper",
+   "sfx": "paper cut L1 (feet → street shops)",
+   "t": 9.198,
+   "peak_db": -12.8
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L2 (street → large building)",
+   "t": 9.697,
+   "peak_db": -12.4
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L2 (building → café pitch)",
+   "t": 10.897,
+   "peak_db": -15.4
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L2 (café → Tarun (\"one client said yes\"))",
+   "t": 12.763,
+   "peak_db": -14.0
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L2 (Tarun → laptop B-roll)",
+   "t": 15.263,
+   "peak_db": -16.7
+  },
+  {
+   "moment": "paper",
+   "sfx": "paper cut L1 (hand match cut → typing)",
+   "t": 15.865,
+   "peak_db": -12.1
+  },
+  {
+   "moment": "paper",
+   "sfx": "paper cut L1 (typing → laptop screen)",
+   "t": 16.232,
+   "peak_db": -14.3
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L3 (speaker: Tarun's laptop → Prahalad, night)",
+   "t": 17.83,
+   "peak_db": -16.3
+  },
+  {
+   "moment": "paper",
+   "sfx": "paper cut L2 (Prahalad → ₹1,500 proof)",
+   "t": 20.532,
+   "peak_db": -11.4
+  },
+  {
+   "moment": "paper",
+   "sfx": "paper cut L1 (proof → Prahalad (the low impact carries \"nothing\"))",
+   "t": 21.898,
+   "peak_db": -12.6
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L2 (Prahalad → phone-call B-roll)",
+   "t": 23.03,
+   "peak_db": -13.9
+  },
+  {
+   "moment": "paper",
+   "sfx": "paper cut L1 (phone to ear → phone checked)",
+   "t": 25.432,
+   "peak_db": -14.8
+  },
+  {
+   "moment": "paper",
+   "sfx": "paper cut L1 (phone → standing, looking away)",
+   "t": 26.765,
+   "peak_db": -16.7
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L3 (B-roll → Prahalad (\"So what did we do next?\"))",
+   "t": 27.93,
+   "peak_db": -12.6
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L3 (speaker: Prahalad → Tarun)",
+   "t": 29.797,
+   "peak_db": -24.0
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L2 (Tarun → walk-away B-roll)",
+   "t": 31.863,
+   "peak_db": -13.9
+  },
+  {
+   "moment": "paper",
+   "sfx": "paper cut L1 (B-roll → Tarun (\"neither\"))",
+   "t": 32.665,
+   "peak_db": -16.4
+  },
+  {
+   "moment": "paper",
+   "sfx": "paper cut L2 (Tarun → website held offline)",
+   "t": 35.732,
+   "peak_db": -16.8
+  },
+  {
+   "moment": "flash",
+   "sfx": "flash snap L1 (offline screen → laptop lid closes)",
+   "t": 36.597,
+   "peak_db": -14.2
+  },
+  {
+   "moment": "paper",
+   "sfx": "paper cut L1 (lid → Tarun (\"client's side\"))",
+   "t": 37.332,
+   "peak_db": -15.8
   }
  ],
  "voice_gain_db": {

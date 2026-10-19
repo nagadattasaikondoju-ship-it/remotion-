@@ -1,4 +1,4 @@
-"""Dialogue restoration + edit, clean ambience beds, natural B-roll sound, 7 restrained SFX
+"""Dialogue restoration + edit, clean ambience beds, natural B-roll sound, designed SFX + flash-cut SFX
 → assets/audio/master.wav (48 kHz stereo, −14.5 LUFS integrated, ≤ −1 dBTP).
 
 Run: python3 scripts/build_audio.py
@@ -18,7 +18,7 @@ import numpy as np
 from scipy.signal import butter, sosfilt, welch
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from edl import (AMBIENCE, BROLL, CLEAN, FPS, MATCH_PAGES, OVER, SEGS, START, LEN, TOTAL, VOICE, WHIP_CUT,  # noqa
+from edl import (AMBIENCE, BROLL, CLEAN, FLASHCUTS, FPS, MATCH_PAGES, OVER, SEGS, START, LEN, TOTAL, VOICE, WHIP_CUT,  # noqa
                  T)
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
@@ -219,7 +219,7 @@ natural("0431", 1.0, T(4, 9.90), T(5, 12.22), -36, 400)    # keys / trackpad und
 natural("0446", 1.45, T(12, 8.20), T(12, 8.90), -33)       # real laptop lid closing
 
 
-# ================= 7 designed SFX moments =================
+# ================= designed SFX moments + flash-cut SFX =================
 def t_axis(d):
     return np.arange(int(d * SR)) / SR
 
@@ -265,6 +265,40 @@ def power_down():  # quiet browser-tab close / UI power-down
     return 0.7 * np.sin(2 * np.pi * np.cumsum(f) / SR) * env(len(t), 0.003, 0.1) + 0.35 * click
 
 
+FLASH_PRE = 0.07  # the flash SFX's airy lead-in; its snap lands on the cut frame
+
+
+def flash_snap(level):  # flash cut: short airy lift into a bright shutter-like snap + a quick shimmer tail
+    t = t_axis(FLASH_PRE + 0.32)
+    n, k = len(t), int(FLASH_PRE * SR)
+    lift = np.zeros(n)
+    lift[:k] = filt(rng.standard_normal(k), "bandpass", [2200, 9000]) * (np.arange(k) / k) ** 2.2 * 0.45
+    tail = np.zeros(n)
+    tail[k:] = (filt(rng.standard_normal(n - k), "highpass", 2800) * env(n - k, 0.0008, 0.0045)
+                + 0.35 * filt(rng.standard_normal(n - k), "bandpass", [4500, 12000]) * env(n - k, 0.003, 0.06))
+    j = k + int(0.022 * SR)  # second, softer shutter blade
+    tail[j:] += 0.35 * filt(rng.standard_normal(n - j), "highpass", 3500) * env(n - j, 0.0005, 0.003)
+    x = filt(lift + tail, "lowpass", 14000)
+    if level == 3:  # speaker changes get a faint low body under the snap
+        tt = t[k:] - t[k]
+        x[k:] += 0.22 * np.sin(2 * np.pi * (68 + 40 * np.exp(-tt / 0.02)) * tt) * env(n - k, 0.002, 0.05)
+    return x
+
+
+PAPER_PRE = 0.035
+
+
+def paper_cut():  # quick paper swipe ending in a crisp snip on the cut
+    t = t_axis(PAPER_PRE + 0.12)
+    n, k = len(t), int(PAPER_PRE * SR)
+    fibre = 1 + 0.8 * np.abs(filt(rng.standard_normal(n), "lowpass", 180)) / 0.05
+    swipe = filt(rng.standard_normal(n), "bandpass", [900, 6500]) * fibre
+    shape = np.where(np.arange(n) < k, (np.arange(n) / k) ** 1.5, np.exp(-(np.arange(n) - k) / (0.03 * SR)))
+    snip = np.zeros(n)
+    snip[k:] = filt(rng.standard_normal(n - k), "highpass", 3000) * env(n - k, 0.0004, 0.0025) * 2.2
+    return swipe * shape / np.max(np.abs(swipe * shape)) + snip
+
+
 def micro_riser():
     t = t_axis(0.7)
     s = (t / 0.7) ** 2
@@ -288,12 +322,27 @@ p0 = OVER["paper"][0]
 for k, fr in enumerate(MATCH_PAGES[:-1]):
     cue(1, "paper page flick (texture)", paper_flick, p0 + fr / FPS, -40)
 cue(1, "premium paper tap (logo card settles)", paper_tap, p0 + MATCH_PAGES[-1] / FPS, -29)
-cue(2, "short airy whoosh (Prahalad → Tarun)", lambda: air_whoosh(0.3), OVER["dip1"] - 0.18, -36)
 cue(3, "muted phone notification (₹1,500 proof)", notify, OVER["pay"][0] + 0.04, -28)
 cue(4, "single low impact / sub drop (nothing happened)", low_impact, T(7, 6.58), -23)
 cue(5, "quiet browser-tab close (site held offline)", power_down, OVER["notpub"][0] + 0.03, -29)
 cue(6, "directional air whip (real camera whip)", lambda: air_whoosh(0.3, 400, 6000), WHIP_CUT / FPS - 0.15, -25)
 cue(7, "short hopeful micro-riser (Part 2)", micro_riser, OVER["end"][0] - 0.7, -30)
+# flash-cut pass: one SFX on every change to the next clip or speaker. Its peak follows what is already playing
+# at the cut (voice + natural sound + ambience): over speech it sits ~15-20 dB under the voice in RMS (a short
+# bright transient still reads), in a pause it drops so it never jumps out of the silence; peaks capped at -11 dBFS
+OFFSET = {("flash", 3): 6, ("flash", 2): 4, ("flash", 1): 2, ("paper", 2): 4, ("paper", 1): 3}
+under = voice + nat + amb.astype(np.float32)
+
+
+def rms_db(x):
+    return 20 * np.log10(np.sqrt(np.mean(np.square(x, dtype=np.float64))) + 1e-9)
+
+
+for t, kind, lvl, what in FLASHCUTS:
+    fn, pre = (lambda: flash_snap(lvl), FLASH_PRE) if kind == "flash" else (paper_cut, PAPER_PRE)
+    local = rms_db(under[int((t - 0.25) * SR):int((t + 0.25) * SR)])
+    peak = float(np.clip(local + OFFSET[kind, lvl], -24, -11))
+    cue(kind, f"{'flash snap' if kind == 'flash' else 'paper cut'} L{lvl} ({what})", fn, t - pre, round(peak, 1))
 
 mix = voice + nat + sfx + amb.astype(np.float32)
 pre = os.path.join(TMP, "_mix.wav")
@@ -309,4 +358,4 @@ json.dump({"sfx": cues, "voice_gain_db": gain, "match_eq": match}, open(os.path.
 print("group gains:", {k: round(v, 1) for k, v in gain.items()})
 for g, m in match.items():
     print(g, " ".join(f"{f}:{d:+.1f}" for f, d in m))
-print("SFX moments:", len({c["moment"] for c in cues}))
+print("SFX moments:", len({c["moment"] for c in cues}), "| flash/paper cuts:", sum(isinstance(c["moment"], str) for c in cues))

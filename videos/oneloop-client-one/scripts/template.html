@@ -92,13 +92,21 @@
       #npTag i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--terra); margin-right: 16px; transform: translateY(-3px); }
 
       /* ---------- transitions ---------- */
-      #dip { opacity: 0; background: #070504; }
-      .wipe { opacity: 0; background: linear-gradient(90deg, rgba(5, 4, 3, 0) 0%, rgba(5, 4, 3, 0.94) 30%, rgba(5, 4, 3, 0.94) 70%, rgba(5, 4, 3, 0) 100%); width: 2200px; left: -2200px; }
-      #flash { opacity: 0; background: #000; }
+      /* flash cut: warm exposure wash + hot core + light sweep (after the editorial flash recipe), screen-blended */
+      #stage { transform-origin: 50% 46%; }
+      #fx { overflow: hidden; pointer-events: none; }
+      #fx .fl { position: absolute; opacity: 0; }
+      #fxWash { inset: 0; background: rgb(255 246 236); }
+      #fxCore { inset: -18%; mix-blend-mode: screen; transform-origin: 50% 44%;
+        background: radial-gradient(ellipse 70% 52% at 50% 44%, #fff 0%, rgb(255 253 250 / 96%) 22%, rgb(255 246 236 / 80%) 46%, rgb(227 154 104 / 30%) 68%, transparent 86%); }
+      #fxSweep { inset: -28%; mix-blend-mode: screen;
+        background: linear-gradient(112deg, transparent 22%, rgb(227 154 104 / 12%) 38%, rgb(255 246 236 / 88%) 49%, #fff 53%, rgb(247 232 218 / 30%) 62%, transparent 78%); }
     </style>
   </head>
   <body>
     <div id="root" data-composition-id="main" data-start="0" data-duration="%%TOTAL%%" data-width="1080" data-height="1920">
+      <!-- everything in picture sits on one stage so the flash cuts can punch the whole frame without breaking the cut-out alignment -->
+      <div id="stage" class="full">
       <video id="base" class="full" src="assets/base.mp4" data-start="0" data-duration="%%TOTAL%%" data-media-start="0" data-track-index="0" muted playsinline></video>
 
       <!-- captions that sit BEHIND the speaker -->
@@ -144,9 +152,10 @@
       <!-- proof-screen captions sit above the proof -->
       <div id="top" class="layer"></div>
 
-      <div id="dip" class="full"></div>
-      <div id="wipeA" class="full wipe"></div>
-      <div id="flash" class="full"></div>
+      </div>
+
+      <!-- flash-cut light layers (above everything in picture) -->
+      <div id="fx" class="full"><div id="fxWash" class="fl"></div><div id="fxCore" class="fl"></div><div id="fxSweep" class="fl"></div></div>
 
       <audio id="mix" src="assets/audio/master.wav" data-start="0" data-duration="%%TOTAL%%" data-media-start="0" data-track-index="1" data-volume="1"></audio>
     </div>
@@ -216,19 +225,32 @@
       tl.fromTo("#npTag", { opacity: 0 }, { opacity: 1, duration: 4 * FR, ease: "none", immediateRender: false }, n0 + 3 * FR);
       tl.set("#notpub", { opacity: 0 }, n1);
 
-      /* ---------- transitions ---------- */
-      // Prahalad → Tarun: 6-frame dark exposure dip centred on the picture cut
-      tl.fromTo("#dip", { opacity: 0 }, { opacity: 0.6, duration: 3 * FR, ease: "sine.in", immediateRender: false }, D.dip1 - 3 * FR);
-      tl.to("#dip", { opacity: 0, duration: 3 * FR, ease: "sine.out" }, D.dip1);
-      // day → night (7 frames) and Prahalad → Tarun (5 frames): soft shadow wipes across the cut
-      [[D.wipe2, 7], [D.wipe3, 5]].forEach(([t, n]) => {
-        tl.set("#wipeA", { opacity: 1, x: 0 }, t - (n / 2) * FR);
-        tl.to("#wipeA", { x: 3280, duration: n * FR, ease: "none" }, t - (n / 2) * FR);
-        tl.set("#wipeA", { opacity: 0 }, t + (n / 2) * FR);
+      /* ---------- flash cuts: every change to the next clip or speaker ---------- */
+      // flash: 2-frame rise peaking on the first incoming frame (picture still reads through it), 0.16-0.24 s recovery,
+      // whole-frame punch that settles
+      // paper: clean cut with a 1-frame light snap (the paper-cut SFX does the work)
+      const FL = { 3: [0.68, 0.5, 0.4, 1.045], 2: [0.52, 0.38, 0.28, 1.035], 1: [0.36, 0.26, 0, 1.025] };
+      const PP = { 2: 0.3, 1: 0.2 };
+      D.flashcuts.forEach(([t, kind, lvl]) => {
+        if (kind === "paper") {
+          tl.fromTo("#fxWash", { opacity: PP[lvl] }, { opacity: 0, duration: 4 * FR, ease: "power2.out", immediateRender: false }, t);
+          tl.fromTo("#stage", { scale: 1.012 }, { scale: 1, duration: 6 * FR, ease: "power2.out", immediateRender: false }, t);
+          return;
+        }
+        const [wash, core, sweep, punch] = FL[lvl];
+        const rise = 2 * FR;
+        tl.fromTo("#fxWash", { opacity: 0 }, { opacity: wash, duration: rise, ease: "power2.in", immediateRender: false }, t - rise);
+        tl.to("#fxWash", { opacity: 0, duration: 0.16, ease: "power3.out" }, t);
+        tl.fromTo("#fxCore", { opacity: 0, scale: 0.86 }, { opacity: core, scale: 1, duration: rise, ease: "power2.in", immediateRender: false }, t - rise);
+        tl.to("#fxCore", { opacity: 0, scale: 1.18, duration: 0.24, ease: "power3.out" }, t);
+        if (sweep) {
+          tl.fromTo("#fxSweep", { opacity: 0, xPercent: -14 }, { opacity: sweep, xPercent: 4, duration: rise, ease: "power2.in", immediateRender: false }, t - rise);
+          tl.to("#fxSweep", { opacity: 0, xPercent: 26, duration: 0.2, ease: "power3.out" }, t);
+        }
+        // outgoing pushes in a touch, incoming lands slightly large and settles
+        tl.fromTo("#stage", { scale: 1 }, { scale: 1 + (punch - 1) * 0.6, duration: 3 * FR, ease: "power2.in", immediateRender: false }, t - 3 * FR);
+        tl.fromTo("#stage", { scale: punch }, { scale: 1, duration: 0.36, ease: "power3.out", immediateRender: false }, t);
       });
-      // 2-frame black between "something or the other." and "So what did we do next?"
-      tl.set("#flash", { opacity: 1 }, D.flash[0]);
-      tl.set("#flash", { opacity: 0 }, D.flash[1]);
 
       window.__timelines = window.__timelines || {};
       window.__timelines["main"] = tl;

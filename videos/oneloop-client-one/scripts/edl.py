@@ -104,11 +104,7 @@ WHIP = [(WHIP_CUT + k, r) for k, r in zip(range(-6, 5), (6, 12, 22, 34, 46, 56, 
 OVER = {
     "paper": (T(1, 4.78), T(1, 5.88)),             # One Loop text match cut, lands on "One Loop"
     "pay": (T(6, 4.28), T(7, 6.30)),               # blurred ₹1,500 receipt, L-cut under Prahalad's voice
-    "flash": (T(8, 12.43), T(9, 12.62)),           # 2-frame black between the clauses
     "notpub": (T(12, 7.30), T(12, 8.20)),          # "Webpage not available" — website held offline
-    "dip1": T(2, 0.20),                            # dark exposure dip on Prahalad → Tarun
-    "wipe2": T(6, 1.62),                           # shadow wipe day B-roll → night Prahalad
-    "wipe3": T(10, 0.98),                          # shadow pass Prahalad → Tarun ("You'd expect us")
     "end": (T(13, 18.55), TOTAL),                  # "Next in Part 2" lockup on the held face
 }
 # One Loop newspaper text match cut (after the supplied reference): page changes, in frames from OVER["paper"][0]
@@ -117,5 +113,37 @@ MATCH_PAGES = [0, 5, 10, 20, 27]  # last page = One Loop logo card, 4-6 frame se
 VOICE = ["P_cam", "P_cam", "T_aud", "T_aud", "T_aud", "T_aud", "P_cam", "P_cam", "P_cam", "P_cam",
          "T_vid", "T_vid", "T_vid", "P_vid"]
 # ambience beds follow the picture's location changes: (start, kind)
-AMBIENCE = [(0.0, "day"), (OVER_DIP := T(2, 0.20), "dusk"), (T(6, 1.62), "night"), (T(10, 0.98), "night2"),
+AMBIENCE = [(0.0, "day"), (T(2, 0.20), "dusk"), (T(6, 1.62), "night"), (T(10, 0.98), "night2"),
             (WHIP_CUT / FPS, "street")]
+
+# flash-cut pass: every picture change to the next clip or speaker (the whip at WHIP_CUT keeps its own blur + whoosh)
+#   (timeline s, kind, level, what changes)
+#   "flash" = exposure flash peaking on the cut + flash SFX; level 3 speaker change, 2 clip change, 1 light
+#   "paper" = clean cut with a 1-frame light snap + paper-cut SFX; level 2 proof screen, 1 quick B-roll step
+#   flashes stay ≥ 1 s apart (no strobing); cuts that land closer than that become paper cuts
+FLASHCUTS = [
+    (OVER["paper"][0], "paper", 1, "Prahalad → OneLoop newspaper match cut"),
+    (OVER["paper"][1], "flash", 2, "OneLoop logo card → Prahalad"),
+    (T(2, 0.20), "flash", 3, "speaker: Prahalad → Tarun"),
+    (T(2, 1.80), "flash", 2, "Tarun → feet B-roll"),
+    (T(2, 2.62), "paper", 1, "feet → street shops"),
+    (T(2, 3.18), "flash", 2, "street → large building"),
+    (T(3, 4.52), "flash", 2, "building → café pitch"),
+    (T(3, 6.40), "flash", 2, "café → Tarun (\"one client said yes\")"),
+    (T(4, 9.32), "flash", 2, "Tarun → laptop B-roll"),
+    (T(4, 9.90), "paper", 1, "hand match cut → typing"),
+    (T(5, 10.74), "paper", 1, "typing → laptop screen"),
+    (T(6, 1.62), "flash", 3, "speaker: Tarun's laptop → Prahalad, night"),
+    (OVER["pay"][0], "paper", 2, "Prahalad → ₹1,500 proof"),
+    (OVER["pay"][1], "paper", 1, "proof → Prahalad (the low impact carries \"nothing\")"),
+    (T(8, 7.60), "flash", 2, "Prahalad → phone-call B-roll"),
+    (T(8, 9.96), "paper", 1, "phone to ear → phone checked"),
+    (T(8, 11.30), "paper", 1, "phone → standing, looking away"),
+    (T(9, 12.62), "flash", 3, "B-roll → Prahalad (\"So what did we do next?\")"),
+    (T(10, 0.98), "flash", 3, "speaker: Prahalad → Tarun"),
+    (T(11, 3.44), "flash", 2, "Tarun → walk-away B-roll"),
+    (T(11, 4.22), "paper", 1, "B-roll → Tarun (\"neither\")"),
+    (OVER["notpub"][0], "paper", 2, "Tarun → website held offline"),
+    (OVER["notpub"][1], "flash", 1, "offline screen → laptop lid closes"),
+    (T(12, 8.90), "paper", 1, "lid → Tarun (\"client's side\")"),
+]

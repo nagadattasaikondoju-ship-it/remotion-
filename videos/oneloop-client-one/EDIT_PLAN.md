@@ -79,7 +79,7 @@ specific reels. These are the pattern sources I could read (Oct 2026):
 | 21.80–23.20 | "and then **nothing** happened." | 0662 6.05 | Face, still; low sub impact under "nothing" | Face |
 | 23.20–25.20 | "So we tried calling him regarding payments," | 0432 phone call | Calm | B-roll |
 | 25.20–27.20 | "and every time he used to say something or the other." | IMG_0419 → IMG_0443 (stills, 1 s each) + 2 clock ticks | Two rapid, calm repetitions | B-roll |
-| 27.20 | — | — | **2-frame black flash** | Impact |
+| 28.00 | — | — | **flash cut** (replaced the 2-frame black in the final pass) | Impact |
 | 27.20–28.85 | "So what did we do next?" | 0662 12.6 (camera already zoomed in) | **Eye contact, tightest Y crop**, no move | Face |
 | 28.85–31.30 | "You would expect us to publish it anyway," | VID 0.75 | R at 1.0× (wider: the pull-back) | Face · hard cut |
 | 31.30–32.00 | "or to walk away —" | `0467` Y walking away | Literal and motivated, 0.7 s | B-roll · cut on gesture |
@@ -93,7 +93,7 @@ specific reels. These are the pattern sources I could read (Oct 2026):
 
 **Visual ratio:** about 70% face, 26% B-roll proof, 4% impact (the paper cut, the "neither" hit, the flash).
 
-**Other effects used:** 3 punch-ins in total, 2 match cuts (the paper cut and hand-to-laptop), 1 real whip, 1 black flash. There are no light flashes, because no bright-to-bright cut needs one. The only speed changes are on walking or riding B-roll, never on a speaker.
+**Other effects used:** 3 punch-ins in total, 2 match cuts (the paper cut and hand-to-laptop), 1 real whip. Final pass (client request): every clip/speaker change became a flash cut or paper cut with its own SFX (see `TRANSITIONS.md`). The only speed changes are on walking or riding B-roll, never on a speaker.
 
 ## 5. Captions (One Loop palette)
 

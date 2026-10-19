@@ -15,7 +15,7 @@ from fontTools.ttLib import TTFont
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from captions import CARDS, END_CARD  # noqa: E402
-from edl import FPS, MATCH_PAGES, OVER, TOTAL, TOTAL_F, T  # noqa: E402
+from edl import FLASHCUTS, FPS, MATCH_PAGES, OVER, TOTAL, TOTAL_F, T  # noqa: E402
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.join(HERE, "..")
@@ -309,8 +309,8 @@ def cols(n_rows, seed):
 logo_w = 900
 D = {
     "total": TOTAL, "caps": out_caps, "paper": list(OVER["paper"]), "pages": MATCH_PAGES,
-    "pay": list(OVER["pay"]), "notpub": list(OVER["notpub"]), "flash": list(OVER["flash"]),
-    "dip1": OVER["dip1"], "wipe2": OVER["wipe2"], "wipe3": OVER["wipe3"],
+    "pay": list(OVER["pay"]), "notpub": list(OVER["notpub"]),
+    "flashcuts": [[round(t, 4), k, lvl] for t, k, lvl, _ in FLASHCUTS],
     # logo wordmark centre lands on the same screen point as every page's "OneLoop" (y 820)
     "logo": {"x": 70 + (W - logo_w) / 2, "y": 30 + 820 - 532 * logo_w / 1034},
 }
