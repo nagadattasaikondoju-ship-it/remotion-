@@ -127,8 +127,9 @@ def cut_for(f0, f1):
     return None, None
 
 
-def person_top(f0, f1, cx, fw):
-    """highest point of the speaker (hair included) near the face, from the cut-out alpha; None if not cut yet"""
+def person_top(f0, f1, cx, fw, cy=None):
+    """top of the speaker's head (hair included), traced upward from the face through the connected
+    silhouette in the cut-out alpha (ignores trees / walls the segmenter may catch); None if not cut yet"""
     path, a = cut_for(f0, f1)
     if not path:
         return None
@@ -140,10 +141,17 @@ def person_top(f0, f1, cx, fw):
         if len(raw) < 540 * 960:
             continue
         al = np.frombuffer(raw[:540 * 960], np.uint8).reshape(960, 540)
-        x0, x1 = int(max(0, (cx - 0.9 * fw) / 2)), int(min(540, (cx + 0.9 * fw) / 2))
-        rows = np.where((al[:, x0:x1] > 128).sum(1) >= 4)[0]
-        if len(rows):
-            tops.append(rows[0] * 2)
+        x0, x1 = int(max(0, (cx - 0.5 * fw) / 2)), int(min(540, (cx + 0.5 * fw) / 2))
+        cov = (al[:, x0:x1] > 128).mean(1)
+        r = int((cy if cy is not None else 0) / 2)
+        miss = 0
+        while r > 0 and miss < 3:
+            r -= 1
+            miss = miss + 1 if cov[r] < 0.12 else 0
+        t = (r + 3) * 2
+        if cy is not None and not (cy - 1.25 * fw <= t <= cy - 0.7 * fw):
+            t = int(cy - 1.0 * fw)  # silhouette merged with a tree / wall behind the head: use the face geometry
+        tops.append(t)
     return min(tops) if tops else None
 
 
@@ -156,7 +164,7 @@ for c in cards:
     o = c["o"]
     f0, f1 = round(c["t0"] * FPS), round(c["t1"] * FPS)
     mode = c["mode"]
-    layer = {"behind": "behind", "env": "front", "lower": "front", "top": "top"}[mode]
+    layer = {"behind": "behind", "upper": "front", "env": "front", "lower": "front", "top": "top"}[mode]
     scheme = o.get("scheme", "light")
     track, t3d, note = None, o.get("t3d"), ""
     if mode == "behind":
@@ -165,13 +173,16 @@ for c in cards:
         sized = fit(c["lines"], SAFE_R - SAFE_L - 40, o.get("size", 150))
         hb = block_h(sized)
         cx, cy, fw = fs
-        top = person_top(f0, f1, cx, fw)
+        top = person_top(f0, f1, cx, fw, cy)
         # only the foot of the last line tucks behind the hair; the words stay readable
-        bottom = (top + 0.2 * sized[-1][2]) if top is not None else cy - 1.3 * fw
+        # the main line tucks a quarter of its height behind the top of the head; every word stays readable
+        bottom = (top + 0.25 * sized[-1][2]) if top is not None else cy - 1.0 * fw
+        dbg = f"top={top} bottom={bottom:.0f} hb={hb:.0f}"
         if bottom - hb < SAFE_TOP:  # shrink to fit the space above the head
             k = (bottom - SAFE_TOP) / hb
-            if k < 0.62:
+            if k < 0.55:
                 mode, layer = "lower", "front"
+                note = f"behind did not fit ({dbg}) → "
             else:
                 sized = [(t, cl, round(s * k, 1)) for t, cl, s in sized]
                 hb = block_h(sized)
@@ -193,10 +204,31 @@ for c in cards:
                 note += "; damped head-follow (55 %, smoothed)"
             else:
                 note += "; locked (tripod shot)"
+    if mode == "upper":
+        # the regular phrase: clean, in the open space above the speaker's head, in front of the background
+        fs = face_stats(f0, f1)
+        cx, cy, fw = fs
+        sized = fit(c["lines"], o.get("maxw", 900), o.get("size", 104))
+        hb = block_h(sized)
+        top = person_top(f0, f1, cx, fw, cy)
+        bottom = (top if top is not None else cy - 1.0 * fw) - 30
+        if bottom - hb < SAFE_TOP:
+            k = (bottom - SAFE_TOP) / hb
+            if k < 0.6:
+                mode, layer = "lower", "front"
+                note = f"upper did not fit (top={top} bottom={bottom:.0f} hb={hb:.0f}) → "
+            else:
+                sized = [(t, cl, round(s * k, 1)) for t, cl, s in sized]
+                hb = block_h(sized)
+        if mode == "upper":
+            bw = max(width(re.sub(r"[\[\]]", "", t), cl, s) for t, cl, s in sized)
+            x = float(np.clip(540 + 0.35 * (cx - 540), SAFE_L + bw / 2, SAFE_R - bw / 2))
+            y = bottom - hb / 2
+            note = "clean phrase in the open space above the head (front, never touches face/hands)"
     if mode == "lower":
         sized = fit(c["lines"], o.get("maxw", 860), o.get("size", 96))
-        x, y = 540, o.get("y", 1440)
-        note = note or "clean lower phrase (no safe surface)"
+        x, y = o.get("x", 540), o.get("y", 1440)
+        note = note + "clean lower phrase"
     if mode == "top":
         sized = fit(c["lines"], o.get("maxw", 900), o.get("size", 110))
         x, y = 540, o.get("y", 330) + block_h(sized) / 2
@@ -230,20 +262,17 @@ for c in cards:
     text = " / ".join(re.sub(r"[\[\]]", "", t) for t, _ in c["lines"])
     cmap_rows.append((c["t0"], c["t1"], c["speech"], text, mode, note))
 
-# end card: "Next in Part 2", gentle opacity rise on the held face (behind the head)
+# end card: "Next in Part 2" — the call to action stays fully readable: in front, above the held face, gentle rise
 fs = face_stats(round(OVER["end"][0] * FPS), TOTAL_F)
-sized = fit(END_CARD, 800, 120)
-hb = block_h(sized)
-top = person_top(round(OVER["end"][0] * FPS), TOTAL_F, fs[0], fs[2])
-bottom = (top + 0.2 * sized[-1][2]) if top is not None else fs[1] - 1.3 * fs[2]
-k = min(1.0, (bottom - SAFE_TOP) / hb)
-sized = [(t, cl, round(s * k, 1)) for t, cl, s in sized]
-out_caps.append({"layer": "behind", "mode": "end", "scheme": "light", "x": float(np.clip(fs[0], 300, 780)),
-                 "y": round(bottom - block_h(sized) / 2, 1), "t3d": None, "t0": end_t0, "t1": TOTAL, "emph": False,
+sized = fit(END_CARD, 820, 120)
+# the held selfie fills the top of the frame, so the lockup sits low on the shirt, clear of the face
+y_end = 1560
+out_caps.append({"layer": "front", "mode": "end", "scheme": "light", "x": 540,
+                 "y": y_end, "t3d": None, "t0": end_t0, "t1": TOTAL, "emph": False,
                  "gentle": True, "track": None,
                  "lines": [{"html": html_line(t, cl), "cls": "" if cl == "main" else cl, "size": s} for t, cl, s in sized]})
-behind_ranges.append((round(end_t0 * FPS), TOTAL_F))
-cmap_rows.append((end_t0, TOTAL, None, "Next in / Part 2", "behind (end card)", "gentle opacity rise on the held face"))
+cmap_rows.append((end_t0, TOTAL, None, "Next in / Part 2", "end card (front)",
+                  "low on the held frame (the face fills the top), gentle opacity rise — the CTA is never hidden"))
 
 # ---------- speaker cut-out ranges (merged, padded) ----------
 rs = sorted((max(0, a - 3), min(TOTAL_F, b + 3)) for a, b in behind_ranges)
@@ -254,13 +283,21 @@ for a, b in rs:
     else:
         merged.append([a, b])
 os.makedirs(os.path.join(ROOT, "assets", "cut"), exist_ok=True)
-json.dump(merged, open(os.path.join(ROOT, "assets", "cut", "ranges.json"), "w"))
-tags = []
-for k, (a, b) in enumerate(merged):
-    fn = f"assets/cut/cut_{a}_{b}.webm"
-    if os.path.exists(os.path.join(ROOT, fn)):
-        tags.append(f'      <video class="full" src="{fn}" data-start="{a / FPS:.4f}" data-duration="{(b - a) / FPS:.4f}" '
-                    f'data-media-start="0" data-track-index="{2 + k % 2}" muted playsinline></video>')
+tags, missing, used = [], [], set()
+for a, b in merged:  # reuse any existing cut-out that covers the range; list the rest for make_cutouts.py
+    path, start = cut_for(a, b)
+    if path is None:
+        missing.append([a, b])
+        continue
+    if path in used:
+        continue
+    used.add(path)
+    m = re.match(r"cut_(\d+)_(\d+)\.webm$", os.path.basename(path))
+    a0, b0 = int(m.group(1)), int(m.group(2))
+    tags.append(f'      <video id="cut{a0}" class="full" src="assets/cut/{os.path.basename(path)}" data-start="{a0 / FPS:.4f}" '
+                f'data-duration="{(b0 - a0) / FPS:.4f}" data-media-start="0" data-track-index="{2 + len(tags) % 2}" '
+                f'muted playsinline></video>')
+json.dump(missing, open(os.path.join(ROOT, "assets", "cut", "ranges.json"), "w"))
 
 # ---------- newspaper page 2 columns (abstract text bars, no invented copy) ----------
 def cols(n_rows, seed):
@@ -306,7 +343,9 @@ for w, a, b in words:
     miss = (~cover[fa:fb]).sum()
     if miss > 0.35 * FPS:
         gaps.append((w, a, b, miss))
-print(f"{len(out_caps)} cards, {len(merged)} cut-out ranges ({sum(b - a for a, b in merged)} frames), "
-      f"{len(tags)} cut-out videos present; uncovered words > 0.35 s: {gaps}")
-for r in merged:
-    print("  cut-out", r, f"{r[0] / FPS:.2f}-{r[1] / FPS:.2f}")
+modes = {}
+for c in out_caps:
+    modes[c["mode"]] = modes.get(c["mode"], 0) + 1
+print(f"{len(out_caps)} cards {modes}; cut-outs used {len(tags)}, still to cut {missing}; "
+      f"uncovered words > 0.35 s: {gaps}")
+

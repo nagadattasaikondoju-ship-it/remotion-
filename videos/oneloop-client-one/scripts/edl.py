@@ -64,9 +64,9 @@ def T(seg, t):
 #   B-roll: ("B", seg, t, src, src_in, zoom, (cx, cy) or None)
 #   J-cut:  ("J", seg)  previous speaker's picture carries on while the next speaker's audio starts
 SHOTS = [
-    ("A", 0, 0.86, 1.15),
-    ("A", 0, 2.86, 1.24),                          # punch-in on "₹10,000"
-    ("A", 1, 5.88, 1.34),                          # closer crop after the One Loop match cut
+    ("A", 0, 0.86, 1.15, 0.40),                    # framed a little low: headroom for the caption beats
+    ("A", 0, 2.86, 1.24, 0.40),                    # punch-in on "₹10,000"
+    ("A", 1, 5.88, 1.34, 0.40),                    # closer crop after the One Loop match cut
     ("J", 2),                                      # Tarun's "We…" starts 0.2 s before his picture
     ("A", 2, 0.20, 1.38),                          # Tarun: "We went to every door in Hyderabad,"
     ("B", 2, 1.80, "0436", 2.2, 1.0, None),        # feet: "from small-scale"
@@ -87,8 +87,8 @@ SHOTS = [
     ("J", 10),                                     # Tarun's "You…" starts under Prahalad
     ("A", 10, 0.98, 1.00),                         # Tarun wide: "You would expect us to publish it anyway,"
     ("B", 11, 3.44, "0467", 6.3, 1.0, None),       # "or to walk away"
-    ("A", 11, 4.22, 1.32),                         # tightest: "but we did neither."
-    ("A", 11, 5.26, 1.15),                         # "We wanted to handle it professionally,"
+    ("A", 11, 4.22, 1.32, 0.42),                   # tightest: "but we did neither." (headroom for the beat)
+    ("A", 11, 5.26, 1.15, 0.42),                   # "We wanted to handle it professionally,"
     ("B", 12, 8.20, "0446", 1.45, 1.0, None),      # laptop lid closes (after the not-published insert)
     ("A", 12, 8.90, 1.15),                         # Tarun: "client's side." → real whip begins
     ("A", 13, 10.00, 1.10),                        # whip lands on Prahalad's selfie
