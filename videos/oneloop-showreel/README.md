@@ -22,6 +22,20 @@
 - **No still holds:** nothing holds still for more than 0.5 s.
 - **Data:** every number comes from `OneLoop_Client_Portfolio_5.xlsx`; see `docs/playbook/oneloop-brand.md`.
 
+## Vertical (Instagram Reels)
+`index.html?v=1` renders the same film at 1080×1920. It's not a crop: the scenes re-lay out for the tall frame, but timeline and soundtrack are identical.
+- **Hook and slit type:** scaled to fit the width.
+- **Icons:** 15 % larger.
+- **3D ribbon and finale:** auto-fit to the frame width.
+- **Dashboard:** a stacked portrait card.
+- **Globe:** larger.
+- **End lockup:** kept clear of the Reels right-hand buttons and bottom caption area.
+```bash
+VERT=1 node render.mjs beats    # review frames → out/vertical/beats/
+VERT=1 node render.mjs full 3   # sub-frames → out/vertical/sub/
+VERT=1 ./assemble.sh            # → out/vertical/OneLoop_OneStroke_Reel_1080x1920_60fps.mp4
+```
+
 ## Build
 ```bash
 npm i                          # playwright-core (uses /opt/pw-browsers Chromium)

@@ -16,7 +16,13 @@
 /* One Loop — "One stroke, never lifted".
    Every pixel is a pure function of t: window.seek(t) draws the frame, nothing animates on its own and no state
    survives between calls. 120 BPM → beat 0.5 s, bar 2 s, 15 s = 7.5 bars. */
-const W = 1920, H = 1080, CX = 960, CY = 540, DUR = 15;
+// ?v=1 → 1080×1920 vertical (Reels). Same timeline; layouts adapt below wherever the frame shape matters.
+const V = new URLSearchParams(location.search).get("v") === "1";
+const W = V ? 1080 : 1920, H = V ? 1920 : 1080, CX = W / 2, CY = H / 2, DUR = 15;
+document.getElementById("c").width = W; document.getElementById("c").height = H;
+const FITW = W - 100;          // widest a hero element may be
+const K12 = V ? 0.64 : 1;      // bars 1–2 (mark + slit type) scale so the mark and AUTOMATE fit the width
+const KM = V ? 1.15 : 1;       // bar 3 icons get bigger in the tall frame (the 3D bar inherits it)
 const COP = "#E59C69", TER = "#8F432E", CRM = "#F7E8DA", BLK = "#000000", WHT = "#FFFFFF";
 const RGB = { cop: [229, 156, 105], ter: [143, 67, 46], crm: [247, 232, 218] };
 
@@ -228,7 +234,7 @@ const SHP = {
 const mix2 = (A, Bp, u) => A.map((p, i) => [lerp(p[0], Bp[i][0], u), lerp(p[1], Bp[i][1], u)]);
 
 /* ---------- globe ---------- */
-const GR = 300;
+const GR = V ? 380 : 300;
 const DOTS = (() => { const out = [], n = 1500, ga = Math.PI * (3 - Math.sqrt(5)); for (let i = 0; i < n; i++) { const y = 1 - (2 * (i + 0.5)) / n, r = Math.sqrt(1 - y * y), th = ga * i; out.push([Math.cos(th) * r, y, Math.sin(th) * r]); } return out; })();
 const ll = (lat, lon) => { const a = (lat * Math.PI) / 180, b = (lon * Math.PI) / 180; return [Math.cos(a) * Math.sin(b), -Math.sin(a), Math.cos(a) * Math.cos(b)]; };
 const CITIES = [
@@ -299,14 +305,14 @@ function hook(ctx, t) {
   const S0 = 800;
   const zoom = (1 + 0.05 * P(t, 0, 1.5)) * (1 + 0.8 * eIn(P(t, 1.5, 2.0)));
   const S = S0 * zoom;
-  ctx.save(); ctx.translate(CX, CY);
-  const lw = lerp(20, SW * S0, eOut(P(t, 0, 0.35))) * zoom;
+  ctx.save(); ctx.translate(CX, CY); ctx.scale(K12, K12);
+  const lw = lerp(20 / K12, SW * S0, eOut(P(t, 0, 0.35))) * zoom;
   const dLeft = 0.5 * eOut(P(t, 0, 0.42)), dRight = 0.5 * eOut(P(t, 0.5, 0.92));
   const snap = spring(t, 1.0, 16);
   if (t < 1.0) {
     ctx.strokeStyle = COP; ctx.lineWidth = lw; ctx.lineCap = "round";
     const pts = FIG8.map(([x, y]) => [x * S, y * S]);
-    if (dLeft > 0) strokePart(ctx, pts, FIG8C.map((v) => v * S), 0, dLeft); else { ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(0, 0, 10, 0, 7); ctx.fill(); }
+    if (dLeft > 0) strokePart(ctx, pts, FIG8C.map((v) => v * S), 0, dLeft); else { ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(0, 0, 10 / K12, 0, 7); ctx.fill(); }
     if (dRight > 0) strokePart(ctx, pts, FIG8C.map((v) => v * S), 0.5, 0.5 + dRight);
   } else {
     // the real logo snaps in: diagonals retract into the crossing while the X spins in
@@ -335,7 +341,8 @@ function wordLayout(ctx, k, t) { const w = WORDS[k]; let track = 0.02;
   if (k === 0) track = lerp(0.55, 0.02, eOut(P(t, 2.0, 2.32)));
   if (k === 2) track = lerp(-0.04, 0.07, eOut(P(t, 3.0, 3.4)));
   return { ...glyphs(ctx, w.s, w.size, 900, track), track }; }
-function kinetic(ctx, t) {
+function kinetic(ctx, t) { ctx.save(); ctx.translate(CX, CY); ctx.scale(K12, K12); ctx.translate(-CX, -CY); kinetic0(ctx, t); ctx.restore(); }
+function kinetic0(ctx, t) {
   const k = clamp(Math.floor((t - 2) / 0.5), 0, 3), tk = 2 + 0.5 * k, w = WORDS[k];
   const last = k === 3;
   // slit half-gap: opens on the beat, shutters closed just before the next beat
@@ -348,7 +355,7 @@ function kinetic(ctx, t) {
   const x0 = CX - totalW / 2, base = CY + (CAP * w.size) / 2;
   const dot = [x0 + L.width + gapDot + pr, base - pr];
   let Z = 1, tx = 0, ty = 0;
-  if (last) { const u = eIn(P(t, 3.78, 4.0)); Z = Math.exp(Math.log(150 / pr) * u); tx = (CX - dot[0]) * eIO(P(t, 3.78, 4.0)); ty = (CY - dot[1]) * eIO(P(t, 3.78, 4.0)); }
+  if (last) { const u = eIn(P(t, 3.78, 4.0)); Z = Math.exp(Math.log((150 * KM) / (pr * K12)) * u); tx = (CX - dot[0]) * eIO(P(t, 3.78, 4.0)); ty = (CY - dot[1]) * eIO(P(t, 3.78, 4.0)); }
   // word push toward camera while the slit shutters
   const push = last ? 1 : 1 + 0.06 * P(t, tk, tk + 0.4) + 0.5 * eIn(P(t, tk + 0.4, tk + 0.5));
   ctx.save();
@@ -384,7 +391,7 @@ function kinetic(ctx, t) {
 // BAR 3 — shape morph: full stop → lens → browser → growth arrow → infinity
 const LABELS = ["01  AUDIT", "02  BUILD", "03  MARKET", "04  AUTOMATE"];
 function morph(ctx, t) {
-  const push = 1 + 0.08 * P(t, 4, 6);
+  const push = (1 + 0.08 * P(t, 4, 6)) * KM;
   ctx.save(); ctx.translate(CX, CY); ctx.scale(push, push);
   ctx.strokeStyle = COP; ctx.fillStyle = COP; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.lineWidth = 26;
   if (t < 4.2) { // disk opens into a ring
@@ -402,7 +409,7 @@ function morph(ctx, t) {
   }
   ctx.restore();
   // index labels, rolling through a mask
-  const ly = CY + 330;
+  const ly = CY + 330 * KM;
   for (let i = 0; i < 4; i++) {
     const tin = 4 + 0.5 * i + 0.04, tout = 4.5 + 0.5 * i;
     let prog = eOut(P(t, tin, tin + 0.22));
@@ -421,16 +428,32 @@ function three(ctx, t) {
   let rz = lerp(lerp(0, -12, k2), 9, k3) - 3 * P(t, 6.0, 7.5);
   const edge = eIO(P(t, 7.5, 7.95));
   rx = lerp(rx, 90, edge); ry = lerp(ry, 0, edge); rz = lerp(rz, 0, edge);
-  let S = 445 * 1.08 * (1 + 0.32 * k1 + 0.22 * k2 + 0.16 * k3 + 0.06 * P(t, 6.0, 7.5));
-  S = lerp(S, 1120 / (1 + 2 * RL), edge);
+  let S = 445 * 1.08 * KM * (1 + 0.32 * k1 + 0.22 * k2 + 0.16 * k3 + 0.06 * P(t, 6.0, 7.5));
+  S = lerp(S, LAY.Wc / (1 + 2 * RL), edge);
   const w = lerp(26, 74, ex) * (1 - 0.3 * edge), d = lerp(0, 96, ex) * lerp(1, 40 / 96, edge);
-  ribbon(ctx, to3(FIG8, S, 0), w, d, { rot: cam(a(rx), a(ry), a(rz)), ortho: edge, oy: lerp(0, 250 - CY, eIO(P(t, 7.6, 8.0))), flat: edge });
+  const ks = Math.min(1, FITW / (S * (1 + 2 * RL) + w));
+  ctx.save(); ctx.translate(CX, CY); ctx.scale(ks, ks); ctx.translate(-CX, -CY);
+  ribbon(ctx, to3(FIG8, S, 0), w, d, { rot: cam(a(rx), a(ry), a(rz)), ortho: edge, oy: lerp(0, (LAY.T + 20 - CY) / ks, eIO(P(t, 7.6, 8.0))), flat: edge });
+  ctx.restore();
 }
 
+// card layout: landscape row layout / vertical stacked layout (same elements, same timing)
+const LAY = V ? (() => { const L = 80, Wc = 920, Hc = 1180, T = 330; return { L, T, Wc, Hc,
+    num: { size: 380, x: L + 50, y: T + 440, clip: [L + 40, T + 70, 800, 400], up: 150, c: [L + 300, T + 300] },
+    brands: { x: L + 64, y: T + 530, size: 64 },
+    svc: { bx: L + 60, labelY: T + 640, labelSize: 26, by: T + 672, bw: 800, bh: 64 },
+    nums: { y: T + 845, size: 130, l1: T + 893, l2: T + 925, ls: 26 },
+    ctry: { x: L + 60, y: T + 1030, size: 54 }, chips: { x: L + 60, y: T + 1098, fs: 22, h: 56 } }; })()
+  : (() => { const L = 400, T = 230; return { L, T, Wc: 1120, Hc: 620,
+    num: { size: 300, x: L + 50, y: T + 370, clip: [L + 40, T + 60, 520, 330], up: 120, c: [L + 250, T + 300] },
+    brands: { x: L + 62, y: T + 440, size: 54 },
+    svc: { bx: L + 600, labelY: T + 120, labelSize: 22, by: T + 150, bw: 460, bh: 56 },
+    nums: { y: T + 330, size: 110, l1: T + 372, l2: T + 400, ls: 22 },
+    ctry: { x: L + 60, y: T + 561, size: 44 }, chips: { x: L + 452, y: T + 545, fs: 20, h: 50 } }; })();
 // BAR 5 — dashboard card unfolds from the bar: real portfolio numbers
 function cardShape(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
 function dash(ctx, t) {
-  const L = 400, T = 230, Wc = 1120, Hc = 620, strip = 40;
+  const { L, T, Wc, Hc } = LAY, strip = 40;
   const pz = 1 + 0.035 * eIO(P(t, 8.3, 9.5)) * (1 - eIO(P(t, 9.5, 9.9)));
   ctx.save(); ctx.translate(CX, CY); ctx.scale(pz, pz); ctx.translate(-CX, -CY);
   // card → circle (beat 20)
@@ -447,41 +470,43 @@ function dash(ctx, t) {
   item(0, L + 300, T + 20, () => maskedText(ctx, "ONE LOOP  ·  CLIENT PORTFOLIO", L + 40, T + 29, 20, 700, 0.3, WHT, eOut(P(t, 8.06, 8.3))));
   // 24 brands
   const n = Math.round(24 * eOut(P(t, 8.02, 8.46)));
-  item(1, L + 250, T + 300, () => {
-    ctx.font = F(900, 300); ctx.fillStyle = BLK; ctx.textBaseline = "alphabetic";
-    const up = (1 - eOut(P(t, 8.0, 8.2))) * 120;
-    ctx.save(); ctx.beginPath(); ctx.rect(L + 40, T + 60, 520, 330); ctx.clip(); ctx.fillText(String(n), L + 50, T + 370 + up); ctx.restore();
-    maskedText(ctx, "BRANDS", L + 62, T + 440, 54, 800, 0.14, BLK, eOut(P(t, 8.12, 8.36)));
+  const A = LAY.num;
+  item(1, A.c[0], A.c[1], () => {
+    ctx.font = F(900, A.size); ctx.fillStyle = BLK; ctx.textBaseline = "alphabetic";
+    const up = (1 - eOut(P(t, 8.0, 8.2))) * A.up;
+    ctx.save(); ctx.beginPath(); ctx.rect(...A.clip); ctx.clip(); ctx.fillText(String(n), A.x, A.y + up); ctx.restore();
+    maskedText(ctx, "BRANDS", LAY.brands.x, LAY.brands.y, LAY.brands.size, 800, 0.14, BLK, eOut(P(t, 8.12, 8.36)));
   });
   // service split
   const s1 = eOut(P(t, 8.5, 8.78)), s2 = eOut(P(t, 8.6, 8.88));
-  const bx = L + 600, by = T + 150, bw = 460, bh = 56, w1 = (bw * 13) / 24;
+  const { bx, by, bw, bh } = LAY.svc, w1 = (bw * 13) / 24, Q = LAY.nums;
   item(2, bx + bw / 2, by, () => {
-    maskedText(ctx, "SERVICE LINES", bx, T + 120, 22, 700, 0.28, TER, eOut(P(t, 8.5, 8.7)));
+    maskedText(ctx, "SERVICE LINES", bx, LAY.svc.labelY, LAY.svc.labelSize, 700, 0.28, TER, eOut(P(t, 8.5, 8.7)));
     ctx.fillStyle = COP; ctx.fillRect(bx, by, w1 * s1, bh);
     ctx.fillStyle = TER; ctx.fillRect(bx + w1 + 6, by, (bw - w1 - 6) * s2, bh);
   });
-  item(3, bx + 100, T + 300, () => {
-    maskedText(ctx, String(Math.round(13 * s1)), bx, T + 330, 110, 900, 0, COP, eOut(P(t, 8.52, 8.74)));
-    maskedText(ctx, "DIGITAL", bx + 4, T + 372, 22, 700, 0.2, BLK, eOut(P(t, 8.58, 8.8)));
-    maskedText(ctx, "MARKETING", bx + 4, T + 400, 22, 700, 0.2, BLK, eOut(P(t, 8.6, 8.82)));
+  item(3, bx + 100, Q.y - 30, () => {
+    maskedText(ctx, String(Math.round(13 * s1)), bx, Q.y, Q.size, 900, 0, COP, eOut(P(t, 8.52, 8.74)));
+    maskedText(ctx, "DIGITAL", bx + 4, Q.l1, Q.ls, 700, 0.2, BLK, eOut(P(t, 8.58, 8.8)));
+    maskedText(ctx, "MARKETING", bx + 4, Q.l2, Q.ls, 700, 0.2, BLK, eOut(P(t, 8.6, 8.82)));
   });
-  item(4, bx + 360, T + 300, () => {
-    maskedText(ctx, String(Math.round(11 * s2)), bx + w1 + 6, T + 330, 110, 900, 0, TER, eOut(P(t, 8.62, 8.84)));
-    maskedText(ctx, "FULL-SERVICE", bx + w1 + 10, T + 372, 22, 700, 0.2, BLK, eOut(P(t, 8.68, 8.9)));
+  item(4, bx + w1 + 100, Q.y - 30, () => {
+    maskedText(ctx, String(Math.round(11 * s2)), bx + w1 + 6, Q.y, Q.size, 900, 0, TER, eOut(P(t, 8.62, 8.84)));
+    maskedText(ctx, "FULL-SERVICE", bx + w1 + 10, Q.l1, Q.ls, 700, 0.2, BLK, eOut(P(t, 8.68, 8.9)));
   });
   // 4 countries + chips on 16ths
-  item(5, L + 200, T + 540, () => maskedText(ctx, "4 COUNTRIES", L + 60, T + 561, 44, 900, 0.04, BLK, eOut(P(t, 9.0, 9.2))));
-  const chips = ["INDIA", "AUSTRALIA", "NEW ZEALAND", "UK"]; let cxp = L + 452;
+  const K = LAY.ctry, CH = LAY.chips;
+  item(5, K.x + 150, K.y - 20, () => maskedText(ctx, "4 COUNTRIES", K.x, K.y, K.size, 900, 0.04, BLK, eOut(P(t, 9.0, 9.2))));
+  const chips = ["INDIA", "AUSTRALIA", "NEW ZEALAND", "UK"]; let cxp = CH.x;
   chips.forEach((name, i) => {
-    ctx.font = F(700, 20); const tw = glyphs(ctx, name, 20, 700, 0.14).width, cw = tw + 36;
+    ctx.font = F(700, CH.fs); const tw = glyphs(ctx, name, CH.fs, 700, 0.14).width, cw = tw + 36;
     const sc = spring(t, 9.0 + 0.125 * i, 26), mx = cxp + cw / 2;
-    item(6 + i, mx, T + 545, () => { if (sc < 0.01) return;
-      ctx.save(); ctx.translate(mx, T + 545); ctx.scale(sc, sc);
-      ctx.beginPath(); ctx.roundRect(-cw / 2, -25, cw, 50, 25); ctx.fillStyle = i === 0 ? COP : CRM; ctx.fill();
+    item(6 + i, mx, CH.y, () => { if (sc < 0.01) return;
+      ctx.save(); ctx.translate(mx, CH.y); ctx.scale(sc, sc);
+      ctx.beginPath(); ctx.roundRect(-cw / 2, -CH.h / 2, cw, CH.h, CH.h / 2); ctx.fillStyle = i === 0 ? COP : CRM; ctx.fill();
       ctx.lineWidth = 3; ctx.strokeStyle = i === 0 ? COP : BLK; ctx.stroke();
-      const gl = glyphs(ctx, name, 20, 700, 0.14); ctx.fillStyle = BLK; ctx.font = F(700, 20);
-      gl.g.forEach((q) => ctx.fillText(q.ch, -tw / 2 + q.x, 7)); ctx.restore(); });
+      const gl = glyphs(ctx, name, CH.fs, 700, 0.14); ctx.fillStyle = BLK; ctx.font = F(700, CH.fs);
+      gl.g.forEach((q) => ctx.fillText(q.ch, -tw / 2 + q.x, CH.fs * 0.36)); ctx.restore(); });
     cxp += cw + 14;
   });
   ctx.restore(); ctx.restore();
@@ -556,16 +581,20 @@ function finale(ctx, t) {
   const speed = 520 + 900 * eIO(P(t, 12.95, 13.2)) - 900 * eIO(P(t, 13.3, 13.5));
   const offset = 300 * (t - 12) + speed * Math.max(0, t - 12.95) * 0.9;
   const txtIn = eOut(P(t, 12.16, 12.42)), txtOut = P(t, 13.4, 13.56);
+  const ks = lerp(1, Math.min(1, FITW / (S * MARK_W)), m);
+  ctx.save(); ctx.translate(CX, CY); ctx.scale(ks, ks); ctx.translate(-CX, -CY);
   if (t < 13.7) {
     ribbon(ctx, C, w, d, { rot: R, ortho: 0, text: { str: PROMISE, size: 66, offset, lobes: [[0, N / 2, false], [N / 2, N, true]],
       hide: (p) => Math.hypot(p[0], p[1]) < 0.13 * S * m,
       scales: (r, gl) => clamp(txtIn * 1.15) * (1 - eIn(clamp(txtOut * 1.5 - (gl.x / 1400) * 0.5))) } });
   } else { ctx.save(); ctx.translate(CX, CY); markSnap(ctx, S, t, 13.7); ctx.restore(); }
+  ctx.restore();
 }
+const S_LOCK = 742 * Math.min(1, FITW / (742 * MARK_W)); // on-screen size of the mark when the finale locks
 
 // END — the real One Loop lockup assembles (traced artwork), then collapses into the opening dot
 function ending(ctx, t) {
-  const M = LOGO.meta, S13 = 742, SE = 550;
+  const M = LOGO.meta, S13 = S_LOCK, SE = Math.min(550, (W - (V ? 200 : 120)) / (M.right - M.left));
   const rise = eIO(P(t, 13.85, 14.05));
   const col = eIn(P(t, 14.62, 14.96)); // collapse into the seed dot
   const drift = 1 + 0.035 * P(t, 13.95, 14.62);

@@ -3,26 +3,29 @@
 //   node render.mjs beats                  → out/beats/bNN.png   (one frame per beat, 0.12 s after it)
 //   node render.mjs audio                  → out/audio_raw.wav   (OfflineAudioContext)
 //   node render.mjs full                   → out/sub/s_NNNNN.png (60 fps × 3 trailing sub-frames = 180 per second)
+//   VERT=1 node render.mjs …               → the 1080×1920 Reels version, into out/vertical/
 import { chromium } from "playwright-core";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const OUT = path.join(HERE, "out");
+const VERT = process.env.VERT === "1";
+const OUT = path.join(HERE, VERT ? "out/vertical" : "out");
+const [VW, VH] = VERT ? [1080, 1920] : [1920, 1080];
 const EXE = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 const [mode, ...args] = process.argv.slice(2);
 
 async function openPage(browser) {
-  const page = await browser.newPage({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1 });
+  const page = await browser.newPage({ viewport: { width: VW, height: VH }, deviceScaleFactor: 1 });
   page.on("pageerror", (e) => console.error("pageerror:", e.message));
-  await page.goto("file://" + path.join(HERE, "index.html"));
+  await page.goto("file://" + path.join(HERE, "index.html") + (VERT ? "?v=1" : ""));
   await page.evaluate(() => window.ready);
   return page;
 }
 const shot = async (page, t, file) => {
   await page.evaluate((tt) => window.seek(tt), t);
-  await page.screenshot({ path: file, clip: { x: 0, y: 0, width: 1920, height: 1080 } });
+  await page.screenshot({ path: file, clip: { x: 0, y: 0, width: VW, height: VH } });
 };
 
 const browser = await chromium.launch({ executablePath: EXE, args: ["--allow-file-access-from-files", "--disable-gpu-vsync"] });
