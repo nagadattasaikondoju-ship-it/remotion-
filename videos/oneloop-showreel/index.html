@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>One Loop — One Stroke</title>
+<style>
+  @font-face { font-family: "M"; src: url("fonts/Montserrat-VF.ttf"); font-weight: 100 900; }
+  html, body { margin: 0; background: #000; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1920" height="1080"></canvas>
+<script>
+/* One Loop — "One stroke, never lifted".
+   Every pixel is a pure function of t: window.seek(t) draws the frame, nothing animates on its own and no state
+   survives between calls. 120 BPM → beat 0.5 s, bar 2 s, 15 s = 7.5 bars. */
+const W = 1920, H = 1080, CX = 960, CY = 540, DUR = 15;
+const COP = "#E59C69", TER = "#8F432E", CRM = "#F7E8DA", BLK = "#000000", WHT = "#FFFFFF";
+const RGB = { cop: [229, 156, 105], ter: [143, 67, 46], crm: [247, 232, 218] };
+
+/* ---------- time helpers ---------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, x) => a + (b - a) * x;
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const eOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const eIn = (x) => (x <= 0 ? 0 : Math.pow(2, 10 * x - 10));
+const eIO = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2);
+// critically damped spring (no overshoot, no bounce): 0 → 1 after t0, stiffness w
+const spring = (t, t0, w = 18) => { const d = t - t0; return d <= 0 ? 0 : 1 - (1 + w * d) * Math.exp(-w * d); };
+const B = (n) => n * 0.5; // beat n → seconds
+
+/* ---------- deterministic PRNG ---------- */
+function rng(seed) { return () => { seed |= 0; seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+  t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+
+/* ---------- polylines ---------- */
+function cum(pts) { const c = [0]; for (let i = 1; i < pts.length; i++) c.push(c[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1])); return c; }
+function resample(pts, n) {
+  const c = cum(pts), L = c[c.length - 1], out = []; let j = 0;
+  for (let i = 0; i < n; i++) { const s = (L * i) / (n - 1); while (j < c.length - 2 && c[j + 1] < s) j++;
+    const u = (s - c[j]) / (c[j + 1] - c[j] || 1); out.push([lerp(pts[j][0], pts[j + 1][0], u), lerp(pts[j][1], pts[j + 1][1], u)]); }
+  return out;
+}
+function strokePart(ctx, pts, c, s0, s1) { // draw arc-length fraction s0..s1 of a polyline
+  const L = c[c.length - 1], a = s0 * L, b = s1 * L; if (b - a < 1e-6) return;
+  ctx.beginPath(); let started = false;
+  for (let i = 0; i < pts.length - 1; i++) {
+    if (c[i + 1] < a || c[i] > b) continue;
+    const u0 = clamp((a - c[i]) / (c[i + 1] - c[i] || 1)), u1 = clamp((b - c[i]) / (c[i + 1] - c[i] || 1));
+    const p0 = [lerp(pts[i][0], pts[i + 1][0], u0), lerp(pts[i][1], pts[i + 1][1], u0)];
+    const p1 = [lerp(pts[i][0], pts[i + 1][0], u1), lerp(pts[i][1], pts[i + 1][1], u1)];
+    if (!started) { ctx.moveTo(p0[0], p0[1]); started = true; }
+    ctx.lineTo(p1[0], p1[1]);
+  }
+  ctx.stroke();
+}
+function strokePts(ctx, pts) { ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]); ctx.stroke(); }
+
+/* ---------- the One Loop mark (unit space: width ≈ 1.71) ---------- */
+const R8 = 0.5 / Math.SQRT2; // loop radius so the diagonals meet each loop tangentially
+function fig8Raw() {
+  const p = [], seg = (a, b, m) => { for (let i = 0; i < m; i++) { const u = i / m; p.push([lerp(a[0], b[0], u), lerp(a[1], b[1], u)]); } };
+  const arc = (cx, a0, a1, m) => { for (let i = 0; i < m; i++) { const a = lerp(a0, a1, i / m); p.push([cx + R8 * Math.cos(a), R8 * Math.sin(a)]); } };
+  seg([0, 0], [-0.25, 0.25], 40); arc(-0.5, Math.PI / 4, Math.PI / 4 + 1.5 * Math.PI, 260);
+  seg([-0.25, -0.25], [0, 0], 40); seg([0, 0], [0.25, 0.25], 40);
+  arc(0.5, (3 * Math.PI) / 4, (3 * Math.PI) / 4 - 1.5 * Math.PI, 260); seg([0.25, -0.25], [0, 0], 41);
+  return p;
+}
+const N = 480;
+const FIG8 = resample(fig8Raw(), N);
+const FIG8C = cum(FIG8);
+// arc-length fractions of the 6 pieces (diag, left loop, diag, diag, right loop, diag)
+const DL = R8, AL = 1.5 * Math.PI * R8, TL = 4 * DL + 2 * AL;
+const FR = [0, DL / TL, (DL + AL) / TL, (2 * DL + AL) / TL, (3 * DL + AL) / TL, (3 * DL + 2 * AL) / TL, 1];
+const SW = 0.09; // mark stroke width (units)
+
+function xPoly(Lh, Lv, h) { // outlined X / plus: arms half-length Lh (x) & Lv (y), half-thickness h, unrotated
+  return [[h, h], [h, Lv], [-h, Lv], [-h, h], [-Lh, h], [-Lh, -h], [-h, -h], [-h, -Lv], [h, -Lv], [h, -h], [Lh, -h], [Lh, h]];
+}
+function drawX(ctx, S, scale, rot, Lh = 0.27, Lv = 0.27, lw = 0.02) {
+  if (scale <= 0.001) return;
+  const h = 0.042, pts = xPoly(Lh, Lv, h);
+  ctx.save(); ctx.rotate(rot); ctx.scale(scale, scale);
+  ctx.beginPath(); pts.forEach(([x, y], i) => (i ? ctx.lineTo(x * S, y * S) : ctx.moveTo(x * S, y * S))); ctx.closePath();
+  ctx.lineWidth = lw * S / scale; ctx.strokeStyle = COP; ctx.lineJoin = "miter"; ctx.stroke(); ctx.restore();
+}
+// logo arcs with the gap around the X; gap (radians) eats each loop's open side
+function drawArcs(ctx, S, gap, lw, outL = [0, 0, 1], outR = [0, 0, 1]) {
+  ctx.strokeStyle = COP; ctx.lineWidth = lw; ctx.lineCap = "butt";
+  ctx.save(); ctx.translate(outL[0] * S, outL[1] * S); ctx.translate(-0.5 * S, 0); ctx.scale(outL[2], outL[2]);
+  ctx.beginPath(); ctx.arc(0, 0, R8 * S, Math.PI / 4 + gap, Math.PI / 4 + 1.5 * Math.PI - gap); ctx.stroke(); ctx.restore();
+  ctx.save(); ctx.translate(outR[0] * S, outR[1] * S); ctx.translate(0.5 * S, 0); ctx.scale(outR[2], outR[2]);
+  ctx.beginPath(); ctx.arc(0, 0, R8 * S, (3 * Math.PI) / 4 - 1.5 * Math.PI + gap, (3 * Math.PI) / 4 - gap); ctx.stroke(); ctx.restore();
+}
+// the complete mark at scale S (pixels per unit), drawn around the current origin
+function drawMark(ctx, S) { drawArcs(ctx, S, 0.26, SW * S); drawX(ctx, S, 1, Math.PI / 4); }
+// the snap that turns the continuous figure-eight into the logo: diagonals retract, loops open, X spins in
+function markSnap(ctx, S, t, t0) {
+  const r = eOut(P(t, t0, t0 + 0.3)), snap = spring(t, t0, 16);
+  ctx.strokeStyle = COP; ctx.lineWidth = SW * S; ctx.lineCap = "butt";
+  drawArcs(ctx, S, 0.26 * eOut(P(t, t0, t0 + 0.25)), SW * S);
+  if (r < 1) { const pts = FIG8.map(([x, y]) => [x * S, y * S]), cc = FIG8C.map((v) => v * S);
+    strokePart(ctx, pts, cc, 0, FR[1] * (1 - r)); strokePart(ctx, pts, cc, FR[2] + (FR[3] - FR[2]) * r, FR[3]);
+    strokePart(ctx, pts, cc, FR[3], FR[3] + (FR[4] - FR[3]) * (1 - r)); strokePart(ctx, pts, cc, FR[5] + (FR[6] - FR[5]) * r, 1); }
+  drawX(ctx, S, snap, Math.PI / 4 + (Math.PI / 2) * (1 - snap));
+}
+
+/* ---------- type ---------- */
+const F = (w, s) => `${w} ${s}px M`;
+function glyphs(ctx, str, size, weight, track) { // per-letter advance with tracking (em)
+  ctx.font = F(weight, size); const out = []; let x = 0;
+  for (const ch of str) { const w = ctx.measureText(ch).width; out.push({ ch, x, w }); x += w + track * size; }
+  return { g: out, width: x - track * size };
+}
+const CAP = 0.70; // Montserrat cap height / em
+
+/* ---------- 3D camera ---------- */
+const FOC = 1800, DIST = 1800;
+function cam(rx, ry, rz) {
+  const cx = Math.cos(rx), sx = Math.sin(rx), cy = Math.cos(ry), sy = Math.sin(ry), cz = Math.cos(rz), sz = Math.sin(rz);
+  return (p) => { // roll (z) → tilt (x) → yaw (y)
+    let x = p[0] * cz - p[1] * sz, y = p[0] * sz + p[1] * cz, z = p[2];
+    let y2 = y * cx - z * sx, z2 = y * sx + z * cx; y = y2; z = z2;
+    let x2 = x * cy + z * sy; z2 = -x * sy + z * cy; return [x2, y, z2];
+  };
+}
+function proj(q, ortho, ox = 0, oy = 0) { const k = lerp(FOC / (q[2] + DIST), 1, ortho); return [CX + ox + q[0] * k, CY + oy + q[1] * k, k]; }
+const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const crs = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const nrm = (a) => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+const shade = (rgb, l) => `rgb(${Math.round(rgb[0] * l)},${Math.round(rgb[1] * l)},${Math.round(rgb[2] * l)})`;
+
+/* solid ribbon along a closed 3D centreline: in-plane width w, extrusion depth d (world z).
+   opts: rot (camera fn), ortho, ox/oy (screen offset), flat (0..1 shading → flat), text {str, size, offset} */
+function ribbon(ctx, C, w, d, o) {
+  const n = C.length, R = o.rot, quads = [];
+  const Tn = [], Nn = [];
+  for (let i = 0; i < n; i++) { const a = C[(i - 1 + n) % n], b = C[(i + 1) % n]; const T = nrm(sub(b, a)); Tn.push(T); Nn.push(nrm(crs(T, [0, 0, 1]))); }
+  const corner = (i, sn, sz) => { const c = C[i % n], m = Nn[i % n]; return [c[0] + m[0] * w * 0.5 * sn, c[1] + m[1] * w * 0.5 * sn, c[2] + d * 0.5 * sz]; };
+  const faces = [ // [side-normal sign, z sign] corners & which base colour
+    { k: "zf", pts: (i) => [corner(i, 1, -1), corner(i + 1, 1, -1), corner(i + 1, -1, -1), corner(i, -1, -1)], nrm: () => [0, 0, -1], col: RGB.cop },
+    { k: "zb", pts: (i) => [corner(i, 1, 1), corner(i + 1, 1, 1), corner(i + 1, -1, 1), corner(i, -1, 1)], nrm: () => [0, 0, 1], col: RGB.cop },
+    { k: "wo", pts: (i) => [corner(i, 1, -1), corner(i + 1, 1, -1), corner(i + 1, 1, 1), corner(i, 1, 1)], nrm: (i) => Nn[i], col: RGB.ter },
+    { k: "wi", pts: (i) => [corner(i, -1, -1), corner(i + 1, -1, -1), corner(i + 1, -1, 1), corner(i, -1, 1)], nrm: (i) => [-Nn[i][0], -Nn[i][1], 0], col: RGB.ter },
+  ];
+  const segs = o.open ? n - 1 : n;
+  for (let i = 0; i < segs; i++) {
+    for (const f of faces) {
+      if (d < 0.5 && (f.k === "wo" || f.k === "wi" || f.k === "zb")) continue;
+      const wp = f.pts(i).map(R), cn = R(f.nrm(i));
+      const ctr = [(wp[0][0] + wp[2][0]) / 2, (wp[0][1] + wp[2][1]) / 2, (wp[0][2] + wp[2][2]) / 2 + DIST];
+      const facing = -(cn[0] * ctr[0] + cn[1] * ctr[1] + cn[2] * ctr[2]);
+      if (facing <= 0 && d >= 0.5) continue;
+      const lit = lerp(0.42 + 0.58 * clamp(-cn[2]), 1, o.flat || 0);
+      quads.push({ z: ctr[2], sp: wp.map((q) => proj(q, o.ortho || 0, o.ox, o.oy)), col: shade(f.col, lit), seg: i, front: f.k === "zf" || (d < 0.5) });
+    }
+  }
+  // text: each lobe of the figure-eight carries the promise on its own closed loop; the right lobe runs reversed so
+  // both read left-to-right across the top. Letters are depth-sorted with the ribbon (drawn just above their strand).
+  const items = quads.map((q) => ({ z: q.z, q }));
+  if (o.text) {
+    ctx.font = F(800, o.text.size);
+    const gl = []; let x = 0;
+    for (const ch of o.text.str) { const wv = ctx.measureText(ch).width; gl.push({ ch, x, w: wv }); x += wv + 0.06 * o.text.size; }
+    const per = x, zf = R([0, 0, -1]);
+    for (const [i0, i1, rev] of o.text.lobes) {
+      const idx = []; for (let i = i0; i < i1; i++) idx.push(i % n);
+      const Lc = [0]; for (let k = 1; k <= idx.length; k++) Lc.push(Lc[k - 1] + Math.hypot(...sub(C[(idx[k - 1] + 1) % n], C[idx[k - 1]])));
+      const total = Lc[idx.length]; if (total < per * 0.5) continue;
+      const reps = Math.max(1, Math.floor(total / per)), stretch = total / (reps * per);
+      for (let r = 0; r < reps; r++) for (const g of gl) {
+        if (g.ch === " ") continue;
+        let s0 = ((r * per + g.x + g.w / 2) * stretch + o.text.offset) % total; if (s0 < 0) s0 += total;
+        const sv = rev ? total - s0 : s0;
+        let k = 0; while (k < idx.length - 1 && Lc[k + 1] < sv) k++;
+        const i = idx[k], u = (sv - Lc[k]) / (Lc[k + 1] - Lc[k] || 1);
+        const a = C[i], b = C[(i + 1) % n], pc = [lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u) - d * 0.5];
+        if (o.text.hide && o.text.hide(pc)) continue;
+        const sc = o.text.scales ? o.text.scales(r, g) : 1; if (sc <= 0.01) continue;
+        const rp = R(pc), facing = d < 0.5 ? 1 : -(zf[0] * rp[0] + zf[1] * rp[1] + zf[2] * (rp[2] + DIST));
+        if (facing <= 0) continue;
+        items.push({ z: rp[2] + DIST - 45, c: { ch: g.ch, p: pc, i, rev, sc } });
+      }
+    }
+  }
+  items.sort((a, b) => b.z - a.z);
+  ctx.lineJoin = "round";
+  for (const it of items) {
+    if (it.q) { const q = it.q;
+      ctx.beginPath(); q.sp.forEach((p, k) => (k ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]))); ctx.closePath();
+      ctx.fillStyle = q.col; ctx.fill(); ctx.strokeStyle = q.col; ctx.lineWidth = 0.9; ctx.stroke(); continue; }
+    const c = it.c, sg = c.rev ? -1 : 1, T = Tn[c.i].map((v) => v * sg), Nv = Nn[c.i].map((v) => v * sg), p = c.p;
+    const pa = proj(R(p), o.ortho || 0, o.ox, o.oy), pb = proj(R([p[0] + T[0] * 4, p[1] + T[1] * 4, p[2]]), o.ortho || 0, o.ox, o.oy);
+    const pn = proj(R([p[0] + Nv[0] * 4, p[1] + Nv[1] * 4, p[2]]), o.ortho || 0, o.ox, o.oy);
+    ctx.save(); ctx.translate(pa[0], pa[1]);
+    ctx.transform((pb[0] - pa[0]) / 4, (pb[1] - pa[1]) / 4, -(pn[0] - pa[0]) / 4, -(pn[1] - pa[1]) / 4, 0, 0); ctx.scale(c.sc, c.sc);
+    ctx.fillStyle = BLK; ctx.font = F(800, o.text.size); ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText(c.ch, 0, o.text.size * 0.04); ctx.restore();
+  }
+}
+const to3 = (pts, S, z = 0) => pts.map(([x, y]) => [x * S, y * S, z]);
+
+/* ---------- shape library for the morph bar (pixels, centred) ---------- */
+function circlePts(r, m, a0 = Math.PI / 4) { const p = []; for (let i = 0; i <= m; i++) { const a = a0 + (2 * Math.PI * i) / m; p.push([r * Math.cos(a), r * Math.sin(a)]); } return p; }
+function magPts(handle) { const r = 137, a = Math.PI / 4, rp = [r * Math.cos(a), r * Math.sin(a)];
+  const he = [rp[0] + Math.cos(a) * handle, rp[1] + Math.sin(a) * handle]; return [he, ...circlePts(r, 200, a)]; }
+function browserPts() { const L = -270, R = 270, T = -190, Bt = 190, D = -110;
+  const pts = []; const seg = (a, b, m) => { for (let i = 0; i < m; i++) pts.push([lerp(a[0], b[0], i / m), lerp(a[1], b[1], i / m)]); };
+  seg([L, D], [R, D], 40); seg([R, D], [R, Bt], 40); seg([R, Bt], [L, Bt], 40); seg([L, Bt], [L, T], 40); seg([L, T], [R, T], 40); seg([R, T], [R, D], 20); pts.push([R, D]); return pts; }
+function arrowPts() { const pts = [[-280, 150], [-95, -15], [30, 70], [255, -150], [140, -150], [255, -150], [255, -35]];
+  const out = []; for (let i = 0; i < pts.length - 1; i++) for (let k = 0; k < 30; k++) out.push([lerp(pts[i][0], pts[i + 1][0], k / 30), lerp(pts[i][1], pts[i + 1][1], k / 30)]); out.push(pts[pts.length - 1]); return out; }
+const SHP = {
+  ring: resample(magPts(0), N), mag: resample(magPts(175), N), web: resample(browserPts(), N),
+  arrow: resample(arrowPts(), N), loop: resample(fig8Raw().map(([x, y]) => [x * 445, y * 445]), N),
+};
+const mix2 = (A, Bp, u) => A.map((p, i) => [lerp(p[0], Bp[i][0], u), lerp(p[1], Bp[i][1], u)]);
+
+/* ---------- globe ---------- */
+const GR = 300;
+const DOTS = (() => { const out = [], n = 1500, ga = Math.PI * (3 - Math.sqrt(5)); for (let i = 0; i < n; i++) { const y = 1 - (2 * (i + 0.5)) / n, r = Math.sqrt(1 - y * y), th = ga * i; out.push([Math.cos(th) * r, y, Math.sin(th) * r]); } return out; })();
+const ll = (lat, lon) => { const a = (lat * Math.PI) / 180, b = (lon * Math.PI) / 180; return [Math.cos(a) * Math.sin(b), -Math.sin(a), Math.cos(a) * Math.cos(b)]; };
+const CITIES = [
+  { n: "HYDERABAD", p: ll(17.39, 78.49) }, { n: "BENGALURU", p: ll(12.97, 77.59) }, { n: "AUSTRALIA", p: ll(-33.33, 115.64) },
+  { n: "NEW ZEALAND", p: ll(-40.9, 174.9) }, { n: "UK", p: ll(52.5, -1.9) },
+];
+function slerp(a, b, u) { const dt = clamp(a[0] * b[0] + a[1] * b[1] + a[2] * b[2], -1, 1), om = Math.acos(dt); if (om < 1e-4) return a;
+  const s = Math.sin(om); return [0, 1, 2].map((k) => (Math.sin((1 - u) * om) * a[k] + Math.sin(u * om) * b[k]) / s); }
+// the route HYD → BLR → AU → NZ → UK → HYD as one closed loop, lifted above the surface on long hops
+const ROUTE = (() => { const order = [0, 1, 2, 3, 4, 0], pts = [], legs = [];
+  for (let k = 0; k < order.length - 1; k++) { const a = CITIES[order[k]].p, b = CITIES[order[k + 1]].p;
+    const om = Math.acos(clamp(a[0] * b[0] + a[1] * b[1] + a[2] * b[2], -1, 1)), m = Math.max(8, Math.round(om * 60));
+    legs.push(pts.length);
+    for (let i = 0; i < m; i++) { const u = i / m, q = slerp(a, b, u), lift = 1 + 0.16 * Math.min(1, om) * Math.sin(Math.PI * u); pts.push(q.map((v) => v * lift)); } }
+  legs.push(pts.length); return { pts, legs }; })();
+const ROUTE_N = (() => { // resampled to N for the morph into the ribbon
+  const p = ROUTE.pts, c = [0]; for (let i = 1; i <= p.length; i++) c.push(c[i - 1] + Math.hypot(...sub(p[i % p.length], p[i - 1])));
+  const L = c[p.length], out = []; let j = 0;
+  for (let i = 0; i < N; i++) { const s = (L * i) / N; while (j < p.length - 1 && c[j + 1] < s) j++; const u = (s - c[j]) / (c[j + 1] - c[j]); const a = p[j], b = p[(j + 1) % p.length];
+    out.push([lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)]); } return out; })();
+const LEG_T = [[10.12, 10.42], [10.5, 10.86], [11.0, 11.3], [11.5, 11.74], [11.74, 11.97]];
+function routeHead(t) { let head = 0; LEG_T.forEach(([a, b], k) => { const u = eOut(P(t, a, b)); if (u > 0) head = ROUTE.legs[k] + (ROUTE.legs[k + 1] - ROUTE.legs[k]) * u; }); return head; }
+function headVec(h) { const p = ROUTE.pts, n = p.length, i = Math.floor(h) % n, f = h - Math.floor(h), a = p[i], b = p[(i + 1) % n];
+  return nrm([lerp(a[0], b[0], f), lerp(a[1], b[1], f), lerp(a[2], b[2], f)]); }
+function globeRot(t) { // the travelling head of the route always swings toward the camera (lagged, so the line leads)
+  t = Math.min(t, 12.0);
+  const v = headVec(routeHead(Math.max(10.0, t - 0.08)));
+  let lon = Math.atan2(v[0], v[2]), lat = -Math.asin(clamp(v[1], -1, 1));
+  return { lon: -lon - 0.25, lat: -lat * 0.55 - 0.12 };
+}
+function globeXf(v, g) { // rotate unit vector so (lat,lon) faces the camera, world px
+  const cb = Math.cos(g.lon), sb = Math.sin(g.lon); let x = v[0] * cb + v[2] * sb, z = -v[0] * sb + v[2] * cb, y = v[1];
+  const ca = Math.cos(g.lat), sa = Math.sin(g.lat); const y2 = y * ca - z * sa, z2 = y * sa + z * ca;
+  return [x * GR, y2 * GR, -z2 * GR]; // facing = negative z (towards the camera)
+}
+
+/* ---------- reveal helper: text that slides through a mask (no fades anywhere) ---------- */
+function maskedText(ctx, str, x, y, size, weight, track, color, prog, dir = 1, align = "left") {
+  if (prog <= 0 || prog >= 2) return;
+  const { g, width } = glyphs(ctx, str, size, weight, track);
+  const x0 = align === "center" ? x - width / 2 : x;
+  ctx.save(); ctx.beginPath(); ctx.rect(x0 - size, y - size * 1.05, width + size * 2, size * 1.35); ctx.clip();
+  const off = prog <= 1 ? (1 - prog) * size * 1.2 * dir : -(prog - 1) * size * 1.2 * dir;
+  ctx.font = F(weight, size); ctx.fillStyle = color; ctx.textBaseline = "alphabetic";
+  for (const q of g) ctx.fillText(q.ch, x0 + q.x, y + off);
+  ctx.restore(); return width;
+}
+
+/* =====================================================================
+   SCENES
+   ===================================================================== */
+// BAR 1 — hook: dot → stroke draws the mark → X snaps → push into the X, it becomes the slit rails
+function hook(ctx, t) {
+  const S0 = 840;
+  const zoom = 1 + 0.8 * eIn(P(t, 1.5, 2.0));
+  const S = S0 * zoom;
+  ctx.save(); ctx.translate(CX, CY);
+  const lw = lerp(20, SW * S0, eOut(P(t, 0, 0.35))) * zoom;
+  const dLeft = 0.5 * eOut(P(t, 0, 0.42)), dRight = 0.5 * eOut(P(t, 0.5, 0.92));
+  const snap = spring(t, 1.0, 16);
+  if (t < 1.0) {
+    ctx.strokeStyle = COP; ctx.lineWidth = lw; ctx.lineCap = "round";
+    const pts = FIG8.map(([x, y]) => [x * S, y * S]);
+    if (dLeft > 0) strokePart(ctx, pts, FIG8C.map((v) => v * S), 0, dLeft); else { ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(0, 0, 10, 0, 7); ctx.fill(); }
+    if (dRight > 0) strokePart(ctx, pts, FIG8C.map((v) => v * S), 0.5, 0.5 + dRight);
+  } else {
+    // diagonals retract into the crossing while the outlined X spins in; loops open the logo's gap
+    const r = eOut(P(t, 1.0, 1.3));
+    ctx.strokeStyle = COP; ctx.lineWidth = lw; ctx.lineCap = "butt";
+    const out = eIn(P(t, 1.5, 1.95));
+    drawArcs(ctx, S, 0.26 * eOut(P(t, 1.0, 1.25)), lw, [-2.6 * out, 0, 1 + 3 * out], [2.6 * out, 0, 1 + 3 * out]);
+    if (r < 1) {
+      const pts = FIG8.map(([x, y]) => [x * S, y * S]), cc = FIG8C.map((v) => v * S);
+      strokePart(ctx, pts, cc, 0, FR[1] * (1 - r)); strokePart(ctx, pts, cc, FR[2] + (FR[3] - FR[2]) * r, FR[3]);
+      strokePart(ctx, pts, cc, FR[3], FR[3] + (FR[4] - FR[3]) * (1 - r)); strokePart(ctx, pts, cc, FR[5] + (FR[6] - FR[5]) * r, 1);
+    }
+    // beat 4: the X turns into a "+" whose vertical arm collapses and horizontal arm stretches past the frame
+    const plus = eIO(P(t, 1.5, 1.9));
+    const Lh = lerp(0.27, 2.2 / zoom, eIn(P(t, 1.55, 1.98))), Lv = lerp(0.27, 0.042, eIO(P(t, 1.5, 1.85)));
+    drawX(ctx, S, snap, lerp(Math.PI / 4 + (Math.PI / 2) * (1 - snap), 0, plus), Lh, Lv);
+  }
+  ctx.restore();
+}
+// rails geometry shared by hook → type
+const RAIL_LW = 0.02 * 840 * 1.8; // X outline width at the end of the push
+const RAIL_G0 = 0.042 * 840 * 1.8; // half-gap at the end of the push
+
+// BAR 2 — kinetic type through a copper slit
+const WORDS = [
+  { s: "AUDIT", size: 236, G: 196 }, { s: "BUILD", size: 236, G: 176 },
+  { s: "MARKET", size: 226, G: 206 }, { s: "AUTOMATE", size: 200, G: 118 },
+];
+function wordLayout(ctx, k, t) { const w = WORDS[k]; let track = 0.02;
+  if (k === 0) track = lerp(0.55, 0.02, eOut(P(t, 2.0, 2.32)));
+  if (k === 2) track = lerp(-0.04, 0.07, eOut(P(t, 3.0, 3.4)));
+  return { ...glyphs(ctx, w.s, w.size, 900, track), track }; }
+function kinetic(ctx, t) {
+  const k = clamp(Math.floor((t - 2) / 0.5), 0, 3), tk = 2 + 0.5 * k, w = WORDS[k];
+  const last = k === 3;
+  // slit half-gap: opens on the beat, shutters closed just before the next beat
+  let g = lerp(k === 0 ? RAIL_G0 : 0, w.G, eOut(P(t, tk, tk + 0.24)));
+  if (!last) g *= 1 - eIn(P(t, tk + 0.4, tk + 0.5));
+  // camera push into AUTOMATE's full stop at the end of the bar
+  const L = wordLayout(ctx, k, t);
+  const pr = 0.074 * w.size, gapDot = 0.05 * w.size;
+  const totalW = L.width + gapDot + 2 * pr;
+  const x0 = CX - totalW / 2, base = CY + (CAP * w.size) / 2;
+  const dot = [x0 + L.width + gapDot + pr, base - pr];
+  let Z = 1, tx = 0, ty = 0;
+  if (last) { const u = eIn(P(t, 3.78, 4.0)); Z = Math.exp(Math.log(150 / pr) * u); tx = (CX - dot[0]) * eIO(P(t, 3.78, 4.0)); ty = (CY - dot[1]) * eIO(P(t, 3.78, 4.0)); }
+  // word push toward camera while the slit shutters
+  const push = last ? 1 : 1 + 0.06 * P(t, tk, tk + 0.4) + 0.5 * eIn(P(t, tk + 0.4, tk + 0.5));
+  ctx.save();
+  ctx.translate(dot[0] + tx, dot[1] + ty); ctx.scale(Z, Z); ctx.translate(-dot[0], -dot[1]);
+  // rails
+  ctx.fillStyle = COP;
+  ctx.fillRect(-4000, CY - g - RAIL_LW / 2, 9920, RAIL_LW); ctx.fillRect(-4000, CY + g - RAIL_LW / 2, 9920, RAIL_LW);
+  // word, clipped to the slit
+  ctx.save(); ctx.beginPath(); ctx.rect(-4000, CY - g + RAIL_LW / 2, 9920, Math.max(0, 2 * g - RAIL_LW)); ctx.clip();
+  ctx.translate(CX, CY); ctx.scale(push, push); ctx.translate(-CX, -CY);
+  ctx.font = F(900, w.size); ctx.fillStyle = WHT; ctx.textBaseline = "alphabetic";
+  L.g.forEach((q, i) => {
+    let y = base, x = x0 + q.x, ch = q.ch;
+    if (k === 1) y -= 300 * (1 - spring(t, tk + 0.022 * i, 30));
+    if (k === 2) { const sc = lerp(0.42, 1, eOut(P(t, tk, tk + 0.3))); x = CX + (x - CX) * sc; }
+    if (k === 3) { // slot roll: each letter scrolls through three others before it lands
+      const land = eOut(P(t, tk + 0.022 * i, tk + 0.2 + 0.022 * i)), roll = (1 - land) * 3, lh = w.size * 1.1, set = "AUTOMATE";
+      for (let j = 0; j <= 3; j++) { const off = (roll - j) * lh; if (Math.abs(off) >= lh) continue;
+        ctx.fillText(j === 0 ? q.ch : set[(i + j * 3) % set.length], x, y + off); }
+      return;
+    }
+    if (k === 2) { const sc = lerp(0.42, 1, eOut(P(t, tk, tk + 0.3))); ctx.save(); ctx.translate(x, y); ctx.scale(sc, sc); ctx.fillText(ch, 0, 0); ctx.restore(); return; }
+    ctx.fillText(ch, x, y);
+  });
+  // the copper full stop (the seed of the next scene)
+  let ds = 1; if (k === 1) ds = spring(t, tk + 0.022 * L.g.length, 30); if (k === 2) ds = lerp(0.42, 1, eOut(P(t, tk, tk + 0.3)));
+  const dx = k === 2 ? CX + (dot[0] - CX) * ds : dot[0];
+  const dy = k === 1 ? dot[1] - 300 * (1 - ds) : dot[1];
+  ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(dx, dy, pr * (k === 2 ? ds : 1), 0, 7); ctx.fill();
+  ctx.restore(); ctx.restore();
+}
+
+// BAR 3 — shape morph: full stop → lens → browser → growth arrow → infinity
+const LABELS = ["01  AUDIT", "02  BUILD", "03  MARKET", "04  AUTOMATE"];
+function morph(ctx, t) {
+  const push = 1 + 0.08 * P(t, 4, 6);
+  ctx.save(); ctx.translate(CX, CY); ctx.scale(push, push);
+  ctx.strokeStyle = COP; ctx.fillStyle = COP; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.lineWidth = 26;
+  if (t < 4.2) { // disk opens into a ring
+    const ri = lerp(0, 124, eOut(P(t, 4.0, 4.2)));
+    ctx.beginPath(); ctx.arc(0, 0, 150, 0, 7); if (ri > 0.5) ctx.arc(0, 0, ri, 7, 0, true); ctx.fill("evenodd");
+  } else {
+    const seq = [[4.2, "ring"], [4.25, "mag"], [4.5, "web"], [5.0, "arrow"], [5.5, "loop"]];
+    let shape = SHP.ring;
+    for (let i = 1; i < seq.length; i++) { const [t0, key] = seq[i], prev = SHP[seq[i - 1][1]];
+      if (t >= t0) shape = mix2(prev, SHP[key], i === 1 ? eOut(P(t, 4.25, 4.45)) : spring(t, t0, 26)); }
+    strokePts(ctx, shape);
+    // browser dots
+    const dIn = spring(t, 4.62, 20) * (1 - eIn(P(t, 4.9, 5.0)));
+    if (dIn > 0.01) [0, 1, 2].forEach((i) => { ctx.beginPath(); ctx.arc(-225 + i * 42, -150, 11 * dIn, 0, 7); ctx.fill(); });
+  }
+  ctx.restore();
+  // index labels, rolling through a mask
+  const ly = CY + 330;
+  for (let i = 0; i < 4; i++) {
+    const tin = 4 + 0.5 * i + 0.04, tout = 4.5 + 0.5 * i;
+    let prog = eOut(P(t, tin, tin + 0.22));
+    if (i < 3 && t >= tout - 0.06) prog = 1 + eIn(P(t, tout - 0.06, tout + 0.1));
+    if (i === 3 && t >= 5.82) prog = 1 + eIn(P(t, 5.82, 5.98));
+    maskedText(ctx, LABELS[i], CX, ly, 44, 700, 0.32, CRM, prog, 1, "center");
+  }
+}
+
+// BAR 4 — the infinity becomes a solid ribbon and turns in space; ends edge-on as a flat bar
+function three(ctx, t) {
+  const a = (x) => (x * Math.PI) / 180;
+  const ex = spring(t, 6.0, 12);
+  let rx = lerp(0, 58, eIO(P(t, 6.0, 6.45))), ry = lerp(0, -22, eIO(P(t, 6.0, 6.45))), rz = 0;
+  ry = lerp(ry, 34, eIO(P(t, 6.5, 6.95))); rz = lerp(0, -14, eIO(P(t, 6.5, 6.95)));
+  rx = lerp(rx, 68, eIO(P(t, 7.0, 7.45))); ry = lerp(ry, -12, eIO(P(t, 7.0, 7.45))); rz = lerp(rz, 10, eIO(P(t, 7.0, 7.45)));
+  const edge = eIO(P(t, 7.5, 7.95));
+  rx = lerp(rx, 90, edge); ry = lerp(ry, 0, edge); rz = lerp(rz, 0, edge);
+  let S = 445 * 1.08 * lerp(1, 1.25, eIO(P(t, 6.5, 7.45)));
+  S = lerp(S, 1120 / (1 + 2 * R8), edge);
+  const w = lerp(26, 70, ex) * (1 - 0.3 * edge), d = lerp(0, 90, ex) * lerp(1, 40 / 90, edge);
+  const C = to3(FIG8, S, 0);
+  ribbon(ctx, C, w, d, { rot: cam(a(rx), a(ry), a(rz)), ortho: edge, oy: lerp(0, 250 - CY, eIO(P(t, 7.6, 8.0))), flat: edge });
+}
+
+// BAR 5 — dashboard card unfolds from the bar: real portfolio numbers
+function cardShape(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function dash(ctx, t) {
+  const L = 400, T = 230, Wc = 1120, Hc = 620, strip = 40;
+  const pz = 1 + 0.035 * eIO(P(t, 8.3, 9.5)) * (1 - eIO(P(t, 9.5, 9.9)));
+  ctx.save(); ctx.translate(CX, CY); ctx.scale(pz, pz); ctx.translate(-CX, -CY);
+  // card → circle (beat 20)
+  const c = eIO(P(t, 9.55, 10.0));
+  const w = lerp(Wc, 2 * GR, c), h = lerp(lerp(strip, Hc, eOut(P(t, 8.0, 8.32))), 2 * GR, c);
+  const x = lerp(L, CX - GR, c), y = lerp(T, CY - GR, c), r = lerp(lerp(0, 26, P(t, 8.0, 8.2)), GR, c);
+  ctx.save(); cardShape(ctx, x, y, w, h, r); ctx.fillStyle = CRM; ctx.fill(); ctx.clip();
+  ctx.fillStyle = TER; ctx.fillRect(x, y, w, strip * (1 - c));
+  ctx.restore();
+  // contents shrink away into the card centre before it rounds (no fades)
+  const gone = (i) => 1 - eIn(P(t, 9.5 + 0.02 * i, 9.66 + 0.02 * i));
+  const item = (i, cx, cy, fn) => { const s = gone(i); if (s <= 0.002) return; ctx.save(); ctx.translate(cx, cy); ctx.scale(s, s); ctx.translate(-cx, -cy); fn(); ctx.restore(); };
+  ctx.save(); cardShape(ctx, x, y, w, h, r); ctx.clip();
+  item(0, L + 300, T + 20, () => maskedText(ctx, "ONE LOOP  ·  CLIENT PORTFOLIO", L + 40, T + 29, 20, 700, 0.3, WHT, eOut(P(t, 8.06, 8.3))));
+  // 24 brands
+  const n = Math.round(24 * eOut(P(t, 8.02, 8.46)));
+  item(1, L + 250, T + 300, () => {
+    ctx.font = F(900, 300); ctx.fillStyle = BLK; ctx.textBaseline = "alphabetic";
+    const up = (1 - eOut(P(t, 8.0, 8.2))) * 120;
+    ctx.save(); ctx.beginPath(); ctx.rect(L + 40, T + 60, 520, 330); ctx.clip(); ctx.fillText(String(n), L + 50, T + 370 + up); ctx.restore();
+    maskedText(ctx, "BRANDS", L + 62, T + 440, 54, 800, 0.14, BLK, eOut(P(t, 8.12, 8.36)));
+  });
+  // service split
+  const s1 = eOut(P(t, 8.5, 8.78)), s2 = eOut(P(t, 8.6, 8.88));
+  const bx = L + 600, by = T + 150, bw = 460, bh = 56, w1 = (bw * 13) / 24;
+  item(2, bx + bw / 2, by, () => {
+    maskedText(ctx, "SERVICE LINES", bx, T + 120, 22, 700, 0.28, TER, eOut(P(t, 8.5, 8.7)));
+    ctx.fillStyle = COP; ctx.fillRect(bx, by, w1 * s1, bh);
+    ctx.fillStyle = TER; ctx.fillRect(bx + w1 + 6, by, (bw - w1 - 6) * s2, bh);
+  });
+  item(3, bx + 100, T + 300, () => {
+    maskedText(ctx, String(Math.round(13 * s1)), bx, T + 330, 110, 900, 0, COP, eOut(P(t, 8.52, 8.74)));
+    maskedText(ctx, "DIGITAL", bx + 4, T + 372, 22, 700, 0.2, BLK, eOut(P(t, 8.58, 8.8)));
+    maskedText(ctx, "MARKETING", bx + 4, T + 400, 22, 700, 0.2, BLK, eOut(P(t, 8.6, 8.82)));
+  });
+  item(4, bx + 360, T + 300, () => {
+    maskedText(ctx, String(Math.round(11 * s2)), bx + w1 + 6, T + 330, 110, 900, 0, TER, eOut(P(t, 8.62, 8.84)));
+    maskedText(ctx, "FULL-SERVICE", bx + w1 + 10, T + 372, 22, 700, 0.2, BLK, eOut(P(t, 8.68, 8.9)));
+  });
+  // 4 countries + chips on 16ths
+  item(5, L + 200, T + 540, () => maskedText(ctx, "4 COUNTRIES", L + 60, T + 561, 44, 900, 0.04, BLK, eOut(P(t, 9.0, 9.2))));
+  const chips = ["INDIA", "AUSTRALIA", "NEW ZEALAND", "UK"]; let cxp = L + 452;
+  chips.forEach((name, i) => {
+    ctx.font = F(700, 20); const tw = glyphs(ctx, name, 20, 700, 0.14).width, cw = tw + 36;
+    const sc = spring(t, 9.0 + 0.125 * i, 26), mx = cxp + cw / 2;
+    item(6 + i, mx, T + 545, () => { if (sc < 0.01) return;
+      ctx.save(); ctx.translate(mx, T + 545); ctx.scale(sc, sc);
+      ctx.beginPath(); ctx.roundRect(-cw / 2, -25, cw, 50, 25); ctx.fillStyle = i === 0 ? COP : CRM; ctx.fill();
+      ctx.lineWidth = 3; ctx.strokeStyle = i === 0 ? COP : BLK; ctx.stroke();
+      const gl = glyphs(ctx, name, 20, 700, 0.14); ctx.fillStyle = BLK; ctx.font = F(700, 20);
+      gl.g.forEach((q) => ctx.fillText(q.ch, -tw / 2 + q.x, 7)); ctx.restore(); });
+    cxp += cw + 14;
+  });
+  ctx.restore(); ctx.restore();
+}
+
+// BAR 6 — the cream disk breaks into a dotted globe; the route draws one loop around the world
+function globe(ctx, t) {
+  const g = globeRot(t);
+  const out = eIn(P(t, 12.0, 12.24)); // dots contract into the centre as the route tears away
+  const R0 = lerp(30, 0, eOut(P(t, 10.0, 10.38))); // dot radius while still merged into the disk
+  const front = [];
+  for (const v of DOTS) { const q = globeXf(v, g); if (q[2] < 18) front.push(q); }
+  const pr = (q) => proj([q[0] * (1 - out), q[1] * (1 - out), q[2] * (1 - out)], 0);
+  if (R0 > 0.2) { // dissolve: the disk is the union of fat dots, clipped to the circle
+    ctx.save(); ctx.beginPath(); ctx.arc(CX, CY, proj([GR, 0, 0], 0)[0] - CX, 0, 7); ctx.clip();
+    ctx.beginPath(); for (const q of front) { const p = pr(q); ctx.moveTo(p[0] + R0 + 3, p[1]); ctx.arc(p[0], p[1], R0 + 3, 0, 7); }
+    ctx.fillStyle = CRM; ctx.fill(); ctx.restore();
+  } else {
+    ctx.fillStyle = CRM; ctx.beginPath();
+    for (const q of front) { const p = pr(q), facing = clamp(-q[2] / GR), r = (1.2 + 2.6 * facing) * (1 - out); if (r < 0.05) continue; ctx.moveTo(p[0] + r, p[1]); ctx.arc(p[0], p[1], r, 0, 7); }
+    ctx.fill();
+  }
+  if (t >= 12.0) return;
+  // route drawing: legs on beats 21-24
+  const pts = ROUTE.pts, head = routeHead(t);
+  ctx.strokeStyle = COP; ctx.lineWidth = 7; ctx.lineCap = "round"; ctx.lineJoin = "round";
+  ctx.beginPath(); let pen = false;
+  for (let i = 0; i <= Math.floor(head) && i < pts.length; i++) {
+    const q = globeXf(pts[i], g); const vis = q[2] < 30; const p = proj(q, 0);
+    if (vis) { if (!pen) { ctx.moveTo(p[0], p[1]); pen = true; } else ctx.lineTo(p[0], p[1]); } else pen = false;
+  }
+  if (head < pts.length) { const i = Math.floor(head), f = head - i, a = globeXf(pts[i], g), b = globeXf(pts[(i + 1) % pts.length], g);
+    const q = [lerp(a[0], b[0], f), lerp(a[1], b[1], f), lerp(a[2], b[2], f)]; if (q[2] < 30 && pen) { const p = proj(q, 0); ctx.lineTo(p[0], p[1]); } }
+  ctx.stroke();
+  // city pins + labels on arrival
+  const arrive = [10.08, 10.42, 10.86, 11.3, 11.74], show = [[10.1, 10.5], [10.42, 10.5], [10.86, 11.36], [11.3, 11.7], [11.74, 12.0]];
+  CITIES.forEach((c, k) => {
+    const q = globeXf(c.p, g); if (q[2] > 0) return; const p = proj(q, 0);
+    const s = spring(t, arrive[k], 24); if (s < 0.01) return;
+    ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(p[0], p[1], 11 * s, 0, 7); ctx.fill();
+    ctx.strokeStyle = COP; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(p[0], p[1], 22 * s, 0, 7); ctx.stroke();
+    const [a, b] = show[k]; if (k === 1) return; // Bengaluru sits on top of Hyderabad: pin only
+    let prog = eOut(P(t, a, a + 0.18)); if (t > b - 0.08) prog = 1 + eIn(P(t, b - 0.08, b + 0.04));
+    const right = p[0] >= CX - 40, edge = right ? CX + GR + 70 : CX - GR - 70;
+    if (prog > 0 && prog < 2) { // leader from the pin to outside the globe, drawn out and retracted (no fades)
+      const u = prog <= 1 ? eOut(prog) : 1, v = prog > 1 ? prog - 1 : 0, x0 = p[0] + (right ? 24 : -24);
+      ctx.strokeStyle = COP; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(lerp(x0, edge, v), p[1]); ctx.lineTo(lerp(x0, edge, u), p[1]); ctx.stroke(); }
+    ctx.font = F(700, 34); const tw = glyphs(ctx, c.n, 34, 700, 0.22).width;
+    maskedText(ctx, c.n, right ? edge + 18 : edge - 18 - tw, p[1] + 12, 34, 700, 0.22, WHT, prog);
+  });
+}
+
+// BAR 7 — strongest: the route tears off the globe into a giant 3D infinity with the promise racing around it
+const PROMISE = "AUDIT. BUILD. MARKET. AUTOMATE. ";
+function finale(ctx, t) {
+  const a = (x) => (x * Math.PI) / 180;
+  const m = spring(t, 12.0, 17);
+  const S = lerp(620, 700, eIO(P(t, 12.5, 13.0))) * lerp(1, 1.06, eIO(P(t, 13.0, 13.45)));
+  const lock = eIO(P(t, 13.5, 13.7));
+  let rx = lerp(26, 18, eIO(P(t, 12.5, 12.95))), ry = lerp(-38, 30, eIO(P(t, 12.4, 12.95))), rz = 0;
+  ry = lerp(ry, -18, eIO(P(t, 13.0, 13.45))); rz = lerp(0, -9, eIO(P(t, 13.0, 13.45))); rx = lerp(rx, 10, eIO(P(t, 13.0, 13.45)));
+  rx = lerp(rx, 0, lock); ry = lerp(ry, 0, lock); rz = lerp(rz, 0, lock);
+  // route (globe frame at t=12) → figure-eight
+  const g = globeRot(12.0);
+  const src = ROUTE_N.map((v) => globeXf(v, g));
+  const target = to3(FIG8, S, 0);
+  // align the route start with the figure-eight start for a clean morph
+  const C = target.map((p, i) => { const q = src[i]; return [lerp(q[0], p[0], m), lerp(q[1], p[1], m), lerp(q[2], p[2], m)]; });
+  const R = cam(a(rx * m), a(ry * m), a(rz));
+  // final lock: ribbon becomes the flat logo stroke, then the X snaps in (same move as the hook)
+  const wv = lerp(7, 112, eOut(P(t, 12.12, 12.42))), w = lerp(wv, SW * S, lock);
+  const d = lerp(0, 64, eOut(P(t, 12.16, 12.46))) * (1 - lock);
+  const speed = 520 + 900 * eIO(P(t, 12.95, 13.2)) - 900 * eIO(P(t, 13.3, 13.5));
+  const offset = 300 * (t - 12) + speed * Math.max(0, t - 12.95) * 0.9;
+  const txtIn = eOut(P(t, 12.16, 12.42)), txtOut = P(t, 13.4, 13.56);
+  if (t < 13.7) {
+    ribbon(ctx, C, w, d, { rot: R, ortho: 0, text: { str: PROMISE, size: 66, offset, lobes: [[0, N / 2, false], [N / 2, N, true]],
+      hide: (p) => Math.hypot(p[0], p[1]) < 0.13 * S * m,
+      scales: (r, gl) => clamp(txtIn * 1.15) * (1 - eIn(clamp(txtOut * 1.5 - (gl.x / 1400) * 0.5))) } });
+  } else { ctx.save(); ctx.translate(CX, CY); markSnap(ctx, S, t, 13.7); ctx.restore(); }
+}
+
+// END — the mark rises, ONELOOP lands, then everything collapses into the opening dot
+function ending(ctx, t) {
+  const S13 = 700 * 1.06;
+  const rise = eIO(P(t, 13.85, 14.05));
+  const col = eIn(P(t, 14.62, 14.96)); // collapse into the seed dot
+  const drift = 1 + 0.035 * P(t, 13.95, 14.62);
+  const S = lerp(S13, 430, rise) * drift * (1 - col);
+  const my = lerp(lerp(CY, 410, rise), CY, col);
+  if (S > 1.5) { ctx.save(); ctx.translate(CX, my); markSnap(ctx, S, t, 13.7); ctx.restore(); }
+  const wm = "ONELOOP", size = 132, wt = 300, track = 0.42;
+  const G = glyphs(ctx, wm, size, wt, track), y0 = 790;
+  ctx.save(); ctx.beginPath(); ctx.rect(0, lerp(y0 - size * 0.95, 0, col), W, lerp(size * 1.05, H, col)); ctx.clip();
+  ctx.font = F(wt, size); ctx.fillStyle = WHT; ctx.textBaseline = "alphabetic";
+  G.g.forEach((q, i) => {
+    const order = Math.abs(i - 3), up = (1 - eOut(P(t, 13.95 + 0.03 * order, 14.17 + 0.03 * order))) * size * 1.1;
+    const x = CX - G.width / 2 + q.x, sc = (1 - col) * drift;
+    const xc = lerp(CX + (x + q.w / 2 - CX) * drift, CX, col), yc = lerp(y0 - size * 0.35, CY, col);
+    if (sc < 0.01) return;
+    ctx.save(); ctx.translate(xc, yc + up); ctx.scale(sc, sc); ctx.fillText(q.ch, -q.w / 2, size * 0.35); ctx.restore();
+  });
+  ctx.restore();
+  const tg = "AUDIT. BUILD. MARKET. AUTOMATE.", ts = 28, tt = 0.34;
+  const T = glyphs(ctx, tg, ts, 600, tt), wipe = eOut(P(t, 14.02, 14.26));
+  ctx.save(); ctx.beginPath(); ctx.rect(CX - (T.width / 2 + 20) * wipe, lerp(840, 0, col), (T.width + 40) * wipe, lerp(50, H, col)); ctx.clip();
+  ctx.font = F(600, ts); ctx.textBaseline = "alphabetic";
+  T.g.forEach((q) => { const sc = (1 - col) * drift; if (sc < 0.01) return;
+    const x = lerp(CX + (CX - T.width / 2 + q.x + q.w / 2 - CX) * drift, CX, col), y = lerp(872, CY, col);
+    ctx.fillStyle = q.ch === "." ? COP : WHT; ctx.save(); ctx.translate(x, y); ctx.scale(sc, sc); ctx.fillText(q.ch, -q.w / 2, 0); ctx.restore(); });
+  ctx.restore();
+  // the seed dot — identical to frame 0
+  if (col > 0) { ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(CX, CY, 10 * eOut(P(t, 14.66, 14.93)), 0, 7); ctx.fill(); }
+}
+
+/* ---------- frame ---------- */
+function scene(ctx, t) {
+  t = clamp(t, 0, DUR - 1e-6);
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = BLK; ctx.fillRect(0, 0, W, H);
+  if (t < 2.0) hook(ctx, t);
+  else if (t < 4.0) kinetic(ctx, t);
+  else if (t < 6.0) morph(ctx, t);
+  else if (t < 8.0) three(ctx, t);
+  else if (t < 10.0) dash(ctx, t);
+  else if (t < 12.0) globe(ctx, t);
+  else if (t < 13.85) { if (t < 12.24) globe(ctx, t); finale(ctx, t); }
+  else ending(ctx, t);
+}
+const main = document.getElementById("c"), mctx = main.getContext("2d");
+const buf = document.createElement("canvas"); buf.width = W; buf.height = H; const bctx = buf.getContext("2d");
+// motion blur inside one sub-frame: average K trailing samples (blur follows speed & direction automatically)
+window.seek = (t, K = 4, span = 1 / 180) => {
+  mctx.setTransform(1, 0, 0, 1, 0, 0); mctx.globalAlpha = 1;
+  for (let k = 0; k < K; k++) {
+    const ts = t - (span * (K - 1 - k)) / K;
+    scene(bctx, Math.max(0, ts));
+    mctx.globalAlpha = 1 / (k + 1); mctx.drawImage(buf, 0, 0);
+  }
+  mctx.globalAlpha = 1;
+};
+window.ready = (async () => { for (const w of [300, 600, 700, 800, 900]) await document.fonts.load(`${w} 100px M`); window.seek(0); return true; })();
+</script>
+<script src="audio.js"></script>
+</body>
+</html>

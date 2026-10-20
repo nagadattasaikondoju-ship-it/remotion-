@@ -6,6 +6,7 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
 ## House standards (read before any edit or sound work)
 - Sound design: @docs/playbook/sound-design.md
 - Short-form editing brief (captions, hooks, animations): @docs/playbook/short-form-editing.md
+- One Loop brand, palette, logo and client-portfolio data: @docs/playbook/oneloop-brand.md
 
 ## User preferences learned so far
 - Wants the work done, not a long pre-approval loop. If they say "start directly", skip the blocking questions,
