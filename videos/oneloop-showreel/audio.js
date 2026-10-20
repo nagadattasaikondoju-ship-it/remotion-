@@ -73,7 +73,7 @@ window.renderAudio = async () => {
   [4.0, 4.5, 5.0, 5.5].forEach((t) => { pop(t, 0.17); noise(t, 0.12, "bandpass", 900, 1.2, 0.06, 0.005, 0.12, 0, 0.2, 3000); }); // morphs
   for (let k = 0; k < 24; k++) click(8.02 + 0.44 * (1 - Math.pow(1 - (k + 1) / 24, 1 / 0.9)) * 0.9, 3000 + k * 40, 0.045); // counter ticks
   [9.0, 9.125, 9.25, 9.375].forEach((t, i) => pop(t, 0.15 + 0.01 * i));     // country chips
-  [10.08, 10.42, 10.86, 11.3, 11.74].forEach((t, i) => tone(t, "sine", 1568 + i * 196, null, 0, 0.06, 0.002, 0.25, 0, 0.5)); // city pings
+  [10.0, 10.14, 10.5, 11.0, 11.5].forEach((t, i) => tone(t, "sine", 1568 + i * 196, null, 0, 0.06, 0.002, 0.25, 0, 0.5)); // city pings
   click(13.7, 1400, 0.22);                                                    // X snaps in
   click(1.0, 1400, 0.2);
   // ---- the collapse back into the dot: reverse suck that ends in silence (so the loop restarts clean) ----

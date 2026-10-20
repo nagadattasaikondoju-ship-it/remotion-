@@ -224,11 +224,12 @@ const CITIES = [
   { n: "HYDERABAD", p: ll(17.39, 78.49) }, { n: "BENGALURU", p: ll(12.97, 77.59) }, { n: "AUSTRALIA", p: ll(-33.33, 115.64) },
   { n: "NEW ZEALAND", p: ll(-40.9, 174.9) }, { n: "UK", p: ll(52.5, -1.9) },
 ];
+const WAYPT = ll(12, -105); // keeps the NZ → UK leg travelling east, so the whole route is one eastward loop
 function slerp(a, b, u) { const dt = clamp(a[0] * b[0] + a[1] * b[1] + a[2] * b[2], -1, 1), om = Math.acos(dt); if (om < 1e-4) return a;
   const s = Math.sin(om); return [0, 1, 2].map((k) => (Math.sin((1 - u) * om) * a[k] + Math.sin(u * om) * b[k]) / s); }
 // the route HYD → BLR → AU → NZ → UK → HYD as one closed loop, lifted above the surface on long hops
-const ROUTE = (() => { const order = [0, 1, 2, 3, 4, 0], pts = [], legs = [];
-  for (let k = 0; k < order.length - 1; k++) { const a = CITIES[order[k]].p, b = CITIES[order[k + 1]].p;
+const ROUTE = (() => { const stops = [0, 1, 2, 3, -1, 4, 0].map((k) => (k < 0 ? WAYPT : CITIES[k].p)), pts = [], legs = [];
+  for (let k = 0; k < stops.length - 1; k++) { const a = stops[k], b = stops[k + 1];
     const om = Math.acos(clamp(a[0] * b[0] + a[1] * b[1] + a[2] * b[2], -1, 1)), m = Math.max(8, Math.round(om * 60));
     legs.push(pts.length);
     for (let i = 0; i < m; i++) { const u = i / m, q = slerp(a, b, u), lift = 1 + 0.16 * Math.min(1, om) * Math.sin(Math.PI * u); pts.push(q.map((v) => v * lift)); } }
@@ -238,16 +239,29 @@ const ROUTE_N = (() => { // resampled to N for the morph into the ribbon
   const L = c[p.length], out = []; let j = 0;
   for (let i = 0; i < N; i++) { const s = (L * i) / N; while (j < p.length - 1 && c[j + 1] < s) j++; const u = (s - c[j]) / (c[j + 1] - c[j]); const a = p[j], b = p[(j + 1) % p.length];
     out.push([lerp(a[0], b[0], u), lerp(a[1], b[1], u), lerp(a[2], b[2], u)]); } return out; })();
-const LEG_T = [[10.12, 10.42], [10.5, 10.86], [11.0, 11.3], [11.5, 11.74], [11.74, 11.97]];
-function routeHead(t) { let head = 0; LEG_T.forEach(([a, b], k) => { const u = eOut(P(t, a, b)); if (u > 0) head = ROUTE.legs[k] + (ROUTE.legs[k + 1] - ROUTE.legs[k]) * u; }); return head; }
-function headVec(h) { const p = ROUTE.pts, n = p.length, i = Math.floor(h) % n, f = h - Math.floor(h), a = p[i], b = p[(i + 1) % n];
-  return nrm([lerp(a[0], b[0], f), lerp(a[1], b[1], f), lerp(a[2], b[2], f)]); }
-function globeRot(t) { // the travelling head of the route always swings toward the camera (lagged, so the line leads)
-  t = Math.min(t, 12.0);
-  const v = headVec(routeHead(Math.max(10.0, t - 0.08)));
-  let lon = Math.atan2(v[0], v[2]), lat = -Math.asin(clamp(v[1], -1, 1));
-  return { lon: -lon - 0.25, lat: -lat * 0.55 - 0.12 };
+// legs end on the beats: AU 10.5 · NZ 11.0 · UK 11.5 · home 11.95  (NZ→UK is split at the waypoint by arc length)
+const LEG_T = [[10.02, 10.14], [10.14, 10.5], [10.62, 11.0], [11.06, 11.27], [11.27, 11.5], [11.56, 11.95]];
+// unwrapped (monotone, eastward) longitude of every route point — the pen is driven by the globe's spin
+const ROUTE_LON = (() => { const out = []; let prev = -1e9, turns = 0, last = null;
+  for (const p of ROUTE.pts) { let L = (Math.atan2(p[0], p[2]) * 180) / Math.PI; if (last !== null) { while (L + turns < last - 180) turns += 360; } L += turns; last = L; prev = Math.max(prev, L); out.push(prev); }
+  return out; })();
+function routeHead(t) {
+  if (t < 10.14) { const u = eIO(P(t, LEG_T[0][0], LEG_T[0][1])); return u > 0 ? ROUTE.legs[1] * u : 0; }
+  const target = mono(SPIN, t) + 6, i0 = ROUTE.legs[1];
+  if (target <= ROUTE_LON[i0]) return i0;
+  for (let i = i0; i < ROUTE_LON.length - 1; i++) if (ROUTE_LON[i + 1] >= target) return i + (target - ROUTE_LON[i]) / (ROUTE_LON[i + 1] - ROUTE_LON[i] || 1);
+  return ROUTE.pts.length;
 }
+function mono(keys, t) { // Fritsch–Carlson monotone cubic through [t, v] keys: smooth, never overshoots
+  const n = keys.length; if (t <= keys[0][0]) return keys[0][1]; if (t >= keys[n - 1][0]) return keys[n - 1][1];
+  const dx = [], m = [], d = []; for (let i = 0; i < n - 1; i++) { dx.push(keys[i + 1][0] - keys[i][0]); d.push((keys[i + 1][1] - keys[i][1]) / dx[i]); }
+  m.push(d[0]); for (let i = 1; i < n - 1; i++) m.push(d[i - 1] * d[i] <= 0 ? 0 : (3 * (dx[i - 1] + dx[i])) / ((2 * dx[i] + dx[i - 1]) / d[i - 1] + (dx[i] + 2 * dx[i - 1]) / d[i])); m.push(d[n - 2]);
+  let i = 0; while (t > keys[i + 1][0]) i++; const h = dx[i], u = (t - keys[i][0]) / h, u2 = u * u, u3 = u2 * u;
+  return (2 * u3 - 3 * u2 + 1) * keys[i][1] + (u3 - 2 * u2 + u) * h * m[i] + (-2 * u3 + 3 * u2) * keys[i + 1][1] + (u3 - u2) * h * m[i + 1];
+}
+const SPIN = [[9.9, 70], [10.0, 78], [10.5, 115], [11.0, 175], [11.5, 358], [12.0, 438]];
+const TILT = [[9.9, 8], [10.0, 10], [10.5, -14], [11.0, -20], [11.5, 26], [12.0, 10]];
+function globeRot(t) { t = Math.min(t, 12.0); return { lon: (-mono(SPIN, t) * Math.PI) / 180, lat: (-mono(TILT, t) * Math.PI) / 180 }; }
 function globeXf(v, g) { // rotate unit vector so (lat,lon) faces the camera, world px
   const cb = Math.cos(g.lon), sb = Math.sin(g.lon); let x = v[0] * cb + v[2] * sb, z = -v[0] * sb + v[2] * cb, y = v[1];
   const ca = Math.cos(g.lat), sa = Math.sin(g.lat); const y2 = y * ca - z * sa, z2 = y * sa + z * ca;
@@ -272,7 +286,7 @@ function maskedText(ctx, str, x, y, size, weight, track, color, prog, dir = 1, a
 // BAR 1 — hook: dot → stroke draws the mark → X snaps → push into the X, it becomes the slit rails
 function hook(ctx, t) {
   const S0 = 840;
-  const zoom = 1 + 0.8 * eIn(P(t, 1.5, 2.0));
+  const zoom = (1 + 0.05 * P(t, 0, 1.5)) * (1 + 0.8 * eIn(P(t, 1.5, 2.0)));
   const S = S0 * zoom;
   ctx.save(); ctx.translate(CX, CY);
   const lw = lerp(20, SW * S0, eOut(P(t, 0, 0.35))) * zoom;
@@ -296,14 +310,14 @@ function hook(ctx, t) {
     }
     // beat 4: the X turns into a "+" whose vertical arm collapses and horizontal arm stretches past the frame
     const plus = eIO(P(t, 1.5, 1.9));
-    const Lh = lerp(0.27, 2.2 / zoom, eIn(P(t, 1.55, 1.98))), Lv = lerp(0.27, 0.042, eIO(P(t, 1.5, 1.85)));
+    const Lh = lerp(0.27, 2.4 / zoom, eIn(P(t, 1.55, 1.98))), Lv = lerp(0.27, 0.042, eIO(P(t, 1.5, 1.85)));
     drawX(ctx, S, snap, lerp(Math.PI / 4 + (Math.PI / 2) * (1 - snap), 0, plus), Lh, Lv);
   }
   ctx.restore();
 }
 // rails geometry shared by hook → type
-const RAIL_LW = 0.02 * 840 * 1.8; // X outline width at the end of the push
-const RAIL_G0 = 0.042 * 840 * 1.8; // half-gap at the end of the push
+const RAIL_LW = 0.02 * 840 * 1.05 * 1.8; // X outline width at the end of the push
+const RAIL_G0 = 0.042 * 840 * 1.05 * 1.8; // half-gap at the end of the push
 
 // BAR 2 — kinetic type through a copper slit
 const WORDS = [
@@ -344,8 +358,8 @@ function kinetic(ctx, t) {
     if (k === 1) y -= 300 * (1 - spring(t, tk + 0.022 * i, 30));
     if (k === 2) { const sc = lerp(0.42, 1, eOut(P(t, tk, tk + 0.3))); x = CX + (x - CX) * sc; }
     if (k === 3) { // slot roll: each letter scrolls through three others before it lands
-      const land = eOut(P(t, tk + 0.022 * i, tk + 0.2 + 0.022 * i)), roll = (1 - land) * 3, lh = w.size * 1.1, set = "AUTOMATE";
-      for (let j = 0; j <= 3; j++) { const off = (roll - j) * lh; if (Math.abs(off) >= lh) continue;
+      const land = eOut(P(t, tk + 0.02 * i, tk + 0.18 + 0.02 * i)), roll = (1 - land) * 2, lh = w.size * 1.1, set = "AUTOMATE";
+      for (let j = 0; j <= 2; j++) { const off = (roll - j) * lh; if (Math.abs(off) >= lh) continue;
         ctx.fillText(j === 0 ? q.ch : set[(i + j * 3) % set.length], x, y + off); }
       return;
     }
@@ -393,18 +407,17 @@ function morph(ctx, t) {
 
 // BAR 4 — the infinity becomes a solid ribbon and turns in space; ends edge-on as a flat bar
 function three(ctx, t) {
-  const a = (x) => (x * Math.PI) / 180;
+  const a = (x) => (x * Math.PI) / 180, k1 = eOut(P(t, 6.0, 6.42)), k2 = eOut(P(t, 6.5, 6.9)), k3 = eOut(P(t, 7.0, 7.4));
   const ex = spring(t, 6.0, 12);
-  let rx = lerp(0, 58, eIO(P(t, 6.0, 6.45))), ry = lerp(0, -22, eIO(P(t, 6.0, 6.45))), rz = 0;
-  ry = lerp(ry, 34, eIO(P(t, 6.5, 6.95))); rz = lerp(0, -14, eIO(P(t, 6.5, 6.95)));
-  rx = lerp(rx, 68, eIO(P(t, 7.0, 7.45))); ry = lerp(ry, -12, eIO(P(t, 7.0, 7.45))); rz = lerp(rz, 10, eIO(P(t, 7.0, 7.45)));
+  let rx = lerp(lerp(lerp(0, 56, k1), 50, k2), 66, k3);
+  let ry = lerp(lerp(lerp(0, -24, k1), 30, k2), -14, k3) + 6 * P(t, 6.0, 7.5);
+  let rz = lerp(lerp(0, -12, k2), 9, k3) - 3 * P(t, 6.0, 7.5);
   const edge = eIO(P(t, 7.5, 7.95));
   rx = lerp(rx, 90, edge); ry = lerp(ry, 0, edge); rz = lerp(rz, 0, edge);
-  let S = 445 * 1.08 * lerp(1, 1.25, eIO(P(t, 6.5, 7.45)));
+  let S = 445 * 1.08 * (1 + 0.32 * k1 + 0.22 * k2 + 0.16 * k3 + 0.06 * P(t, 6.0, 7.5));
   S = lerp(S, 1120 / (1 + 2 * R8), edge);
-  const w = lerp(26, 70, ex) * (1 - 0.3 * edge), d = lerp(0, 90, ex) * lerp(1, 40 / 90, edge);
-  const C = to3(FIG8, S, 0);
-  ribbon(ctx, C, w, d, { rot: cam(a(rx), a(ry), a(rz)), ortho: edge, oy: lerp(0, 250 - CY, eIO(P(t, 7.6, 8.0))), flat: edge });
+  const w = lerp(26, 74, ex) * (1 - 0.3 * edge), d = lerp(0, 96, ex) * lerp(1, 40 / 96, edge);
+  ribbon(ctx, to3(FIG8, S, 0), w, d, { rot: cam(a(rx), a(ry), a(rz)), ortho: edge, oy: lerp(0, 250 - CY, eIO(P(t, 7.6, 8.0))), flat: edge });
 }
 
 // BAR 5 — dashboard card unfolds from the bar: real portfolio numbers
@@ -496,21 +509,20 @@ function globe(ctx, t) {
   if (head < pts.length) { const i = Math.floor(head), f = head - i, a = globeXf(pts[i], g), b = globeXf(pts[(i + 1) % pts.length], g);
     const q = [lerp(a[0], b[0], f), lerp(a[1], b[1], f), lerp(a[2], b[2], f)]; if (q[2] < 30 && pen) { const p = proj(q, 0); ctx.lineTo(p[0], p[1]); } }
   ctx.stroke();
-  // city pins + labels on arrival
-  const arrive = [10.08, 10.42, 10.86, 11.3, 11.74], show = [[10.1, 10.5], [10.42, 10.5], [10.86, 11.36], [11.3, 11.7], [11.74, 12.0]];
+  // city pins pop as the line arrives (on the beat)
+  const arrive = [10.0, 10.14, 10.5, 11.0, 11.5];
   CITIES.forEach((c, k) => {
-    const q = globeXf(c.p, g); if (q[2] > 0) return; const p = proj(q, 0);
+    const q = globeXf(c.p, g); if (q[2] > 10) return; const p = proj(q, 0);
     const s = spring(t, arrive[k], 24); if (s < 0.01) return;
-    ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(p[0], p[1], 11 * s, 0, 7); ctx.fill();
+    ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(p[0], p[1], 10 * s, 0, 7); ctx.fill();
     ctx.strokeStyle = COP; ctx.lineWidth = 3; ctx.beginPath(); ctx.arc(p[0], p[1], 22 * s, 0, 7); ctx.stroke();
-    const [a, b] = show[k]; if (k === 1) return; // Bengaluru sits on top of Hyderabad: pin only
-    let prog = eOut(P(t, a, a + 0.18)); if (t > b - 0.08) prog = 1 + eIn(P(t, b - 0.08, b + 0.04));
-    const right = p[0] >= CX - 40, edge = right ? CX + GR + 70 : CX - GR - 70;
-    if (prog > 0 && prog < 2) { // leader from the pin to outside the globe, drawn out and retracted (no fades)
-      const u = prog <= 1 ? eOut(prog) : 1, v = prog > 1 ? prog - 1 : 0, x0 = p[0] + (right ? 24 : -24);
-      ctx.strokeStyle = COP; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(lerp(x0, edge, v), p[1]); ctx.lineTo(lerp(x0, edge, u), p[1]); ctx.stroke(); }
-    ctx.font = F(700, 34); const tw = glyphs(ctx, c.n, 34, 700, 0.22).width;
-    maskedText(ctx, c.n, right ? edge + 18 : edge - 18 - tw, p[1] + 12, 34, 700, 0.22, WHT, prog);
+  });
+  const names = [["HYDERABAD", 10.0], ["AUSTRALIA", 10.5], ["NEW ZEALAND", 11.0], ["UK", 11.5]];
+  names.forEach(([nm, t0], i) => {
+    let prog = eOut(P(t, t0 + 0.02, t0 + 0.22));
+    const t1 = i < 3 ? names[i + 1][1] : 12.0;
+    if (t >= t1 - 0.06) prog = 1 + eIn(P(t, t1 - 0.06, t1 + 0.06));
+    maskedText(ctx, nm, CX, CY + GR + 96, 40, 700, 0.3, WHT, prog, 1, "center");
   });
 }
 
@@ -519,8 +531,8 @@ const PROMISE = "AUDIT. BUILD. MARKET. AUTOMATE. ";
 function finale(ctx, t) {
   const a = (x) => (x * Math.PI) / 180;
   const m = spring(t, 12.0, 17);
-  const S = lerp(620, 700, eIO(P(t, 12.5, 13.0))) * lerp(1, 1.06, eIO(P(t, 13.0, 13.45)));
   const lock = eIO(P(t, 13.5, 13.7));
+  const S = lerp(lerp(660, 800, eOut(P(t, 12.5, 12.9))) * lerp(1, 1.08, eOut(P(t, 13.0, 13.4))), 742, lock);
   let rx = lerp(26, 18, eIO(P(t, 12.5, 12.95))), ry = lerp(-38, 30, eIO(P(t, 12.4, 12.95))), rz = 0;
   ry = lerp(ry, -18, eIO(P(t, 13.0, 13.45))); rz = lerp(0, -9, eIO(P(t, 13.0, 13.45))); rx = lerp(rx, 10, eIO(P(t, 13.0, 13.45)));
   rx = lerp(rx, 0, lock); ry = lerp(ry, 0, lock); rz = lerp(rz, 0, lock);
@@ -574,7 +586,7 @@ function ending(ctx, t) {
     ctx.fillStyle = q.ch === "." ? COP : WHT; ctx.save(); ctx.translate(x, y); ctx.scale(sc, sc); ctx.fillText(q.ch, -q.w / 2, 0); ctx.restore(); });
   ctx.restore();
   // the seed dot — identical to frame 0
-  if (col > 0) { ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(CX, CY, 10 * eOut(P(t, 14.66, 14.93)), 0, 7); ctx.fill(); }
+  const sd = eOut(P(t, 14.86, 14.95)); if (sd > 0) { ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(CX, CY, 10 * sd, 0, 7); ctx.fill(); }
 }
 
 /* ---------- frame ---------- */
