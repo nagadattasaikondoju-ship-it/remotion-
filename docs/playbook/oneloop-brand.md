@@ -14,6 +14,11 @@ borrow their facts or visuals.
   - The mark is an infinity built from two open copper C-loops facing each other, with an outlined **X** at the crossing.
   - Wordmark ONELOOP in thin geometric caps: the O's have gaps and the E is three bars.
   - Tagline in small tracked caps underneath.
+- **Vector logo:** `videos/oneloop-showreel/logo.js` is traced from that PNG. It holds the exact loops, X, wordmark letters, tagline and copper dots. Use it whenever the logo appears in motion, instead of redrawing the mark.
+  - Measured with 1 unit = distance between the loop centres: loop centre-line radius 0.373, stroke 0.107.
+  - X: arms at 45°, half-length 0.208, half-thickness 0.037, outline 0.032.
+  - Loop ends are cut on 45° lines, leaving an even channel around the X.
+  - The user flagged a hand-drawn approximation as "doesn't feel the same", so always use the traced artwork.
 
 ## Palette (sampled from the logo + used in every One Loop edit)
 

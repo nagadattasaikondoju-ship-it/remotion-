@@ -13,6 +13,8 @@
 | 7 | 12–14 s | Strongest moment | The route tears off into a giant 3D infinity with the promise racing around both lobes → locks into the logo |
 | ½ | 14–15 s | End title | ONELOOP + tagline → collapse into the opening dot |
 
+**Logo:** every appearance of the mark and the end lockup uses `logo.js`, vectorised from the real logo PNG, so the loops, cut ends, X and custom ONELOOP lettering match the brand artwork exactly. The continuous figure-eight used for drawing, morphing and 3D shares the logo's measured loop centres, radius and stroke.
+
 **Rules followed:**
 - **Type and colour:** one typeface (Montserrat variable), with One Loop copper, terracotta and cream plus black and white.
 - **Motion:** spring and exponential easing only, no bounce.
