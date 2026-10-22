@@ -24,6 +24,12 @@ Entries can belong to several categories.
 | Code | 21 | [`categories/code.md`](categories/code.md) |
 | Uncategorized | 4 | [`categories/uncategorized.md`](categories/uncategorized.md) |
 
+## Templates (both on the site)
+
+These are the curator's own customizable prompts, separate from the gallery:
+- **[The showreel prompt](templates/showreel.md):** the improved version of the most-used prompt on the site, the 15-second motion-designer showreel. It's the brief behind our One Loop "One stroke" showreel.
+- **[The 3D template](templates/realtime.md):** for real-time three.js pieces, with the gallery set as a 3D space of video cards; swap in your subject.
+
 ## Skills (all 5 on the site)
 
 | Skill | What it does | Engine | Here | Licence |
