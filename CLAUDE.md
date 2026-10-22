@@ -7,12 +7,10 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
 - Sound design: @docs/playbook/sound-design.md
 - Short-form editing brief (captions, hooks, animations): @docs/playbook/short-form-editing.md
 - One Loop brand, palette, logo and client-portfolio data: @docs/playbook/oneloop-brand.md
-- Product motion-graphics reference library: `docs/library/prompt-motion/README.md`.
-  - Contents: 103 Product UI prompts and 5 skills scraped from prompt-motion.com.
-  - Downloaded skills (reference only, not installed): cinetic, product-film, taste-skill, session-story, generative-film.
-  - Read the matching skill before building a product or launch video.
-
-## User preferences learned so far
+- Motion-graphics reference library: `docs/library/prompt-motion/README.md`.
+  - Contents: all 236 Prompt Motion entries, one file per category with full prompt text, plus the site's 5 skills.
+  - Installed skills: `cinetic` (cinematic launch/product films, Remotion or HyperFrames) and `product-film` (Remotion films from a product's own design system). Use them for product and launch videos.
+  - taste-skill, session-story and generative-film are reference copies only.
 - Wants the work done, not a long pre-approval loop. If they say "start directly", skip the blocking questions,
   but still deliver the cue sheet/breakdown alongside the result.
 - Always send the finished video as a file (share copy + high-bitrate 1080×1920 master).

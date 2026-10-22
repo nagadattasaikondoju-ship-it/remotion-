@@ -1,6 +1,115 @@
-# Product UI prompts — full text
+# Product UI — Prompt Motion entries (103)
 
-From [prompt-motion.com](https://prompt-motion.com). Each prompt belongs to the creator credited above it; the post link is the original source.
+From [prompt-motion.com](https://prompt-motion.com), newest first. Every prompt belongs to the creator credited above it.
+
+**Most-used techniques in this category:** real product / URL (21), spring / easing (19), light canvas (19), music / BPM / beat sync (19), camera moves (15), UI components / dashboard (14), dark canvas (14), cursor / real clicks (13).
+**Stacks stated:** not stated (74), Remotion (11), HyperFrames (5), HTML + Playwright (3), HTML (2), WebGL2 + Playwright (1).
+
+| # | Title | Creator | Date | Stack |
+|---|---|---|---|---|
+| 1 | [TasteSkill dashboard showcase](#1-tasteskill-dashboard-showcase) | @LexnLin | 2026-10-20 | — |
+| 2 | [Landing page 3D scroll](#2-landing-page-3d-scroll) | @twoclipping | 2026-10-14 | WebGL2 + Playwright |
+| 3 | [White ball UI motion loop](#3-white-ball-ui-motion-loop) | @rossaxbt | 2026-10-10 | HTML |
+| 4 | [Food craving launch film](#4-food-craving-launch-film) | @ultimaxbt | 2026-10-08 | HTML |
+| 5 | [Ora 2 image model launch film](#5-ora-2-image-model-launch-film) | @rossaxbt | 2026-10-07 | HTML canvas + Playwright + ffmpeg |
+| 6 | [Prompt Motion site promo](#6-prompt-motion-site-promo) | @antonio_kodheli | 2026-10-06 | Remotion |
+| 7 | [SuperX feature release teaser](#7-superx-feature-release-teaser) | @robj3d3 | 2026-10-05 | — |
+| 8 | [Cinetic skill launch film](#8-cinetic-skill-launch-film) | @LexnLin | 2026-10-04 | — |
+| 9 | [Lism CSS 1.0 release video](#9-lism-css-10-release-video) | @ddryo_loos | 2026-10-02 | — |
+| 10 | [ViralGrow product promo](#10-viralgrow-product-promo) | @samuel_yostt | 2026-10-01 | — |
+| 11 | [Supasito launch video](#11-supasito-launch-video) | @wozu_co | 2026-10-01 | — |
+| 12 | [Chunku product promo](#12-chunku-product-promo) | @reyzostyle | 2026-09-30 | HyperFrames |
+| 13 | [DistilBook motion explainer](#13-distilbook-motion-explainer) | @sudo_kiran | 2026-09-29 | — |
+| 14 | [Dubz Up motion showreel](#14-dubz-up-motion-showreel) | @Devius_Maximus | 2026-09-29 | — |
+| 15 | [Launch video remake comparison](#15-launch-video-remake-comparison) | @notdwd | 2026-09-28 | — |
+| 16 | [Mascot referral program promo](#16-mascot-referral-program-promo) | @paulo_kombucha | 2026-09-28 | — |
+| 17 | [FundMyCompute platform overview](#17-fundmycompute-platform-overview) | @JayScambler | 2026-09-28 | — |
+| 18 | [Bold Pilot SEO promo](#18-bold-pilot-seo-promo) | @utopyaszx | 2026-09-28 | — |
+| 19 | [Photo retouch app promo](#19-photo-retouch-app-promo) | @oliahmed205 | 2026-09-28 | — |
+| 20 | [GenVizu product launch](#20-genvizu-product-launch) | @listudio | 2026-09-28 | — |
+| 21 | [sweetRegret app update reel](#21-sweetregret-app-update-reel) | @thilina_a | 2026-09-28 | — |
+| 22 | [AjustaCV Pro pricing promo](#22-ajustacv-pro-pricing-promo) | @thayto_dev | 2026-09-27 | HyperFrames |
+| 23 | [Frame by Frame launch video](#23-frame-by-frame-launch-video) | @notdwd | 2026-09-27 | — |
+| 24 | [Pixelup Labs studio showreel](#24-pixelup-labs-studio-showreel) | @arjunsh1607 | 2026-09-27 | — |
+| 25 | [Whiteboard skill tutorial](#25-whiteboard-skill-tutorial) | @lemomo_ai | 2026-09-27 | — |
+| 26 | [Trezio app motion reel](#26-trezio-app-motion-reel) | @agonaliu_ | 2026-09-27 | — |
+| 27 | [Taxtello bookkeeping app film](#27-taxtello-bookkeeping-app-film) | @daniel_haida | 2026-09-27 | Remotion |
+| 28 | [Product intro synced to music](#28-product-intro-synced-to-music) | @BogdanDragomir | 2026-09-27 | — |
+| 29 | [Website analyzer product promo](#29-website-analyzer-product-promo) | @en______ra | 2026-09-27 | — |
+| 30 | [Ondefica app motion reel](#30-ondefica-app-motion-reel) | @jesscaroline7 | 2026-09-27 | HyperFrames |
+| 31 | [Second brain service promo](#31-second-brain-service-promo) | @TheViableEdge | 2026-09-27 | Remotion |
+| 32 | [SaaS launch video](#32-saas-launch-video) | @aschapmann | 2026-09-27 | Remotion |
+| 33 | [Muse connector tracker promo](#33-muse-connector-tracker-promo) | @elliot_garreffa | 2026-09-27 | Remotion |
+| 34 | [YouTube transcript product ad](#34-youtube-transcript-product-ad) | @tstfully | 2026-09-27 | — |
+| 35 | [Photo print app launch film](#35-photo-print-app-launch-film) | @twoclipping | 2026-09-26 | HTML + Playwright |
+| 36 | [Travel visa service promo](#36-travel-visa-service-promo) | @thismacapital | 2026-09-26 | — |
+| 37 | [Reddit marketing tool launch video](#37-reddit-marketing-tool-launch-video) | @anthonyriera | 2026-09-26 | Remotion |
+| 38 | [mdfor.dev product intro video](#38-mdfordev-product-intro-video) | @HO_BA | 2026-09-26 | — |
+| 39 | [MotionSites one million visitors](#39-motionsites-one-million-visitors) | @viktoroddy | 2026-09-26 | — |
+| 40 | [Email tool promo reel](#40-email-tool-promo-reel) | @melvynx | 2026-09-26 | — |
+| 41 | [Jev engineering showreel](#41-jev-engineering-showreel) | @polydao | 2026-09-26 | — |
+| 42 | [Spotify product film](#42-spotify-product-film) | @brainextends | 2026-09-26 | — |
+| 43 | [Browser automation skill launch](#43-browser-automation-skill-launch) | @hqmank | 2026-09-26 | — |
+| 44 | [founder.page launch video](#44-founderpage-launch-video) | @RatheeJaisal | 2026-09-26 | — |
+| 45 | [Alan agent platform promo](#45-alan-agent-platform-promo) | @prasad_pilla | 2026-09-26 | — |
+| 46 | [Tally product demo](#46-tally-product-demo) | @VisheshBaghell | 2026-09-26 | — |
+| 47 | [DistilBook product explainer](#47-distilbook-product-explainer) | @sudo_kiran | 2026-09-26 | — |
+| 48 | [Badge unlock screen animation](#48-badge-unlock-screen-animation) | @BThreeAgency | 2026-09-26 | — |
+| 49 | [AIsa API key promo](#49-aisa-api-key-promo) | @0xfemyn | 2026-09-26 | — |
+| 50 | [Developer portfolio site showreel](#50-developer-portfolio-site-showreel) | @wani_shola | 2026-09-26 | Remotion |
+| 51 | [Step race app promo](#51-step-race-app-promo) | @marklaunches | 2026-09-26 | — |
+| 52 | [Bento.surf product video](#52-bentosurf-product-video) | @bizibeast | 2026-09-26 | — |
+| 53 | [Portfolio motion reel](#53-portfolio-motion-reel) | @heyiammallik | 2026-09-26 | — |
+| 54 | [Voice agent SaaS launch](#54-voice-agent-saas-launch) | @FractaDev | 2026-09-26 | — |
+| 55 | [Matra caption app promo](#55-matra-caption-app-promo) | @gautam_mer1 | 2026-09-26 | Remotion, React |
+| 56 | [Quetzal social app reel](#56-quetzal-social-app-reel) | @miskinho_ | 2026-09-26 | — |
+| 57 | [Motion designer showreel](#57-motion-designer-showreel) | @danilowm | 2026-09-26 | HyperFrames |
+| 58 | [Email verification tool promo](#58-email-verification-tool-promo) | @KmAsiff | 2026-09-26 | — |
+| 59 | [AllInvestView product promo](#59-allinvestview-product-promo) | @rammanq | 2026-09-26 | — |
+| 60 | [Amazon wholesale pitch video](#60-amazon-wholesale-pitch-video) | @ceowinkz | 2026-09-26 | — |
+| 61 | [Personal skills showreel](#61-personal-skills-showreel) | @ibrahimwasim240 | 2026-09-26 | — |
+| 62 | [AgentHud project motion video](#62-agenthud-project-motion-video) | @Jazzen_Chen | 2026-09-26 | — |
+| 63 | [CloudJoi search showcase](#63-cloudjoi-search-showcase) | @lester_tyy | 2026-09-26 | Remotion |
+| 64 | [Brieform product presentation](#64-brieform-product-presentation) | @MajorBaguette | 2026-09-26 | Remotion |
+| 65 | [Enxovaly baby app promo](#65-enxovaly-baby-app-promo) | @gabrielbuzziv | 2026-09-25 | HyperFrames |
+| 66 | [Distilbook product video](#66-distilbook-product-video) | @ajith_io | 2026-09-25 | — |
+| 67 | [Dub promo video](#67-dub-promo-video) | @steventey | 2026-09-25 | — |
+| 68 | [Distilbook motion showreel](#68-distilbook-motion-showreel) | @itisRazak | 2026-09-25 | — |
+| 69 | [Sahi trading terminal reveal](#69-sahi-trading-terminal-reveal) | @dale_vaz | 2026-09-25 | JavaScript |
+| 70 | [AI Arena product promo](#70-ai-arena-product-promo) | @ezshine | 2026-09-25 | — |
+| 71 | [Stock analysis app promo](#71-stock-analysis-app-promo) | @AIStockSavvy | 2026-09-25 | — |
+| 72 | [Visual guides library launch](#72-visual-guides-library-launch) | @techyoutbe | 2026-09-25 | — |
+| 73 | [Morphing UI states loop](#73-morphing-ui-states-loop) | @demonugc | 2026-09-25 | HTML, Playwright |
+| 74 | [Supademo launch video](#74-supademo-launch-video) | @jhylee95 | 2026-09-25 | — |
+| 75 | [Norilu product launch video](#75-norilu-product-launch-video) | @sachaarbonel | 2026-09-25 | — |
+| 76 | [Ren app launch video](#76-ren-app-launch-video) | @macrohou | 2026-09-25 | — |
+| 77 | [Fitters Bible app promo](#77-fitters-bible-app-promo) | @Adamdesgns | 2026-09-25 | — |
+| 78 | [Studio website showreel](#78-studio-website-showreel) | @andginja | 2026-09-25 | — |
+| 79 | [PicTwin AI app ad](#79-pictwin-ai-app-ad) | @l3d1c | 2026-09-25 | — |
+| 80 | [QuickDesign brand promo](#80-quickdesign-brand-promo) | @quickdesignio | 2026-09-25 | — |
+| 81 | [Claude self-promo spot](#81-claude-self-promo-spot) | @slvDev | 2026-09-25 | — |
+| 82 | [DistilBook product explainer](#82-distilbook-product-explainer) | @sudo_kiran | 2026-09-25 | — |
+| 83 | [SaaS product launch video](#83-saas-product-launch-video) | @xelandre__ | 2026-09-25 | HTML/JS, Playwright, ffmpeg |
+| 84 | [Parenting app hype video](#84-parenting-app-hype-video) | @francoxavier33 | 2026-09-25 | Remotion |
+| 85 | [Motion designer showreel](#85-motion-designer-showreel) | @KangarooHere | 2026-09-25 | — |
+| 86 | [org2html product showreel](#86-org2html-product-showreel) | @kyonax_on_tech | 2026-09-25 | — |
+| 87 | [Gene Spectra promo](#87-gene-spectra-promo) | @madebyjmayala | 2026-09-25 | — |
+| 88 | [Commotion app showreel](#88-commotion-app-showreel) | @Amol909S | 2026-09-25 | — |
+| 89 | [Lidlezz app promo](#89-lidlezz-app-promo) | @cansincengiz_me | 2026-09-25 | — |
+| 90 | [Crux motion design showreel](#90-crux-motion-design-showreel) | @marouanegazouzi | 2026-09-25 | — |
+| 91 | [ocrX app launch video](#91-ocrx-app-launch-video) | @mehul4795 | 2026-09-25 | — |
+| 92 | [FigPad product promo](#92-figpad-product-promo) | @Ai_Baymax | 2026-09-25 | — |
+| 93 | [Database client launch video](#93-database-client-launch-video) | @iamMXFSCHR | 2026-09-25 | — |
+| 94 | [Design portfolio video reel](#94-design-portfolio-video-reel) | @kikelopezdesign | 2026-09-25 | — |
+| 95 | [Shape morphing through UI states](#95-shape-morphing-through-ui-states) | @twoclipping | 2026-09-24 | HTML + Playwright |
+| 96 | [Tennis game launch video](#96-tennis-game-launch-video) | @deifosv | 2026-09-24 | — |
+| 97 | [Five scroll-based sections](#97-five-scroll-based-sections) | @ercankeskinx | 2026-09-24 | — |
+| 98 | [Three.js Skyraider aircraft model](#98-threejs-skyraider-aircraft-model) | @BuildFastWithAI | 2026-09-24 | Three.js |
+| 99 | [Sotto reading app explainer](#99-sotto-reading-app-explainer) | @1stnoel_ | 2026-09-24 | — |
+| 100 | [Tented image gen product video](#100-tented-image-gen-product-video) | @justincooperman | 2026-09-24 | Blender |
+| 101 | [UGC ad generator promo](#101-ugc-ad-generator-promo) | @twoclipping | 2026-09-23 | HTML + Playwright |
+| 102 | [Sherwood agentic hedge fund explainer](#102-sherwood-agentic-hedge-fund-explainer) | @imthatcarlos | 2026-09-23 | Remotion |
+| 103 | [Datagran ChatGPT ads explainer](#103-datagran-chatgpt-ads-explainer) | @charlesmendez | 2026-09-23 | — |
 
 ## 1. TasteSkill dashboard showcase
 
@@ -1427,7 +1536,7 @@ make a dynamic 15-second motion graphics video that shows what an incredible mot
 
 **Skill:** A Claude Code skill that learns your product's design system, interviews you about the film, then builds and renders a launch or landing-page video in Remotion using your real components, logo and music.
 
-
+Install: `see https://github.com/Rieranthony/product-film-skill`
 
 ## 38. mdfor.dev product intro video
 
