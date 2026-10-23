@@ -3,14 +3,16 @@
 //   node render.mjs beats [from] [to]      → out/beats/tNN.NN.png (one frame per half-beat, 0.12 s after it)
 //   node render.mjs audio                  → out/audio_raw.wav    (OfflineAudioContext)
 //   node render.mjs full [workers]         → out/sub/s_NNNNN.png  (60 fps × 3 trailing sub-frames = 180 per second)
+//   LAND=1 node render.mjs …               → the 1920×1080 landscape version (index.html?l=1), into out/landscape/
 import { chromium } from "playwright-core";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
-const OUT = path.join(HERE, "out");
-const [VW, VH, DUR] = [1080, 1920, 76];
+const LAND = process.env.LAND === "1";
+const OUT = path.join(HERE, LAND ? "out/landscape" : "out");
+const [VW, VH, DUR] = LAND ? [1920, 1080, 76] : [1080, 1920, 76];
 const EXE = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
 const [mode, ...args] = process.argv.slice(2);
 
@@ -18,7 +20,7 @@ async function openPage(browser) {
   const page = await browser.newPage({ viewport: { width: VW, height: VH }, deviceScaleFactor: 1 });
   page.on("pageerror", (e) => console.error("pageerror:", e.message));
   page.on("console", (m) => { if (m.type() === "error") console.error("console:", m.text()); });
-  await page.goto("file://" + path.join(HERE, "index.html"));
+  await page.goto("file://" + path.join(HERE, "index.html") + (LAND ? "?l=1" : ""));
   await page.evaluate(() => window.ready);
   return page;
 }

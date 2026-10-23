@@ -23,6 +23,21 @@
    vendors into one loop, the logo, the audit lens, the CTA, the growth-path rail, the route around the globe and the
    3D ribbon, and it lands as the real traced logo on the end card. */
 const W = 1080, H = 1920, CX = 540, CY = 960, DUR = 76, FITW = 980;
+/* ?l=1 → 1920×1080 landscape. Scenes keep their vertical design coordinates; each scene (or group inside it) is
+   placed into the wide frame by PL[...] = [scale, design x, design y, frame x, frame y]. Vertical: no placement. */
+const LAND = new URLSearchParams(location.search).get("l") === "1";
+const RW = LAND ? 1920 : W, RH = LAND ? 1080 : H, RCX = RW / 2, RCY = RH / 2;
+document.getElementById("c").width = RW; document.getElementById("c").height = RH;
+const PL = LAND ? {
+  act12: [0.74, 540, 1010, 960, 560], aud: [0.92, 540, 850, 640, 565], cta: [1, 540, 850, 960, 570], prod: [0.8, 540, 920, 960, 590],
+  ch: [0.72, 540, 960, 960, 580], rmc: [0.78, 540, 960, 960, 590], content: [0.72, 540, 960, 960, 570], auto: [0.72, 540, 960, 960, 580],
+  quote: [0.8, 540, 960, 960, 520], proof: [0.72, 540, 960, 960, 560], part: [0.8, 540, 960, 960, 560], globe: [0.78, 540, 960, 960, 560],
+  team: [0.72, 540, 960, 960, 560], fin: [1, 540, 960, 960, 540],
+} : {};
+function place(ctx, pl) { if (!pl) return; ctx.translate(pl[3], pl[4]); ctx.scale(pl[0], pl[0]); ctx.translate(-pl[1], -pl[2]); }
+const fwd = (pl, p) => (pl ? [pl[3] + (p[0] - pl[1]) * pl[0], pl[4] + (p[1] - pl[2]) * pl[0]] : p);
+const inv = (pl, p) => (pl ? [pl[1] + (p[0] - pl[3]) / pl[0], pl[2] + (p[1] - pl[4]) / pl[0]] : p);
+function inReal(ctx, fn) { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); fn(); ctx.restore(); }
 const COP = "#E59C69", TER = "#8F432E", CRM = "#E1E0CC", INK = "#161616", BLK = "#000000", WHT = "#FFFFFF";
 const EDGE = "#2C2C2C", GRY = "#9CA3AF", DIM = "#6B7280";
 const RGB = { cop: [229, 156, 105], ter: [143, 67, 46] };
@@ -105,7 +120,7 @@ function lockup(ctx, cx, cy, S, t, tw, tt, snapT) {
   const M = LOGO.meta;
   ctx.save(); ctx.translate(cx, cy); if (snapT === null) { drawLoops(ctx, S); drawXLogo(ctx, S, 1, 0); } else markSnap(ctx, S, t, snapT); ctx.restore();
   const wTop = cy + M.wordTop * S, wBot = cy + M.wordBot * S, wh = wBot - wTop;
-  if (tw > 0) { ctx.save(); ctx.beginPath(); ctx.rect(0, wTop - 3, W, wh + 6); ctx.clip(); ctx.fillStyle = WHT;
+  if (tw > 0) { ctx.save(); ctx.beginPath(); ctx.rect(-2 * W, wTop - 3, 5 * W, wh + 6); ctx.clip(); ctx.fillStyle = WHT;
     LOGO.WORD.forEach((L, i) => { const o = Math.abs(i - 3), up = (1 - eOut(clamp(tw * 1.6 - o * 0.12))) * wh * 1.15;
       if (up >= wh * 1.1) return; ctx.save(); ctx.translate(cx, cy + up); pathOf(ctx, L.paths, S); ctx.fill("evenodd"); ctx.restore(); });
     ctx.restore(); }
@@ -257,6 +272,7 @@ const GY = 1010; // centre of the vendor grid
 let HOOK_DOT = [CX, GY];
 function sHook(ctx, t) {
   if (t > 2.1) return;
+  place(ctx, PL.act12);
   const r = head(ctx, t, [wl("Your growth", -0.12, 0.5), [{ s: "is", t: 0.75 }, { s: "leaking", t: 1.0, f: "S" }]],
     { x: CX, y: 860, size: 168, lh: 186, out: 1.62, outDir: -1 });
   const last = r[r.length - 1], dr = 17;
@@ -294,6 +310,7 @@ function tileIcon(ctx, k, x, y, s, t) {
 }
 function sTiles(ctx, t) {
   if (t < 2.0 || t >= 10.65) return;
+  place(ctx, PL.act12);
   if (t < 2.25) { // the drop lands and spreads into one copper square…
     const s = lerp(34, 840, spring(t, 2.0, 24)); rr(ctx, CX - s / 2, GY - s / 2, s, s, lerp(17, 34, P(t, 2.0, 2.1))); ctx.fillStyle = COP; ctx.fill(); return;
   }
@@ -329,16 +346,25 @@ function sTiles(ctx, t) {
   LEAKS.forEach((s, i) => { const a = 4.0 + 0.5 * i, b = i < 3 ? a + 0.47 : 5.9; const pr = inout(t, a, b, 0.2); if (pr <= 0 || pr >= 2) return;
     const sc = pr <= 1 ? eOut(clamp(pr * 1.4)) : 1 - eIn(pr - 1);
     popAt(ctx, CX, GY, sc, () => pill(ctx, s, CX, GY, 40, COP, BLK)); });
-  // headlines
+  // headlines (landscape: either side of the grid, read left → grid → right)
+  if (LAND) inReal(ctx, () => {
+    head(ctx, t, [[{ s: "4", t: 3.0 }, { s: "vendors.", t: 3.12 }]], { x: 330, y: 590, size: 104, out: 5.9, fit: 520 });
+    head(ctx, t, [[{ s: "0", t: 3.5, f: "S" }, { s: "owners.", t: 3.62 }]], { x: 1590, y: 590, size: 104, out: 5.9, fit: 520 });
+    head(ctx, t, [wl("Growth breaks", 6.0, 0.25), [{ s: "in the", t: 6.5 }, { s: "gaps.", t: 7.0, f: "S" }]], { x: RCX, y: 500, size: 160, lh: 180, out: 7.42, fit: 1500 });
+    head(ctx, t, [wl("Unless", 8.0, 0.2), wl("one team", 8.2, 0.2)], { x: 330, y: 540, size: 92, lh: 104, out: 9.9, fit: 520 });
+    head(ctx, t, [[{ s: "owns the", t: 8.75 }], [{ s: "whole loop.", t: 9.0, f: "S" }]], { x: 1590, y: 540, size: 92, lh: 104, out: 9.9, fit: 520 });
+  }); else {
   head(ctx, t, [[{ s: "4", t: 3.0 }, { s: "vendors.", t: 3.12 }], [{ s: "0", t: 3.5, f: "S" }, { s: "owners.", t: 3.62 }]], { x: CX, y: 380, size: 132, lh: 140, out: 5.9 });
   head(ctx, t, [wl("Growth breaks", 6.0, 0.25), [{ s: "in the", t: 6.5 }, { s: "gaps.", t: 7.0, f: "S" }]], { x: CX, y: 920, size: 150, lh: 170, out: 7.42 });
   head(ctx, t, [wl("Unless one team", 8.0, 0.2), [{ s: "owns the", t: 8.75 }, { s: "whole loop.", t: 9.0, f: "S" }]], { x: CX, y: 380, size: 112, lh: 126, out: 9.9 });
+  }
 }
 // the thread: stitches the four tiles into one loop, then twists into the infinity and becomes the logo stroke
 const S_MARK = 500;
 function squareLoop(G) { const e = G.side + G.g / 2 + 34; return [[CX - e, GY + e], [CX - e, GY - e], [CX + e, GY - e], [CX + e, GY + e], [CX - e, GY + e]]; }
 function sThread(ctx, t) {
   if (t < 7.6 || t >= 12.0) return;
+  place(ctx, PL.act12);
   const G = tileGeo(Math.min(t, 10.0));
   ctx.strokeStyle = COP; ctx.lineCap = "round"; ctx.lineJoin = "round";
   if (t < 10.0) {
@@ -369,6 +395,7 @@ function sThread(ctx, t) {
 const M = LOGO.meta, SE = Math.min(470, (W - 200) / (M.right - M.left));
 function sLogo(ctx, t) {
   if (t < 12.0 || t >= 18.0) return;
+  place(ctx, PL.act12);
   // 12.0 snap at the thread's size → 12.45 rise into the lockup → 13.8 lockup gives way, the mark rides up to the top
   const rise = eIO(P(t, 12.4, 12.75)), up = eIO(P(t, 13.78, 14.12)), gone = eIn(P(t, 17.62, 17.9));
   const lockC = (M.top + M.tagBot) / 2;
@@ -379,6 +406,7 @@ function sLogo(ctx, t) {
 }
 function sPromise(ctx, t) {
   if (t < 14.0 || t >= 18.0) return;
+  place(ctx, PL.act12);
   const WD = ["AUDIT", "BUILD", "MARKET", "AUTOMATE"], size = 148;
   WD.forEach((s, i) => {
     const y = 700 + i * 168, t0 = 14.0 + 0.5 * i, dir = i % 2 ? -1 : 1;
@@ -394,8 +422,9 @@ function sPromise(ctx, t) {
     { x: CX, y: 760, size: 128, lh: 168, out: 17.62 });
   // the full stop after "growth" becomes the audit lens
   const last = r[r.length - 1], s = spring(t, 17.2, 22); if (s < 0.01) return;
-  const p0 = [last.x + last.wd + 30, last.y - 18], u = eIO(P(t, 17.6, 18.0));
-  ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(lerp(p0[0], LENS0[0], u), lerp(p0[1], LENS0[1], u), lerp(18 * s, 30, u), 0, 7); ctx.fill();
+  const p0 = [last.x + last.wd + 30, last.y - 18], u = eIO(P(t, 17.6, 18.0)), L0 = inv(PL.act12, fwd(PL.aud, LENS0));
+  const k = LAND ? PL.aud[0] / PL.act12[0] : 1;
+  ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(lerp(p0[0], L0[0], u), lerp(p0[1], L0[1], u), lerp(18 * s, 30 * k, u), 0, 7); ctx.fill();
 }
 
 /* =====================================================================
@@ -405,7 +434,7 @@ const STAGES = [["01", "Audit & Forensics", 18], ["02", "Build & Deploy", 26], [
 function sStage(ctx, t) {
   if (t < 18.0 || t >= 50.2) return;
   // the growth-path rail: four segments, the copper thread fills them as the film moves through the stages
-  const x0 = 80, segW = (FITW - 80 - 3 * 14) / 4 + 20, y = 262, inP = eOut(P(t, 18.0, 18.4)), outP = eIn(P(t, 49.8, 50.15));
+  const x0 = LAND ? 100 : 80, segW = LAND ? (1720 - 3 * 14) / 4 : (FITW - 80 - 3 * 14) / 4 + 20, y = LAND ? 62 : 262, inP = eOut(P(t, 18.0, 18.4)), outP = eIn(P(t, 49.8, 50.15));
   for (let k = 0; k < 4; k++) {
     const sx = x0 + k * (segW + 14), wv = segW * inP * (1 - outP);
     ctx.fillStyle = EDGE; ctx.fillRect(sx, y, wv, 8);
@@ -413,22 +442,25 @@ function sStage(ctx, t) {
   }
   STAGES.forEach(([n, name, t0], k) => {
     const pr = inout(t, t0 + 0.02, k < 3 ? t0 + 7.9 : 49.8, 0.24);
-    const nw = mtext(ctx, n, x0, 350, 60, pr, { c: COP });
-    mtext(ctx, name, x0 + 92, 350, 60, pr, { c: CRM });
+    const ly = LAND ? 132 : 350, ls = LAND ? 48 : 60;
+    mtext(ctx, n, x0, ly, ls, pr, { c: COP });
+    mtext(ctx, name, x0 + ls * 1.53, ly, ls, pr, { c: CRM });
   });
 }
 // ---- 01 AUDIT ----
 const LENS0 = [790, 1330];
 const BR = { x: 110, y: 450, w: 860, h: 800 };
 function browserZoom(t) { // shrink up for the headline, then dive into the CTA
-  const sh = eIO(P(t, 22.0, 22.4)), s = lerp(1, 0.62, sh), ax = CX, ay = 420;
+  const sh = LAND ? 0 : eIO(P(t, 22.0, 22.4)), s = lerp(1, 0.62, sh), ax = CX, ay = 420;
   const dive = eIn(P(t, 23.75, 24.12)), cta = [BR.x + 40 + 115, BR.y + 340 + 34];
   const sx = ax + (cta[0] - ax) * s, sy = ay + (cta[1] - ay) * s;      // CTA on screen before the dive
-  const Z = lerp(1, 640 / (230 * s), dive);
-  return { s, ax, ay, dive, Z, sx, sy, tx: lerp(0, CX - sx, eIO(P(t, 23.75, 24.12))), ty: lerp(0, 1050 - sy, eIO(P(t, 23.75, 24.12))) };
+  const tgt = inv(PL.aud, fwd(PL.cta, [CX, 1050])), tw = LAND ? (640 * PL.cta[0]) / PL.aud[0] : 640;
+  const Z = lerp(1, tw / (230 * s), dive);
+  return { s, ax, ay, dive, Z, sx, sy, tx: lerp(0, tgt[0] - sx, eIO(P(t, 23.75, 24.12))), ty: lerp(0, tgt[1] - sy, eIO(P(t, 23.75, 24.12))) };
 }
 function sAudit(ctx, t) {
   if (t < 18.0 || t >= 24.12) return;
+  place(ctx, PL.aud);
   const Z = browserZoom(t), b = BR, X = (v) => b.x + v, Y = (v) => b.y + v;
   ctx.save();
   ctx.translate(Z.sx + Z.tx, Z.sy + Z.ty); ctx.scale(Z.Z, Z.Z); ctx.translate(-Z.sx, -Z.sy);
@@ -465,12 +497,15 @@ function sAudit(ctx, t) {
     if (open > 0.05) { ctx.beginPath(); ctx.moveTo(lx + R0 * 0.72, ly + R0 * 0.72); ctx.lineTo(lx + R0 * 0.72 + 80 * open, ly + R0 * 0.72 + 80 * open); ctx.lineWidth = 22; ctx.stroke(); }
     if (R0 < 31 && open < 0.02) { ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(lx, ly, 30, 0, 7); ctx.fill(); }
   }
-  head(ctx, t, [wl("We find the", 22.0, 0.2), [{ s: "bottleneck", t: 22.5, f: "S" }], wl("before we build.", 23.0, 0.2)], { x: CX, y: 1060, size: 112, lh: 128, out: 23.5 });
+  const hl = [wl("We find the", 22.0, 0.2), [{ s: "bottleneck", t: 22.5, f: "S" }], wl("before we build.", 23.0, 0.2)];
+  if (LAND) inReal(ctx, () => head(ctx, t, hl, { x: 1490, y: 430, size: 96, lh: 112, out: 23.5, fit: 700 }));
+  else head(ctx, t, hl, { x: CX, y: 1060, size: 112, lh: 128, out: 23.5 });
 }
 // the CTA: cursor clicks "Audit my business" — pill → loader → check → the check becomes the first block of the build
 const BTN = { cx: CX, cy: 1050, w: 640, h: 150 };
 function sCTA(ctx, t) {
   if (t < 24.0 || t >= 26.6) return;
+  place(ctx, PL.cta);
   head(ctx, t, [wl("Your free", 24.12, 0.2), [{ s: "growth audit.", t: 24.5, f: "S" }]], { x: CX, y: 640, size: 120, lh: 140, out: 25.6 });
   const morph = spring(t, 25.0, 20), toBlock = eIO(P(t, 25.75, 26.1));
   let w = lerp(BTN.w, 150, morph), h = BTN.h, cx = BTN.cx, cy = BTN.cy, r = h / 2;
@@ -495,6 +530,7 @@ const PH = { x: 350, y: 450, w: 380, h: 760 };
 const HERO = { x: PH.x + 25, y: PH.y + 110, w: 330, h: 270 };
 function sBuild(ctx, t) {
   if (t < 25.9 || t >= 30.6) return;
+  place(ctx, PL.cta);
   const out = eIn(P(t, 29.85, 30.3)), ox = -900 * out;
   ctx.save(); ctx.translate(ox, 0);
   const ps = spring(t, 25.9, 18);
@@ -530,8 +566,10 @@ function sBuild(ctx, t) {
   const ck = [[26.0, [1150, 900]], [26.12, [980, 640]], [26.5, [PH.x + 225, PH.y + 80]], [26.62, [1000, 1460]], [27.0, [PH.x + 145, PH.y + 555]], [27.12, [80, 1500]], [27.5, [PH.x + 225, PH.y + 676]], [27.58, [1000, 900]], [27.75, [PH.x + 205, PH.y + 455]], [28.1, [1150, 1300]]];
   if (t >= 26.0 && t < 28.1) { const cx = mono(ck.map(([k, p]) => [k, p[0]]), t), cy = mono(ck.map(([k, p]) => [k, p[1]]), t); cursor(ctx, cx + ox, cy, [26.12, 26.62, 27.12, 27.58].reduce((a, tt) => a + bump(t, tt, 0.12), 0)); }
   // chips: what the build guarantees (all the site's words)
-  [["Sub-second loads", 28.5], ["Verified tracking", 29.0], ["SEO-ready", 29.5]].forEach(([s, t0], i) => {
-    const sc = spring(t, t0, 22) * (1 - eIn(P(t, 29.85 + 0.04 * i, 30.1 + 0.04 * i))); popAt(ctx, CX, 1300 + i * 84, sc, () => pill(ctx, s, CX, 1300 + i * 84, 34, i === 0 ? COP : INK, i === 0 ? BLK : CRM, i === 0 ? null : EDGE)); });
+  const chip = (fn) => (LAND ? inReal(ctx, fn) : fn());
+  chip(() => [["Sub-second loads", 28.5], ["Verified tracking", 29.0], ["SEO-ready", 29.5]].forEach(([s, t0], i) => {
+    const cx = LAND ? 1520 : CX, cy = LAND ? 420 + i * 110 : 1300 + i * 84, fs = LAND ? 44 : 34;
+    const sc = spring(t, t0, 22) * (1 - eIn(P(t, 29.85 + 0.04 * i, 30.1 + 0.04 * i))); popAt(ctx, cx, cy, sc, () => pill(ctx, s, cx, cy, fs, i === 0 ? COP : INK, i === 0 ? BLK : CRM, i === 0 ? null : EDGE)); }));
 }
 // shipped products: a conveyor of six real platforms, each with its own live mini-UI
 const PRODUCTS = [
@@ -566,12 +604,13 @@ function miniUI(ctx, k, x, y, w, h, lt) {
 }
 function sProducts(ctx, t) {
   if (t < 29.9 || t >= 34.3) return;
+  place(ctx, PL.prod);
   const CW = 800, CH = 900, cy0 = 470;
   let p = -1 + spring(t, 29.95, 22); for (let k = 1; k < 6; k++) p += spring(t, 29.95 + 0.5 * k, 22);
   const deck = eIO(P(t, 32.95, 33.35)), gone = eIn(P(t, 33.85, 34.15));
   for (let k = 5; k >= 0; k--) {
     const conv = CX + 1000 * (k - p), dx = lerp(conv, CX + (k - 2.5) * 22, deck), dy = lerp(cy0, cy0 - 40 + (5 - k) * 14 + 80 * gone * 0 , deck);
-    const s = lerp(1, 0.72, deck) * (1 - gone); if (s < 0.01 || dx < -500 || dx > 1600) continue;
+    const s = lerp(1, 0.72, deck) * (1 - gone); if (s < 0.01 || dx < (LAND ? -1300 : -500) || dx > (LAND ? 2400 : 1600)) continue;
     popAt(ctx, dx, dy + CH / 2, s, () => {
       const x = dx - CW / 2, y = dy, [tag, name, cat] = PRODUCTS[k];
       card(ctx, x, y, CW, CH, 36);
@@ -587,6 +626,7 @@ function sProducts(ctx, t) {
 const CHANNELS = [["Google Search", 34.0], ["Shopping", 34.5], ["Meta", 34.75], ["Performance Max", 35.0], ["SEO · AEO · GEO", 35.5]];
 function sChannels(ctx, t) {
   if (t < 34.0 || t >= 36.4) return;
+  place(ctx, PL.ch);
   const rows = [[0], [1, 2], [3], [4]], gone = (i) => eIn(P(t, 35.9 + 0.04 * i, 36.15 + 0.04 * i));
   rows.forEach((row, ri) => {
     const ws = row.map((i) => textW(ctx, CHANNELS[i][0], 54) + 54 * 1.8), tot = ws.reduce((a, b) => a + b, 0) + 24 * (row.length - 1);
@@ -600,6 +640,7 @@ function sChannels(ctx, t) {
 }
 function sRMC(ctx, t) {
   if (t < 36.0 || t >= 40.3) return;
+  place(ctx, PL.rmc);
   const K = { x: 90, y: 440, w: 900, h: 1040 }, cin = spring(t, 36.0, 18), cout = eIn(P(t, 39.85, 40.2));
   const s = cin * (1 - cout); if (s < 0.01) return;
   popAt(ctx, CX, K.y + K.h / 2, s, () => {
@@ -635,6 +676,7 @@ function sRMC(ctx, t) {
 }
 function sContent(ctx, t) {
   if (t < 40.0 || t >= 42.3) return;
+  place(ctx, PL.content);
   const G = [["food", 90, 440, 440, 560], ["drink", 550, 440, 440, 340], ["fashion", 550, 800, 440, 440], ["watch", 90, 1020, 440, 220]];
   G.forEach(([k, x, y, w, h], i) => { const t0 = 40.0 + 0.25 * i, wv = eOut(P(t, t0, t0 + 0.3)), out = eIn(P(t, 41.78 + 0.03 * i, 42.0 + 0.03 * i));
     if (wv <= 0 || out >= 1) return; const hh = h * wv * (1 - out);
@@ -646,6 +688,7 @@ const NODES = [["New lead", 42.0], ["Routed", 42.5], ["CRM", 43.0], ["Instant fo
 const NY = (i) => 440 + i * 172, NX = 220, NW = 640, NH = 116;
 function sAutomate(ctx, t) {
   if (t < 42.0 || t >= 48.5) return;
+  place(ctx, PL.auto);
   const out = (i) => eIn(P(t, 47.72 + 0.04 * i, 47.98 + 0.04 * i));
   // thread between nodes
   ctx.strokeStyle = COP; ctx.lineWidth = 8; ctx.lineCap = "round";
@@ -674,6 +717,7 @@ function sAutomate(ctx, t) {
 }
 function sQuote(ctx, t) {
   if (t < 48.0 || t >= 50.2) return;
+  place(ctx, PL.quote);
   const L = ["“Our operational", "handoffs and client", "intake pipelines are", "now completely", "automated.”"];
   setFont(ctx, "S", 280); ctx.fillStyle = COP; const qs = spring(t, 48.0, 22); popAt(ctx, CX, 560, qs * (1 - eIn(P(t, 49.75, 49.95))), () => { ctx.textAlign = "center"; ctx.fillText("“", CX, 700); ctx.textAlign = "left"; });
   L.forEach((s, i) => mtext(ctx, s, CX, 820 + i * 96, 88, inout(t, 48.1 + 0.12 * i, 49.72 + 0.02 * i), { f: "S", align: "center", c: CRM }));
@@ -692,7 +736,7 @@ function creamMask(t) { // radius of the cream disc (iris opens from the quote's
 function sProof(ctx, t) {
   if (t < 49.82 || t >= 56.2) return;
   const r = creamMask(t); if (r <= 0) return;
-  ctx.save(); ctx.beginPath(); ctx.arc(CX, CY, r, 0, 7); ctx.clip(); ctx.fillStyle = CRM; ctx.fillRect(0, 0, W, H);
+  ctx.save(); ctx.beginPath(); ctx.arc(RCX, RCY, r, 0, 7); ctx.clip(); ctx.fillStyle = CRM; ctx.fillRect(0, 0, RW, RH); place(ctx, PL.proof);
   const o = { color: INK, accent: TER };
   head(ctx, t, [[{ s: "Proof", t: 50.0, f: "S" }, { s: "over", t: 50.5 }], [{ s: "promises.", t: 51.0 }]], { ...o, x: CX, y: 900, size: 172, lh: 190, out: 51.68 });
   mtext(ctx, "VERIFIED GOOGLE ADS RESULTS", CX, 1180, 34, inout(t, 51.3, 51.72), { align: "center", c: TER, track: 0.16 });
@@ -716,16 +760,18 @@ const NAMES = ["DSL Virtue Mall", "Next Galleria Mall", "AMR Planet Mall", "Rada
   "Learn French Enligne", "UJ Management", "Zaravi", "YRJ EV Bikes", "Orbit", "Bikers Gear UK", "Bamboo Spa", "RMC Plumbing", "Bikers Wear"];
 function sPartners(ctx, t) {
   if (t < 55.9 || t >= 58.3) return;
+  place(ctx, PL.part);
   const out = eIn(P(t, 57.85, 58.15));
   head(ctx, t, [[{ s: "22+", t: 56.0, c: COP }]], { x: CX, y: 720, size: 330, out: 57.7 });
   mtext(ctx, "verified client partnerships", CX, 830, 56, inout(t, 56.15, 57.7), { align: "center", c: CRM, w: 700 });
   for (let r = 0; r < 4; r++) {
     const y = 1010 + r * 120, dir = r % 2 ? 1 : -1, sp = 520 + r * 60, inn = eOut(P(t, 56.25 + 0.08 * r, 56.6 + 0.08 * r));
-    let x = (dir < 0 ? 0 : -2400) + dir * sp * (t - 56) + (1 - inn) * -dir * 1200;
+    const X0 = inv(PL.part, [0, 0])[0], X1 = inv(PL.part, [RW, 0])[0];
+    let x = (dir < 0 ? X0 : X0 - 2400) + dir * sp * (t - 56) + (1 - inn) * -dir * 1200;
     const oy = -eIn(P(t, 57.7 + 0.04 * r, 57.92 + 0.04 * r)) * 100; if (oy <= -99) continue;
-    ctx.save(); ctx.beginPath(); ctx.rect(0, y - 70, W, 96); ctx.clip();
-    for (let k = 0; k < 14; k++) { const s = NAMES[(r * 6 + k) % NAMES.length], wv = textW(ctx, s, 64, "A", 800);
-      if (x + wv > -50 && x < W + 50) { ctx.fillStyle = (k + r) % 3 === 0 ? COP : r % 2 ? GRY : CRM; ctx.fillText(s, x, y + oy); ctx.fillStyle = EDGE; ctx.beginPath(); ctx.arc(x + wv + 30, y - 22 + oy, 7, 0, 7); ctx.fill(); }
+    ctx.save(); ctx.beginPath(); ctx.rect(X0, y - 70, X1 - X0, 96); ctx.clip();
+    for (let k = 0; k < (LAND ? 24 : 14); k++) { const s = NAMES[(r * 6 + k) % NAMES.length], wv = textW(ctx, s, 64, "A", 800);
+      if (x + wv > X0 - 50 && x < X1 + 50) { ctx.fillStyle = (k + r) % 3 === 0 ? COP : r % 2 ? GRY : CRM; ctx.fillText(s, x, y + oy); ctx.fillStyle = EDGE; ctx.beginPath(); ctx.arc(x + wv + 30, y - 22 + oy, 7, 0, 7); ctx.fill(); }
       x += wv + 60; }
     ctx.restore();
   }
@@ -749,6 +795,7 @@ const gproj = (q) => { const k = FOC / (q[2] + DIST); return [CX + q[0] * k, GCY
 function headVec(t) { const h = routeHead(t), i = Math.min(ROUTE.pts.length - 2, Math.floor(h)), f = h - i, a = ROUTE.pts[i], b = ROUTE.pts[i + 1]; return nrm([lerp(a[0], b[0], f), lerp(a[1], b[1], f), lerp(a[2], b[2], f)]); }
 function sGlobe(ctx, t) {
   if (t < 57.9 || t >= 62.2) return;
+  place(ctx, PL.globe);
   head(ctx, t, [[{ s: "5", t: 58.0 }, { s: "markets.", t: 58.12 }], [{ s: "One", t: 58.5 }, { s: "loop.", t: 58.62, f: "S" }]], { x: CX, y: 420, size: 112, lh: 124, out: 61.6 });
   const hv = headVec(Math.max(58.5, t)), lat = -Math.asin(-hv[1]) * 0.55, lon = -Math.atan2(hv[0], hv[2]);
   const grow = spring(t, 57.95, 12), col = eIn(P(t, 61.6, 62.0)), R = GR * grow * (1 - col);
@@ -770,11 +817,13 @@ function sGlobe(ctx, t) {
    ===================================================================== */
 function sTeam(ctx, t) {
   if (t < 62.0 || t >= 66.1) return;
-  const P3 = [["team_video", 80, 420, 920, 436, 62.0, [0, -1]], ["team_photo", 80, 876, 450, 600, 62.25, [-1, 0]], ["team_set", 550, 876, 450, 600, 62.5, [1, 0]]];
+  const P3 = LAND ? [["team_video", 100, 140, 900, 400, 62.0, [-1, 0]], ["team_photo", 100, 560, 900, 400, 62.25, [-1, 0]], ["team_set", 1020, 140, 800, 820, 62.5, [1, 0]]] : [["team_video", 80, 420, 920, 436, 62.0, [0, -1]], ["team_photo", 80, 876, 450, 600, 62.25, [-1, 0]], ["team_set", 550, 876, 450, 600, 62.5, [1, 0]]];
+  if (LAND) ctx.save();
   P3.forEach(([k, x, y, w, h, t0, d], i) => { const wv = eOut(P(t, t0, t0 + 0.3)), out = eIn(P(t, 63.85 + 0.04 * i, 64.15 + 0.04 * i)); if (wv <= 0 || out >= 1) return;
     ctx.save(); ctx.translate(d[0] * 1100 * out, d[1] * 900 * out); ctx.beginPath(); ctx.rect(x, y, w, h * wv); ctx.clip(); photo(ctx, k, x, y, w, h, 24, 1.1 - 0.1 * wv, 0.5, 0.35); ctx.restore(); });
   // darken behind the type so it reads over the photos
-  const dim = eOut(P(t, 62.95, 63.15)) * (1 - eIn(P(t, 63.85, 64.1))); if (dim > 0) { ctx.fillStyle = `rgba(0,0,0,${0.62 * dim})`; ctx.fillRect(0, 0, W, H); }
+  const dim = eOut(P(t, 62.95, 63.15)) * (1 - eIn(P(t, 63.85, 64.1))); if (dim > 0) { ctx.fillStyle = `rgba(0,0,0,${0.62 * dim})`; ctx.fillRect(0, 0, RW, RH); }
+  if (LAND) { ctx.restore(); place(ctx, PL.team); }
   head(ctx, t, [[{ s: "25+", t: 63.0, c: COP }], [{ s: "specialists.", t: 63.25, f: "S", c: CRM }]], { x: CX, y: 960, size: 240, lh: 230, out: 63.72 });
   head(ctx, t, [wl("Not two people", 64.0, 0.15), [{ s: "wearing ten hats.", t: 64.45, f: "S" }]], { x: CX, y: 500, size: 108, lh: 126, out: 65.75 });
   const DOM = ["Web & app development", "Digital marketing", "Business automation", "Brand & creative", "AI & infrastructure"];
@@ -790,6 +839,7 @@ const PROMISE = "AUDIT. BUILD. MARKET. AUTOMATE. ";
 const RING = (() => { const out = []; for (let i = 0; i < N; i++) { const a = Math.PI - (i / N) * Math.PI * 2; out.push([Math.cos(a) * 30, Math.sin(a) * 30, 0]); } return out; })();
 function sFinale(ctx, t) {
   if (t < 65.85 || t >= 69.7) return;
+  place(ctx, PL.fin);
   if (t < 66.0) { const s = eIn(P(t, 65.85, 66.0)); ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(CX, CY, lerp(0, 30, s), 0, 7); ctx.fill(); return; }
   const a = (x) => (x * Math.PI) / 180, m = spring(t, 66.0, 10), lock = eIO(P(t, 69.25, 69.7));
   const S = lerp(lerp(420, 520, eOut(P(t, 66.4, 67.2))), S_MARK, lock);
@@ -806,14 +856,19 @@ function sFinale(ctx, t) {
 }
 function sEnd(ctx, t) {
   if (t < 69.7) return;
+  place(ctx, PL.fin);
   const lockC = (M.top + M.tagBot) / 2;
   const rise = eIO(P(t, 70.0, 70.4)), top = eIO(P(t, 72.0, 72.45));
   let S = lerp(S_MARK, SE, rise) * (1 + 0.025 * P(t, 70.4, 72.0)), cy = lerp(CY, CY - lockC * S, rise);
-  S = lerp(S, SE * 0.5, top); cy = lerp(cy, 330 - M.top * S, top);
+  let cx = CX;
+  if (LAND) { S = lerp(S, SE * 0.82, top); cy = lerp(cy, CY - lockC * S, top); cx = lerp(CX, 120, top); }
+  else { S = lerp(S, SE * 0.5, top); cy = lerp(cy, 330 - M.top * S, top); }
+  const RX = LAND ? 980 : CX, dy = LAND ? -40 : 0; // CTA column (landscape: right of the lockup)
   const push = 1 + 0.035 * P(t, 73.0, 76.0);
   ctx.save(); ctx.translate(CX, CY); ctx.scale(push, push); ctx.translate(-CX, -CY);
-  lockup(ctx, CX, cy, S, t, P(t, 70.15, 70.55), eOut(P(t, 70.35, 70.65)), 69.7);
-  head(ctx, t, [wl("Get your free", 72.25, 0.12), [{ s: "growth audit.", t: 72.6, f: "S" }]], { x: CX, y: 780, size: 116, lh: 136 });
+  lockup(ctx, cx, cy, S, t, P(t, 70.15, 70.55), eOut(P(t, 70.35, 70.65)), 69.7);
+  ctx.translate(RX - CX, dy);
+  head(ctx, t, [wl("Get your free", 72.25, 0.12), [{ s: "growth audit.", t: 72.6, f: "S" }]], { x: CX, y: 780, size: 116, lh: 136, fit: LAND ? 760 : undefined });
   const bs = spring(t, 73.0, 20), press = bump(t, 73.72, 0.16), done = t >= 73.75;
   popAt(ctx, CX, 1050, bs * (1 - 0.05 * press), () => { rr(ctx, CX - 320, 975, 640, 150, 75); ctx.fillStyle = done ? COP : CRM; ctx.fill();
     setFont(ctx, "A", 50); ctx.fillStyle = BLK; ctx.fillText("Audit my business", CX - 256, 1068);
@@ -830,11 +885,11 @@ function sEnd(ctx, t) {
 const SCENES = [sHook, sTiles, sThread, sLogo, sPromise, sStage, sAudit, sCTA, sBuild, sProducts, sChannels, sRMC, sContent, sAutomate, sQuote, sPartners, sProof, sGlobe, sTeam, sFinale, sEnd];
 function scene(ctx, t) {
   t = clamp(t, 0, DUR - 1e-6);
-  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.fillStyle = BLK; ctx.fillRect(0, 0, W, H);
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.globalAlpha = 1; ctx.fillStyle = BLK; ctx.fillRect(0, 0, RW, RH);
   for (const f of SCENES) { ctx.save(); f(ctx, t); ctx.restore(); }
 }
 const main = document.getElementById("c"), mctx = main.getContext("2d");
-const buf = document.createElement("canvas"); buf.width = W; buf.height = H; const bctx = buf.getContext("2d");
+const buf = document.createElement("canvas"); buf.width = RW; buf.height = RH; const bctx = buf.getContext("2d");
 // motion blur inside one sub-frame: average K trailing samples (blur follows speed & direction automatically)
 window.seek = (t, K = 4, span = 1 / 180) => {
   mctx.setTransform(1, 0, 0, 1, 0, 0); mctx.globalAlpha = 1;
