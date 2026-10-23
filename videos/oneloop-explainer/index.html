@@ -305,6 +305,10 @@ function sTiles(ctx, t) {
     ctx.save(); ctx.translate(cx, cy); ctx.rotate(G.rot * sx * sy);
     const lit = t >= 8 ? spring(t, [8.75, 9.25, 8.35, 9.75][k], 20) : 0; // stitched tiles turn copper-edged
     card(ctx, -h, -h, side, side, 30 * (side / 400), INK, lit > 0.5 ? COP : EDGE, lit > 0.5 ? 5 : 2);
+    // the copper of the drop drains out of each tile from the centre (no flash cut from copper to dark)
+    const drain = eOut(P(t, 2.25, 2.5));
+    if (drain < 1) { ctx.save(); rr(ctx, -h, -h, side, side, 30 * (side / 400)); ctx.clip(); ctx.fillStyle = COP; ctx.fillRect(-h, -h, side, side);
+      const ih = h * drain; rr(ctx, -ih, -ih, 2 * ih, 2 * ih, 30 * (side / 400) * drain); ctx.fillStyle = INK; ctx.fill(); ctx.restore(); }
     const ls = side / 408, lab = spring(t, 2.25 + 0.25 * k, 22);
     if (lab > 0.01 && ls > 0.25) popAt(ctx, 0, 0, lab, () => {
       tileIcon(ctx, k, -h + 90 * ls, -h + 90 * ls, ls, t);
