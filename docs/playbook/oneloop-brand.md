@@ -5,8 +5,24 @@ Studio" (Nepal), "One Loop Agency" (oneloopagency.com) and "Looply" (Hyderabad) 
 borrow their facts or visuals.
 
 ## Identity
-- **Who:** Hyderabad-based agency, founded by **Prahalad** (yellow-check shirt) and **Tarun** (red shirt).
-  They started by going door to door pitching local businesses.
+- **Site:** https://www.oneloop.in (captured Oct 2026). It is first-party; quote it verbatim.
+- **Who:** Hyderabad-born "growth intelligence collective" / "full-loop growth company".
+  - Leadership on the site: **K. Naga Datta Sai** (Founder; product and strategy; previously co-founded and led product at an AI startup) and **S.L.N Prahaladh** (Co-Founder; automation and AI systems).
+  - LinkedIn: linkedin.com/in/naga-datta, linkedin.com/in/slnprahaladh.
+  - In their own story videos, **Prahalad** (yellow-check shirt) and **Tarun** (red shirt) appear on camera. They started by going door to door pitching local businesses.
+  - The site shows founder monograms only (ND/SP), not photos. Never tag a face with a name without asking.
+- **Thesis (their words):** "Growth breaks down in the gaps between a business's website, its marketing, its operations, and its brand — usually because each piece is handled by a different vendor with no one owning the outcome." Also: "We are OneLoop, closing the gaps in modern growth."
+- **Method, "The Growth Path":**
+  1. Audit & Forensics: unit economics, ad waste, conversion leakage, team friction, "before building anything". The audit is free.
+  2. Build & Deploy: sub-second loads, verified tracking.
+  3. Market & Track: Google Search, Shopping, Meta, PMax.
+  4. Automate Operations: lead routing, self-correcting AI.
+  5. Scale & Expand.
+- **Six service loops:** Web & App · Digital Marketing (incl. SEO/AEO/GEO) · Process Automation · SaaS & Infrastructure · Custom Technology · Branding & Digital Growth.
+- **Scale claims on the site:** 22+ verified client partnerships · 25+ specialists ("not two people wearing ten hats").
+- **Markets:** Australia · Dubai · Hyderabad · NZ · UK (site footer: AU · AE · IN · NZ · UK).
+- **Contact:** WhatsApp +91 93927 53155 · calls +91 831 765 7952 / 8688660239. CTA copy: "Audit my business".
+- **Shipped products:** XP Academy (EdTech) · Nirvaha (Play Store wellness) · LN Sports Arena · Sithiyam Travel · Campus Cartel · DocOnCommit (open source).
 - **Promise / tagline (from the logo):** AUDIT. BUILD. MARKET. AUTOMATE. Each word is followed by a copper full stop.
 - **Positioning heard in their own videos:** "from small-scale local businesses to large-scale enterprises".
   Part 2 of their story is about "some of the best clients we've worked with".
@@ -21,6 +37,7 @@ borrow their facts or visuals.
   - The user flagged a hand-drawn approximation as "doesn't feel the same", so always use the traced artwork.
 
 ## Palette (sampled from the logo + used in every One Loop edit)
+Website palette: black #000 / #161616 ground, cream text #E1E0CC, copper #E59C69 accent.
 
 | Name | Hex |
 |---|---|
@@ -32,8 +49,9 @@ borrow their facts or visuals.
 | Black | #000 (the logo's ground) |
 
 ## Type used so far
-- Montserrat 700/800/900 for heavy caps.
-- Playfair Display italic as the emotional accent.
+- **Website fonts:** Almarai (sans) and Instrument Serif *italic* (accent). The explainer uses these, in `videos/oneloop-explainer/fonts/`.
+- Montserrat 700/800/900 for heavy caps (earlier reels).
+- Playfair Display italic as the emotional accent (earlier reels).
 - Font files: `videos/oneloop-client-one/assets/fonts/`.
 
 ## Client portfolio (user's file `OneLoop_Client_Portfolio_5.xlsx`, all rows marked "Verified")
@@ -64,5 +82,20 @@ By sector:
 
 Don't invent revenue, growth percentages or results; none are in the data.
 
+## Verified case studies (Client Success Stories PDF, Google Ads)
+These are safe to quote exactly. One hero number per frame, and keep chart ratios true.
+
+| Client | Market / since | Results |
+|---|---|---|
+| RMC Plumbing Services | AU, Search, Oct 2023 | 11 → 66 leads/mo; $92 → $19 CPL (−79%, AUD); 1,327 leads on AUD 32,499 |
+| Bamboo Spa | NZ, Oct 2024 | 1,237 → 2,587 conversions/mo (2.1x); NZD 1.44 → 0.78 per conversion |
+| Bikers Wear Australia | AU, Apr 2024 | ~9x ROAS; AUD 753K revenue on 88K spend (17 months, Mar 2025–Jul 2026) |
+| Bikers Gear UK | UK, Jan 2025 | 4.6x blended ROAS; £123,940 on £26,723 (10 months) |
+
+- **Client quote used:** UJ Management Solutions: "Our operational handoffs and client intake pipelines are now completely automated…"
+- **Unlabelled Google Ads screenshots (Q2 2024 vs Q2 2025):** client unknown. Ask before using.
+
 ## Story assets
+- **Explainer** (`videos/oneloop-explainer`): 76 s vertical film, "The Thread That Closes the Gaps". STRATEGY.md holds the research, script and gaps.
+- **Photography:** the portfolio PDF has One Loop's own shoots. Extracted picks are in `videos/oneloop-explainer/img/`. Avoid third-party brand shots (e.g. the Coca-Cola can).
 - **Client #1 reel** (`videos/oneloop-client-one`): the unpaid first client. Never name or identify that client.
