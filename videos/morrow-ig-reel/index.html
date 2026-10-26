@@ -8,7 +8,7 @@
   @font-face { font-family: "Inter"; src: url("fonts/inter-500.woff2"); font-weight: 500; }
   @font-face { font-family: "Inter"; src: url("fonts/inter-600.woff2"); font-weight: 600; }
   @font-face { font-family: "Inter"; src: url("fonts/inter-700.woff2"); font-weight: 700; }
-  @font-face { font-family: "IS"; src: url("fonts/InstrumentSerif-Regular.ttf"); }
+  @font-face { font-family: "FR"; src: url("fonts/Fraunces-VF.ttf"); font-weight: 100 900; }
   html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
   /* everything is laid out in the reference screenshot's own 941×1672 coordinates, then scaled to 1080×1920 */
   #ui { position: absolute; left: 0; top: 0; width: 941px; height: 1672px; transform: scale(1.147715); transform-origin: 0 0;
@@ -23,15 +23,23 @@
         font-size: 25px; letter-spacing: 0.01em; line-height: 1.2; color: #2E2E2E; font-weight: 400; }
   svg { overflow: visible; }
   #cap { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: none; }
-  #cap div { position: absolute; left: 0; width: 1080px; text-align: center; font-family: "IS"; color: #F4EAB4;
-             text-shadow: 0 2px 14px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.6); }
+  /* reference style: chunky soft serif in lemon yellow, stacked lines, top and bottom lines bent on arcs */
+  #cap svg text { font-family: "FR"; font-weight: 900; font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 72; fill: #F7E81E;
+                  letter-spacing: -1px; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.35)); }
 </style>
 </head>
 <body>
 <div id="ui"></div>
 <div id="cap">
-  <div style="top: 1050px; font-size: 92px; line-height: 92px;">if i handled your café's<br />instagram...</div>
-  <div style="top: 1258px; font-size: 84px; line-height: 84px;">ep. 01</div>
+  <svg width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;left:0;top:0;">
+    <defs>
+      <path id="arcTop" d="M 250 1035 Q 540 925 830 1035" fill="none"/>
+      <path id="arcBot" d="M 95 1300 Q 540 1420 985 1300" fill="none"/>
+    </defs>
+    <text font-size="96" text-anchor="middle"><textPath href="#arcTop" startOffset="50%">if i handled</textPath></text>
+    <text x="540" y="1200" font-size="150" text-anchor="middle">your café's</text>
+    <text font-size="150" text-anchor="middle"><textPath href="#arcBot" startOffset="50%">instagram...</textPath></text>
+  </svg>
 </div>
 <script>
 /* Morrow Coffee House — "if I handled your café's Instagram" profile build.
@@ -141,7 +149,7 @@ function caption() { ui.style.display = "none"; document.getElementById("cap").s
 window.seek = seek; window.caption = caption; window.TIMING = { DROP, S1, S2, S3, R, END, BEAT };
 window.ready = (async () => {
   await document.fonts.load("700 30px Inter"); await document.fonts.load("400 30px Inter"); await document.fonts.load("600 30px Inter");
-  await document.fonts.load("500 30px Inter"); await document.fonts.load("80px IS"); await document.fonts.load("30px 'Noto Color Emoji'");
+  await document.fonts.load("500 30px Inter"); await document.fonts.load("900 80px FR"); await document.fonts.load("30px 'Noto Color Emoji'");
   await Promise.all([...document.images].map((im) => (im.complete ? 0 : new Promise((r) => { im.onload = im.onerror = r; }))));
   seek(DROP); return true;
 })();

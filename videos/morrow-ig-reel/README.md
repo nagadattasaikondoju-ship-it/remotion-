@@ -1,7 +1,7 @@
 # Morrow Coffee House — "if I handled your café's Instagram… ep. 01"
 
 10.08 s · 1080×1920 · 60 fps. Recreates the reference reel's edit:
-- **Hook (0–2.38 s):** Prahalad typing, with a serif caption.
+- **Hook (0–2.38 s):** Prahalad typing, with a lemon-yellow soft-serif caption, arched top and bottom lines ("if i handled / your café's / instagram..."), styled after the reference.
 - **Wireframe profile (beat drop at 2.38 s):** placeholder avatar, bio, highlights and grid.
 - **Fill-in:** the profile fills in one step every 2 beats (113 BPM, the song "DANCE…" by Slayyyter):
   1. name, logo and link
