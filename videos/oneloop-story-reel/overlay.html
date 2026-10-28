@@ -1,0 +1,324 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>One Loop story reel overlay</title>
+<style>html,body{margin:0;background:transparent;overflow:hidden}canvas{display:block}</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="logo.js"></script>
+<script>
+/* One Loop story reel: captions + graphics over out/base.mp4. 1080×1920, 38 s, transparent.
+   window.seek(t) draws the frame for video time t (pure function of t). Timings are the VO's Whisper word times,
+   mapped to video time (part A = raw − 1.05 s, part B = raw + 2.60 s after the 4 s logos/analytics gap). */
+const W = 1080, H = 1920, CX = 540, DUR = 38;
+const COP = "#E59C69", CRM = "#E1E0CC", WHT = "#FFFFFF", INK = "#0B0B0B";
+const cv = document.getElementById("c"), ctx = cv.getContext("2d");
+
+/* ---------- time helpers ---------- */
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, x) => a + (b - a) * x;
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const eOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const eIO = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2);
+const spring = (t, t0, w = 18) => { const d = t - t0; return d <= 0 ? 0 : 1 - (1 + w * d) * Math.exp(-w * d); };
+// caption pop: quick overshoot (≈8 %) then settle, the punch of the reference captions
+const pop = (t, t0) => { const d = t - t0; return d <= 0 ? 0 : 1 - Math.exp(-13 * d) * Math.cos(16 * d); };
+
+/* ---------- polylines + the traced One Loop mark (same construction as the explainer) ---------- */
+function cum(pts) { const c = [0]; for (let i = 1; i < pts.length; i++) c.push(c[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1])); return c; }
+function resample(pts, n) {
+  const c = cum(pts), L = c[c.length - 1], out = []; let j = 0;
+  for (let i = 0; i < n; i++) { const s = (L * i) / (n - 1); while (j < c.length - 2 && c[j + 1] < s) j++;
+    const u = (s - c[j]) / (c[j + 1] - c[j] || 1); out.push([lerp(pts[j][0], pts[j + 1][0], u), lerp(pts[j][1], pts[j + 1][1], u)]); }
+  return out;
+}
+function strokePart(ctx, pts, c, s0, s1) {
+  const L = c[c.length - 1], a = s0 * L, b = s1 * L; if (b - a < 1e-6) return;
+  ctx.beginPath(); let started = false;
+  for (let i = 0; i < pts.length - 1; i++) {
+    if (c[i + 1] < a || c[i] > b) continue;
+    const u0 = clamp((a - c[i]) / (c[i + 1] - c[i] || 1)), u1 = clamp((b - c[i]) / (c[i + 1] - c[i] || 1));
+    const p0 = [lerp(pts[i][0], pts[i + 1][0], u0), lerp(pts[i][1], pts[i + 1][1], u0)];
+    const p1 = [lerp(pts[i][0], pts[i + 1][0], u1), lerp(pts[i][1], pts[i + 1][1], u1)];
+    if (!started) { ctx.moveTo(p0[0], p0[1]); started = true; }
+    ctx.lineTo(p1[0], p1[1]);
+  }
+  ctx.stroke();
+}
+const RL = LOGO.meta.rl, SW = LOGO.meta.sw, TH = Math.asin(2 * RL);
+function fig8Raw() { // the mark as ONE continuous line: the loops joined through the X by tangent diagonals
+  const p = [], seg = (a, b, m) => { for (let i = 0; i < m; i++) { const u = i / m; p.push([lerp(a[0], b[0], u), lerp(a[1], b[1], u)]); } };
+  const arc = (cx, a0, a1, m) => { for (let i = 0; i < m; i++) { const a = lerp(a0, a1, i / m); p.push([cx + RL * Math.cos(a), RL * Math.sin(a)]); } };
+  const sn = Math.sin(TH), cs = Math.cos(TH), T = [-0.5 * cs * cs, 0.5 * sn * cs], a0 = Math.PI / 2 - TH, span = Math.PI + 2 * TH;
+  seg([0, 0], T, 40); arc(-0.5, a0, a0 + span, 280); seg([T[0], -T[1]], [0, 0], 40);
+  seg([0, 0], [-T[0], T[1]], 40); arc(0.5, Math.PI - a0, Math.PI - a0 - span, 280); seg([-T[0], -T[1]], [0, 0], 41);
+  return p;
+}
+const FIG8 = resample(fig8Raw(), 480), FIG8C = cum(FIG8);
+const DL = 0.5 * Math.cos(TH), AL = (Math.PI + 2 * TH) * RL, TL = 4 * DL + 2 * AL;
+const FR = [0, DL / TL, (DL + AL) / TL, (2 * DL + AL) / TL, (3 * DL + AL) / TL, (3 * DL + 2 * AL) / TL, 1];
+function pathOf(ctx, polys, S) { ctx.beginPath(); for (const poly of polys) { poly.forEach(([x, y], i) => (i ? ctx.lineTo(x * S, y * S) : ctx.moveTo(x * S, y * S))); ctx.closePath(); } }
+function drawLoops(ctx, S) { ctx.fillStyle = COP; for (const g of [LOGO.CL, LOGO.CR]) { pathOf(ctx, g, S); ctx.fill("evenodd"); } }
+function drawXLogo(ctx, S, scale, rot) { if (scale <= 0.001) return; ctx.save(); ctx.rotate(rot); ctx.scale(scale, scale); pathOf(ctx, LOGO.X, S); ctx.fillStyle = COP; ctx.fill("evenodd"); ctx.restore(); }
+function diagonals(ctx, S, r, lw) {
+  if (r >= 1) return;
+  const pts = FIG8.map(([x, y]) => [x * S, y * S]), cc = FIG8C.map((v) => v * S);
+  ctx.strokeStyle = COP; ctx.lineWidth = lw; ctx.lineCap = "butt";
+  strokePart(ctx, pts, cc, 0, FR[1] * (1 - r)); strokePart(ctx, pts, cc, FR[2] + (FR[3] - FR[2]) * r, FR[3]);
+  strokePart(ctx, pts, cc, FR[3], FR[3] + (FR[4] - FR[3]) * (1 - r)); strokePart(ctx, pts, cc, FR[5] + (FR[6] - FR[5]) * r, 1);
+}
+// the copper line traces the figure-eight, then snaps into the real logo: diagonals retract, the X spins in
+function markDraw(ctx, S, t, traceA, snapT) {
+  if (t < snapT) { const pts = FIG8.map(([x, y]) => [x * S, y * S]), cc = FIG8C.map((v) => v * S);
+    ctx.strokeStyle = COP; ctx.lineWidth = SW * S; ctx.lineCap = "round"; strokePart(ctx, pts, cc, 0, eIO(P(t, traceA, snapT))); return; }
+  drawLoops(ctx, S); diagonals(ctx, S, eOut(P(t, snapT, snapT + 0.3)), SW * S);
+  const s = spring(t, snapT, 16); drawXLogo(ctx, S, s, (Math.PI / 2) * (1 - s));
+}
+function lockup(cx, cy, S, t, traceA, snapT, tw, tt) {
+  const M = LOGO.meta;
+  ctx.save(); ctx.translate(cx, cy); markDraw(ctx, S, t, traceA, snapT); ctx.restore();
+  const wTop = cy + M.wordTop * S, wh = (M.wordBot - M.wordTop) * S;
+  if (tw > 0) { ctx.save(); ctx.beginPath(); ctx.rect(0, wTop - 3, W, wh + 6); ctx.clip(); ctx.fillStyle = WHT;
+    LOGO.WORD.forEach((L, i) => { const o = Math.abs(i - 3), up = (1 - eOut(clamp(tw * 1.6 - o * 0.12))) * wh * 1.15;
+      if (up >= wh * 1.1) return; ctx.save(); ctx.translate(cx, cy + up); pathOf(ctx, L.paths, S); ctx.fill("evenodd"); ctx.restore(); });
+    ctx.restore(); }
+  if (tt > 0) { const half = ((M.right - M.left) / 2) * S + 20; ctx.save(); ctx.beginPath();
+    ctx.rect(cx - half * tt, cy + M.tagTop * S - 6, 2 * half * tt, (M.tagBot - M.tagTop) * S + 12); ctx.clip();
+    ctx.translate(cx, cy); pathOf(ctx, LOGO.TAGW, S); ctx.fillStyle = WHT; ctx.fill("evenodd"); pathOf(ctx, LOGO.TAGC, S); ctx.fillStyle = COP; ctx.fill(); ctx.restore(); }
+}
+
+/* ---------- type ---------- */
+const MAXW = 960; // 60 px side margins (inside the 9:16 safe zone)
+function font(size, w) { ctx.font = `${w} ${size}px M`; }
+function fitSize(str, size, w, track, maxw = MAXW) {
+  font(size, w); ctx.letterSpacing = `${track * size}px`; const wd = ctx.measureText(str).width;
+  return wd > maxw ? (size * maxw) / wd : size;
+}
+// one caption line: centred at (x, y), popped in at t0 (scale from 0.55, overshoot), out over 0.1 s at t1.
+// copperTail: trailing characters drawn in copper (the brand's full stops)
+function line(t, o) {
+  const { s, t0, t1 = 99, y, x = CX, size = 72, w = 800, col = WHT, track = 0, alpha = 1, copperTail = 0, shadow = true } = o;
+  if (t < t0 || t > t1 + 0.1) return;
+  const k = pop(t, t0), out = 1 - P(t, t1, t1 + 0.1), a = clamp((t - t0) / 0.05) * out * alpha; if (a <= 0) return;
+  const sz = fitSize(s, size, w, track, o.maxw || MAXW);
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); const sc = (0.55 + 0.45 * k) * lerp(0.92, 1, out); ctx.scale(sc, sc);
+  font(sz, w); ctx.letterSpacing = `${track * sz}px`; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+  const head = copperTail ? s.slice(0, -copperTail) : s, tail = copperTail ? s.slice(-copperTail) : "";
+  const wHead = ctx.measureText(head).width, wAll = ctx.measureText(s).width - track * sz; let x0 = -wAll / 2;
+  if (shadow) { ctx.shadowColor = "rgba(0,0,0,0.55)"; ctx.shadowBlur = sz * 0.18; ctx.shadowOffsetY = sz * 0.04; }
+  ctx.fillStyle = col; ctx.fillText(head, x0, 0);
+  if (tail) { ctx.fillStyle = COP; ctx.fillText(tail, x0 + wHead, 0); }
+  ctx.restore();
+}
+const inr = (n) => Math.round(n).toLocaleString("en-IN");
+
+/* ---------- screenplay ---------- */
+// subtitles: small bold white, mid-frame, 2–4 words, on the VO
+const SUBY = 1230;
+const SUBS = [
+  [3.31, 3.83, "A few friends"], [3.83, 4.62, "in Hyderabad,"], [4.73, 5.62, "late nights,"], [5.81, 6.92, "back-to-back calls,"],
+  [6.99, 7.69, "building for brands"], [7.69, 8.63, "that had never"], [8.63, 9.50, "heard of us."],
+  [9.65, 10.15, "Most brands"], [10.15, 10.79, "don't have a"],
+  [12.83, 13.31, "So we start"], [13.31, 13.62, "with an"],
+  [14.19, 15.62, "find what's holding them back,"],
+];
+// emphasis captions: the big stacked lines on the important words (with the footage darkened behind them)
+const DIMS = [[0.10, 3.25], [10.75, 12.78], [13.55, 18.55], [19.75, 24.85], [32.55, 36.30]];
+function dimLayer(t) {
+  let a = 0; for (const [a0, a1] of DIMS) a = Math.max(a, P(t, a0, a0 + 0.15) * (1 - P(t, a1 - 0.12, a1)));
+  if (a <= 0) return;
+  const g = ctx.createRadialGradient(CX, 960, 200, CX, 960, 1150);
+  g.addColorStop(0, `rgba(0,0,0,${0.38 * a})`); g.addColorStop(1, `rgba(0,0,0,${0.62 * a})`);
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+}
+
+function hook(t) { // WE MADE / ₹95,000 / IN 2 MONTHS
+  if (t > 3.3) return;
+  line(t, { s: "WE MADE", t0: 0.21, t1: 3.15, y: 700, size: 76, w: 800, track: 0.12 });
+  const v = 95000 * eOut(P(t, 1.05, 1.75));
+  line(t, { s: "₹" + inr(v), t0: 1.05, t1: 3.15, y: 885, size: 250, w: 900, track: -0.02 });
+  line(t, { s: "IN 2 MONTHS", t0: 1.97, t1: 3.15, y: 1075, size: 92, w: 900, col: COP, track: 0.06 });
+}
+function leak(t) { // TRAFFIC PROBLEM (struck through) → THEY HAVE / A LEAK.
+  if (t < 10.7 || t > 12.85) return;
+  line(t, { s: "TRAFFIC", t0: 10.79, t1: 11.74, y: 860, size: 200, w: 900 });
+  line(t, { s: "PROBLEM", t0: 10.99, t1: 11.74, y: 1060, size: 200, w: 900 });
+  const st = eOut(P(t, 11.15, 11.38)), so = 1 - P(t, 11.74, 11.84);
+  if (st > 0 && so > 0) { ctx.save(); ctx.globalAlpha = so; ctx.strokeStyle = COP; ctx.lineWidth = 22; ctx.lineCap = "round";
+    for (const [y, d] of [[860, 0], [1060, 0.06]]) { const k = eOut(P(t, 11.15 + d, 11.38 + d)); if (k <= 0) continue;
+      ctx.beginPath(); ctx.moveTo(80, y + 8); ctx.lineTo(80 + 920 * k, y - 8 + 16 * (1 - k)); ctx.stroke(); }
+    ctx.restore(); }
+  line(t, { s: "THEY HAVE", t0: 11.83, t1: 12.72, y: 790, size: 76, w: 800, track: 0.12 });
+  line(t, { s: "A LEAK", t0: 12.15, t1: 12.72, y: 975, size: 230, w: 900 });
+  // the copper full stop of "A LEAK." drips down the frame
+  if (t >= 12.23 && t < 12.82) {
+    font(fitSize("A LEAK", 230, 900, 0), 900); ctx.letterSpacing = "0px"; const ww = ctx.measureText("A LEAK").width;
+    const k = pop(t, 12.23), fall = Math.pow(P(t, 12.40, 12.80), 2) * 820, r = 22 * k;
+    const x = CX + ww / 2 + 30, y = 1040 + fall, a = 1 - P(t, 12.72, 12.82);
+    ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = COP;
+    if (fall > 0) { ctx.beginPath(); ctx.moveTo(x - r * 0.45, 1040); ctx.lineTo(x + r * 0.45, 1040); ctx.lineTo(x + r * 0.8, y); ctx.lineTo(x - r * 0.8, y); ctx.fill(); }
+    ctx.beginPath(); ctx.arc(x, y, r * (1 + Math.min(0.3, fall / 1500)), 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  }
+}
+function path4(t) { // AUDIT. BUILD. MARKET. AUTOMATE. — the growth path, current word lit
+  if (t < 13.5 || t > 18.6) return;
+  const W4 = [["AUDIT.", 13.63], ["BUILD.", 15.83], ["MARKET.", 16.85], ["AUTOMATE.", 17.77]];
+  W4.forEach(([s, t0], i) => { const next = W4[i + 1] ? W4[i + 1][1] : 99, lit = t < next ? 1 : 0.38 + 0.62 * (1 - P(t, next, next + 0.15));
+    line(t, { s, t0, t1: 18.45, y: 600 + i * 175, size: 170, w: 900, copperTail: 1, alpha: lit, maxw: 900 }); });
+}
+function logoBeat(t) { // "That's one loop." — the copper line draws the figure-eight and snaps into the logo
+  if (t < 18.55 || t >= 19.70) return;
+  ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
+  const a = 1 - P(t, 19.58, 19.70); ctx.save(); ctx.globalAlpha = a;
+  const S = 400 * lerp(0.94, 1, eOut(P(t, 18.55, 19.7)));
+  lockup(CX, 860, S, t, 18.55, 18.93, P(t, 18.95, 19.45), P(t, 19.15, 19.55)); ctx.restore();
+}
+function roles(t) { // Developers / designers / marketers / AI builders
+  if (t < 19.75 || t > 23.4) return;
+  const R = [["DEVELOPERS", 19.81], ["DESIGNERS", 20.59], ["MARKETERS", 21.43], ["AI BUILDERS", 22.39]];
+  R.forEach(([s, t0], i) => { const t1 = R[i + 1] ? R[i + 1][1] - 0.02 : 23.30;
+    line(t, { s: `0${i + 1} / 04`, t0, t1, y: 800, size: 46, w: 800, col: COP, track: 0.3 });
+    line(t, { s, t0, t1, y: 945, size: 165, w: 900, maxw: 940 }); });
+  // progress rail under the word: one copper segment per role
+  const k = eOut(P(t, 19.81, 19.95)) * (1 - P(t, 23.25, 23.35)); if (k <= 0) return;
+  for (let i = 0; i < 4; i++) { const on = t >= R[i][1]; ctx.fillStyle = on ? COP : "rgba(255,255,255,0.28)";
+    ctx.globalAlpha = k; ctx.fillRect(240 + i * 155, 1075, 135 * (on ? eOut(P(t, R[i][1], R[i][1] + 0.25)) : 1), 8); }
+  ctx.globalAlpha = 1;
+}
+function oneTeam(t) {
+  if (t < 23.4 || t > 24.9) return;
+  line(t, { s: "ONE TEAM.", t0: 23.45, t1: 24.78, y: 860, size: 190, w: 900, copperTail: 1 });
+  line(t, { s: "ONE LOOP.", t0: 24.23, t1: 24.78, y: 1060, size: 190, w: 900, copperTail: 1 });
+}
+
+/* ---------- 25+ brands: One Loop's own shoots as a card pile ---------- */
+const PHOTOS = ["food_plate", "model_woman", "drink", "food_kebab", "watch", "model_man", "dancer", "food_jamun"];
+const IMG = {};
+function cover(img, x, y, w, h, z = 1, fx = 0.5, fy = 0.5) {
+  const s = Math.max(w / img.width, h / img.height) * z, iw = img.width * s, ih = img.height * s;
+  ctx.drawImage(img, x + (w - iw) * fx, y + (h - ih) * fy, iw, ih);
+}
+function rrect(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function brands(t) {
+  if (t < 24.75 || t >= 28.45) return;
+  const T0 = 24.85, D = 0.45, i = clamp(Math.floor((t - T0) / D), 0, PHOTOS.length - 1);
+  if (t >= T0) {
+    const img = IMG[PHOTOS[i]];
+    ctx.save(); ctx.filter = "blur(36px) brightness(0.42) saturate(1.2)"; cover(img, -80, -80, W + 160, H + 160, 1.05); ctx.restore();
+    // last three cards: each flies in from below with a turn, lands on the pile slightly rotated
+    for (let j = Math.max(0, i - 2); j <= i; j++) {
+      const im = IMG[PHOTOS[j]], tj = T0 + j * D, k = spring(t, tj, 20), rot = ((j % 2 ? 1 : -1) * (3 + (j % 3)) * Math.PI) / 180;
+      const maxW = 760, maxH = 820, s = Math.min(maxW / im.width, maxH / im.height), cw = im.width * s, ch = im.height * s;
+      const y = 1020 + (1 - k) * 1100, drift = (t - tj) * 14;
+      ctx.save(); ctx.translate(CX, y - drift); ctx.rotate(rot * k + (1 - k) * rot * 4); ctx.scale(1 + 0.02 * (t - tj), 1 + 0.02 * (t - tj));
+      ctx.shadowColor = "rgba(0,0,0,0.55)"; ctx.shadowBlur = 60; ctx.shadowOffsetY = 24;
+      ctx.fillStyle = "#F9F6F1"; rrect(-cw / 2 - 14, -ch / 2 - 14, cw + 28, ch + 28, 22); ctx.fill(); ctx.shadowColor = "transparent";
+      ctx.save(); rrect(-cw / 2, -ch / 2, cw, ch, 12); ctx.clip(); ctx.drawImage(im, -cw / 2, -ch / 2, cw, ch); ctx.restore();
+      ctx.restore();
+    }
+  }
+  const n = Math.round(25 * eOut(P(t, 24.75, 25.45)));
+  line(t, { s: `${n}+`, t0: 24.75, t1: 28.33, y: 330, size: 250, w: 900 });
+  line(t, { s: "BRANDS", t0: 25.71, t1: 28.33, y: 495, size: 80, w: 800, col: COP, track: 0.3 });
+  // cities as copper-outlined chips
+  const C = [["HYDERABAD", 26.47], ["DUBAI", 27.35], ["AUSTRALIA", 27.89]], fs = 40, pad = 34, gap = 18;
+  font(fs, 800); ctx.letterSpacing = `${0.12 * fs}px`; const ws = C.map(([s]) => ctx.measureText(s).width - 0.12 * fs + pad * 2);
+  let x = CX - (ws.reduce((a, b) => a + b, 0) + gap * 2) / 2;
+  C.forEach(([s, t0], i) => { const k = pop(t, t0), out = 1 - P(t, 28.33, 28.43); if (k > 0 && out > 0) {
+      ctx.save(); ctx.globalAlpha = clamp((t - t0) / 0.05) * out; ctx.translate(x + ws[i] / 2, 1690); ctx.scale(0.6 + 0.4 * k, 0.6 + 0.4 * k);
+      ctx.fillStyle = "rgba(11,11,11,0.78)"; rrect(-ws[i] / 2, -42, ws[i], 84, 42); ctx.fill();
+      ctx.strokeStyle = COP; ctx.lineWidth = 3; ctx.stroke(); ctx.fillStyle = WHT; font(fs, 800); ctx.letterSpacing = `${0.12 * fs}px`;
+      ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(s, -ws[i] / 2 + pad, 2); ctx.restore(); }
+    x += ws[i] + gap; });
+}
+
+/* ---------- client wall (no VO): the 24 verified names from the client portfolio, scrolling ---------- */
+const CLIENTS = ["DSL Virtue Mall", "AMR Planet Mall", "Next Galleria Mall", "Hyderabad Smiles", "Khan Saab", "Mirame Cafe",
+  "Amyra Cafe & Kitchen", "Radaar Bar & Kitchen", "Dr Sushma Dental", "RMC Plumbing · AU", "Bamboo Spa · NZ", "Bikers Wear Australia",
+  "Bikers Gear UK", "Stellar Reserve", "Nirvaha", "The Diamond Store", "Studlyf", "LN Sports Arena", "The Antique Loft",
+  "Learn French Enligne", "CtrlX Studios", "Cellbay", "FuturoWorks", "Sania Job Bowl"];
+function wall(t) {
+  if (t < 28.45 || t >= 30.45) return;
+  ctx.fillStyle = INK; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createRadialGradient(CX, 980, 50, CX, 980, 900); g.addColorStop(0, "rgba(229,156,105,0.16)"); g.addColorStop(1, "rgba(229,156,105,0)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  line(t, { s: "TRUSTED BY", t0: 28.48, t1: 30.36, y: 300, size: 44, w: 800, col: COP, track: 0.4, shadow: false });
+  line(t, { s: "OUR CLIENTS", t0: 28.55, t1: 30.36, y: 400, size: 120, w: 900, shadow: false });
+  const fs = 40, ph = 92, out = 1 - P(t, 30.33, 30.45);
+  for (let r = 0; r < 6; r++) {
+    const names = CLIENTS.slice(r * 4, r * 4 + 4), y = 640 + r * 172, dir = r % 2 ? 1 : -1, k = eOut(P(t, 28.6 + r * 0.06, 28.95 + r * 0.06));
+    if (k <= 0) continue;
+    font(fs, 800); ctx.letterSpacing = "0px";
+    const ws = names.map((s) => ctx.measureText(s).width + 76), rowW = ws.reduce((a, b) => a + b + 22, 0);
+    let x = (dir < 0 ? 40 : -rowW + 1040) + dir * (t - 28.45) * 150 + (1 - k) * 300 * -dir;
+    ctx.save(); ctx.globalAlpha = k * out;
+    for (let rep = -1; rep <= 1; rep++) { let xx = x + rep * rowW;
+      names.forEach((s, i) => { if (xx + ws[i] > -20 && xx < W + 20) {
+          ctx.fillStyle = "#171513"; rrect(xx, y - ph / 2, ws[i], ph, ph / 2); ctx.fill();
+          ctx.strokeStyle = "rgba(229,156,105,0.55)"; ctx.lineWidth = 2.5; ctx.stroke();
+          ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(xx + 32, y, 7, 0, Math.PI * 2); ctx.fill();
+          ctx.fillStyle = CRM; ctx.textAlign = "left"; ctx.textBaseline = "middle"; font(fs, 800); ctx.fillText(s, xx + 52, y + 2); }
+        xx += ws[i] + 22; }); }
+    ctx.restore();
+  }
+}
+
+/* ---------- real growth analytics: the two Google Ads screenshots, KPI tile highlighted ---------- */
+const ADS = [ // crop of the screenshot (KPI strip + chart), the tile to light up (in crop px), the callout
+  { img: "ads_q2_2025", crop: [50, 236, 1212, 424], tile: [1, 1, 217, 123], t0: 30.45, t1: 31.45, big: 8.43, fmt: (v) => v.toFixed(2) + "×",
+    label: "CONV. VALUE / COST", date: "GOOGLE ADS · 1 APR – 30 JUN 2025" },
+  { img: "ads_mar_2026", crop: [358, 216, 1232, 268], tile: [2, 2, 208, 108], t0: 31.45, t1: 32.45, big: 6406, fmt: (v) => Math.round(v).toLocaleString("en-IN"),
+    label: "CONVERSIONS IN ONE MONTH", date: "GOOGLE ADS · 1 – 31 MAR 2026" },
+];
+function analytics(t) {
+  if (t < 30.45 || t >= 32.45) return;
+  ctx.fillStyle = INK; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createRadialGradient(CX, 1100, 50, CX, 1100, 950); g.addColorStop(0, "rgba(229,156,105,0.14)"); g.addColorStop(1, "rgba(229,156,105,0)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  line(t, { s: "REAL RESULTS", t0: 30.47, t1: 32.36, y: 300, size: 44, w: 800, col: COP, track: 0.4, shadow: false });
+  for (const A of ADS) {
+    if (t < A.t0 || t >= A.t1 + 0.12) continue;
+    const im = IMG[A.img], [sx, sy, sw, sh] = A.crop, cw = 980, s = cw / sw, ch = sh * s;
+    const kin = spring(t, A.t0, 16), kout = eIO(P(t, A.t1 - 0.1, A.t1 + 0.12)), z = 1 + 0.06 * P(t, A.t0, A.t1);
+    const cx = CX - kout * 1100 + (1 - kin) * 900, cy = 1130;
+    ctx.save(); ctx.translate(cx, cy); ctx.scale(z, z);
+    ctx.shadowColor = "rgba(0,0,0,0.6)"; ctx.shadowBlur = 50; ctx.shadowOffsetY = 20; ctx.fillStyle = "#fff";
+    rrect(-cw / 2 - 10, -ch / 2 - 10, cw + 20, ch + 20, 22); ctx.fill(); ctx.shadowColor = "transparent";
+    ctx.save(); rrect(-cw / 2, -ch / 2, cw, ch, 14); ctx.clip(); ctx.drawImage(im, sx, sy, sw, sh, -cw / 2, -ch / 2, cw, ch); ctx.restore();
+    // copper ring around the KPI tile
+    const [tx, ty, tw, th] = A.tile, hk = eOut(P(t, A.t0 + 0.22, A.t0 + 0.45));
+    if (hk > 0) { ctx.strokeStyle = COP; ctx.lineWidth = 8; ctx.globalAlpha = hk; const gr = 10 + 18 * (1 - hk);
+      rrect(-cw / 2 + tx * s - gr, -ch / 2 + ty * s - gr, tw * s + 2 * gr, th * s + 2 * gr, 16); ctx.stroke(); ctx.globalAlpha = 1; }
+    ctx.restore();
+    const a = 1 - kout;
+    line(t, { s: A.fmt(A.big * eOut(P(t, A.t0 + 0.05, A.t0 + 0.6))), t0: A.t0 + 0.05, t1: A.t1 - 0.06, y: 560, size: 230, w: 900, alpha: a, shadow: false });
+    line(t, { s: A.label, t0: A.t0 + 0.15, t1: A.t1 - 0.06, y: 725, size: 46, w: 800, col: COP, track: 0.18, alpha: a, shadow: false });
+    line(t, { s: A.date, t0: A.t0 + 0.25, t1: A.t1 - 0.06, y: 1130 + ch / 2 + 90, size: 32, w: 700, col: "rgba(225,224,204,0.7)", track: 0.14, alpha: a, shadow: false });
+  }
+}
+function outro(t) {
+  if (t < 32.5 || t > 36.35) return;
+  line(t, { s: "WE'RE JUST", t0: 32.62, t1: 34.12, y: 790, size: 76, w: 800, track: 0.12 });
+  line(t, { s: "GETTING", t0: 33.02, t1: 34.12, y: 965, size: 200, w: 900 });
+  line(t, { s: "STARTED.", t0: 33.26, t1: 34.12, y: 1150, size: 200, w: 900, copperTail: 1 });
+  line(t, { s: "COME GROW WITH US", t0: 34.22, t1: 36.20, y: 860, size: 76, w: 800, track: 0.08 });
+  line(t, { s: "@ONELOOP.IN", t0: 35.00, t1: 36.20, y: 1010, size: 170, w: 900, col: COP });
+}
+function endCard(t) {
+  if (t < 36.30) return;
+  ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
+  lockup(CX, 800, 430, t, 36.30, 36.62, P(t, 36.65, 37.15), P(t, 36.95, 37.40));
+  line(t, { s: "oneloop.in", t0: 37.25, y: 1330, size: 60, w: 700, col: COP, track: 0.06, shadow: false });
+}
+
+function subtitles(t) { for (const [t0, t1, s] of SUBS) line(t, { s, t0, t1: t1 - 0.02, y: SUBY, size: 62, w: 800 }); }
+
+window.seek = (t) => {
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, W, H); ctx.globalAlpha = 1; ctx.filter = "none";
+  dimLayer(t); subtitles(t); hook(t); leak(t); path4(t); roles(t); oneTeam(t);
+  brands(t); logoBeat(t); wall(t); analytics(t); outro(t); endCard(t);
+};
+window.ready = (async () => {
+  const f = new FontFace("M", "url(fonts/Montserrat-VF.ttf)", { weight: "100 900" }); await f.load(); document.fonts.add(f);
+  await Promise.all([...PHOTOS, "ads_q2_2025", "ads_mar_2026"].map((n) => new Promise((res, rej) => {
+    const im = new Image(); im.onload = () => { IMG[n] = im; res(); }; im.onerror = rej; im.src = `img/${n}.${n.startsWith("ads") ? "png" : "jpg"}`; })));
+  window.seek(0); return true;
+})();
+</script></body></html>
