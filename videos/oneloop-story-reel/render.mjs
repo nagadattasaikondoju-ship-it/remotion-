@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const EXE = "/opt/pw-browsers/chromium-1194/chrome-linux/chrome";
-const FPS = 60, DUR = 38;
+const FPS = 60, DUR = 34.5;
 const [mode, ...args] = process.argv.slice(2);
 
 async function openPage(browser) {

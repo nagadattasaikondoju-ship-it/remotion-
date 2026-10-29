@@ -6,7 +6,7 @@
 import os, json, subprocess, numpy as np
 from scipy.signal import stft, istft, fftconvolve
 HERE = os.path.dirname(os.path.abspath(__file__)); OUT = os.path.join(HERE, "out")
-SR, DUR = 48000, 38.0
+SR, DUR = 48000, 34.5
 N = int(SR * DUR)
 rng = np.random.default_rng(7)
 db = lambda x: 10 ** (x / 20)
@@ -79,13 +79,6 @@ def riser_metal(d):
 def shimmer():
     x = shaped_noise(0.7, lambda u: 5000 + 5000 * u, lambda u: 2500 + 0 * u, lambda u: np.sin(np.pi * u) ** 2)
     return fade(norm(x), 0.01, 0.05), int(SR * 0.35)
-def pad(d):  # ambient bed: soft A-minor chord + air, slow swell (stands in for music in the no-VO proof beat)
-    t = tt(d); x = np.zeros_like(t)
-    for f, a in ((55, 0.9), (110, 0.7), (164.81, 0.45), (220, 0.35), (261.63, 0.3), (329.63, 0.22)):
-        for det in (-0.6, 0.6): x += a * np.sin(2 * np.pi * (f + det) * t + rng.uniform(0, 6)) * (0.8 + 0.2 * np.sin(2 * np.pi * 0.7 * t + f))
-    air = shaped_noise(d, lambda u: 1800 + 0 * u, lambda u: 1200 + 0 * u, lambda u: 0 * u + 1)
-    x = norm(x) + 0.12 * norm(air); env = np.clip(t / 0.35, 0, 1) * np.clip((d - t) / 0.45, 0, 1)
-    return norm(x * env), 0
 def chime():
     x = np.zeros(int(SR * 1.6)); t = tt(1.4)
     for k, f in enumerate((1046.5, 1318.5, 1568.0)):
@@ -94,43 +87,34 @@ def chime():
     return fade(verb(norm(x), 1.0, 0.3), 0.001, 0.2), 0
 
 # ---------- cue sheet (video time of the visual event = the sound's hit / peak point) ----------
-FOOT_CUTS = [1.60, 3.20, 3.87, 4.64, 5.55, 6.85, 8.10, 9.50, 11.60, 12.75, 14.10, 15.75, 16.75, 17.40, 20.55, 21.30, 22.00, 23.30, 34.10]
+# Plain cuts, so no transition whooshes; sound only on what moves or pops on screen, all of it under the VO.
 CUES = []  # (family, time, design, level dBFS peak, pan −1…1 or None for auto-sweep, note)
-for i, c in enumerate(FOOT_CUTS):
-    CUES.append(("whooshes", c, ("whoosh", 0.42, 0.6, 400, 4200), -24, None, "short whoosh on the xfade, peak on the cut"))
-for c, note in [(18.62, "footage dissolves into the logo"), (19.55, "logo punches out into the team"), (24.98, "circle reveal into the photo pile"),
-                (28.44, "client wall pushes up"), (30.45, "analytics push in from the right"), (31.45, "second screenshot slides in"),
-                (32.32, "analytics slide up off the footage"), (36.30, "into the end card")]:
-    CUES.append(("whooshes", c, ("whoosh", 0.7, 0.62, 200, 3200), -16, None, note))
 CUES.append(("whooshes", 11.20, ("whoosh", 0.3, 0.5, 900, 6000), -20, None, "copper strike across TRAFFIC PROBLEM"))
+CUES.append(("whooshes", 18.75, ("whoosh", 0.5, 0.6, 300, 3500), -19, None, "copper line traces the figure-eight"))
 TEX = [(0.21, "pop", -15, "WE MADE"), (1.97, "pop", -14, "IN 2 MONTHS"), (10.79, "pop", -15, "TRAFFIC"), (10.99, "pop", -15, "PROBLEM"),
        (11.83, "pop", -15, "THEY HAVE"), (12.40, "droplet", -15, "the copper full stop drips"),
        (13.63, "scifi_click", -14, "AUDIT."), (15.83, "scifi_click", -14, "BUILD."), (16.85, "scifi_click", -14, "MARKET."), (17.77, "scifi_click", -14, "AUTOMATE."),
+       (17.28, "scifi_impact", -15, "8.43× tile ringed (Google Ads Q2 2025)"),
        (19.81, "ui_click", -15, "01 DEVELOPERS"), (20.59, "ui_click", -15, "02 DESIGNERS"), (21.43, "ui_click", -15, "03 MARKETERS"), (22.39, "ui_click", -15, "04 AI BUILDERS"),
        (23.45, "pop", -14, "ONE TEAM."), (24.23, "pop", -14, "ONE LOOP."), (25.71, "pop", -15, "BRANDS"),
        (26.47, "pop", -16, "HYDERABAD chip"), (27.35, "pop", -16, "DUBAI chip"), (27.89, "pop", -16, "AUSTRALIA chip"),
-       (28.62, "pop", -12, "SUCCESSFUL CLIENTS"), (29.55, "shimmer", -18, "copper light sweep over the wall"),
-       (30.67, "scifi_impact", -11, "8.43 tile lights up"), (31.67, "scifi_impact", -12, "6,406 tile lights up"),
-       (32.62, "pop", -15, "WE'RE JUST"), (33.02, "pop", -14, "GETTING"), (33.26, "pop", -14, "STARTED."), (34.22, "pop", -15, "COME GROW WITH US"),
-       (35.00, "scifi_impact", -13, "@ONELOOP.IN"), (36.62, "chime", -13, "logo snaps on the end card (success reward)")]
+       (28.75, "scifi_impact", -14, "6,406 tile ringed (Google Ads March 2026)"),
+       (28.97, "pop", -16, "WE'RE JUST"), (29.37, "pop", -15, "GETTING STARTED."), (30.57, "pop", -15, "COME GROW WITH US"),
+       (31.69, "scifi_impact", -14, "@ONELOOP.IN"), (33.05, "chime", -13, "logo snaps on the end card (success reward)")]
 for t0, d, lv, note in TEX: CUES.append(("textures", t0, (d,), lv, 0.0, note))
-for j in range(8): CUES.append(("textures", 24.85 + j * 0.45 + 0.06, ("camera_click",), -17, 0.0, f"photo card {j + 1} lands"))
-for t0 in sorted({round(28.62 + k * 0.055, 3) for k in range(9)}): CUES.append(("textures", t0, ("ui_click",), -19, 0.0, "logo cards pop (one per diagonal)"))
-for a, b, n_, note in [(1.05, 1.75, 12, "₹95,000 counter"), (24.75, 25.45, 10, "25+ counter"), (28.45, 29.05, 10, "21+ counter"),
-                        (30.50, 31.05, 9, "8.43× counter"), (31.50, 32.05, 9, "6,406 counter")]:
+for i in range(24): CUES.append(("textures", 24.92 + i * 0.095, ("ui_click",), -20, 0.0, "client logo pops (one per tile)"))
+for a, b, n_, note in [(1.05, 1.75, 12, "₹95,000 counter"), (24.75, 25.45, 10, "25+ counter"), (16.98, 17.58, 9, "8.43× counter"), (28.45, 29.05, 9, "6,406 counter")]:
     for k in range(n_): CUES.append(("textures", a + (b - a) * (1 - (1 - k / n_) ** 2), ("tick",), -24, 0.0, note))
-RIS = [(9.85, 12.15, "riser_bass", -13, "sharp bass riser into A LEAK"), (17.80, 18.93, "riser_metal", -14, "metallic riser into the logo snap"),
-       (27.00, 28.45, "riser_bass", -12, "sharp bass riser into the client wall"), (35.25, 36.62, "riser_metal", -14, "metallic riser into the end card")]
+RIS = [(9.85, 12.15, "riser_bass", -13, "sharp bass riser into A LEAK"), (17.85, 18.93, "riser_metal", -15, "metallic riser into the logo snap"),
+       (23.50, 24.75, "riser_bass", -14, "sharp bass riser into 25+ brands"), (31.90, 33.05, "riser_metal", -14, "metallic riser into the end card")]
 for a, b, d, lv, note in RIS: CUES.append(("risers", b, (d, b - a), lv, 0.0, note))
-for t0, lv, note in [(1.05, -9, "₹95,000 lands (hook impact)"), (12.15, -10, "A LEAK"), (18.93, -9, "the X snaps into the logo"),
-                     (28.45, -8, "client wall lands"), (36.62, -10, "end-card logo")]:
+for t0, lv, note in [(1.05, -9, "₹95,000 lands (hook impact)"), (12.15, -10, "A LEAK"), (18.93, -12, "the X snaps into the logo"),
+                     (24.75, -12, "25+ brands"), (33.05, -11, "end-card logo")]:
     CUES.append(("hits", t0, ("hit",), lv, 0.0, note))
 
-if not os.environ.get("MUSIC"):
-    CUES.append(("beds", 28.20, ("pad", 4.45), -13, 0.0, "ambient bed under the no-VO proof beat (replaced by the music bed)"))
-DESIGNS = dict(pad=pad, whoosh=whoosh, pop=pop, tick=tick, ui_click=ui_click, scifi_click=scifi_click, camera_click=camera_click, droplet=droplet,
+DESIGNS = dict(whoosh=whoosh, pop=pop, tick=tick, ui_click=ui_click, scifi_click=scifi_click, camera_click=camera_click, droplet=droplet,
                scifi_impact=scifi_impact, hit=hit, riser_bass=riser_bass, riser_metal=riser_metal, shimmer=shimmer, chime=chime)
-FAM = ["beds", "whooshes", "textures", "risers", "hits"]
+FAM = ["whooshes", "textures", "risers", "hits"]
 stems = {f: np.zeros((N, 2)) for f in FAM}
 cache = {}
 for fam, t0, spec, lv, pan, note in CUES:
@@ -147,7 +131,7 @@ def read(path, ch):
     return np.frombuffer(raw, np.float32).reshape(-1, ch).astype(np.float64)
 vo = read(os.path.join(OUT, "vo_raw.wav"), 1)[:N, 0]; vo = np.pad(vo, (0, N - len(vo)))
 stems["vo"] = np.stack([vo, vo], 1) * db(-3)  # mono VO, equal-power centre
-# music bed: ~16 dB under the voice, ducked a further 6 dB while the VO talks, lifted in the no-VO proof beat (28.45–32.45)
+# music bed: ~16 dB under the voice, ducked a further 6 dB while the VO talks
 music = os.environ.get("MUSIC")
 if music:
     m = read(music, 2)[int(float(os.environ.get("MUSIC_IN", "0")) * SR):][:N]; m = np.pad(m, ((0, N - len(m)), (0, 0)))
@@ -157,7 +141,7 @@ if music:
     k = np.exp(-1 / (SR * 0.25)); duck = np.zeros(N); s = 0.0
     for i in range(0, N, 480):  # 10 ms control rate: fast attack, 250 ms release
         tgt = 1.0 if env[i:i + 480].any() else 0.0; s = tgt if tgt > s else s * k ** 480; duck[i:i + 480] = s
-    gain = g0 * db(-6 * duck) * (1 + (db(6) - 1) * np.clip(np.minimum((np.arange(N) / SR - 28.3) / 0.3, (32.6 - np.arange(N) / SR) / 0.3), 0, 1))
+    gain = g0 * db(-6 * duck)
     gain *= np.clip((DUR - np.arange(N) / SR) / 1.2, 0, 1) * np.clip(np.arange(N) / SR / 0.15, 0, 1)
     stems["music"] = m * gain[:, None]
 mix = sum(stems.values())
