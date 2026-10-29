@@ -1,6 +1,6 @@
 # Build the footage track (base.mp4, 1080×1920, 60 fps, no audio) from the screenplay's shot list.
 # Every shot: source in-point, its slot on the timeline, optional rotation, then fill-crop to 9:16, light HD sharpen, shared grade.
-# Graphics-only slots (logo, client logo wall, end card) are black here; overlay.html draws them.
+# The one graphics-only slot (client logo wall) is black here; overlay.html draws it.
 import os, subprocess
 HERE = os.path.dirname(os.path.abspath(__file__))
 UP = "/root/.claude/uploads/b8e0fea9-ddb3-5f50-9983-de131f1aa53e"
@@ -8,7 +8,7 @@ DR = os.environ.get("DRIVE", "/tmp/claude-0/-home-user-remotion-/b8e0fea9-ddb3-5
 BR = os.path.join(HERE, "..", "oneloop-day-brolls", "out")
 SRC = {
     "scrum": (f"{BR}/BROLL_06_scrum_meet.mp4", ""), "testing": (f"{BR}/BROLL_09_testing_what_we_built_DRAFT-small-artifacts.mp4", ""),
-    "gate": (f"{BR}/BROLL_02_gate_open.mp4", ""), "door": (f"{BR}/BROLL_03_door_open.mp4", ""),
+    "arrive": (f"{BR}/BROLL_04_checking_in_DRAFT-small-artifacts.mp4", ""),
     "emails": (f"{BR}/BROLL_05_checking_emails.mp4", ""), "coding": (f"{BR}/BROLL_07_heads_down_coding.mp4", ""),
     "bugcheck": (f"{BR}/BROLL_08_bro_check_this_bug.mp4", ""),
     "m0424": (f"{DR}/MVI_0424.mp4", "transpose=2,"), "m0425": (f"{DR}/MVI_0425.mp4", "transpose=2,"),
@@ -16,23 +16,29 @@ SRC = {
     "m0440": (f"{DR}/MVI_0440.mp4", "transpose=2,"),
     "bts": (f"{UP}/7863d88a-IMG_0075_2.MOV", ""),                       # rotation flag → ffmpeg auto-rotates upright
     "night": (f"{DR}/brand/softcore_20min_edit.mp4", "eq=gamma=1.35:saturation=1.2,"), "olreel": (f"{DR}/brand/one_loop_reel_2.mp4", ""),
-    "trufit": (f"{DR}/brand/be_tru_fit_3.mp4", ""), "futuro": (f"{DR}/brand/IMG_1121.mp4", ""),
 }
 # (timeline start, timeline end, source key, source in-point, source duration) — source dur ≠ slot dur → speed change.
 # Video time = VO time − 1.05 s throughout (one continuous VO, no gap). Plain cuts.
-SHOTS = [
-    (0.00, 1.60, "testing", 0.40, 1.60), (1.60, 3.20, "scrum", 0.00, 1.30),
-    (3.20, 3.87, "gate", 0.00, 0.666), (3.87, 4.64, "door", 0.00, 0.766),
-    (4.64, 5.55, "night", 3.55, 0.91), (5.55, 6.85, "m0432", 4.20, 1.30),
-    (6.85, 8.10, "bts", 1.00, 1.25), (8.10, 9.50, "bts", 3.00, 1.40),
-    (9.50, 11.60, "m0425", 4.20, 2.10), (11.60, 12.75, "olreel", 21.00, 1.70),
-    (12.75, 14.10, "m0424", 1.00, 1.35), (14.10, 15.75, "emails", 0.00, 1.65),
-    (15.75, 16.75, "coding", 0.00, 1.00), (16.75, 17.40, "bts", 0.00, 0.65),
-    (17.40, 18.55, "m0431", 1.00, 1.15), (18.55, 19.70, None, 0, 0),
-    (19.70, 20.55, "m0440", 5.00, 0.85), (20.55, 21.30, "trufit", 12.65, 0.75),
-    (21.30, 22.00, "futuro", 0.00, 0.70), (22.00, 23.30, "m0424", 4.00, 1.30),
-    (23.30, 24.75, "bugcheck", 0.30, 1.45), (24.75, 28.45, None, 0, 0),
-    (28.45, 30.50, "m0440", 1.70, 2.05), (30.50, 32.75, "bts", 10.20, 1.62), (32.75, 34.50, None, 0, 0),
+SHOTS = [  # one shot per spoken line where possible, 1–2.6 s each, each picked to show what the line says
+    (0.00, 1.60, "testing", 0.40, 1.60),    # "We made ₹95,000…": the team testing what they built
+    (1.60, 3.31, "scrum", 0.00, 1.31),      # "…in two months": whiteboard scrum
+    (3.31, 4.70, "arrive", 0.00, 1.39),     # "A few friends in Hyderabad": two of them arriving at the office
+    (4.70, 5.70, "night", 3.55, 0.91),      # "Late nights": the city at night
+    (5.70, 6.95, "m0432", 4.60, 1.25),      # "Back-to-back calls": on a call
+    (6.95, 8.20, "bts", 0.20, 1.25),        # "Building for brands…": the shoot crew
+    (8.20, 9.55, "bts", 3.00, 1.35),        # "…that had never heard of us": shooting for a brand
+    (9.55, 11.75, "m0425", 4.20, 2.20),     # "Most brands don't have a traffic problem": thinking at the laptop
+    (11.75, 12.80, "olreel", 21.00, 1.55),  # "They have a leak": the notification pile
+    (12.80, 14.15, "m0424", 1.00, 1.35),    # "So we start with an audit": opening the laptop
+    (14.15, 15.80, "emails", 0.00, 1.65),   # "find what's holding them back"
+    (15.80, 16.85, "coding", 0.00, 1.05),   # "build the fix"
+    (16.85, 19.75, "m0431", 1.00, 2.90),    # "market it and automate" (8.43× proof) → "That's OneLoop" (logo over the shot)
+    (19.75, 21.40, "m0440", 5.00, 1.65),    # "Developers, designers"
+    (21.40, 23.40, "m0424", 4.00, 2.00),    # "marketers and AI builders"
+    (23.40, 24.75, "bugcheck", 0.30, 1.35), # "One team, one loop"
+    (24.75, 28.45, None, 0, 0),             # 21+ brands: the client logo wall (overlay, full frame)
+    (28.45, 30.50, "m0440", 1.70, 2.05),    # "We're just getting started" (6,406 proof)
+    (30.50, 34.50, "bts", 10.20, 3.00),     # "Come grow with us" → end card over the shot
 ]
 FPS, DUR = 60, 34.5
 SEG = os.path.join(HERE, "out", "seg"); os.makedirs(SEG, exist_ok=True)

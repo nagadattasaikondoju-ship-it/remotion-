@@ -14,27 +14,32 @@ node render.mjs stills 1.4 12.6 …            # single overlay frames for check
 ```
 
 ## Screenplay (video time = VO time − 1.05 s; word times from Whisper)
+One shot per line, matched to what is said; plain cuts; no black frames before the end.
 | Time | Picture | On screen |
 |---|---|---|
-| 0.0–3.2 | testing what we built → scrum | **WE MADE / ₹95,000** (counts up on "95,000") **/ IN 2 MONTHS** |
-| 3.2–9.5 | gate, door, night city, calls, BTS shoot | subtitles: a few friends in Hyderabad, late nights, back-to-back calls, building for brands… |
-| 9.5–12.75 | MVI_0425 → One Loop reel notification stack | **TRAFFIC PROBLEM** (struck in copper) → **THEY HAVE / A LEAK.** (the copper full stop drips) |
-| 12.75–16.85 | MVI_0424, emails, coding | **AUDIT. BUILD.** builds on each word |
-| 16.85–18.55 | BTS, MVI_0431 | "market it": the stack moves up (**MARKET. AUTOMATE.**) and the proof lands below: **8.43× RETURN ON AD SPEND**, Google Ads Apr–Jun 2025, tile ringed |
-| 18.55–19.70 | black | "That's one loop": the copper line traces the figure-eight and snaps into the traced logo |
-| 19.70–23.30 | MVI_0440, TruFit, FuturoWorks reel, MVI_0424 | **01–04: DEVELOPERS / DESIGNERS / MARKETERS / AI BUILDERS** |
-| 23.30–24.75 | bug check | **ONE TEAM. ONE LOOP.** |
-| 24.75–28.45 | client logo wall | "25-plus brands": **25+ BRANDS**, 24 client tiles pop one by one, then chips **HYDERABAD · DUBAI · AUSTRALIA** on the words |
-| 28.45–30.50 | MVI_0440 | "we're just getting started": **6,406 CONVERSIONS IN ONE MONTH**, Google Ads March 2026, tile ringed |
-| 30.50–32.75 | BTS camera operator | **COME GROW WITH US / @ONELOOP.IN** |
-| 32.75–34.50 | black | logo lockup + oneloop.in |
+| 0.0–3.3 | team testing what they built → whiteboard scrum | **WE MADE / ₹95,000 / IN 2 MONTHS** (count-up, one deep impact) |
+| 3.3–4.7 | two of them arriving at the office | "A few friends in Hyderabad" |
+| 4.7–5.7 | the city at night | "late nights" |
+| 5.7–6.95 | on a phone call (MVI_0432) | "back-to-back calls" |
+| 6.95–9.55 | the shoot crew, shooting for a brand | "building for brands that had never heard of us" |
+| 9.55–12.8 | thinking at the laptop → notification pile | **TRAFFIC PROBLEM** struck → **THEY HAVE / A LEAK.** (copper drip) |
+| 12.8–16.85 | opening the laptop, emails, coding | **AUDIT.** "find what's holding them back" **BUILD.** |
+| 16.85–18.55 | over-the-shoulder at the laptop | **MARKET. AUTOMATE.** + **8.43× RETURN ON AD SPEND** (Google Ads, Apr–Jun 2025) |
+| 18.55–19.75 | same shot, darkened | "That's OneLoop": the copper line snaps into the logo |
+| 19.75–23.4 | headphones at the laptop, typing | "Developers, designers, / marketers and AI builders." |
+| 23.4–24.75 | bug check | **ONE TEAM. ONE LOOP.** |
+| 24.75–28.45 | logo wall | **21+ BRANDS**, the 15 client logos pop in one by one |
+| 28.45–30.5 | headphones outdoors | **WE'RE JUST GETTING STARTED.** + **6,406 CONVERSIONS IN ONE MONTH** (Google Ads, March 2026) |
+| 30.5–34.5 | camera operator on set | **COME GROW WITH US / @ONELOOP.IN** → logo lockup over the shot |
 
 ## Notes
 - Cuts: plain cuts throughout (the user found transitions on every cut cheap).
-- Sound: `sfx.py` places synthesised SFX on the cue sheet: pops, clicks and ticks on captions, logo tiles and counters; impacts on the two results; four risers with hits; a chime on the end card. There are no transition whooshes and no silent stretches. The Ultimate Editors library isn't in the repo, so these are a stand-in; swap per cue. Mix normalised to −14 LUFS, voice on top.
+- Voice: the WhatsApp voice note (AAC 128 kbps, cut at ~15 kHz, gated) goes through a repair chain in `assemble.sh`: warmth, de-box, presence, air, harmonic exciter, de-ess, 3:1 compression, plus a −62 dBFS room-tone bed under the gate holes. A proper re-record (lav or USB mic, sent as a file) will still sound clearly better.
+- Sound: six SFX only (`sfx.py`, cue sheet in `out/CUES.md`), all low and warm, 12–18 dB under the voice: hook impact, 8.43× lift, riser and hit into the logo, swell into the logo wall, 6,406 lift, end-card sting. Synthesised, because the Ultimate Editors library isn't in the repo yet.
 - Music: the user chose "Memory Reboot" (VØJ & Narvent). Pass a licensed copy with `MUSIC=`.
-- Client logos: radaar, bikersgear, bamboospa, lnsports, cellbay (from the user); amrplanet, antiqueloft, bikerswear, ctrlx, hydsmiles, lfe, rmc, studlyf, sushma, nirvaha (from each client's own website). Name tiles for clients without a logo yet.
+- Client logos (only real logos, no name tiles): radaar, bikersgear, bamboospa, lnsports, cellbay (from the user); amrplanet, antiqueloft, bikerswear, ctrlx, hydsmiles, lfe, rmc, studlyf, sushma, nirvaha (from each client's own website).
 - Excluded footage:
   - Mahesh Babu film footage (les_x_bob): copyrighted.
   - Futuro Works SaaS animation: excluded by the user.
   - Day B-rolls 01 and 10: burned-in captions.
+  - Client ads (TruFit, FuturoWorks) as filler under the team line: read as random.

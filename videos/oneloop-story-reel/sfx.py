@@ -1,4 +1,4 @@
-# Sound pass for the story reel: synthesised SFX on the cue sheet below + VO (+ optional music bed) → out/mix_raw.wav,
+# Sound pass for the story reel: six synthesised SFX on the cue sheet below + VO (+ optional music bed) → out/mix_raw.wav,
 # with one stem per family in out/stems/ (whooshes, textures, risers, hits, vo, music) for a manual finish in the mixer.
 # The Ultimate Editors library isn't in the repo yet, so every SFX here is synthesised (fallback; swap per cue later).
 #   python3 sfx.py                    → VO + SFX
@@ -28,92 +28,49 @@ def fade(x, a=0.002, b=0.01):
     if nb: x[-nb:] *= np.linspace(1, 0, nb)
     return x
 
-# ---------- sound designs (each returns (mono signal, sample index of its hit / peak)) ----------
-def whoosh(d=0.55, peak=0.62, lo=250, hi=3800):
-    env = lambda u: np.where(u < peak, (u / peak) ** 2.2, np.exp(-(u - peak) / (1 - peak) * 4))
-    fc = lambda u: lo + (hi - lo) * np.where(u < peak, (u / peak) ** 1.6, 1 - 0.55 * (u - peak) / (1 - peak))
-    x = shaped_noise(d, fc, lambda u: 0.35 * fc(u) + 150, env)
-    return fade(norm(x), 0.005, 0.03), int(SR * d * peak)
-def pop():
-    t = tt(0.09); f = 380 + 700 * np.exp(-t / 0.012); x = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.028)
-    x[:96] += rng.standard_normal(96) * 0.5 * np.linspace(1, 0, 96)
-    return fade(norm(x)), 0
-def tick(f=3600):
-    t = tt(0.03); x = np.sin(2 * np.pi * f * t) * np.exp(-t / 0.004); return fade(norm(x), 0.0005), 0
-def ui_click():
-    t = tt(0.05); x = np.sin(2 * np.pi * 2300 * t) * np.exp(-t / 0.007) + 0.6 * np.sin(2 * np.pi * 1150 * t) * np.exp(-t / 0.012)
-    x[:144] += rng.standard_normal(144) * 0.6 * np.linspace(1, 0, 144); return fade(norm(x), 0.0005), 0
-def scifi_click():
-    t = tt(0.12); f = 900 + 1800 * (1 - np.exp(-t / 0.02)); ph = 2 * np.pi * np.cumsum(f) / SR
-    x = np.sign(np.sin(ph)) * 0.35 * np.exp(-t / 0.02) + np.sin(ph * 1.5) * np.sin(2 * np.pi * 70 * t) * np.exp(-t / 0.04)
-    return fade(verb(norm(x), 0.4, 0.18)), 0
-def camera_click():
-    x = np.zeros(int(SR * 0.16))
-    for o, a in ((0, 1.0), (0.055, 0.7)):
-        i = int(SR * o); b = rng.standard_normal(240) * np.exp(-np.arange(240) / 50) * a; x[i:i + 240] += b
-        t = tt(0.025); x[i:i + len(t)] += 0.5 * a * np.sin(2 * np.pi * 160 * t) * np.exp(-t / 0.006)
-    x = np.diff(x, prepend=0) * 0.6 + x * 0.4; return fade(norm(x), 0.0002), 0
-def droplet():
-    t = tt(0.14); f = 650 + 1500 * (1 - np.exp(-t / 0.025)); x = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.035)
-    return fade(verb(norm(x), 0.5, 0.25)), 0
-def scifi_impact():
-    t = tt(1.0); body = np.sin(2 * np.pi * np.cumsum(40 + 60 * np.exp(-t / 0.05)) / SR) * np.exp(-t / 0.22)
-    metal = sum(np.sin(2 * np.pi * f * t + i) * np.exp(-t / dd) for i, (f, dd) in enumerate([(523, 0.35), (1371, 0.25), (2207, 0.18), (3301, 0.12)])) * 0.25
-    crack = shaped_noise(1.0, lambda u: 2500 + 0 * u, lambda u: 2000 + 0 * u, lambda u: np.exp(-u * 40))
-    return fade(verb(norm(body + metal + 0.5 * norm(crack)), 0.9, 0.25), 0.0005, 0.1), 0
-def hit():
-    t = tt(1.6); boom = np.sin(2 * np.pi * np.cumsum(30 + 85 * np.exp(-t / 0.06)) / SR) * np.exp(-t / 0.45)
-    crack = shaped_noise(1.6, lambda u: 900 + 0 * u, lambda u: 1400 + 0 * u, lambda u: np.exp(-u * 30))
-    return fade(verb(norm(boom + 0.35 * norm(crack)), 1.2, 0.2), 0.0005, 0.2), 0
-def riser_bass(d):
-    t = tt(d); u = t / d; f = 42 * (180 / 42) ** (u ** 1.4); ph = 2 * np.pi * np.cumsum(f) / SR
-    tone = (np.sin(ph) + 0.4 * np.sin(2 * ph) + 0.2 * np.sin(3 * ph)) * u ** 2.2
-    air = shaped_noise(d, lambda u: 400 + 5000 * u ** 1.8, lambda u: 300 + 1500 * u, lambda u: u ** 3)
-    x = norm(tone) + 0.45 * norm(air); return fade(norm(x), 0.05, 0.004), len(x)
-def riser_metal(d):
-    t = tt(d); u = t / d; base = 220 * 4 ** (u ** 1.5); x = np.zeros_like(t)
-    for r, a in ((1, 1), (2.76, 0.6), (5.4, 0.4), (8.93, 0.25)): x += a * np.sin(2 * np.pi * np.cumsum(base * r) / SR)
-    x *= (0.6 + 0.4 * np.sin(2 * np.pi * np.cumsum(4 + 26 * u ** 2) / SR)) * u ** 2.5
-    shim = shaped_noise(d, lambda u: 6000 + 3000 * u, lambda u: 1800 + 0 * u, lambda u: u ** 3)
-    return fade(norm(verb(norm(x) + 0.3 * norm(shim), 0.6, 0.15)), 0.05, 0.004), len(t)
-def shimmer():
-    x = shaped_noise(0.7, lambda u: 5000 + 5000 * u, lambda u: 2500 + 0 * u, lambda u: np.sin(np.pi * u) ** 2)
-    return fade(norm(x), 0.01, 0.05), int(SR * 0.35)
-def chime():
-    x = np.zeros(int(SR * 1.6)); t = tt(1.4)
-    for k, f in enumerate((1046.5, 1318.5, 1568.0)):
-        s = sum(a * np.sin(2 * np.pi * f * r * t) * np.exp(-t / dd) for r, a, dd in ((1, 1, 0.6), (2.0, 0.35, 0.3), (3.0, 0.15, 0.15)))
-        i = int(SR * 0.07 * k); x[i:i + len(t)] += s
-    return fade(verb(norm(x), 1.0, 0.3), 0.001, 0.2), 0
+# ---------- minimal set: warm, low, no high-frequency clicks (they read as cheap next to a voice) ----------
+def impact(weight=1.0):
+    """deep cinematic impact: soft-attack sub drop + low body thump + a short dark room"""
+    t = tt(1.8); sub = np.sin(2 * np.pi * np.cumsum(36 + 30 * np.exp(-t / 0.08)) / SR) * np.exp(-t / (0.55 * weight))
+    body = shaped_noise(1.8, lambda u: 160 + 0 * u, lambda u: 90 + 0 * u, lambda u: np.exp(-u * 1.8 / 0.07))
+    x = norm(sub) + 0.35 * norm(body); x[: int(SR * 0.004)] *= np.linspace(0, 1, int(SR * 0.004))
+    return fade(verb(norm(x), 1.4, 0.18), 0.0005, 0.3), 0
+def soft_impact():
+    """subtle proof hit: short airy lift into a light low thump"""
+    lift = shaped_noise(0.30, lambda u: 700 + 1500 * u, lambda u: 500 + 0 * u, lambda u: u ** 3) * 0.25
+    t = tt(0.9); thump = np.sin(2 * np.pi * np.cumsum(55 + 40 * np.exp(-t / 0.04)) / SR) * np.exp(-t / 0.18)
+    x = np.concatenate([lift, np.zeros(len(thump))]); x[len(lift):] += norm(thump)
+    return fade(verb(norm(x), 0.8, 0.15), 0.01, 0.2), len(lift)
+def swell(d=0.9):
+    """reverse-style swell that ends on its hit point"""
+    x = shaped_noise(d, lambda u: 250 + 1400 * u ** 2, lambda u: 200 + 600 * u, lambda u: u ** 2.5)
+    t = tt(d); x = norm(x) + 0.3 * np.sin(2 * np.pi * 55 * t) * (t / d) ** 3
+    return fade(norm(x), 0.05, 0.01), len(t)
+def soft_riser(d):
+    x = shaped_noise(d, lambda u: 300 + 3500 * u ** 1.6, lambda u: 250 + 900 * u, lambda u: u ** 2.8)
+    t = tt(d); x = norm(x) + 0.35 * np.sin(2 * np.pi * np.cumsum(50 + 70 * (t / d) ** 2) / SR) * (t / d) ** 2
+    return fade(norm(x), 0.08, 0.01), len(t)
+def sting():
+    """end-card sting: warm low hit + a soft major chord that blooms and decays"""
+    t = tt(2.2); x = np.zeros_like(t)
+    for f, a in ((130.81, 0.8), (196.0, 0.6), (261.63, 0.5), (329.63, 0.35), (392.0, 0.3), (587.33, 0.18)):
+        x += a * (np.sin(2 * np.pi * f * t) + 0.3 * np.sin(4 * np.pi * f * t)) * np.exp(-t / 0.9) * (1 - np.exp(-t / 0.015))
+    h, _ = impact(0.7); n = min(len(h), len(x)); x[:n] += 1.2 * norm(h[:n]) * np.max(np.abs(x))
+    return fade(verb(norm(x), 1.6, 0.3), 0.001, 0.4), 0
 
-# ---------- cue sheet (video time of the visual event = the sound's hit / peak point) ----------
-# Plain cuts, so no transition whooshes; sound only on what moves or pops on screen, all of it under the VO.
-CUES = []  # (family, time, design, level dBFS peak, pan −1…1 or None for auto-sweep, note)
-CUES.append(("whooshes", 11.20, ("whoosh", 0.3, 0.5, 900, 6000), -20, None, "copper strike across TRAFFIC PROBLEM"))
-CUES.append(("whooshes", 18.75, ("whoosh", 0.5, 0.6, 300, 3500), -19, None, "copper line traces the figure-eight"))
-TEX = [(0.21, "pop", -15, "WE MADE"), (1.97, "pop", -14, "IN 2 MONTHS"), (10.79, "pop", -15, "TRAFFIC"), (10.99, "pop", -15, "PROBLEM"),
-       (11.83, "pop", -15, "THEY HAVE"), (12.40, "droplet", -15, "the copper full stop drips"),
-       (13.63, "scifi_click", -14, "AUDIT."), (15.83, "scifi_click", -14, "BUILD."), (16.85, "scifi_click", -14, "MARKET."), (17.77, "scifi_click", -14, "AUTOMATE."),
-       (17.28, "scifi_impact", -15, "8.43× tile ringed (Google Ads Q2 2025)"),
-       (19.81, "ui_click", -15, "01 DEVELOPERS"), (20.59, "ui_click", -15, "02 DESIGNERS"), (21.43, "ui_click", -15, "03 MARKETERS"), (22.39, "ui_click", -15, "04 AI BUILDERS"),
-       (23.45, "pop", -14, "ONE TEAM."), (24.23, "pop", -14, "ONE LOOP."), (25.71, "pop", -15, "BRANDS"),
-       (26.47, "pop", -16, "HYDERABAD chip"), (27.35, "pop", -16, "DUBAI chip"), (27.89, "pop", -16, "AUSTRALIA chip"),
-       (28.75, "scifi_impact", -14, "6,406 tile ringed (Google Ads March 2026)"),
-       (28.97, "pop", -16, "WE'RE JUST"), (29.37, "pop", -15, "GETTING STARTED."), (30.57, "pop", -15, "COME GROW WITH US"),
-       (31.69, "scifi_impact", -14, "@ONELOOP.IN"), (33.05, "chime", -13, "logo snaps on the end card (success reward)")]
-for t0, d, lv, note in TEX: CUES.append(("textures", t0, (d,), lv, 0.0, note))
-for i in range(24): CUES.append(("textures", 24.92 + i * 0.095, ("ui_click",), -20, 0.0, "client logo pops (one per tile)"))
-for a, b, n_, note in [(1.05, 1.75, 12, "₹95,000 counter"), (24.75, 25.45, 10, "25+ counter"), (16.98, 17.58, 9, "8.43× counter"), (28.45, 29.05, 9, "6,406 counter")]:
-    for k in range(n_): CUES.append(("textures", a + (b - a) * (1 - (1 - k / n_) ** 2), ("tick",), -24, 0.0, note))
-RIS = [(9.85, 12.15, "riser_bass", -13, "sharp bass riser into A LEAK"), (17.85, 18.93, "riser_metal", -15, "metallic riser into the logo snap"),
-       (23.50, 24.75, "riser_bass", -14, "sharp bass riser into 25+ brands"), (31.90, 33.05, "riser_metal", -14, "metallic riser into the end card")]
-for a, b, d, lv, note in RIS: CUES.append(("risers", b, (d, b - a), lv, 0.0, note))
-for t0, lv, note in [(1.05, -9, "₹95,000 lands (hook impact)"), (12.15, -10, "A LEAK"), (18.93, -12, "the X snaps into the logo"),
-                     (24.75, -12, "25+ brands"), (33.05, -11, "end-card logo")]:
-    CUES.append(("hits", t0, ("hit",), lv, 0.0, note))
+# ---------- cue sheet (video time of the visual event = the sound's hit point) ----------
+# Six sounds in the whole reel, each on a moment that matters; the voice carries everything else (music when supplied).
+CUES = [  # (family, time, design, level dBFS peak, pan, note)
+    ("hits", 1.05, ("impact",), -11, 0.0, "₹95,000 lands (hook impact)"),
+    ("textures", 17.00, ("soft_impact",), -17, 0.0, "8.43× return on ad spend appears"),
+    ("risers", 18.93, ("soft_riser", 0.9), -19, 0.0, "soft riser into the logo snap"),
+    ("hits", 18.93, ("soft_impact",), -15, 0.0, "the X snaps into the One Loop logo"),
+    ("whooshes", 24.75, ("swell", 0.9), -18, 0.0, "swell into 21+ brands / logo wall"),
+    ("textures", 28.47, ("soft_impact",), -17, 0.0, "6,406 conversions appears"),
+    ("hits", 33.05, ("sting",), -14, 0.0, "end-card logo sting"),
+]
 
-DESIGNS = dict(whoosh=whoosh, pop=pop, tick=tick, ui_click=ui_click, scifi_click=scifi_click, camera_click=camera_click, droplet=droplet,
-               scifi_impact=scifi_impact, hit=hit, riser_bass=riser_bass, riser_metal=riser_metal, shimmer=shimmer, chime=chime)
+DESIGNS = dict(impact=impact, soft_impact=soft_impact, swell=swell, soft_riser=soft_riser, sting=sting)
 FAM = ["whooshes", "textures", "risers", "hits"]
 stems = {f: np.zeros((N, 2)) for f in FAM}
 cache = {}
