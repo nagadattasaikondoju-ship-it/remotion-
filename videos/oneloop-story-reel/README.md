@@ -6,7 +6,8 @@ The user's script, voiced in the WhatsApp VO and cut over One Loop's own footage
 ```
 PYTHONPATH=/tmp/pyimg python3 build_base.py   # footage track → out/base.mp4 (needs the Drive B-rolls, see DRIVE in the script)
 node render.mjs full 4                       # captions + graphics → out/ov/f_NNNNN.png (transparent, 2,280 frames)
-./assemble.sh                                # VO mix + composite → out/OneLoop_Story_1080x1920_60fps_{MASTER,share}.mp4
+./assemble.sh                                # VO + SFX mix + composite → out/OneLoop_Story_1080x1920_60fps_{MASTER,share}.mp4
+MUSIC=track.mp3 MUSIC_IN=0 ./assemble.sh     # same, plus a music bed ducked under the VO (stems in out/stems, cue sheet in out/CUES.md)
 node render.mjs stills 1.4 12.6 …            # single overlay frames for checking
 ```
 
@@ -21,14 +22,16 @@ node render.mjs stills 1.4 12.6 …            # single overlay frames for check
 | 19.70–23.30 | MVI_0440, TruFit, FuturoWorks reel, MVI_0424 | **01–04: DEVELOPERS / DESIGNERS / MARKETERS / AI BUILDERS** |
 | 23.30–24.85 | bug check | **ONE TEAM. ONE LOOP.** |
 | 24.85–28.45 | portfolio shoots as a card pile | **25+ BRANDS**, chips HYDERABAD · DUBAI · AUSTRALIA |
-| 28.45–30.45 | (no VO) | client wall: the 24 verified names from the client portfolio |
+| 28.45–30.45 | (no VO) | **21+ SUCCESSFUL CLIENTS**: 4×6 wall, 15 real logos (5 from the user, 10 from the clients' own websites) + name tiles; pushes up over the photo pile |
 | 30.45–32.45 | (no VO) | Google Ads: 8.43 conv. value/cost (Q2 2025), 6,406 conversions (Mar 2026) |
 | 32.45–36.30 | MVI_0440, BTS camera operator | **WE'RE JUST GETTING STARTED.** → **COME GROW WITH US / @ONELOOP.IN** |
 | 36.30–38.00 | black | logo lockup + oneloop.in |
 
 ## Notes
-- Audio is the VO only (no music bed, per the One Loop brief), cleaned and normalised to −14 LUFS. No SFX: the Ultimate Editors library isn't in the repo yet.
-- The client wall uses names, not logos; swap in logo files when available.
+- Transitions: every footage cut is a 0.24 s xfade centred on the cut (smooth slide / zoom / blur); the graphics sections push in and out over moving footage.
+- Sound: `sfx.py` places synthesised SFX on the cue sheet (whooshes on every transition, pops/clicks/ticks on captions, cards and counters, four risers with hits, a chime on the end card) plus an ambient bed under the no-VO beat. The Ultimate Editors library isn't in the repo, so these are a stand-in; swap per cue. Mix normalised to −14 LUFS, voice on top.
+- Music: the user chose "Memory Reboot" (VØJ & Narvent). Pass a licensed copy with `MUSIC=`; it replaces the ambient bed.
+- Client logos: radaar, bikersgear, bamboospa, lnsports, cellbay (from the user); amrplanet, antiqueloft, bikerswear, ctrlx, hydsmiles, lfe, rmc, studlyf, sushma, nirvaha (from each client's own website). Name tiles for clients without a logo yet.
 - Excluded footage:
   - Mahesh Babu film footage (les_x_bob): copyrighted.
   - Futuro Works SaaS animation: excluded by the user.

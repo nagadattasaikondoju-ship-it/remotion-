@@ -164,10 +164,10 @@ function path4(t) { // AUDIT. BUILD. MARKET. AUTOMATE. — the growth path, curr
     line(t, { s, t0, t1: 18.45, y: 600 + i * 175, size: 170, w: 900, copperTail: 1, alpha: lit, maxw: 900 }); });
 }
 function logoBeat(t) { // "That's one loop." — the copper line draws the figure-eight and snaps into the logo
-  if (t < 18.55 || t >= 19.70) return;
-  ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
-  const a = 1 - P(t, 19.58, 19.70); ctx.save(); ctx.globalAlpha = a;
-  const S = 400 * lerp(0.94, 1, eOut(P(t, 18.55, 19.7)));
+  if (t < 18.48 || t >= 19.70) return;
+  const bg = P(t, 18.48, 18.66) * (1 - P(t, 19.50, 19.70)); ctx.fillStyle = `rgba(0,0,0,${bg})`; ctx.fillRect(0, 0, W, H);
+  const ex = eIO(P(t, 19.42, 19.66)), a = 1 - ex; ctx.save(); ctx.globalAlpha = a;
+  const S = 400 * lerp(0.94, 1, eOut(P(t, 18.55, 19.4))) * (1 + 0.5 * ex);
   lockup(CX, 860, S, t, 18.55, 18.93, P(t, 18.95, 19.45), P(t, 19.15, 19.55)); ctx.restore();
 }
 function roles(t) { // Developers / designers / marketers / AI builders
@@ -196,11 +196,16 @@ function cover(img, x, y, w, h, z = 1, fx = 0.5, fy = 0.5) {
   ctx.drawImage(img, x + (w - iw) * fx, y + (h - ih) * fy, iw, ih);
 }
 function rrect(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+// section pushes between the full-screen graphics: photo pile ↑ wall, wall ← analytics, analytics ↑ off the footage
+const KW = (t) => eIO(P(t, 28.30, 28.58)), KA = (t) => eIO(P(t, 30.32, 30.58)), KE = (t) => eIO(P(t, 32.20, 32.45));
 function brands(t) {
-  if (t < 24.75 || t >= 28.45) return;
+  if (t < 24.75 || t >= 28.58) return;
+  ctx.save(); ctx.translate(0, -H * KW(t));
   const T0 = 24.85, D = 0.45, i = clamp(Math.floor((t - T0) / D), 0, PHOTOS.length - 1);
   if (t >= T0) {
     const img = IMG[PHOTOS[i]];
+    ctx.save(); const rv = eIO(P(t, T0, T0 + 0.3)); // circle reveal out of the bug-check shot
+    if (rv < 1) { ctx.beginPath(); ctx.arc(CX, 1020, 1150 * rv, 0, Math.PI * 2); ctx.clip(); }
     ctx.save(); ctx.filter = "blur(36px) brightness(0.42) saturate(1.2)"; cover(img, -80, -80, W + 160, H + 160, 1.05); ctx.restore();
     // last three cards: each flies in from below with a turn, lands on the pile slightly rotated
     for (let j = Math.max(0, i - 2); j <= i; j++) {
@@ -213,6 +218,7 @@ function brands(t) {
       ctx.save(); rrect(-cw / 2, -ch / 2, cw, ch, 12); ctx.clip(); ctx.drawImage(im, -cw / 2, -ch / 2, cw, ch); ctx.restore();
       ctx.restore();
     }
+    ctx.restore();
   }
   const n = Math.round(25 * eOut(P(t, 24.75, 25.45)));
   line(t, { s: `${n}+`, t0: 24.75, t1: 28.33, y: 330, size: 250, w: 900 });
@@ -227,52 +233,78 @@ function brands(t) {
       ctx.strokeStyle = COP; ctx.lineWidth = 3; ctx.stroke(); ctx.fillStyle = WHT; font(fs, 800); ctx.letterSpacing = `${0.12 * fs}px`;
       ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(s, -ws[i] / 2 + pad, 2); ctx.restore(); }
     x += ws[i] + gap; });
+  ctx.restore();
 }
 
-/* ---------- client wall (no VO): the 24 verified names from the client portfolio, scrolling ---------- */
-const CLIENTS = ["DSL Virtue Mall", "AMR Planet Mall", "Next Galleria Mall", "Hyderabad Smiles", "Khan Saab", "Mirame Cafe",
-  "Amyra Cafe & Kitchen", "Radaar Bar & Kitchen", "Dr Sushma Dental", "RMC Plumbing · AU", "Bamboo Spa · NZ", "Bikers Wear Australia",
-  "Bikers Gear UK", "Stellar Reserve", "Nirvaha", "The Diamond Store", "Studlyf", "LN Sports Arena", "The Antique Loft",
-  "Learn French Enligne", "CtrlX Studios", "Cellbay", "FuturoWorks", "Sania Job Bowl"];
-function wall(t) {
-  if (t < 28.45 || t >= 30.45) return;
-  ctx.fillStyle = INK; ctx.fillRect(0, 0, W, H);
-  const g = ctx.createRadialGradient(CX, 980, 50, CX, 980, 900); g.addColorStop(0, "rgba(229,156,105,0.16)"); g.addColorStop(1, "rgba(229,156,105,0)");
-  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  line(t, { s: "TRUSTED BY", t0: 28.48, t1: 30.36, y: 300, size: 44, w: 800, col: COP, track: 0.4, shadow: false });
-  line(t, { s: "OUR CLIENTS", t0: 28.55, t1: 30.36, y: 400, size: 120, w: 900, shadow: false });
-  const fs = 40, ph = 92, out = 1 - P(t, 30.33, 30.45);
-  for (let r = 0; r < 6; r++) {
-    const names = CLIENTS.slice(r * 4, r * 4 + 4), y = 640 + r * 172, dir = r % 2 ? 1 : -1, k = eOut(P(t, 28.6 + r * 0.06, 28.95 + r * 0.06));
-    if (k <= 0) continue;
-    font(fs, 800); ctx.letterSpacing = "0px";
-    const ws = names.map((s) => ctx.measureText(s).width + 76), rowW = ws.reduce((a, b) => a + b + 22, 0);
-    let x = (dir < 0 ? 40 : -rowW + 1040) + dir * (t - 28.45) * 150 + (1 - k) * 300 * -dir;
-    ctx.save(); ctx.globalAlpha = k * out;
-    for (let rep = -1; rep <= 1; rep++) { let xx = x + rep * rowW;
-      names.forEach((s, i) => { if (xx + ws[i] > -20 && xx < W + 20) {
-          ctx.fillStyle = "#171513"; rrect(xx, y - ph / 2, ws[i], ph, ph / 2); ctx.fill();
-          ctx.strokeStyle = "rgba(229,156,105,0.55)"; ctx.lineWidth = 2.5; ctx.stroke();
-          ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(xx + 32, y, 7, 0, Math.PI * 2); ctx.fill();
-          ctx.fillStyle = CRM; ctx.textAlign = "left"; ctx.textBaseline = "middle"; font(fs, 800); ctx.fillText(s, xx + 52, y + 2); }
-        xx += ws[i] + 22; }); }
-    ctx.restore();
+/* ---------- client wall (no VO): 21+ successful clients — real logos (yours + the clients' own websites), names where no logo ---------- */
+const TILES = [ // logo key → img/clients/<key>.png on a card of the logo's own ground; or a name tile
+  { k: "radaar", bg: "#F8ECD7" }, { k: "amrplanet", bg: "#FFFFFF" }, { n: "DSL Virtue Mall" }, { k: "bikersgear", bg: "#000000" },
+  { k: "lnsports", bg: "#FFFFFF" }, { n: "Next Galleria Mall" }, { k: "nirvaha", bg: "#FAF7F2" }, { k: "cellbay", bg: "#FFFFFF" },
+  { n: "Khan Saab" }, { k: "bamboospa", bg: "#FFFFFF" }, { k: "hydsmiles", bg: "#FFFFFF" }, { n: "Mirame Cafe" },
+  { k: "antiqueloft", bg: "#1E1A18" }, { k: "sushma", bg: "#FFFFFF" }, { n: "Stellar Reserve" }, { k: "ctrlx", bg: "#000000", l: "CtrlX Studios", lc: "#E1E0CC" },
+  { n: "The Diamond Store" }, { k: "lfe", bg: "#FFFFFF" }, { k: "bikerswear", bg: "#FFFFFF" }, { n: "Amyra Cafe & Kitchen" },
+  { k: "rmc", bg: "#FFFFFF", l: "RMC Plumbing · AU" }, { n: "FuturoWorks" }, { k: "studlyf", bg: "#FFFFFF", l: "Studlyf" }, { n: "Sania Job Bowl" },
+];
+const LOGOS = TILES.filter((x) => x.k).map((x) => x.k);
+function wrapLines(str, size, maxw) {
+  font(size, 800); ctx.letterSpacing = "0px"; const out = []; let cur = "";
+  for (const w of str.split(" ")) { const nx = cur ? cur + " " + w : w; if (ctx.measureText(nx).width > maxw && cur) { out.push(cur); cur = w; } else cur = nx; }
+  out.push(cur); return out;
+}
+function tile(T, x, y, w, h) {
+  if (T.k) {
+    ctx.fillStyle = T.bg; rrect(x, y, w, h, 18); ctx.fill();
+    const im = IMG["c_" + T.k], lab = T.l ? 30 : 0, pw = w - 30, ph = h - 26 - lab, s = Math.min(pw / im.width, ph / im.height);
+    const iw = im.width * s, ih = im.height * s; ctx.drawImage(im, x + (w - iw) / 2, y + 13 + (ph - ih) / 2, iw, ih);
+    if (lab) { font(21, 800); ctx.letterSpacing = "0px"; ctx.fillStyle = T.lc || "#2A2A2A"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillText(T.l, x + w / 2, y + h - 22); }
+  } else {
+    ctx.fillStyle = "#171513"; rrect(x, y, w, h, 18); ctx.fill(); ctx.strokeStyle = "rgba(229,156,105,0.7)"; ctx.lineWidth = 2.5; ctx.stroke();
+    let size = 31, L = wrapLines(T.n, size, w - 34); while (L.length > 2) { size -= 2; L = wrapLines(T.n, size, w - 34); }
+    ctx.fillStyle = CRM; ctx.textAlign = "center"; ctx.textBaseline = "middle"; font(size, 800);
+    L.forEach((ln, i) => ctx.fillText(ln, x + w / 2, y + h / 2 + (i - (L.length - 1) / 2) * size * 1.15 + 2));
   }
+}
+function wall(t) {
+  if (t < 28.30 || t >= 30.58) return;
+  ctx.save(); ctx.translate(-W * KA(t), H * (1 - KW(t)));
+  ctx.fillStyle = INK; ctx.fillRect(0, 0, W, H);
+  const g = ctx.createRadialGradient(CX, 1000, 50, CX, 1000, 950); g.addColorStop(0, "rgba(229,156,105,0.18)"); g.addColorStop(1, "rgba(229,156,105,0)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const n = Math.round(21 * eOut(P(t, 28.45, 29.05)));
+  line(t, { s: `${n}+`, t0: 28.45, t1: 30.9, y: 300, size: 210, w: 900, shadow: false });
+  line(t, { s: "SUCCESSFUL CLIENTS", t0: 28.62, t1: 30.9, y: 450, size: 52, w: 800, col: COP, track: 0.22, shadow: false });
+  // 4 × 6 grid; cards pop in on a diagonal wave, the whole wall drifts in slowly
+  const cw = 222, chh = 150, gx = (W - 120 - 4 * cw) / 3, gy = 24, y0 = 575, z = 1 + 0.035 * P(t, 28.5, 30.6);
+  ctx.save(); ctx.translate(CX, 1060); ctx.scale(z, z); ctx.translate(-CX, -1060);
+  TILES.forEach((T, i) => {
+    const c = i % 4, r = Math.floor(i / 4), t0 = 28.62 + (r + c) * 0.055, k = pop(t, t0); if (k <= 0) return;
+    const x = 60 + c * (cw + gx), y = y0 + r * (chh + gy);
+    ctx.save(); ctx.globalAlpha = clamp((t - t0) / 0.06); ctx.translate(x + cw / 2, y + chh / 2); ctx.scale(0.5 + 0.5 * k, 0.5 + 0.5 * k);
+    ctx.shadowColor = "rgba(0,0,0,0.5)"; ctx.shadowBlur = 24; ctx.shadowOffsetY = 8; tile(T, -cw / 2, -chh / 2, cw, chh); ctx.restore();
+  });
+  // copper light sweep across the wall once it is full
+  const sw = P(t, 29.55, 30.15);
+  if (sw > 0 && sw < 1) { const sx = lerp(-400, W + 400, eIO(sw)); const lg = ctx.createLinearGradient(sx - 160, 0, sx + 160, 0);
+    lg.addColorStop(0, "rgba(255,220,190,0)"); lg.addColorStop(0.5, "rgba(255,220,190,0.22)"); lg.addColorStop(1, "rgba(255,220,190,0)");
+    ctx.globalCompositeOperation = "lighter"; ctx.fillStyle = lg; ctx.fillRect(0, y0 - 20, W, 6 * (chh + gy) + 20); ctx.globalCompositeOperation = "source-over"; }
+  ctx.restore(); ctx.restore();
 }
 
 /* ---------- real growth analytics: the two Google Ads screenshots, KPI tile highlighted ---------- */
 const ADS = [ // crop of the screenshot (KPI strip + chart), the tile to light up (in crop px), the callout
   { img: "ads_q2_2025", crop: [50, 236, 1212, 424], tile: [1, 1, 217, 123], t0: 30.45, t1: 31.45, big: 8.43, fmt: (v) => v.toFixed(2) + "×",
     label: "CONV. VALUE / COST", date: "GOOGLE ADS · 1 APR – 30 JUN 2025" },
-  { img: "ads_mar_2026", crop: [358, 216, 1232, 268], tile: [2, 2, 208, 108], t0: 31.45, t1: 32.45, big: 6406, fmt: (v) => Math.round(v).toLocaleString("en-IN"),
+  { img: "ads_mar_2026", crop: [358, 216, 1232, 268], tile: [2, 2, 208, 108], t0: 31.45, t1: 32.8, big: 6406, fmt: (v) => Math.round(v).toLocaleString("en-IN"),
     label: "CONVERSIONS IN ONE MONTH", date: "GOOGLE ADS · 1 – 31 MAR 2026" },
 ];
 function analytics(t) {
-  if (t < 30.45 || t >= 32.45) return;
+  if (t < 30.32 || t >= 32.45) return;
+  ctx.save(); ctx.translate(W * (1 - KA(t)), -H * KE(t));
   ctx.fillStyle = INK; ctx.fillRect(0, 0, W, H);
   const g = ctx.createRadialGradient(CX, 1100, 50, CX, 1100, 950); g.addColorStop(0, "rgba(229,156,105,0.14)"); g.addColorStop(1, "rgba(229,156,105,0)");
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  line(t, { s: "REAL RESULTS", t0: 30.47, t1: 32.36, y: 300, size: 44, w: 800, col: COP, track: 0.4, shadow: false });
+  line(t, { s: "REAL RESULTS", t0: 30.47, t1: 32.9, y: 300, size: 44, w: 800, col: COP, track: 0.4, shadow: false });
   for (const A of ADS) {
     if (t < A.t0 || t >= A.t1 + 0.12) continue;
     const im = IMG[A.img], [sx, sy, sw, sh] = A.crop, cw = 980, s = cw / sw, ch = sh * s;
@@ -292,6 +324,7 @@ function analytics(t) {
     line(t, { s: A.label, t0: A.t0 + 0.15, t1: A.t1 - 0.06, y: 725, size: 46, w: 800, col: COP, track: 0.18, alpha: a, shadow: false });
     line(t, { s: A.date, t0: A.t0 + 0.25, t1: A.t1 - 0.06, y: 1130 + ch / 2 + 90, size: 32, w: 700, col: "rgba(225,224,204,0.7)", track: 0.14, alpha: a, shadow: false });
   }
+  ctx.restore();
 }
 function outro(t) {
   if (t < 32.5 || t > 36.35) return;
@@ -302,9 +335,9 @@ function outro(t) {
   line(t, { s: "@ONELOOP.IN", t0: 35.00, t1: 36.20, y: 1010, size: 170, w: 900, col: COP });
 }
 function endCard(t) {
-  if (t < 36.30) return;
-  ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
-  lockup(CX, 800, 430, t, 36.30, 36.62, P(t, 36.65, 37.15), P(t, 36.95, 37.40));
+  if (t < 36.22) return;
+  ctx.fillStyle = `rgba(0,0,0,${P(t, 36.22, 36.40)})`; ctx.fillRect(0, 0, W, H);
+  lockup(CX, 800, 430, t, 36.32, 36.62, P(t, 36.65, 37.15), P(t, 36.95, 37.40));
   line(t, { s: "oneloop.in", t0: 37.25, y: 1330, size: 60, w: 700, col: COP, track: 0.06, shadow: false });
 }
 
@@ -317,8 +350,9 @@ window.seek = (t) => {
 };
 window.ready = (async () => {
   const f = new FontFace("M", "url(fonts/Montserrat-VF.ttf)", { weight: "100 900" }); await f.load(); document.fonts.add(f);
-  await Promise.all([...PHOTOS, "ads_q2_2025", "ads_mar_2026"].map((n) => new Promise((res, rej) => {
-    const im = new Image(); im.onload = () => { IMG[n] = im; res(); }; im.onerror = rej; im.src = `img/${n}.${n.startsWith("ads") ? "png" : "jpg"}`; })));
+  const load = (key, src) => new Promise((res, rej) => { const im = new Image(); im.onload = () => { IMG[key] = im; res(); }; im.onerror = rej; im.src = src; });
+  await Promise.all([...PHOTOS.map((n) => load(n, `img/${n}.jpg`)), load("ads_q2_2025", "img/ads_q2_2025.png"), load("ads_mar_2026", "img/ads_mar_2026.png"),
+    ...LOGOS.map((k) => load("c_" + k, `img/clients/${k}.png`))]);
   window.seek(0); return true;
 })();
 </script></body></html>
