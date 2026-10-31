@@ -13,3 +13,5 @@ __pycache__/
 
 # SFX tooling checkout (bash tools/setup_sfx.sh)
 tools/earshot/
+# Lemo-Opuscar style library (fetched by .claude/skills/lemo-opuscar/scripts/setup.sh)
+tools/lemo-opuscar/

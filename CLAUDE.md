@@ -20,6 +20,11 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
 - Project briefs override the house standard for that project (e.g. One Loop: no music bed, dialogue dominant).
 - Ultimate Editors SFX library: not yet available in this repo. Ask for its Drive folder before a sound pass.
   Synthesised SFX are a fallback only, and the user must be told when they're used.
+- Lemo-Opuscar (github.com/lemomo-ai/lemo-opuscar, MIT; films and styles CC BY 4.0): skill `lemo-opuscar` with 66 code-made film styles.
+  - Keep the library in the repo: `LEMO_OPUSCAR_HOME=/home/user/remotion-/tools/lemo-opuscar sh .claude/skills/lemo-opuscar/scripts/setup.sh` (gitignored, re-fetch per container).
+  - Render packages (`setup.sh deps`) aren't installed yet; ask the user before running them.
+  - Use the preinstalled browser with `PLAYWRIGHT_CHROME=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`, not a new download. Its ffmpeg check wants 7+; this container has 6.1.
+  - Its sound still goes through the sound pipeline below.
 - **Sound pipeline for EVERY video (user's standing rule):**
   1. Openverse API (`tools/openverse_sfx.py`): search and fetch real recorded SFX (CC0).
   2. Real SFX skill (`real-sfx`): analyse the video and place the sounds on the timeline.
