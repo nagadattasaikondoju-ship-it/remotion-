@@ -22,8 +22,11 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
   Synthesised SFX are a fallback only, and the user must be told when they're used.
 - Lemo-Opuscar (github.com/lemomo-ai/lemo-opuscar, MIT; films and styles CC BY 4.0): skill `lemo-opuscar` with 66 code-made film styles.
   - Keep the library in the repo: `LEMO_OPUSCAR_HOME=/home/user/remotion-/tools/lemo-opuscar sh .claude/skills/lemo-opuscar/scripts/setup.sh` (gitignored, re-fetch per container).
-  - Render packages (`setup.sh deps`) aren't installed yet; ask the user before running them.
-  - Use the preinstalled browser with `PLAYWRIGHT_CHROME=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`, not a new download. Its ffmpeg check wants 7+; this container has 6.1.
+  - The user approved its render packages (Oct 2026). In a fresh container, `cd tools/lemo-opuscar`, then run `npm install` and create `.venv` with python3.12 from `requirements.txt`.
+    Skip `setup.sh deps`: it downloads a second browser.
+  - Use the preinstalled browser with `PLAYWRIGHT_CHROME=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`. A test render of swiss-motion works.
+  - Fonts aren't in the library: download each film's OFL fonts from github.com/google/fonts into its `fonts/` folder.
+  - WebGL is software-rendered here, so 3D styles render slowly. Its ffmpeg check wants 7+; this container has 6.1.
   - Its sound still goes through the sound pipeline below.
 - **Sound pipeline for EVERY video (user's standing rule):**
   1. Openverse API (`tools/openverse_sfx.py`): search and fetch real recorded SFX (CC0).
