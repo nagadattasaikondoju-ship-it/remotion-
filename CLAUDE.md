@@ -28,6 +28,17 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
   - Fonts aren't in the library: download each film's OFL fonts from github.com/google/fonts into its `fonts/` folder.
   - WebGL is software-rendered here, so 3D styles render slowly. Its ffmpeg check wants 7+; this container has 6.1.
   - Its sound still goes through the sound pipeline below.
+- Imported motion and editing skills (Oct 2026): 119 skills from 30 repos.
+  - `tools/skill-repos.json` lists each skill's source repo and licence. `python3 tools/install_skill_repos.py` re-installs them all at pinned commits.
+  - Unlicensed repos (krusemediallc, tenfoldmarc, iart generative-illustration) are git-ignored: used locally, not re-published.
+  - Reference-only clones (After Effects MCP and aftr need the user's desktop After Effects; Claude-Editor) live in `tools/skill-repos/`.
+  - Routing when skills overlap: this repo's house rules and playbooks win.
+    - Talking-head reels: `branded-ad-edit`, `reel-recut`, `tenfold-video-edit`; QA with `video-qa`.
+    - Charts and stats: `chart-animation`, `animated-chart`.
+    - Captions: `caption-animation`, `embedded-captions`.
+    - Remotion: `remotion-best-practices` (router). Brand system: `brand-intake`, `brand-motion-guidelines`.
+    - Critique: `motion-design-critique`.
+  - Sound always goes through the pipeline below, not `km-sound-design` or `dsk-elevenlabs`. ElevenLabs, Arcads, RunPod and Ideogram need paid API keys; ask first.
 - **Sound pipeline for EVERY video (user's standing rule):**
   1. Openverse API (`tools/openverse_sfx.py`): search and fetch real recorded SFX (CC0).
   2. Real SFX skill (`real-sfx`): analyse the video and place the sounds on the timeline.
