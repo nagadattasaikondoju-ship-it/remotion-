@@ -20,6 +20,12 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
 - Project briefs override the house standard for that project (e.g. One Loop: no music bed, dialogue dominant).
 - Ultimate Editors SFX library: not yet available in this repo. Ask for its Drive folder before a sound pass.
   Synthesised SFX are a fallback only, and the user must be told when they're used.
+- **Sound pipeline for EVERY video (user's standing rule):**
+  1. Openverse API (`tools/openverse_sfx.py`): search and fetch real recorded SFX (CC0).
+  2. Real SFX skill (`real-sfx`): analyse the video and place the sounds on the timeline.
+  3. Earshot (`earshot` / `real-sound`): analyse the placed sounds, generate and refine any missing ones, and QA the mix.
+
+  The output is a professionally sound-designed video. Don't hand-synthesise SFX outside this pipeline.
 - Real-recording SFX tools (installed Oct 2026):
   - Skills: `real-sfx` (Clipwing: places real sounds on frames), `real-sound` and `earshot` (earshot: measures sounds the agent can't hear).
   - Library: `assets/sfx/openverse/`, CC0 sounds from Openverse/Freesound. Per-file source and licence are in `credits.json`.

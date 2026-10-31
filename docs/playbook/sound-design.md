@@ -17,8 +17,18 @@ Rules below are the user's standard for every edit in this repo. Where a project
 7. Diegetic first. If the thing on screen makes a real sound, use that sound and name its source.
 8. Whoosh peak on the fastest frame of the movement.
 
+## Pipeline (every video, in this order)
+1. **Openverse API:** search and fetch real sound effects (`python3 tools/openverse_sfx.py "query" N`, CC0 only).
+   They land in `assets/sfx/openverse/<category>/`, with the source and licence of each file in `credits.json`.
+2. **Real SFX** (`.claude/skills/real-sfx`): analyse the video and place the sounds on the timeline, on the exact frame.
+3. **Earshot** (`.claude/skills/earshot`, `real-sound`): analyse what was placed, generate and refine the missing sounds,
+   and check sync, masking and loudness.
+
+The result is a professionally sound-designed video: a new MP4 plus a separate SFX track.
+
 ## Library (only source unless told otherwise)
-Use the Ultimate Editors SFX library. Don't generate a sound if the library has one.
+Use the Ultimate Editors SFX library once it's connected. Until then use the CC0 Openverse library from the pipeline above.
+Don't generate a sound if a library has one.
 
 Most folders hold 3+ variations. Audition them all, pick one by length, pace and weight, and say which one and why.
 
