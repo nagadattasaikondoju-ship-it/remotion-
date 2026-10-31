@@ -10,3 +10,6 @@ out
 pipeline/models/
 public/media/
 __pycache__/
+
+# SFX tooling checkout (bash tools/setup_sfx.sh)
+tools/earshot/
