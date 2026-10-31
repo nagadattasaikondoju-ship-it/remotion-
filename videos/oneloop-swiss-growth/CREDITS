@@ -1,0 +1,28 @@
+# CREDITS: One Loop, The Growth Path (Swiss Motion Graphics, 30 s)
+
+Brand: One Loop's own logo (traced artwork, logo.js), colours and wording from oneloop.in. Used by One Loop.
+
+## Type
+- Archivo (Omnibus-Type), SIL Open Font License 1.1: fonts/OFL-Archivo.txt (github.com/google/fonts/tree/main/ofl/archivo)
+
+## Music: original score (music/score.py), real instrument samples
+- Drums: "MuldjordKit" by Lars Muldjord (drumgizmo.org), FreePats version, licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+- Samples (CC0): FreePats project (freepats.zenvoid.org), Versilian Community Sample Library (Versilian Studios)
+
+## Sound effects: real recordings (Openverse → Freesound, CC0 1.0, no attribution required; listed anyway)
+- "Rolled paper,slapping 1.wav" by kaonaya, cc0 1.0: https://freesound.org/people/kaonaya/sounds/131337
+- "Rolled paper,slapping 3.wav" by kaonaya, cc0 1.0: https://freesound.org/people/kaonaya/sounds/131344
+- "Rolled paper,slapping 6.wav" by kaonaya, cc0 1.0: https://freesound.org/people/kaonaya/sounds/131334
+- "Typewriter - single key - type 1.wav" by yottasounds, cc0 1.0: https://freesound.org/people/yottasounds/sounds/380138
+- "Typewriter - single key - type 2.wav" by yottasounds, cc0 1.0: https://freesound.org/people/yottasounds/sounds/380137
+- "Typewriter - single key - type 3.wav" by yottasounds, cc0 1.0: https://freesound.org/people/yottasounds/sounds/380136
+- "hi speed electronic whoosh 1.wav" by martian, cc0 1.0: https://freesound.org/people/martian/sounds/19307
+- "Swipe Whoosh" by qubodup, cc0 1.0: https://freesound.org/people/qubodup/sounds/60007
+- "Whoosh #1" by Kinoton, cc0 1.0: https://freesound.org/people/Kinoton/sounds/427823
+- "38 Wood Block 1.aif" by darcyadam, cc0 1.0: https://freesound.org/people/darcyadam/sounds/634276
+- "Wood block hit" by thomasjaunism, cc0 1.0: https://freesound.org/people/thomasjaunism/sounds/218460
+- "wood block" by thomasjaunism, cc0 1.0: https://freesound.org/people/thomasjaunism/sounds/218461
+- Paper slaps: sliced from "rolled paper slapping" recordings (Freesound, CC0 1.0) via the real-sfx skill.
+
+## Sound effects: earshot sound bank (earshot, MIT, github.com/Leonxlnx/earshot), fitted from CC0 recordings
+- fit/land.light/finger_wood, fit/land.light/fingertip_book, fit/tick/domino (assets/sfx/earshot/CREDITS.md)

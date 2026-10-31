@@ -4,6 +4,11 @@
       "name": "main",
       "path": "/home/user/remotion-/assets/sfx/openverse",
       "tier": "main"
+    },
+    {
+      "name": "earshot",
+      "path": "/home/user/remotion-/assets/sfx/earshot",
+      "tier": "extra"
     }
   ],
   "uisfx": {
