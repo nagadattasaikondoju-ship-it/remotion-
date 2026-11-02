@@ -1,11 +1,11 @@
 {
- "count": 52,
+ "count": 62,
  "libraries": [
   {
    "name": "main",
    "path": "/home/user/remotion-/assets/sfx/openverse",
    "tier": "main",
-   "files": 48,
+   "files": 58,
    "catalog": false
   },
   {
@@ -29,7 +29,6 @@
    "peak_db": -1.0,
    "mean_db": -25.9,
    "peak_time": 0.01,
-   "lr_corr": 1.0,
    "attack_ms": 0,
    "decay_ms": 60,
    "centroid": 4579,
@@ -39,6 +38,7 @@
    "flat": 0.185,
    "bumps": 0.0,
    "active_dur": 0.09,
+   "lr_corr": 1.0,
    "words": [
     "punchy",
     "bright",
@@ -61,7 +61,6 @@
    "peak_db": -1.0,
    "mean_db": -25.9,
    "peak_time": 0.01,
-   "lr_corr": 1.0,
    "attack_ms": 0,
    "decay_ms": 60,
    "centroid": 4586,
@@ -71,6 +70,7 @@
    "flat": 0.172,
    "bumps": 0.0,
    "active_dur": 0.09,
+   "lr_corr": 1.0,
    "words": [
     "punchy",
     "bright",
@@ -93,7 +93,6 @@
    "peak_db": -1.0,
    "mean_db": -19.1,
    "peak_time": 0.01,
-   "lr_corr": 1.0,
    "attack_ms": 10,
    "decay_ms": 100,
    "centroid": 74,
@@ -103,6 +102,7 @@
    "flat": 0.007,
    "bumps": 0.0,
    "active_dur": 0.22,
+   "lr_corr": 1.0,
    "words": [
     "punchy",
     "sub",
@@ -127,7 +127,6 @@
    "peak_db": -1.0,
    "mean_db": -21.2,
    "peak_time": 0.01,
-   "lr_corr": 1.0,
    "attack_ms": 10,
    "decay_ms": 70,
    "centroid": 171,
@@ -137,6 +136,7 @@
    "flat": 0.001,
    "bumps": 0.0,
    "active_dur": 0.2,
+   "lr_corr": 1.0,
    "onset_count": 0,
    "words": [
     "punchy",
@@ -322,6 +322,217 @@
   {
    "library": "main",
    "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/soft-pop/popping-candle_da353a.mp3",
+   "folder": "soft-pop",
+   "name": "popping-candle da353a",
+   "role": "ui",
+   "roles": [
+    "ui",
+    "pop"
+   ],
+   "duration": 12.0,
+   "peak_db": -14.0,
+   "mean_db": -32.4,
+   "peak_time": 2.15,
+   "lr_corr": -0.59,
+   "mono_ref": 1,
+   "attack_ms": 2110,
+   "decay_ms": 3780,
+   "centroid": 13,
+   "rolloff": 15,
+   "low": 0.995,
+   "high": 0.0,
+   "flat": 0.104,
+   "bumps": 2.4,
+   "active_dur": 11.84,
+   "words": [
+    "slow-build",
+    "sub",
+    "heavy",
+    "tonal",
+    "bed",
+    "long-tail"
+   ],
+   "id": 9
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/soft-pop/3-popping-pops_fa52a6.mp3",
+   "folder": "soft-pop",
+   "name": "3-popping-pops fa52a6",
+   "role": "ui",
+   "roles": [
+    "ui",
+    "pop"
+   ],
+   "duration": 3.518,
+   "peak_db": -10.3,
+   "mean_db": -39.6,
+   "peak_time": 0.63,
+   "lr_corr": 1.0,
+   "attack_ms": 0,
+   "decay_ms": 80,
+   "centroid": 897,
+   "rolloff": 1015,
+   "low": 0.007,
+   "high": 0.003,
+   "flat": 0.013,
+   "bumps": 3.3,
+   "active_dur": 3.15,
+   "words": [
+    "punchy",
+    "warm",
+    "thin",
+    "tonal",
+    "long"
+   ],
+   "id": 10
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/soft-pop/cracking-a-can-of-red-bull2-wav_97c59c.mp3",
+   "folder": "soft-pop",
+   "name": "cracking-a-can-of-red-bull2-wav 97c59c",
+   "role": "hit",
+   "roles": [
+    "hit",
+    "ui",
+    "pop"
+   ],
+   "duration": 0.618,
+   "peak_db": 0.0,
+   "mean_db": -27.0,
+   "peak_time": 0.53,
+   "lr_corr": 1.0,
+   "attack_ms": 530,
+   "decay_ms": 20,
+   "centroid": 4317,
+   "rolloff": 6250,
+   "low": 0.034,
+   "high": 0.662,
+   "flat": 0.498,
+   "bumps": 3.3,
+   "active_dur": 0.59,
+   "words": [
+    "slow-build",
+    "bright",
+    "thin",
+    "textured",
+    "short",
+    "dry"
+   ],
+   "id": 11
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/soft-pop/soda-can-tlm-05-aiff_9b423a.mp3",
+   "folder": "soft-pop",
+   "name": "soda-can-tlm-05-aiff 9b423a",
+   "role": "ui",
+   "roles": [
+    "ui",
+    "pop"
+   ],
+   "duration": 7.25,
+   "peak_db": -0.1,
+   "mean_db": -40.8,
+   "peak_time": 1.81,
+   "lr_corr": 1.0,
+   "attack_ms": 250,
+   "decay_ms": 30,
+   "centroid": 4249,
+   "rolloff": 6750,
+   "low": 0.001,
+   "high": 0.506,
+   "flat": 0.298,
+   "bumps": 3.3,
+   "active_dur": 5.39,
+   "words": [
+    "swelling",
+    "bright",
+    "thin",
+    "textured",
+    "bed"
+   ],
+   "id": 12
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/soft-pop/brush2-wav_fe72b9.mp3",
+   "folder": "soft-pop",
+   "name": "brush2-wav fe72b9",
+   "role": "ui",
+   "roles": [
+    "ui",
+    "pop"
+   ],
+   "duration": 1.335,
+   "peak_db": -24.5,
+   "mean_db": -39.2,
+   "peak_time": 0.21,
+   "lr_corr": 1.0,
+   "attack_ms": 120,
+   "decay_ms": 900,
+   "centroid": 325,
+   "rolloff": 312,
+   "low": 0.749,
+   "high": 0.017,
+   "flat": 0.184,
+   "bumps": 2.9,
+   "active_dur": 1.34,
+   "onset_count": 3,
+   "words": [
+    "soft-attack",
+    "dark",
+    "heavy",
+    "textured",
+    "medium",
+    "long-tail"
+   ],
+   "id": 13
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/soft-pop/brush-wav_875a45.mp3",
+   "folder": "soft-pop",
+   "name": "brush-wav 875a45",
+   "role": "ui",
+   "roles": [
+    "ui",
+    "pop"
+   ],
+   "duration": 1.602,
+   "peak_db": -23.6,
+   "mean_db": -40.0,
+   "peak_time": 1.31,
+   "lr_corr": 1.0,
+   "attack_ms": 1250,
+   "decay_ms": 290,
+   "centroid": 207,
+   "rolloff": 187,
+   "low": 0.897,
+   "high": 0.01,
+   "flat": 0.15,
+   "bumps": 6.8,
+   "active_dur": 1.6,
+   "onset_count": 6,
+   "words": [
+    "slow-build",
+    "dark",
+    "heavy",
+    "textured",
+    "long"
+   ],
+   "id": 14
+  },
+  {
+   "library": "main",
+   "tier": "main",
    "path": "/home/user/remotion-/assets/sfx/openverse/paper-slap/rolled-paper-slapping-3-wav_db9797.mp3",
    "folder": "paper-slap",
    "name": "rolled-paper-slapping-3-wav db9797",
@@ -351,7 +562,7 @@
     "textured",
     "medium"
    ],
-   "id": 9
+   "id": 15
   },
   {
    "library": "main",
@@ -385,7 +596,7 @@
     "textured",
     "medium"
    ],
-   "id": 10
+   "id": 16
   },
   {
    "library": "main",
@@ -419,7 +630,7 @@
     "short",
     "dry"
    ],
-   "id": 11
+   "id": 17
   },
   {
    "library": "main",
@@ -452,7 +663,7 @@
     "textured",
     "short"
    ],
-   "id": 12
+   "id": 18
   },
   {
    "library": "main",
@@ -485,7 +696,7 @@
     "textured",
     "long"
    ],
-   "id": 13
+   "id": 19
   },
   {
    "library": "main",
@@ -518,7 +729,7 @@
     "textured",
     "medium"
    ],
-   "id": 14
+   "id": 20
   },
   {
    "library": "main",
@@ -551,7 +762,7 @@
     "tonal",
     "short"
    ],
-   "id": 15
+   "id": 21
   },
   {
    "library": "main",
@@ -582,7 +793,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 16
+   "id": 22
   },
   {
    "library": "main",
@@ -613,7 +824,7 @@
     "tonal",
     "short"
    ],
-   "id": 17
+   "id": 23
   },
   {
    "library": "main",
@@ -645,7 +856,7 @@
     "short",
     "dry"
    ],
-   "id": 18
+   "id": 24
   },
   {
    "library": "main",
@@ -680,7 +891,7 @@
     "long",
     "long-tail"
    ],
-   "id": 19
+   "id": 25
   },
   {
    "library": "main",
@@ -715,7 +926,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 20
+   "id": 26
   },
   {
    "library": "main",
@@ -749,7 +960,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 21
+   "id": 27
   },
   {
    "library": "main",
@@ -783,7 +994,7 @@
     "long",
     "long-tail"
    ],
-   "id": 22
+   "id": 28
   },
   {
    "library": "main",
@@ -817,7 +1028,7 @@
     "long",
     "long-tail"
    ],
-   "id": 23
+   "id": 29
   },
   {
    "library": "main",
@@ -853,7 +1064,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 24
+   "id": 30
   },
   {
    "library": "main",
@@ -887,7 +1098,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 25
+   "id": 31
   },
   {
    "library": "main",
@@ -921,7 +1132,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 26
+   "id": 32
   },
   {
    "library": "main",
@@ -955,7 +1166,7 @@
     "noisy",
     "short"
    ],
-   "id": 27
+   "id": 33
   },
   {
    "library": "main",
@@ -990,7 +1201,7 @@
     "noisy",
     "short"
    ],
-   "id": 28
+   "id": 34
   },
   {
    "library": "main",
@@ -1024,7 +1235,7 @@
     "textured",
     "bed"
    ],
-   "id": 29
+   "id": 35
   },
   {
    "library": "main",
@@ -1060,7 +1271,7 @@
     "short",
     "dry"
    ],
-   "id": 30
+   "id": 36
   },
   {
    "library": "main",
@@ -1095,7 +1306,7 @@
     "noisy",
     "short"
    ],
-   "id": 31
+   "id": 37
   },
   {
    "library": "main",
@@ -1130,7 +1341,7 @@
     "textured",
     "short"
    ],
-   "id": 32
+   "id": 38
   },
   {
    "library": "main",
@@ -1164,7 +1375,7 @@
     "textured",
     "bed"
    ],
-   "id": 33
+   "id": 39
   },
   {
    "library": "main",
@@ -1198,7 +1409,7 @@
     "textured",
     "bed"
    ],
-   "id": 34
+   "id": 40
   },
   {
    "library": "main",
@@ -1232,7 +1443,7 @@
     "textured",
     "bed"
    ],
-   "id": 35
+   "id": 41
   },
   {
    "library": "main",
@@ -1266,7 +1477,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 36
+   "id": 42
   },
   {
    "library": "main",
@@ -1298,7 +1509,7 @@
     "tonal",
     "long"
    ],
-   "id": 37
+   "id": 43
   },
   {
    "library": "main",
@@ -1331,7 +1542,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 38
+   "id": 44
   },
   {
    "library": "main",
@@ -1364,7 +1575,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 39
+   "id": 45
   },
   {
    "library": "main",
@@ -1397,7 +1608,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 40
+   "id": 46
   },
   {
    "library": "main",
@@ -1431,7 +1642,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 41
+   "id": 47
   },
   {
    "library": "main",
@@ -1464,7 +1675,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 42
+   "id": 48
   },
   {
    "library": "main",
@@ -1498,7 +1709,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 43
+   "id": 49
   },
   {
    "library": "main",
@@ -1530,7 +1741,7 @@
     "textured",
     "short"
    ],
-   "id": 44
+   "id": 50
   },
   {
    "library": "main",
@@ -1563,7 +1774,7 @@
     "bed",
     "long-tail"
    ],
-   "id": 45
+   "id": 51
   },
   {
    "library": "main",
@@ -1598,7 +1809,7 @@
     "pulsing",
     "dry"
    ],
-   "id": 46
+   "id": 52
   },
   {
    "library": "main",
@@ -1630,7 +1841,7 @@
     "tonal",
     "short"
    ],
-   "id": 47
+   "id": 53
   },
   {
    "library": "main",
@@ -1665,7 +1876,7 @@
     "long",
     "long-tail"
    ],
-   "id": 48
+   "id": 54
   },
   {
    "library": "main",
@@ -1698,7 +1909,7 @@
     "textured",
     "medium"
    ],
-   "id": 49
+   "id": 55
   },
   {
    "library": "main",
@@ -1731,7 +1942,7 @@
     "tonal",
     "short"
    ],
-   "id": 50
+   "id": 56
   },
   {
    "library": "main",
@@ -1765,7 +1976,150 @@
     "long",
     "long-tail"
    ],
-   "id": 51
+   "id": 57
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/chime/loading-chime_b342d7.mp3",
+   "folder": "chime",
+   "name": "loading-chime b342d7",
+   "role": "ui",
+   "roles": [
+    "ui",
+    "chime"
+   ],
+   "duration": 0.15,
+   "peak_db": -8.1,
+   "mean_db": -17.2,
+   "peak_time": 0.03,
+   "lr_corr": 1.0,
+   "attack_ms": 30,
+   "decay_ms": 40,
+   "centroid": 679,
+   "rolloff": 562,
+   "low": 0.0,
+   "high": 0.0,
+   "flat": 0.0,
+   "bumps": 6.7,
+   "active_dur": 0.15,
+   "onset_count": 1,
+   "words": [
+    "punchy",
+    "warm",
+    "thin",
+    "tonal",
+    "short",
+    "dry"
+   ],
+   "id": 58
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/chime/pb-bar-chimes-long_c67874.mp3",
+   "folder": "chime",
+   "name": "pb-bar-chimes-long c67874",
+   "role": "ui",
+   "roles": [
+    "ui",
+    "chime"
+   ],
+   "duration": 15.738,
+   "peak_db": -19.8,
+   "mean_db": -64.1,
+   "peak_time": 1.77,
+   "lr_corr": 0.16,
+   "attack_ms": 1450,
+   "decay_ms": 4390,
+   "centroid": 6034,
+   "rolloff": 7218,
+   "low": 0.001,
+   "high": 0.899,
+   "flat": 0.112,
+   "bumps": 1.0,
+   "active_dur": 13.3,
+   "words": [
+    "slow-build",
+    "airy",
+    "thin",
+    "tonal",
+    "bed",
+    "long-tail"
+   ],
+   "id": 59
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/chime/wind-chime-g-003-wav_435c17.mp3",
+   "folder": "chime",
+   "name": "wind-chime-g-003-wav 435c17",
+   "role": "ui",
+   "roles": [
+    "ui",
+    "ambience",
+    "chime"
+   ],
+   "duration": 3.373,
+   "peak_db": -12.0,
+   "mean_db": -56.9,
+   "peak_time": 0.19,
+   "lr_corr": 1.0,
+   "attack_ms": 180,
+   "decay_ms": 1630,
+   "centroid": 3718,
+   "rolloff": 4218,
+   "low": 0.119,
+   "high": 0.878,
+   "flat": 0.007,
+   "bumps": 3.9,
+   "active_dur": 3.27,
+   "onset_count": 0,
+   "words": [
+    "swelling",
+    "bright",
+    "tonal",
+    "long",
+    "long-tail"
+   ],
+   "id": 60
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/chime/chime-notification_adb6e2.mp3",
+   "folder": "chime",
+   "name": "chime-notification adb6e2",
+   "role": "ui",
+   "roles": [
+    "ui",
+    "chime"
+   ],
+   "duration": 0.324,
+   "peak_db": -4.4,
+   "mean_db": -18.4,
+   "peak_time": 0.03,
+   "lr_corr": 1.0,
+   "attack_ms": 20,
+   "decay_ms": 30,
+   "centroid": 2461,
+   "rolloff": 2468,
+   "low": 0.0,
+   "high": 0.0,
+   "flat": 0.003,
+   "bumps": 6.7,
+   "active_dur": 0.31,
+   "onset_count": 2,
+   "words": [
+    "punchy",
+    "mid",
+    "thin",
+    "tonal",
+    "short",
+    "dry"
+   ],
+   "id": 61
   }
  ]
 }

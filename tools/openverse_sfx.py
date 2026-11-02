@@ -16,9 +16,9 @@ def get(url):
     req = urllib.request.Request(url, headers={"User-Agent": "remotion-sfx-library/1.0"})
     with urllib.request.urlopen(req, timeout=40) as r: return r.read()
 
-def fetch(folder, query, n, licence="cc0"):
+def fetch(folder, query, n, licence="cc0"):  # page_size above 10 currently times out (504) on the anonymous API
     # (Freesound entries carry no category and the API's length filter is unreliable, so duration is checked below)
-    q = urllib.parse.urlencode({"q": query, "license": licence, "page_size": min(20, n * 3)})
+    q = urllib.parse.urlencode({"q": query, "license": licence, "page_size": min(10, n * 3)})
     try: res = json.loads(get(f"{API}?{q}"))["results"]
     except Exception as e:  # anonymous Openverse searches are rate-limited: stop this category, keep what we have
         print(f"{folder:12s} search failed ({e}); run again later to fill it"); return []

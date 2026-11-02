@@ -1,0 +1,9 @@
+[
+ {"t": 3.442, "type": "pop", "g": 0.8, "note": "step 1: name, logo, link and Follow pop in"},
+ {"t": 4.504, "type": "pop", "g": 0.7, "note": "step 2: bio"},
+ {"t": 5.566, "type": "pop", "g": 0.8, "note": "step 3: highlights"},
+ {"t": 6.628, "type": "pop", "g": 0.8, "note": "step 4: grid row 1"},
+ {"t": 7.690, "type": "pop", "g": 0.8, "note": "step 5: grid row 2"},
+ {"t": 8.752, "type": "pop", "g": 0.8, "note": "step 6: grid row 3"},
+ {"t": 8.80, "type": "sparkle", "g": 0.9, "note": "the finished profile glints (jewellery)"}
+]
