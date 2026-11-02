@@ -22,4 +22,5 @@
 - `assemble.sh` gives:
   - MASTER (CRF 8) and share copy, both with the song and SFX;
   - a SFX-only share copy, for posting with Instagram's "Use audio" on the reference reel, which keeps the song licensed.
+- Photo: the user's second Aavarya screenshot (blue Follow button, standard bottom nav), 2 Nov.
 - Aavarya is the user's mock-up. Post it as a concept, not as a client case study.
