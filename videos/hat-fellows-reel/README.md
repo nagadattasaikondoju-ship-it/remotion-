@@ -14,26 +14,27 @@
 - **Pipeline:**
   1. `edl.json`: 16 kept phrases (pauses and fillers cut).
   2. Build `out/base.mov` from the EDL (the ffmpeg trim/concat in the session notes; 12 ms audio fades).
-  3. `tools/grade.py`:
-     - person matte (torchvision DeepLabV3-MobileNetV3);
-     - background softly defocused and dimmed;
-     - alternating punch-ins that hide the jump cuts (1.42–1.50× on the wide hook take);
-     - warm tone curve with a highlight knee, and a vignette.
-     - Needs Pillow on PYTHONPATH (the system PIL is broken for python3.11).
+  3. `tools/grade.py` (v2, after the user's notes on 3 Nov: **no background blur or dimming**, the room stays as shot):
+     - alternating punch-ins that hide the jump cuts (1.42–1.50× on the wide hook take, Lanczos);
+     - a clarity grade read from the footage: the walls' green fluorescent cast neutralised, highlights kept off the clip point,
+       a gentle S-curve, +8 % chroma, light local contrast (CLAHE) and a thresholded unsharp mask for an HD read;
+     - an 8 % edge vignette.
   4. `index.html` + `render.mjs frames`: captions and cards as transparent PNGs. Word times come from Whisper on the cut; captions are verbatim, with the name corrected to "HAT Fellows".
-  5. `music/score.py`: an original lo-fi bed.
-     - 90 BPM, vibraphone / electric bass from VCSL (CC0), drums from MuldjordKit (CC BY 4.0).
-     - Plays under the face only and stops down for every card (house rule).
-     - Sits −19 LU under the voice.
-  6. `assemble.sh`:
-     - voice clean-up;
-     - music level;
-     - Real SFX from `sfx_cues.json` / `sfx_map.json` (Openverse CC0 recordings picked with Earshot);
-     - two-pass loudnorm to −14 LUFS;
-     - outputs: MASTER (CRF 8), share copy, and a voice+SFX version with no music.
-- **QA:**
-  - Real SFX: 16/16 sounds on their frames.
-  - Earshot critique: launch-grade, 22/23 metrics. The one flag is music coverage: the stop-downs under the cards are deliberate.
+  5. Voice: `tools/denoise.py` runs DeepFilterNet3 (speech enhancement) on the whole take before cutting.
+     - Pauses drop from about −57 dB to −80/−88 dB.
+     - Then it's cut on the EDL, with EQ (de-box, presence, air), a de-esser and gentle compression (in `assemble.sh`).
+     - Needs `deepfilternet` + `torchaudio` 2.5.1 on PYTHONPATH, with the model unzipped in `~/.cache/DeepFilterNet/DeepFilterNet3`.
+  6. `music/score.py`: an original lo-fi bed. It's **not in the main version** (the user asked for only the voice plus the transition SFX).
+     - Kept for `_share_with-soft-music.mp4`, 4 dB lower than before.
+  7. `assemble.sh`:
+     - Real SFX from `sfx_cues.json` / `sfx_map.json`: card whooshes (softer), the HAT-reveal impact, stamps, pops, the "live" chime and the end-card glint. The risers were removed.
+     - Two-pass loudnorm to −14 LUFS.
+     - Outputs: MASTER (CRF 8) and share (CRF 15), both voice + SFX; plus `_share_with-soft-music`.
+- **QA (v2):**
+  - Real SFX: 14/14 sounds on their frames.
+  - Voice gaps sit at −68 to −81 dB after noise reduction.
+  - Final −14.5 LUFS.
+  - Earshot's only critical flag is "no music", which is deliberate: the main version is voice + transition SFX, as the user asked.
 - **To confirm before posting:**
   - "Human Accelerator Tank" is the speaker's expansion of HAT; the site doesn't spell it out.
   - "AI credits" is as spoken; the site lists partner product credits.

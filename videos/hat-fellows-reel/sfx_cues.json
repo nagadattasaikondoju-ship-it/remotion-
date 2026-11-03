@@ -1,24 +1,122 @@
 [
- {"t": 9.40, "type": "riser", "len": 2.0, "g": 0.9, "note": "build under 'and that's where I found…', ends on the HAT reveal"},
- {"t": 11.40, "type": "cardwhoosh", "g": 0.8, "note": "cut to the HAT card (reverse whoosh peaks on the cut)"},
- {"t": 11.40, "type": "hit", "g": 0.85, "note": "impact under the letterpress logo — riser + hit = loudest stack"},
- {"t": 12.58, "type": "pop", "g": 0.6, "note": "H-uman"},
- {"t": 12.98, "type": "pop", "g": 0.6, "note": "A-ccelerator"},
- {"t": 13.76, "type": "pop", "g": 0.65, "note": "T-ank"},
- {"t": 20.62, "type": "strike", "g": 0.7, "note": "marker strikes through 'meeting people'"},
- {"t": 20.96, "type": "cardwhoosh", "g": 0.75, "note": "cut to the CXO card"},
- {"t": 21.60, "type": "stamp", "g": 0.7, "note": "CXOs"},
- {"t": 22.72, "type": "stamp", "g": 0.7, "note": "CFOs"},
- {"t": 23.54, "type": "stamp", "g": 0.75, "note": "CMOs"},
- {"t": 24.20, "type": "riser", "len": 2.0, "g": 0.85, "note": "build into Early Access"},
- {"t": 26.20, "type": "cardwhoosh", "g": 0.8, "note": "cut to Early Access"},
- {"t": 28.02, "type": "live", "g": 0.8, "note": "'is live now.' — notification chime"},
- {"t": 31.08, "type": "pop", "g": 0.6, "note": "'LINK' keyword"},
- {"t": 33.90, "type": "cardwhoosh", "g": 0.75, "note": "cut to the selection card"},
- {"t": 34.80, "type": "pop", "g": 0.6, "note": "tick draws"},
- {"t": 35.64, "type": "stamp", "g": 0.85, "note": "'shortlisted.' stamp"},
- {"t": 40.82, "type": "pop", "g": 0.65, "note": "'drop a comment.' keyword"},
- {"t": 42.62, "type": "cardwhoosh", "g": 0.75, "note": "cut to the end card"},
- {"t": 42.66, "type": "sparkle", "g": 0.75, "note": "logo lands on the end card (conclusion)"},
- {"t": 43.32, "type": "pop", "g": 0.65, "note": "'Comment LINK' button"}
+ {
+  "t": 11.4,
+  "type": "cardwhoosh",
+  "g": 0.6,
+  "note": "cut to the HAT card (reverse whoosh peaks on the cut)"
+ },
+ {
+  "t": 11.4,
+  "type": "hit",
+  "g": 0.85,
+  "note": "impact under the letterpress logo \u2014 riser + hit = loudest stack"
+ },
+ {
+  "t": 12.58,
+  "type": "pop",
+  "g": 0.6,
+  "note": "H-uman"
+ },
+ {
+  "t": 12.98,
+  "type": "pop",
+  "g": 0.6,
+  "note": "A-ccelerator"
+ },
+ {
+  "t": 13.76,
+  "type": "pop",
+  "g": 0.65,
+  "note": "T-ank"
+ },
+ {
+  "t": 20.62,
+  "type": "strike",
+  "g": 0.52,
+  "note": "marker strikes through 'meeting people'"
+ },
+ {
+  "t": 20.96,
+  "type": "cardwhoosh",
+  "g": 0.56,
+  "note": "cut to the CXO card"
+ },
+ {
+  "t": 21.6,
+  "type": "stamp",
+  "g": 0.7,
+  "note": "CXOs"
+ },
+ {
+  "t": 22.72,
+  "type": "stamp",
+  "g": 0.7,
+  "note": "CFOs"
+ },
+ {
+  "t": 23.54,
+  "type": "stamp",
+  "g": 0.75,
+  "note": "CMOs"
+ },
+ {
+  "t": 26.2,
+  "type": "cardwhoosh",
+  "g": 0.6,
+  "note": "cut to Early Access"
+ },
+ {
+  "t": 28.02,
+  "type": "live",
+  "g": 0.8,
+  "note": "'is live now.' \u2014 notification chime"
+ },
+ {
+  "t": 31.08,
+  "type": "pop",
+  "g": 0.6,
+  "note": "'LINK' keyword"
+ },
+ {
+  "t": 33.9,
+  "type": "cardwhoosh",
+  "g": 0.56,
+  "note": "cut to the selection card"
+ },
+ {
+  "t": 34.8,
+  "type": "pop",
+  "g": 0.6,
+  "note": "tick draws"
+ },
+ {
+  "t": 35.64,
+  "type": "stamp",
+  "g": 0.85,
+  "note": "'shortlisted.' stamp"
+ },
+ {
+  "t": 40.82,
+  "type": "pop",
+  "g": 0.65,
+  "note": "'drop a comment.' keyword"
+ },
+ {
+  "t": 42.62,
+  "type": "cardwhoosh",
+  "g": 0.56,
+  "note": "cut to the end card"
+ },
+ {
+  "t": 42.66,
+  "type": "sparkle",
+  "g": 0.75,
+  "note": "logo lands on the end card (conclusion)"
+ },
+ {
+  "t": 43.32,
+  "type": "pop",
+  "g": 0.65,
+  "note": "'Comment LINK' button"
+ }
 ]
