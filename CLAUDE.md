@@ -7,6 +7,7 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
 - Sound design: @docs/playbook/sound-design.md
 - Short-form editing brief (captions, hooks, animations): @docs/playbook/short-form-editing.md
 - One Loop brand, palette, logo and client-portfolio data: @docs/playbook/oneloop-brand.md
+- Skills knowledge base (all project skills by job, with sources and routing): `docs/skills-knowledge-base.md`. Regenerate with `python3 tools/build_skills_kb.py` after installs.
 - Motion-graphics reference library: `docs/library/prompt-motion/README.md`.
   - Contents: all 236 Prompt Motion entries, one file per category with full prompt text, plus the site's 5 skills.
   - Installed skills: `cinetic` (cinematic launch/product films, Remotion or HyperFrames) and `product-film` (Remotion films from a product's own design system). Use them for product and launch videos.
