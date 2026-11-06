@@ -1,0 +1,16 @@
+[
+ {"t": 1.90, "type": "whoosh", "g": 0.5, "note": "punch-in on 'PAY ATTENTION'"},
+ {"t": 4.90, "type": "strike", "g": 0.5, "note": "red strike through 'building startups'"},
+ {"t": 6.85, "type": "glitch", "g": 0.55, "note": "blinds transition into 'Introducing the WHY Venture Studio'"},
+ {"t": 16.38, "type": "pop", "g": 0.55, "note": "chip: international experience"},
+ {"t": 17.78, "type": "pop", "g": 0.55, "note": "chip: connections across the ecosystem"},
+ {"t": 24.06, "type": "rec", "g": 0.6, "note": "camera viewfinder on: 'our first cohort…'"},
+ {"t": 27.26, "type": "live", "g": 0.7, "note": "LIVE badge: 'registrations are live'"},
+ {"t": 31.02, "type": "pop", "g": 0.55, "note": "'apply.' box"},
+ {"t": 31.29, "type": "whoosh", "g": 0.5, "note": "punch-in + ring: 'only 15 startups'"},
+ {"t": 31.29, "type": "hit", "g": 0.45, "note": "low impact under the ring punch (loudest stack)"},
+ {"t": 33.71, "type": "glitch", "g": 0.5, "note": "blinds transition into 'so be curious, be serious'"},
+ {"t": 37.54, "type": "pop", "g": 0.6, "note": "'comment LINK' box"},
+ {"t": 39.19, "type": "whoosh", "g": 0.5, "note": "end card"},
+ {"t": 39.81, "type": "pop", "g": 0.55, "note": "'Comment LINK' button"}
+]
