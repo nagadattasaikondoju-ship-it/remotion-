@@ -42,3 +42,6 @@ tools/skill-repos/
 .claude/skills/video-edit-pipeline/
 .claude/skills/video-qa/
 .claude/skills/video-review-canvas/
+
+# Chromium path links for reanimate (tools/setup_skill_clis.sh)
+tools/pw-compat/

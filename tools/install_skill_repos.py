@@ -1,6 +1,7 @@
 # Install the motion-graphics / video-editing skill repos the user collected (Oct 2026) into .claude/skills/.
 #   python3 tools/install_skill_repos.py            clone (pinned commits) into tools/skill-repos/, then install
 #   python3 tools/install_skill_repos.py --src DIR  install from existing clones in DIR (<owner>_<repo>, iart/<pack>)
+#   python3 tools/install_skill_repos.py --only owner/repo,owner/repo   (re)install just those repos; the rest of the manifest is kept
 # Every SKILL.md folder becomes .claude/skills/<name>. A name that clashes with an installed skill, with another repo's
 # skill, or that is too generic next to this repo's own house rules gets the repo's prefix (folder and frontmatter).
 # Repos without a licence are installed for use but git-ignored (not re-published); this script restores them.
@@ -31,6 +32,11 @@ REPOS = [  # (owner/repo, commit, prefix, licensed)
     (I + "generative-illustration-skills", "e7d6243", "genillus", False),
     (I + "javascript-animation-skills", "f7d0882", "jsanim", True), (I + "lower-thirds-skills", "aa8ef7e", "lt", True),
     (I + "b-roll-skills", "a51e34b", "broll", True), (I + "talking-head-skills", "a315032", "th", True),
+    # Nov 2026 batch (all MIT; read for hooks / settings / prompt-steering before pinning). earshot itself comes from tools/setup_sfx.sh.
+    ("alchaincyf/huashu-motion", "52467f9", "huashu", True), ("rossark0/rossark-motion-skill", "9b20964", "rossark", True),
+    ("talsiach/take-one", "830621c", "takeone", True), ("NiazMorshed2007/reanimate", "3f7a55a", "reanimate", True),
+    ("shreyaskarnik/argo", "5f71549", "argo", True), ("vincentsch/explainroo", "e95232c", "explainroo", True),
+    ("win4r/video-director", "4747e5c", "vdir", True),
 ]
 REFERENCE_ONLY = [("Dakkshin/after-effects-mcp", "88d5fbf"), ("Arman-Luthra/aftr", "628397d"),
                   ("lanayepifanova/Claude-Editor", "b9a2e27"), ("iart-ai/motion-skills", "238dfc5")]
@@ -57,19 +63,23 @@ def name_of(skill_md):
 
 def main():
     src = sys.argv[sys.argv.index("--src") + 1] if "--src" in sys.argv else None
+    only = set(sys.argv[sys.argv.index("--only") + 1].split(",")) if "--only" in sys.argv else None
     found = []  # (repo, prefix, licensed, skill dir, original name)
     for repo, commit, prefix, licensed in REPOS:
+        if only and repo not in only: continue
         d = local_dir(src, repo) if src else os.path.join(CLONES, repo.replace("/", "_"))
         if not src: ensure_clone(repo, commit, d)
         found += [(repo, prefix, licensed, s, name_of(os.path.join(s, "SKILL.md"))) for s in skill_dirs(d)]
-    if not src:
+    if not src and not only:
         for repo, commit in REFERENCE_ONLY: ensure_clone(repo, commit, os.path.join(CLONES, repo.replace("/", "_")))
     mpath = os.path.join(ROOT, "tools", "skill-repos.json")  # what an earlier run installed is not "ours"
-    prev = {m["skill"] for m in json.load(open(mpath))} if os.path.exists(mpath) else set()
+    prev_m = json.load(open(mpath)) if os.path.exists(mpath) else []
+    prev = {m["skill"] for m in prev_m}
     ours = {n for n in os.listdir(SKILLS)} - prev  # skills that were here before this installer
     counts = {}
     for f in found: counts[f[4]] = counts.get(f[4], 0) + 1
-    manifest, ignored = [], []
+    manifest = [m for m in prev_m if m["from"] not in only] if only else []
+    ignored = [f".claude/skills/{m['skill']}/" for m in manifest if not m["licensed"]]
     for repo, prefix, licensed, sdir, name in found:
         final = f"{prefix}-{name}" if (name in ours or counts[name] > 1 or name in GENERIC) else name
         dest = os.path.join(SKILLS, final)
@@ -85,7 +95,7 @@ def main():
     block = "# Skills from repos without a licence: used locally, not re-published (python3 tools/install_skill_repos.py)\n" + "\n".join(sorted(ignored)) + "\n"
     text = re.sub(r"# Skills from repos without a licence:.*?\n(?:\.claude/skills/[^\n]+\n)*", "", text, flags=re.S)
     open(gi, "w").write(text.rstrip("\n") + "\n\n" + block)
-    print(f"installed {len(manifest)} skills ({sum(not m['licensed'] for m in manifest)} unlicensed, git-ignored); "
+    print(f"manifest: {len(manifest)} skills ({sum(not m['licensed'] for m in manifest)} unlicensed, git-ignored); "
           f"renamed: {', '.join(m['original_name'] + '→' + m['skill'] for m in manifest if m['skill'] != m['original_name'])}")
 
 if __name__ == "__main__": main()

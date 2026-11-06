@@ -39,6 +39,16 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
     - Remotion: `remotion-best-practices` (router). Brand system: `brand-intake`, `brand-motion-guidelines`.
     - Critique: `motion-design-critique`.
   - Sound always goes through the pipeline below, not `km-sound-design` or `dsk-elevenlabs`. ElevenLabs, Arcads, RunPod and Ideogram need paid API keys; ask first.
+- Nov 2026 skills (7 repos, all MIT, read for hooks / settings / prompt-steering, pinned in `tools/install_skill_repos.py`):
+  `huashu-motion`, `rossark-motion-skill`, `take-one`, `reanimate`, `argo-guide`, `explainroo`, `video-director`. earshot (same batch) was already installed.
+  - Fresh container: `python3 tools/install_skill_repos.py --only <owner/repo,…>` re-clones them, then `bash tools/setup_skill_clis.sh` builds `om`, `explainroo`, `argo` from those clones (never from npm), installs reanimate's bun deps, links Chromium paths and fixes Pillow.
+  - Browsers (no second download): `OM_CHROME=/opt/pw-browsers/chromium-1194/chrome-linux/chrome` for `om`; `EXPLAINROO_CHROME=` the same path for explainroo; `PLAYWRIGHT_BROWSERS_PATH=tools/pw-compat` for reanimate's scripts (never run its `setup.sh`, it downloads Chromium).
+  - **Never add huashu-motion's "Made with huashu-motion" end signature** to the user's or a client's film unless the user asks.
+  - Use `om` from PATH, not `npx huashu-motion` (that pulls unreviewed code from npm).
+  - Paid generation (take-one's Higgsfield/Seedance/Kling/Suno/ElevenLabs routes, argo's OpenAI/ElevenLabs/Gemini TTS): ask first, as for every paid API. Local voices only by default (explainroo Kokoro, argo `kokoro-js`).
+  - Routing: launch film from a site → `huashu-motion`; product-in-use / ad / music video with a reviewer → `take-one`; app demo with voiceover → `argo-guide`; word-synced explainer → `explainroo`;
+    copy an animation from a site/video/GIF → `reanimate`; mascot/icon/logo idle motion → `rossark-motion-skill`; direction + QA on any coded video → `video-director` (`scripts/qa_video.py`, `check_timeline.py`).
+  - House rules still win (sound pipeline, captions, One Loop brief, no fabricated clients). Their sound goes through the pipeline below.
 - **Sound pipeline for EVERY video (user's standing rule):**
   1. Openverse API (`tools/openverse_sfx.py`): search and fetch real recorded SFX (CC0).
   2. Real SFX skill (`real-sfx`): analyse the video and place the sounds on the timeline.

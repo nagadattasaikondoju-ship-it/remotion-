@@ -712,5 +712,47 @@
   "from": "iart-ai/talking-head-skills",
   "original_name": "talking-head",
   "licensed": true
+ },
+ {
+  "skill": "huashu-motion",
+  "from": "alchaincyf/huashu-motion",
+  "original_name": "huashu-motion",
+  "licensed": true
+ },
+ {
+  "skill": "rossark-motion-skill",
+  "from": "rossark0/rossark-motion-skill",
+  "original_name": "rossark-motion-skill",
+  "licensed": true
+ },
+ {
+  "skill": "take-one",
+  "from": "talsiach/take-one",
+  "original_name": "take-one",
+  "licensed": true
+ },
+ {
+  "skill": "reanimate",
+  "from": "NiazMorshed2007/reanimate",
+  "original_name": "reanimate",
+  "licensed": true
+ },
+ {
+  "skill": "argo-guide",
+  "from": "shreyaskarnik/argo",
+  "original_name": "argo-guide",
+  "licensed": true
+ },
+ {
+  "skill": "explainroo",
+  "from": "vincentsch/explainroo",
+  "original_name": "explainroo",
+  "licensed": true
+ },
+ {
+  "skill": "video-director",
+  "from": "win4r/video-director",
+  "original_name": "video-director",
+  "licensed": true
  }
 ]
