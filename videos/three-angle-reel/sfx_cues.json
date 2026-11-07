@@ -1,0 +1,288 @@
+[
+ {
+  "t": 2.07,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "split opens: her clip slides down, he slides into the lower half"
+ },
+ {
+  "t": 2.35,
+  "type": "click",
+  "g": 0.45,
+  "note": "'paused' tag on the host's half"
+ },
+ {
+  "t": 12.937,
+  "type": "whoosh",
+  "g": 0.45,
+  "note": "split closes: back to him full screen"
+ },
+ {
+  "t": 12.877,
+  "type": "pop",
+  "g": 0.55,
+  "note": "audience panel grows in"
+ },
+ {
+  "t": 13.057,
+  "type": "click",
+  "g": 0.45,
+  "note": "cursor grabs the age slider"
+ },
+ {
+  "t": 14.047,
+  "type": "click",
+  "g": 0.5,
+  "note": "cursor clicks 'Women'"
+ },
+ {
+  "t": 14.857,
+  "type": "strike",
+  "g": 0.5,
+  "note": "red strike through 'your targeting' on 'decides'"
+ },
+ {
+  "t": 16.417,
+  "type": "scan",
+  "g": 0.45,
+  "note": "the scan line reads the ad creative"
+ },
+ {
+  "t": 18.667,
+  "type": "whoosh",
+  "g": 0.4,
+  "note": "ad card leaves: 'so here's what we do'"
+ },
+ {
+  "t": 18.167,
+  "type": "riser",
+  "g": 0.55,
+  "note": "build into the frame-becomes-card move",
+  "len": 1.6
+ },
+ {
+  "t": 19.887,
+  "type": "whoosh",
+  "g": 0.55,
+  "note": "his frame shrinks into a tilted card"
+ },
+ {
+  "t": 20.567,
+  "type": "pop",
+  "g": 0.55,
+  "note": "fan card 01 problem"
+ },
+ {
+  "t": 20.747,
+  "type": "pop",
+  "g": 0.55,
+  "note": "fan card 02 proof"
+ },
+ {
+  "t": 21.027,
+  "type": "pop",
+  "g": 0.55,
+  "note": "fan card 03 offer"
+ },
+ {
+  "t": 21.637,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "frame flies back full, card 01 becomes the lower card"
+ },
+ {
+  "t": 21.677,
+  "type": "hit",
+  "g": 0.4,
+  "note": "low impact under the return (loudest stack of the first half)"
+ },
+ {
+  "t": 23.067,
+  "type": "type",
+  "g": 0.4,
+  "note": "the pain types itself out",
+  "len": 0.8
+ },
+ {
+  "t": 24.947,
+  "type": "pop",
+  "g": 0.45,
+  "note": "card swaps to 02 PROOF"
+ },
+ {
+  "t": 27.027,
+  "type": "pop",
+  "g": 0.45,
+  "note": "testimonial slides up"
+ },
+ {
+  "t": 27.707,
+  "type": "pop",
+  "g": 0.45,
+  "note": "card swaps to 03 OFFER"
+ },
+ {
+  "t": 29.827,
+  "type": "stamp",
+  "g": 0.6,
+  "note": "'deal' stamp lands"
+ },
+ {
+  "t": 28.827,
+  "type": "riser",
+  "g": 0.5,
+  "note": "build into the second frame-becomes-card move",
+  "len": 1.4
+ },
+ {
+  "t": 30.347,
+  "type": "whoosh",
+  "g": 0.55,
+  "note": "his frame shrinks again; the product box appears"
+ },
+ {
+  "t": 31.217,
+  "type": "pop",
+  "g": 0.5,
+  "note": "one product \u2192 ad 1 shoots out"
+ },
+ {
+  "t": 31.317,
+  "type": "pop",
+  "g": 0.5,
+  "note": "one product \u2192 ad 2 shoots out"
+ },
+ {
+  "t": 31.417,
+  "type": "pop",
+  "g": 0.5,
+  "note": "one product \u2192 ad 3 shoots out"
+ },
+ {
+  "t": 32.557,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "frame flies back full"
+ },
+ {
+  "t": 33.387,
+  "type": "pop",
+  "g": 0.45,
+  "note": "each ad finds its own audience (dots)"
+ },
+ {
+  "t": 34.927,
+  "type": "pop",
+  "g": 0.5,
+  "note": "budget chart in, bars grow"
+ },
+ {
+  "t": 36.627,
+  "type": "cut",
+  "g": 0.65,
+  "note": "click: the weakest bar is cut (red)"
+ },
+ {
+  "t": 38.407,
+  "type": "win",
+  "g": 0.55,
+  "note": "money moves to the winner (mint bar grows)"
+ },
+ {
+  "t": 39.127,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "his frame shrinks: the proof wall"
+ },
+ {
+  "t": 39.267,
+  "type": "card",
+  "g": 0.5,
+  "note": "account card unfolds: Bamboo Spa"
+ },
+ {
+  "t": 39.507,
+  "type": "card",
+  "g": 0.5,
+  "note": "account card unfolds: India account"
+ },
+ {
+  "t": 39.807,
+  "type": "card",
+  "g": 0.5,
+  "note": "account card unfolds: RMC Plumbing"
+ },
+ {
+  "t": 40.147,
+  "type": "card",
+  "g": 0.5,
+  "note": "account card unfolds: e-commerce account"
+ },
+ {
+  "t": 40.947,
+  "type": "click",
+  "g": 0.5,
+  "note": "cursor clicks the first account"
+ },
+ {
+  "t": 41.027,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "camera dives into Bamboo Spa 1,237 \u2192 2,587"
+ },
+ {
+  "t": 42.287,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "camera dives into India 6,406 conversions"
+ },
+ {
+  "t": 43.327,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "camera dives into RMC 11 \u2192 66 leads"
+ },
+ {
+  "t": 44.447,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "camera dives into e-commerce 8.43\u00d7 ROAS"
+ },
+ {
+  "t": 43.807,
+  "type": "hit",
+  "g": 0.45,
+  "note": "RMC 6.1\u00d7 lands (the biggest jump: loudest stack of the second half)"
+ },
+ {
+  "t": 45.107,
+  "type": "whoosh",
+  "g": 0.45,
+  "note": "pull back to the wall of results, frame returns"
+ },
+ {
+  "t": 45.747,
+  "type": "pop",
+  "g": 0.45,
+  "note": "DM composer grows in"
+ },
+ {
+  "t": 46.857,
+  "type": "click",
+  "g": 0.45,
+  "note": "cursor clicks the message field"
+ },
+ {
+  "t": 46.967,
+  "type": "type",
+  "g": 0.4,
+  "note": "types META",
+  "len": 0.7999999999999972
+ },
+ {
+  "t": 47.867,
+  "type": "send",
+  "g": 0.55,
+  "note": "send: META bubble pops"
+ }
+]

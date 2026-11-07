@@ -10,3 +10,38 @@ out
 pipeline/models/
 public/media/
 __pycache__/
+
+# SFX tooling checkout (bash tools/setup_sfx.sh)
+tools/earshot/
+# Lemo-Opuscar style library (fetched by .claude/skills/lemo-opuscar/scripts/setup.sh)
+tools/lemo-opuscar/
+
+# Reference clones of the skill repos (python3 tools/install_skill_repos.py)
+tools/skill-repos/
+
+# Skills from repos without a licence: used locally, not re-published (python3 tools/install_skill_repos.py)
+.claude/skills/ai-audio-sound-design/
+.claude/skills/arcads-broll/
+.claude/skills/arcads-video-edit/
+.claude/skills/branded-ad-edit/
+.claude/skills/broll-capture/
+.claude/skills/capcut-export/
+.claude/skills/edits-hook-overlay/
+.claude/skills/edl-tighten/
+.claude/skills/generative-illustration/
+.claude/skills/hook-splitter/
+.claude/skills/hook-variations/
+.claude/skills/km-sound-design/
+.claude/skills/naming-convention/
+.claude/skills/openart-broll/
+.claude/skills/recap-video/
+.claude/skills/reel-recut/
+.claude/skills/reel-style-clone/
+.claude/skills/talking-head-image-overlays/
+.claude/skills/tenfold-video-edit/
+.claude/skills/video-edit-pipeline/
+.claude/skills/video-qa/
+.claude/skills/video-review-canvas/
+
+# Chromium path links for reanimate (tools/setup_skill_clis.sh)
+tools/pw-compat/

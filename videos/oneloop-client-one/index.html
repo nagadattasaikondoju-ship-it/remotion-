@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>One Loop Client One</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      @font-face { font-family: "Mont"; font-weight: 700; src: url("assets/fonts/Montserrat-normal-700.ttf"); }
+      @font-face { font-family: "Mont"; font-weight: 800; src: url("assets/fonts/Montserrat-normal-800.ttf"); }
+      @font-face { font-family: "Mont"; font-weight: 900; src: url("assets/fonts/Montserrat-normal-900.ttf"); }
+      @font-face { font-family: "Playfair"; font-style: italic; font-weight: 600; src: url("assets/fonts/PlayfairDisplay-italic-600.ttf"); }
+      @font-face { font-family: "Baskerville"; font-weight: 700; src: url("assets/fonts/LibreBaskerville-normal-700.ttf"); }
+      @font-face { font-family: "Josefin"; font-weight: 400; src: url("assets/fonts/JosefinSans-normal-400.ttf"); }
+      @font-face { font-family: "Josefin"; font-weight: 600; src: url("assets/fonts/JosefinSans-normal-600.ttf"); }
+      :root {
+        --copper: #e39a68;     /* One Loop logo copper (light end of the logo gradient) */
+        --copper2: #c8784a;    /* logo copper, deep */
+        --terra: #8f432e;      /* dark terracotta */
+        --cream: #f7e8da;
+        --char: #1e1a18;
+        --off: #f9f6f1;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+      #root { position: relative; width: 1080px; height: 1920px; overflow: hidden; }
+      .full { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+      video.full { object-fit: cover; }
+      .layer { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; }
+
+      /* ---------- captions ---------- */
+      .cw { position: absolute; left: 0; top: 0; width: 0; height: 0; opacity: 0; }
+      .c3 { position: absolute; left: 0; top: 0; transform-style: preserve-3d; }
+      .ci { position: absolute; left: 0; top: 0; transform: translate(-50%, -50%); text-align: center; white-space: nowrap; }
+      .ln { display: block; line-height: 0.98; text-transform: uppercase; font-family: "Mont"; font-weight: 900; letter-spacing: -0.012em; }
+      .ln.sm { font-weight: 800; letter-spacing: 0.02em; }
+      .ln.kw { font-family: "Playfair"; font-style: italic; font-weight: 600; text-transform: none; letter-spacing: -0.01em; line-height: 1.04; }
+      .ln .k { color: var(--copper); }
+      .light .ln { color: var(--cream); text-shadow: 1px 1px 0 #6e3a28, 2px 2px 0 #6e3a28, 3px 3px 0 #4a2418, 0 4px 6px rgba(0, 0, 0, 0.28); }
+      .light .ln.kw, .light .ln .k { color: var(--copper); }
+      .dark .ln { color: var(--char); text-shadow: 1.5px 0 0 var(--off), -1.5px 0 0 var(--off), 0 1.5px 0 var(--off), 0 -1.5px 0 var(--off),
+        2px 3px 0 rgba(249, 246, 241, 0.75); }
+      .dark .ln.kw, .dark .ln .k { color: var(--terra); }
+      .lower .ln { text-shadow: 0 2px 0 rgba(20, 14, 10, 0.75), 0 3px 4px rgba(0, 0, 0, 0.35); }
+
+      /* ---------- newspaper "OneLoop" text match cut ---------- */
+      #mc { opacity: 0; background: #e9e1d2; overflow: hidden; }
+      .np { position: absolute; left: -70px; top: -60px; width: 1220px; height: 2040px; opacity: 0; overflow: hidden; }
+      .np .mast { position: absolute; left: 0; right: 0; text-align: center; }
+      .np .hd { position: absolute; left: 130px; right: 130px; }
+      /* the highlighted word is pinned to the frame centre; the words either side spill off the page edges */
+      .np .row { position: absolute; left: -400px; right: -400px; top: 880px; height: 0; display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); white-space: nowrap; }
+      .np .row span { display: flex; transform: translateY(-50%); }
+      .np .row span:first-child { justify-content: flex-end; }
+      .np .row span:last-child { justify-content: flex-start; }
+      .np .hl { padding: 0.02em 0.16em 0.06em; background: linear-gradient(transparent 8%, #eaa877 8%, #eaa877 92%, transparent 92%); color: #17120e; }
+      .np .bd { position: absolute; left: 130px; right: 130px; }
+      .np .cols { position: absolute; left: 70px; right: 70px; display: flex; gap: 34px; }
+      .np .cols div { flex: 1; }
+      .bar { height: 15px; margin: 0 0 21px; border-radius: 3px; }
+      #np1 { background: radial-gradient(ellipse at 45% 35%, #f3ead9, #dccfb8); }
+      #np1 .hd { top: 190px; font: 700 128px/1.08 "Baskerville"; color: #26201a; text-align: center; }
+      #np1 .row { font: 700 132px/1 "Baskerville"; color: #2a231c; }
+      #np1 .bd { top: 1010px; font: 400 64px/1.55 "Josefin"; color: #3b342c; }
+      #np2 { background: linear-gradient(180deg, #f6f4ef, #e7e3da); }
+      #np2 .mast { top: 120px; font: 600 30px/1 "Josefin"; letter-spacing: 0.3em; color: #555; }
+      #np2 .mast b { display: block; margin-top: 18px; font: 700 52px/1 "Baskerville"; letter-spacing: 0.04em; color: #1d1b18; }
+      #np2 .row { font: 700 118px/1 "Baskerville"; color: #222; }
+      #np2 .cols { top: 300px; height: 520px; }
+      #np2 .cols.b2 { top: 960px; height: 900px; }
+      #np2 .bar { background: #8b8678; }
+      #np3 { background: radial-gradient(ellipse at 40% 30%, #ffffff, #e9e9e6); }
+      #np3 .hd { top: 160px; font: 800 118px/1.06 "Mont"; color: #1f1f22; text-align: left; letter-spacing: -0.01em; }
+      #np3 .row { font: 700 126px/1 "Mont"; color: #222; }
+      #np3 .bd { top: 990px; font: 400 58px/1.5 "Mont"; color: #333; }
+      #np4 { background: radial-gradient(ellipse at 50% 40%, #ece2cd, #d3c5a8); }
+      #np4 .hd { top: 260px; font: 700 104px/1.12 "Baskerville"; color: #2b241b; text-align: center; }
+      #np4 .row { font: 400 124px/1 "Baskerville"; color: #2b241b; }
+      #np4 .bd { top: 1020px; left: 220px; right: 220px; font: 400 62px/1.55 "Baskerville"; color: #3a3125; }
+      #np5 { background: #000; }
+      #np5 img { position: absolute; width: 900px; }
+
+      /* ---------- proof screens ---------- */
+      #pay { opacity: 0; background: radial-gradient(ellipse at 50% 46%, #2a211b, #0b0908 72%); }
+      #payCard { position: absolute; left: 110px; top: 560px; width: 860px; height: 940px; border-radius: 40px; overflow: hidden;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.08); transform-origin: 82% 26%; }
+      #payCard img { width: 860px; display: block; }
+      #notpub { opacity: 0; background: #e9e9e9; }
+      #notpub img { position: absolute; left: 70px; top: 760px; width: 940px; transform-origin: 50% 40%; }
+      #npTag { position: absolute; left: 0; right: 0; top: 1420px; text-align: center; font: 800 34px/1 "Mont"; letter-spacing: 0.22em; color: var(--terra); }
+      #npTag i { display: inline-block; width: 12px; height: 12px; border-radius: 50%; background: var(--terra); margin-right: 16px; transform: translateY(-3px); }
+
+      /* ---------- transitions ---------- */
+      /* flash cut: warm exposure wash + hot core + light sweep (after the editorial flash recipe), screen-blended */
+      #stage { transform-origin: 50% 46%; }
+      #fx { overflow: hidden; pointer-events: none; }
+      #fx .fl { position: absolute; opacity: 0; }
+      #fxWash { inset: 0; background: rgb(255 246 236); }
+      #fxCore { inset: -18%; mix-blend-mode: screen; transform-origin: 50% 44%;
+        background: radial-gradient(ellipse 70% 52% at 50% 44%, #fff 0%, rgb(255 253 250 / 96%) 22%, rgb(255 246 236 / 80%) 46%, rgb(227 154 104 / 30%) 68%, transparent 86%); }
+      #fxSweep { inset: -28%; mix-blend-mode: screen;
+        background: linear-gradient(112deg, transparent 22%, rgb(227 154 104 / 12%) 38%, rgb(255 246 236 / 88%) 49%, #fff 53%, rgb(247 232 218 / 30%) 62%, transparent 78%); }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="47.8000" data-width="1080" data-height="1920">
+      <!-- everything in picture sits on one stage so the flash cuts can punch the whole frame without breaking the cut-out alignment -->
+      <div id="stage" class="full">
+      <video id="base" class="full" src="assets/base.mp4" data-start="0" data-duration="47.8000" data-media-start="0" data-track-index="0" muted playsinline></video>
+
+      <!-- captions that sit BEHIND the speaker -->
+      <div id="behind" class="layer"></div>
+
+      <!-- the speaker cut out (alpha), laid back over the behind-captions -->
+      <video id="cut150" class="full" src="assets/cut/cut_150_233.webm" data-start="5.0000" data-duration="2.7667" data-media-start="0" data-track-index="2" muted playsinline></video>
+      <video id="cut534" class="full" src="assets/cut/cut_534_619.webm" data-start="17.8000" data-duration="2.8333" data-media-start="0" data-track-index="3" muted playsinline></video>
+      <video id="cut645" class="full" src="assets/cut/cut_645_696.webm" data-start="21.5000" data-duration="1.7000" data-media-start="0" data-track-index="2" muted playsinline></video>
+      <video id="cut979" class="full" src="assets/cut/cut_979_1016.webm" data-start="32.6333" data-duration="1.2333" data-media-start="0" data-track-index="3" muted playsinline></video>
+      <video id="cut1040" class="full" src="assets/cut/cut_1040_1076.webm" data-start="34.6667" data-duration="1.2000" data-media-start="0" data-track-index="2" muted playsinline></video>
+
+      <!-- captions in front: environment-anchored and lower-third -->
+      <div id="front" class="layer"></div>
+
+      <!-- newspaper "OneLoop" text match cut (rebuilt at full resolution after the supplied reference) -->
+      <div id="mc" class="full">
+        <div class="np" id="np1">
+          <div class="hd">We Had Just<br />Started</div>
+          <div class="row"><span>we had just started&nbsp;</span><span class="hl">OneLoop</span><span>&nbsp;and that money</span></div>
+          <div class="bd">Our first client agreed<br />to pay us ₹10,000<br />for a website.</div>
+        </div>
+        <div class="np" id="np2">
+          <div class="mast">ONE LOOP · NOTES<b>THE FIRST CLIENT</b></div>
+          <div class="cols"><div><div class="bar" style="width:65%"></div><div class="bar" style="width:70%"></div><div class="bar" style="width:92%"></div><div class="bar" style="width:84%"></div><div class="bar" style="width:65%"></div><div class="bar" style="width:78%"></div><div class="bar" style="width:80%"></div><div class="bar" style="width:68%"></div><div class="bar" style="width:89%"></div><div class="bar" style="width:66%"></div><div class="bar" style="width:76%"></div><div class="bar" style="width:81%"></div><div class="bar" style="width:78%"></div><div class="bar" style="width:84%"></div><div class="bar" style="width:90%"></div><div class="bar" style="width:98%"></div></div><div><div class="bar" style="width:72%"></div><div class="bar" style="width:86%"></div><div class="bar" style="width:88%"></div><div class="bar" style="width:73%"></div><div class="bar" style="width:62%"></div><div class="bar" style="width:98%"></div><div class="bar" style="width:73%"></div><div class="bar" style="width:73%"></div><div class="bar" style="width:95%"></div><div class="bar" style="width:84%"></div><div class="bar" style="width:79%"></div><div class="bar" style="width:91%"></div><div class="bar" style="width:63%"></div><div class="bar" style="width:88%"></div><div class="bar" style="width:76%"></div><div class="bar" style="width:65%"></div></div><div><div class="bar" style="width:87%"></div><div class="bar" style="width:97%"></div><div class="bar" style="width:69%"></div><div class="bar" style="width:85%"></div><div class="bar" style="width:73%"></div><div class="bar" style="width:90%"></div><div class="bar" style="width:89%"></div><div class="bar" style="width:70%"></div><div class="bar" style="width:93%"></div><div class="bar" style="width:86%"></div><div class="bar" style="width:87%"></div><div class="bar" style="width:93%"></div><div class="bar" style="width:78%"></div><div class="bar" style="width:90%"></div><div class="bar" style="width:95%"></div><div class="bar" style="width:65%"></div></div></div>
+          <div class="row"><span>we had just started&nbsp;</span><span class="hl">OneLoop</span><span>&nbsp;with one website</span></div>
+          <div class="cols b2"><div><div class="bar" style="width:92%"></div><div class="bar" style="width:92%"></div><div class="bar" style="width:81%"></div><div class="bar" style="width:72%"></div><div class="bar" style="width:64%"></div><div class="bar" style="width:76%"></div><div class="bar" style="width:77%"></div><div class="bar" style="width:63%"></div><div class="bar" style="width:63%"></div><div class="bar" style="width:99%"></div><div class="bar" style="width:86%"></div><div class="bar" style="width:70%"></div><div class="bar" style="width:78%"></div><div class="bar" style="width:99%"></div><div class="bar" style="width:96%"></div><div class="bar" style="width:94%"></div><div class="bar" style="width:76%"></div><div class="bar" style="width:80%"></div><div class="bar" style="width:87%"></div><div class="bar" style="width:64%"></div><div class="bar" style="width:83%"></div><div class="bar" style="width:72%"></div><div class="bar" style="width:95%"></div><div class="bar" style="width:64%"></div><div class="bar" style="width:87%"></div><div class="bar" style="width:95%"></div><div class="bar" style="width:70%"></div><div class="bar" style="width:96%"></div><div class="bar" style="width:95%"></div><div class="bar" style="width:62%"></div></div><div><div class="bar" style="width:88%"></div><div class="bar" style="width:62%"></div><div class="bar" style="width:81%"></div><div class="bar" style="width:78%"></div><div class="bar" style="width:69%"></div><div class="bar" style="width:74%"></div><div class="bar" style="width:92%"></div><div class="bar" style="width:74%"></div><div class="bar" style="width:67%"></div><div class="bar" style="width:88%"></div><div class="bar" style="width:79%"></div><div class="bar" style="width:92%"></div><div class="bar" style="width:70%"></div><div class="bar" style="width:74%"></div><div class="bar" style="width:92%"></div><div class="bar" style="width:81%"></div><div class="bar" style="width:81%"></div><div class="bar" style="width:70%"></div><div class="bar" style="width:62%"></div><div class="bar" style="width:97%"></div><div class="bar" style="width:65%"></div><div class="bar" style="width:94%"></div><div class="bar" style="width:75%"></div><div class="bar" style="width:98%"></div><div class="bar" style="width:77%"></div><div class="bar" style="width:97%"></div><div class="bar" style="width:83%"></div><div class="bar" style="width:71%"></div><div class="bar" style="width:90%"></div><div class="bar" style="width:87%"></div></div><div><div class="bar" style="width:87%"></div><div class="bar" style="width:79%"></div><div class="bar" style="width:70%"></div><div class="bar" style="width:86%"></div><div class="bar" style="width:66%"></div><div class="bar" style="width:88%"></div><div class="bar" style="width:86%"></div><div class="bar" style="width:76%"></div><div class="bar" style="width:92%"></div><div class="bar" style="width:69%"></div><div class="bar" style="width:76%"></div><div class="bar" style="width:92%"></div><div class="bar" style="width:76%"></div><div class="bar" style="width:89%"></div><div class="bar" style="width:85%"></div><div class="bar" style="width:97%"></div><div class="bar" style="width:99%"></div><div class="bar" style="width:89%"></div><div class="bar" style="width:92%"></div><div class="bar" style="width:67%"></div><div class="bar" style="width:89%"></div><div class="bar" style="width:94%"></div><div class="bar" style="width:77%"></div><div class="bar" style="width:83%"></div><div class="bar" style="width:80%"></div><div class="bar" style="width:98%"></div><div class="bar" style="width:74%"></div><div class="bar" style="width:77%"></div><div class="bar" style="width:62%"></div><div class="bar" style="width:77%"></div></div></div>
+        </div>
+        <div class="np" id="np3">
+          <div class="hd">Door To Door,<br />Hyderabad</div>
+          <div class="row"><span>had just started&nbsp;</span><span class="hl">OneLoop</span><span>&nbsp;and went</span></div>
+          <div class="bd">Audit. Build. Market.<br />Automate. Small local<br />businesses to large<br />enterprises.</div>
+        </div>
+        <div class="np" id="np4">
+          <div class="hd">Client<br />Number One</div>
+          <div class="row"><span>we had just started&nbsp;</span><span class="hl">OneLoop</span><span>&nbsp;that year</span></div>
+          <div class="bd">That money mattered<br />a lot to us.</div>
+        </div>
+        <div class="np" id="np5"><img src="assets/img/logo.png" alt="" /></div>
+      </div>
+
+      <!-- proof: the real ₹1,500 receipt, personal and client details redacted -->
+      <div id="pay" class="full"><div id="payCard"><img src="assets/img/payment-1500.png" alt="" /></div></div>
+      <!-- proof: the website was held offline -->
+      <div id="notpub" class="full"><img src="assets/img/not-published.png" alt="" /><div id="npTag"><i></i>WEBSITE HELD OFFLINE</div></div>
+
+      <!-- proof-screen captions sit above the proof -->
+      <div id="top" class="layer"></div>
+
+      </div>
+
+      <!-- flash-cut light layers (above everything in picture) -->
+      <div id="fx" class="full"><div id="fxWash" class="fl"></div><div id="fxCore" class="fl"></div><div id="fxSweep" class="fl"></div></div>
+
+      <audio id="mix" src="assets/audio/master.wav" data-start="0" data-duration="47.8000" data-media-start="0" data-track-index="1" data-volume="1"></audio>
+    </div>
+
+    <script>
+      const D = {"total": 47.8, "caps": [{"layer": "front", "mode": "upper", "scheme": "light", "x": 528.7, "y": 460.0, "t3d": null, "t0": 0.06, "t1": 1.0933, "emph": false, "track": null, "lines": [{"html": "Our first <span class=\"k\">client</span>", "cls": "", "size": 93.1}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 536.5, "y": 344.0, "t3d": null, "t0": 1.0933, "t1": 2.4267, "emph": true, "track": null, "lines": [{"html": "agreed to pay us", "cls": "sm", "size": 60.4}, {"html": "<span class=\"k\">₹10,000</span>", "cls": "", "size": 131.4}]}, {"layer": "front", "mode": "lower", "scheme": "light", "x": 540, "y": 1440, "t3d": null, "t0": 2.4267, "t1": 3.2, "emph": false, "track": null, "lines": [{"html": "for a website,", "cls": "", "size": 96}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 542.5, "y": 420.4, "t3d": null, "t0": 4.3933, "t1": 5.0933, "emph": false, "track": null, "lines": [{"html": "and that money", "cls": "", "size": 92.1}]}, {"layer": "behind", "mode": "behind", "scheme": "light", "x": 564.9, "y": 373.7, "t3d": null, "t0": 5.0933, "t1": 6.4667, "emph": true, "track": null, "lines": [{"html": "mattered", "cls": "kw", "size": 132.3}, {"html": "a lot to us.", "cls": "", "size": 112.2}]}, {"layer": "behind", "mode": "behind", "scheme": "light", "x": 551.9, "y": 373.8, "t3d": null, "t0": 6.8, "t1": 7.66, "emph": false, "track": null, "lines": [{"html": "We went to", "cls": "sm", "size": 61.5}, {"html": "every <span class=\"k\">door</span>", "cls": "", "size": 133.6}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 540.3, "y": 375.5, "t3d": null, "t0": 7.66, "t1": 8.5267, "emph": false, "track": null, "lines": [{"html": "in <span class=\"k\">Hyderabad</span>,", "cls": "", "size": 104}]}, {"layer": "front", "mode": "env", "scheme": "dark", "x": 540, "y": 980, "t3d": "perspective(1100px) rotateX(48deg)", "t0": 8.5267, "t1": 9.2333, "emph": false, "track": [[256, 0.0, 0.0, 1.0, -0.0], [257, 0.6, 7.7, 1.0006, 0.0], [258, 1.2, 15.1, 1.0011, 0.0], [259, 2.0, 22.5, 1.002, -0.0], [260, 2.3, 30.5, 1.0032, 0.02], [261, 2.9, 38.2, 1.0042, 0.02], [262, 3.1, 46.7, 1.0056, 0.02], [263, 3.6, 55.8, 1.0073, 0.03], [264, 4.0, 64.4, 1.0085, 0.02], [265, 4.3, 67.2, 1.0015, 0.17], [266, 5.0, 77.0, 1.0028, 0.17], [267, 6.2, 85.6, 1.0034, 0.12], [268, 7.3, 94.7, 1.0042, 0.09], [269, 8.3, 103.4, 1.0048, 0.09], [270, 8.4, 112.0, 1.0053, 0.07], [271, 9.3, 120.2, 1.0058, 0.05], [272, 10.7, 127.6, 1.0058, 0.02], [273, 11.2, 134.6, 1.0056, 0.01], [274, 11.5, 142.5, 1.0063, -0.01], [275, 11.7, 150.9, 1.0071, 0.0], [276, 12.6, 159.2, 1.008, -0.01]], "lines": [{"html": "from small-scale", "cls": "", "size": 83.1}]}, {"layer": "front", "mode": "env", "scheme": "light", "x": 540, "y": 1420, "t3d": null, "t0": 9.2333, "t1": 9.7667, "emph": false, "track": [[277, 0.0, 0.0, 1.0, 0.0], [278, 8.4, 0.3, 1.0009, -0.08], [279, 16.2, 0.1, 1.0015, -0.13], [280, 23.4, -0.4, 1.002, -0.17], [281, 31.0, -1.0, 1.0026, -0.23], [282, 38.1, -1.5, 1.0037, -0.27], [283, 45.6, -2.3, 1.0044, -0.32], [284, 53.5, -3.2, 1.0052, -0.4], [285, 60.2, -4.1, 1.0059, -0.44], [286, 67.4, -4.9, 1.0068, -0.49], [287, 74.9, -5.3, 1.0079, -0.55], [288, 81.8, -6.4, 1.0082, -0.61], [289, 89.0, -7.6, 1.009, -0.69], [290, 95.9, -8.7, 1.0095, -0.77], [291, 102.8, -10.1, 1.0104, -0.85], [292, 109.7, -11.0, 1.0118, -0.91]], "lines": [{"html": "local <span class=\"k\">businesses</span>", "cls": "", "size": 86.4}]}, {"layer": "front", "mode": "env", "scheme": "dark", "x": 440, "y": 640, "t3d": "perspective(1400px) rotateY(-14deg)", "t0": 9.7667, "t1": 11.0267, "emph": false, "track": [[293, 0.0, 0.0, 1.0, 0.0], [294, 3.3, -0.3, 1.0002, -0.01], [295, 7.2, -0.6, 1.0002, -0.02], [296, 10.5, -1.1, 1.0004, -0.04], [297, 13.6, -1.5, 1.0006, -0.05], [298, 17.4, -2.3, 1.001, -0.05], [299, 21.1, -2.9, 1.0014, -0.05], [300, 25.0, -3.3, 1.0019, -0.03], [301, 28.3, -3.7, 1.0023, -0.03], [302, 31.4, -4.2, 1.0028, -0.02], [303, 34.4, -4.6, 1.0033, -0.0], [304, 37.5, -5.3, 1.0041, -0.0], [305, 40.2, -5.9, 1.0043, -0.02], [306, 42.9, -6.5, 1.0046, -0.04], [307, 45.2, -7.0, 1.0049, -0.05], [308, 47.4, -7.4, 1.0051, -0.06], [309, 49.9, -7.7, 1.0054, -0.06], [310, 52.4, -7.9, 1.0056, -0.05], [311, 55.0, -8.1, 1.0058, -0.05], [312, 57.5, -8.2, 1.0059, -0.05], [313, 59.9, -8.7, 1.0062, -0.05], [314, 62.6, -9.0, 1.0065, -0.05], [315, 66.0, -9.7, 1.0069, -0.07], [316, 69.2, -10.2, 1.0072, -0.07], [317, 72.9, -11.0, 1.0076, -0.09], [318, 76.3, -11.7, 1.0079, -0.11], [319, 79.3, -12.2, 1.0082, -0.12], [320, 82.4, -12.6, 1.0087, -0.12], [321, 85.4, -13.2, 1.0091, -0.14], [322, 88.4, -13.5, 1.0096, -0.13], [323, 92.0, -13.9, 1.0101, -0.14], [324, 95.1, -14.9, 1.0105, -0.15], [325, 97.6, -15.5, 1.011, -0.16], [326, 100.1, -15.8, 1.0117, -0.16], [327, 103.1, -15.9, 1.0123, -0.16], [328, 106.7, -16.6, 1.013, -0.16]], "lines": [{"html": "to large-scale", "cls": "sm", "size": 44}, {"html": "<span class=\"k\">enterprises</span>.", "cls": "", "size": 90.3}]}, {"layer": "front", "mode": "env", "scheme": "dark", "x": 540, "y": 430, "t3d": null, "t0": 11.0267, "t1": 11.7267, "emph": false, "track": [[331, 0.0, -0.0, 1.0, 0.0], [332, 0.6, 0.0, 0.9994, 0.02], [333, 1.7, -0.2, 0.9997, 0.01], [334, 2.7, -0.3, 1.0, -0.01], [335, 3.7, -0.4, 1.0001, 0.0], [336, 4.8, -0.4, 1.0007, 0.03], [337, 6.7, -0.6, 1.0012, 0.02], [338, 7.5, -0.2, 1.0008, 0.03], [339, 9.0, -0.5, 1.0022, 0.07], [340, 10.5, 0.2, 1.002, 0.11], [341, 11.4, -0.2, 1.0035, 0.09], [342, 12.7, 0.5, 1.0033, 0.1], [343, 13.1, 0.0, 1.0042, 0.1], [344, 15.3, 0.4, 1.0048, 0.12], [345, 15.6, 0.7, 1.004, 0.13], [346, 17.2, 1.7, 1.0035, 0.19], [347, 18.8, 2.4, 1.0026, 0.2], [348, 19.5, 2.0, 1.0027, 0.2], [349, 20.6, 2.3, 1.0017, 0.2], [350, 20.8, 2.7, 1.0009, 0.23], [351, 22.1, 3.0, 1.0004, 0.29]], "lines": [{"html": "We pitched", "cls": "sm", "size": 57.0}, {"html": "our <span class=\"k\">idea</span>", "cls": "", "size": 124}]}, {"layer": "front", "mode": "env", "scheme": "dark", "x": 540, "y": 400, "t3d": null, "t0": 11.7267, "t1": 12.8333, "emph": false, "track": [[352, -0.0, 0.0, 1.0, -0.0], [353, 0.5, 0.3, 1.0002, 0.05], [354, 1.3, 0.1, 1.0005, 0.11], [355, 2.4, 0.4, 1.0005, 0.12], [356, 3.0, 0.7, 1.0002, 0.16], [357, 3.8, 1.7, 0.9994, 0.21], [358, 4.7, 1.5, 1.0001, 0.19], [359, 5.8, 2.5, 0.9996, 0.21], [360, 6.2, 3.0, 0.9998, 0.22], [361, 6.7, 4.1, 0.9999, 0.21], [362, 7.5, 4.5, 1.0004, 0.19], [363, 7.5, 4.5, 1.0011, 0.18], [364, 8.4, 4.9, 1.0016, 0.18], [365, 8.6, 5.0, 1.0016, 0.16], [366, 9.2, 5.2, 1.002, 0.18], [367, 9.6, 5.4, 1.0026, 0.2], [368, 10.3, 5.8, 1.0034, 0.24], [369, 10.2, 5.4, 1.0046, 0.21], [370, 9.8, 6.1, 1.0053, 0.16], [371, 10.0, 6.5, 1.0057, 0.08], [372, 10.0, 6.2, 1.0065, 0.04], [373, 10.0, 7.6, 1.0059, 0.02], [374, 10.0, 8.1, 1.0064, 0.03], [375, 10.1, 9.3, 1.0055, -0.03], [376, 9.9, 9.5, 1.0055, -0.04], [377, 9.8, 10.3, 1.0051, -0.06], [378, 9.3, 10.5, 1.005, -0.08], [379, 8.9, 10.5, 1.0047, -0.12], [380, 8.3, 10.2, 1.0051, -0.16], [381, 8.2, 9.8, 1.0056, -0.16], [382, 7.5, 11.1, 1.005, -0.15], [383, 7.6, 8.2, 1.0047, -0.16], [384, 7.7, 15.2, 0.9944, -0.13]], "lines": [{"html": "on how to develop", "cls": "sm", "size": 44}, {"html": "their <span class=\"k\">business</span>,", "cls": "", "size": 88.8}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 541.1, "y": 341.1, "t3d": null, "t0": 13.26, "t1": 14.2267, "emph": false, "track": null, "lines": [{"html": "and one client", "cls": "", "size": 99.7}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 542.1, "y": 316.0, "t3d": null, "t0": 14.2267, "t1": 15.36, "emph": false, "track": null, "lines": [{"html": "said <span class=\"k\">yes</span>", "cls": "sm", "size": 42.4}, {"html": "for a website.", "cls": "", "size": 92.3}]}, {"layer": "front", "mode": "env", "scheme": "light", "x": 540, "y": 1290, "t3d": null, "t0": 15.36, "t1": 16.2933, "emph": false, "track": [[461, -0.0, 0.0, 1.0, -0.0], [462, 0.5, -0.5, 0.9998, -0.01], [463, 0.7, -0.1, 0.9999, 0.04], [464, 0.8, -1.6, 0.9998, 0.05], [465, 1.2, -1.5, 1.0005, 0.06], [466, 2.4, -2.6, 1.0012, 0.07], [467, 1.8, -1.9, 1.0014, 0.09], [468, 1.5, -2.3, 1.0013, 0.12], [469, 1.9, -2.4, 1.0019, 0.15], [470, 2.0, -2.9, 1.0016, 0.13], [471, 2.4, -3.0, 1.0013, 0.14], [472, 3.2, -3.4, 1.0011, 0.15], [473, 3.3, -2.6, 1.0015, 0.15], [474, 3.7, -2.6, 1.0021, 0.17], [475, 3.0, -2.8, 1.0024, 0.2], [476, 3.4, -3.9, 1.0021, 0.17]], "lines": [{"html": "We built", "cls": "sm", "size": 57.0}, {"html": "the <span class=\"k\">demo</span>", "cls": "", "size": 124}]}, {"layer": "front", "mode": "env", "scheme": "light", "x": 540, "y": 1230, "t3d": null, "t0": 16.2933, "t1": 16.8267, "emph": false, "track": [[489, 0.0, -0.0, 1.0, 0.0], [490, 0.6, -1.1, 0.9999, -0.05], [491, 0.3, -0.8, 0.9998, -0.02], [492, 0.2, -1.6, 0.9995, 0.01], [493, 0.6, -2.4, 0.9994, 0.01], [494, -0.1, -2.9, 0.999, 0.01], [495, -0.5, -3.5, 0.9986, 0.04], [496, -2.1, -4.2, 0.9978, 0.02], [497, -1.9, -5.7, 0.9979, -0.01], [498, -3.7, -5.4, 0.9973, 0.03], [499, -4.2, -6.0, 0.9973, 0.01], [500, -5.3, -5.3, 0.9969, 0.01], [501, -6.6, -5.1, 0.9969, 0.01], [502, -7.4, -4.9, 0.997, 0.0], [503, -8.3, -4.5, 0.9969, 0.01], [504, -10.2, -4.2, 0.9965, 0.05]], "lines": [{"html": "when we were", "cls": "sm", "size": 57.0}, {"html": "ready", "cls": "", "size": 124}]}, {"layer": "front", "mode": "env", "scheme": "light", "x": 540, "y": 1230, "t3d": null, "t0": 16.8267, "t1": 17.9, "emph": false, "track": [[505, -0.0, 0.0, 1.0, 0.0], [506, -1.3, 0.3, 0.9999, -0.02], [507, -1.5, -0.1, 0.9997, 0.0], [508, -1.4, -0.7, 0.9998, -0.01], [509, -2.3, -1.3, 0.9995, -0.0], [510, -2.8, -2.1, 0.9988, 0.02], [511, -3.4, -3.1, 0.9986, 0.03], [512, -4.3, -3.0, 0.9989, 0.05], [513, -3.8, -4.1, 0.999, 0.01], [514, -4.4, -4.7, 0.9987, -0.02], [515, -4.8, -5.4, 0.9986, 0.02], [516, -4.5, -4.9, 0.999, 0.07], [517, -4.4, -5.1, 0.9997, 0.11], [518, -4.6, -4.8, 1.0005, 0.14], [519, -3.8, -4.1, 1.0014, 0.16], [520, -2.9, -3.5, 1.0019, 0.18], [521, -2.0, -2.4, 1.0024, 0.2], [522, -1.2, -2.3, 1.0018, 0.17], [523, 0.5, -1.6, 1.0017, 0.19], [524, 1.3, -2.5, 1.0014, 0.21], [525, 2.3, -3.7, 1.0014, 0.21], [526, 2.4, -4.0, 1.0004, 0.26], [527, 2.8, -4.4, 1.0003, 0.3], [528, 4.1, -4.9, 1.0008, 0.27], [529, 3.9, -5.4, 1.0008, 0.24], [530, 3.9, -6.5, 1.0005, 0.28], [531, 3.9, -7.3, 1.0004, 0.31], [532, 2.8, -7.8, 1.0004, 0.36], [533, 2.7, -8.5, 1.0001, 0.41], [534, 1.1, -8.8, 0.9997, 0.44], [535, 1.1, -9.3, 1.0, 0.45], [536, 0.7, -9.9, 0.9996, 0.45]], "lines": [{"html": "to <span class=\"k\">publish</span> it.", "cls": "", "size": 107.9}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 521.5, "y": 341.6, "t3d": null, "t0": 17.9, "t1": 18.76, "emph": false, "track": null, "lines": [{"html": "And then", "cls": "sm", "size": 47.8}, {"html": "the <span class=\"k\">payments</span>", "cls": "", "size": 104}]}, {"layer": "behind", "mode": "behind", "scheme": "light", "x": 537.8, "y": 400.8, "t3d": null, "t0": 18.76, "t1": 19.5933, "emph": true, "track": null, "lines": [{"html": "<span class=\"k\">slowed down</span>.", "cls": "", "size": 104.8}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 578.0, "y": 304.5, "t3d": null, "t0": 19.5933, "t1": 20.5267, "emph": false, "track": null, "lines": [{"html": "At the", "cls": "sm", "size": 35.0}, {"html": "beginning,", "cls": "", "size": 76.2}]}, {"layer": "top", "mode": "top", "scheme": "light", "x": 540, "y": 408.7, "t3d": null, "t0": 20.5267, "t1": 21.5933, "emph": false, "track": null, "lines": [{"html": "he paid us", "cls": "sm", "size": 50.6}, {"html": "<span class=\"k\">₹1,500</span>,", "cls": "", "size": 110}]}, {"layer": "behind", "mode": "behind", "scheme": "light", "x": 652.4, "y": 350.1, "t3d": null, "t0": 21.5933, "t1": 22.5933, "emph": true, "track": null, "lines": [{"html": "and then", "cls": "sm", "size": 54.9}, {"html": "nothing", "cls": "kw", "size": 140.8}]}, {"layer": "front", "mode": "lower", "scheme": "light", "x": 430, "y": 1540, "t3d": null, "t0": 22.5933, "t1": 23.1267, "emph": false, "track": null, "lines": [{"html": "happened.", "cls": "", "size": 96}]}, {"layer": "front", "mode": "env", "scheme": "dark", "x": 540, "y": 360, "t3d": null, "t0": 23.1267, "t1": 24.4933, "emph": false, "track": [[694, 0.0, 0.0, 1.0, -0.0], [695, 0.9, -0.0, 1.0002, 0.0], [696, 0.8, 0.5, 0.9999, 0.01], [697, 0.2, 0.5, 0.9998, 0.0], [698, 0.4, 0.1, 1.0, -0.04], [699, 0.1, 0.4, 0.9998, -0.03], [700, 0.0, 0.8, 0.9997, -0.02], [701, -0.3, 1.0, 0.9997, -0.0], [702, -0.5, 0.9, 0.9996, -0.01], [703, -0.9, 0.5, 0.9995, -0.03], [704, -1.8, 0.5, 0.9994, -0.05], [705, -2.8, 0.4, 0.9994, -0.07], [706, -2.9, 0.5, 0.9995, -0.08], [707, -3.7, 0.4, 0.9994, -0.05], [708, -3.7, -0.1, 0.9994, -0.03], [709, -4.3, 0.4, 0.9996, -0.03], [710, -4.4, 0.1, 0.9997, -0.04], [711, -4.5, 0.2, 0.9998, -0.01], [712, -5.4, -0.5, 0.9997, 0.02], [713, -5.4, 0.0, 0.9999, 0.02], [714, -6.2, -0.7, 1.0001, 0.0], [715, -6.3, -0.0, 1.0001, -0.03], [716, -5.8, -0.7, 1.0002, -0.03], [717, -4.8, -0.7, 1.0002, -0.03], [718, -3.6, -1.1, 1.0003, -0.0], [719, -2.5, -0.3, 1.0002, 0.01], [720, -2.0, -0.0, 1.0003, 0.01], [721, -1.3, 0.4, 1.0004, -0.03], [722, -0.5, 0.6, 1.0004, -0.02], [723, 0.3, 0.8, 1.0004, -0.03], [724, 0.9, 0.4, 1.0005, -0.06], [725, 1.8, 0.9, 1.0005, -0.05], [726, 1.6, 0.7, 1.0005, -0.05], [727, 2.5, 1.9, 1.0008, -0.03], [728, 1.9, 2.2, 1.0004, -0.04], [729, 3.0, 2.3, 1.0004, -0.04], [730, 3.6, 2.4, 1.0005, -0.05], [731, 3.9, 3.9, 1.0, -0.02], [732, 4.2, 3.4, 1.0001, -0.02], [733, 4.4, 4.0, 1.0003, -0.06], [734, 3.8, 4.2, 1.0001, -0.09]], "lines": [{"html": "So we tried", "cls": "sm", "size": 57.0}, {"html": "calling <span class=\"k\">him</span>", "cls": "", "size": 124}]}, {"layer": "front", "mode": "env", "scheme": "dark", "x": 540, "y": 360, "t3d": null, "t0": 24.4933, "t1": 25.4267, "emph": false, "track": [[735, 0.0, 0.0, 1.0, 0.0], [736, 0.3, 0.1, 1.0002, 0.02], [737, 0.8, 0.9, 1.0004, 0.06], [738, 0.4, 1.2, 1.0004, 0.09], [739, 1.1, 1.7, 1.0004, 0.09], [740, 0.5, 2.7, 0.9999, 0.07], [741, 0.1, 3.6, 0.9994, 0.1], [742, 0.6, 4.4, 0.9995, 0.15], [743, 1.0, 4.7, 0.9998, 0.19], [744, 0.8, 5.5, 0.9999, 0.2], [745, 0.5, 6.5, 0.9994, 0.18], [746, 0.1, 7.1, 0.9996, 0.19], [747, 0.3, 7.6, 0.9994, 0.22], [748, -0.2, 8.5, 0.9994, 0.22], [749, 0.1, 7.7, 0.9994, 0.2], [750, -0.8, 8.3, 0.9992, 0.22], [751, -0.9, 8.9, 0.9993, 0.21], [752, -1.1, 9.6, 0.9991, 0.21], [753, -1.8, 9.5, 0.9991, 0.19], [754, -2.6, 9.7, 0.999, 0.19], [755, -2.7, 10.3, 0.9992, 0.17], [756, -3.6, 11.4, 0.999, 0.19], [757, -3.8, 11.4, 0.9993, 0.22], [758, -4.0, 11.9, 0.9992, 0.21], [759, -5.0, 13.5, 0.999, 0.18], [760, -5.2, 14.5, 0.9989, 0.17], [761, -6.1, 15.9, 0.9987, 0.15], [762, -6.3, 17.2, 0.9988, 0.17]], "lines": [{"html": "regarding", "cls": "sm", "size": 57.0}, {"html": "<span class=\"k\">payments</span>,", "cls": "", "size": 124}]}, {"layer": "front", "mode": "env", "scheme": "dark", "x": 540, "y": 360, "t3d": null, "t0": 25.4267, "t1": 26.26, "emph": false, "track": [[763, 0.0, 0.0, 1.0, -0.0]], "lines": [{"html": "and every", "cls": "sm", "size": 57.0}, {"html": "<span class=\"k\">time</span>", "cls": "", "size": 124}]}, {"layer": "front", "mode": "env", "scheme": "dark", "x": 540, "y": 360, "t3d": null, "t0": 26.26, "t1": 27.0267, "emph": false, "track": [[788, 0.0, 0.0, 1.0, -0.0], [789, -0.5, -0.4, 1.0001, -0.02], [790, -0.3, -1.0, 1.0, -0.03], [791, -0.3, -0.6, 1.0002, -0.03], [792, -0.4, -0.7, 1.0001, -0.01], [793, -0.2, -0.6, 1.0002, 0.01], [794, 0.1, -1.2, 0.9999, 0.02], [795, -0.1, -0.4, 1.0, 0.02], [796, 0.8, -0.9, 1.0003, 0.04], [797, 0.3, -1.1, 1.0002, 0.02], [798, 0.1, -0.5, 1.0003, 0.01], [799, 0.3, -0.8, 1.0006, 0.0], [800, 0.1, -1.0, 1.0006, -0.02], [801, 0.3, -0.6, 1.0009, -0.02], [802, 1.2, -0.7, 1.0011, -0.03], [803, 1.9, -0.9, 1.0008, -0.05]], "lines": [{"html": "he used", "cls": "sm", "size": 57.0}, {"html": "to say", "cls": "", "size": 124}]}, {"layer": "front", "mode": "env", "scheme": "dark", "x": 300, "y": 520, "t3d": null, "t0": 27.0267, "t1": 28.0, "emph": false, "track": [[811, 0.0, 0.0, 1.0, 0.0], [812, 1.7, 2.2, 0.9912, -0.0], [813, 1.2, 4.1, 0.9862, -0.04], [814, 1.1, 6.3, 0.9801, -0.03], [815, 1.7, 8.8, 0.9736, 0.01], [816, 2.3, 10.4, 0.9686, 0.07], [817, 3.3, 12.2, 0.9625, 0.06], [818, 3.9, 14.3, 0.9563, 0.05], [819, 5.0, 16.9, 0.949, 0.07], [820, 6.0, 18.5, 0.9442, 0.1], [821, 6.7, 20.9, 0.938, 0.08], [822, 6.8, 23.8, 0.9325, 0.06], [823, 7.7, 25.7, 0.9262, 0.05], [824, 8.2, 28.8, 0.9196, 0.07], [825, 9.9, 30.1, 0.9143, 0.18], [826, 11.3, 32.3, 0.9084, 0.22], [827, 11.1, 32.3, 0.9064, 0.26], [828, 10.6, 32.3, 0.9064, 0.25], [829, 8.9, 32.5, 0.9063, 0.2], [830, 8.0, 32.4, 0.9062, 0.18], [831, 6.8, 32.2, 0.9062, 0.12], [832, 5.2, 32.6, 0.906, 0.08], [833, 4.9, 33.4, 0.9054, 0.09], [834, 5.4, 32.5, 0.906, 0.17], [835, 3.5, 32.7, 0.9065, 0.09], [836, 3.7, 33.2, 0.9052, 0.12], [837, 2.9, 33.1, 0.9054, 0.12], [838, 2.3, 32.3, 0.906, 0.15], [839, 1.7, 32.3, 0.9062, 0.14]], "lines": [{"html": "something", "cls": "sm", "size": 44}, {"html": "or the <span class=\"k\">other</span>.", "cls": "", "size": 63.4}]}, {"layer": "front", "mode": "lower", "scheme": "light", "x": 540, "y": 1530, "t3d": null, "t0": 28.0267, "t1": 29.8667, "emph": true, "track": null, "lines": [{"html": "So what did", "cls": "sm", "size": 44.2}, {"html": "we do <span class=\"k\">next?</span>", "cls": "", "size": 96}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 586.4, "y": 323.0, "t3d": null, "t0": 29.8667, "t1": 30.8267, "emph": false, "track": null, "lines": [{"html": "You would", "cls": "sm", "size": 46.9}, {"html": "expect us", "cls": "", "size": 102.1}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 567.2, "y": 320.0, "t3d": null, "t0": 30.8267, "t1": 31.9933, "emph": false, "track": null, "lines": [{"html": "to publish it", "cls": "sm", "size": 45.0}, {"html": "<span class=\"k\">anyway</span>,", "cls": "", "size": 97.9}]}, {"layer": "front", "mode": "env", "scheme": "light", "x": 450, "y": 430, "t3d": null, "t0": 31.9933, "t1": 32.7, "emph": false, "track": [[960, 0.0, 0.0, 1.0, -0.0], [961, 2.7, -4.6, 0.998, -0.07], [962, 0.1, -9.8, 0.9946, -0.12], [963, -10.9, -16.4, 0.9943, -0.21], [964, -19.7, -23.7, 0.9936, -0.27], [965, -23.2, -28.8, 0.9954, -0.55], [966, -26.0, -30.2, 0.9969, -0.9], [967, -25.1, -30.0, 0.9976, -1.36], [968, -18.0, -31.0, 0.9977, -1.52], [969, -10.0, -32.0, 0.9972, -1.7], [970, 4.1, -37.1, 0.9977, -1.87], [971, 14.5, -44.3, 0.9977, -1.9], [972, 29.7, -50.2, 0.9977, -1.79], [973, 42.9, -54.1, 0.9978, -1.78], [974, 51.2, -57.1, 0.999, -1.75], [975, 64.8, -59.9, 0.9989, -1.87], [976, 75.8, -65.4, 1.0003, -1.62], [977, 91.2, -68.8, 0.9998, -1.4], [978, 103.1, -70.2, 0.9983, -1.12], [979, 114.8, -64.7, 0.9984, -1.01], [980, 125.9, -55.2, 0.9974, -1.08]], "lines": [{"html": "or to", "cls": "sm", "size": 47.2}, {"html": "walk <span class=\"k\">away</span>,", "cls": "", "size": 102.6}]}, {"layer": "behind", "mode": "behind", "scheme": "light", "x": 517.8, "y": 386.2, "t3d": null, "t0": 32.7267, "t1": 33.76, "emph": true, "track": null, "lines": [{"html": "but we did", "cls": "sm", "size": 65.8}, {"html": "neither.", "cls": "kw", "size": 168.8}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 535.6, "y": 324.1, "t3d": null, "t0": 33.76, "t1": 34.76, "emph": false, "track": null, "lines": [{"html": "We wanted to", "cls": "sm", "size": 47.6}, {"html": "handle it", "cls": "", "size": 103.6}]}, {"layer": "behind", "mode": "behind", "scheme": "light", "x": 497.0, "y": 413.6, "t3d": null, "t0": 34.76, "t1": 35.7667, "emph": true, "track": null, "lines": [{"html": "professionally.", "cls": "kw", "size": 112.7}]}, {"layer": "top", "mode": "top", "scheme": "dark", "x": 540, "y": 545.4, "t3d": null, "t0": 35.7667, "t1": 36.8933, "emph": false, "track": null, "lines": [{"html": "but that was not", "cls": "sm", "size": 48.5}, {"html": "the same case", "cls": "", "size": 105.4}]}, {"layer": "front", "mode": "lower", "scheme": "light", "x": 540, "y": 1440, "t3d": null, "t0": 36.8933, "t1": 38.0333, "emph": false, "track": null, "lines": [{"html": "from the", "cls": "sm", "size": 44.2}, {"html": "<span class=\"k\">client's</span> side.", "cls": "", "size": 96}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 500.7, "y": 478.6, "t3d": null, "t0": 38.5933, "t1": 39.3267, "emph": false, "track": null, "lines": [{"html": "That was", "cls": "sm", "size": 47.8}, {"html": "about", "cls": "", "size": 104}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 510.1, "y": 313.0, "t3d": null, "t0": 39.3267, "t1": 40.5333, "emph": false, "track": null, "lines": [{"html": "our first", "cls": "sm", "size": 40.5}, {"html": "<span class=\"k\">client</span>,", "cls": "", "size": 88.1}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 510.6, "y": 347.6, "t3d": null, "t0": 40.86, "t1": 41.6267, "emph": false, "track": null, "lines": [{"html": "and", "cls": "sm", "size": 47.8}, {"html": "thankfully", "cls": "", "size": 104}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 497.8, "y": 373.6, "t3d": null, "t0": 41.6267, "t1": 43.2933, "emph": false, "track": null, "lines": [{"html": "not every client", "cls": "sm", "size": 47.8}, {"html": "is like <span class=\"k\">that</span>.", "cls": "", "size": 104}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 464.7, "y": 323.0, "t3d": null, "t0": 43.2933, "t1": 44.36, "emph": true, "track": null, "lines": [{"html": "And in", "cls": "sm", "size": 46.9}, {"html": "<span class=\"k\">part 2</span>,", "cls": "", "size": 102.1}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 495.8, "y": 321.0, "t3d": null, "t0": 44.36, "t1": 45.0267, "emph": false, "track": null, "lines": [{"html": "we'll talk", "cls": "sm", "size": 45.6}, {"html": "about", "cls": "", "size": 99.3}]}, {"layer": "front", "mode": "upper", "scheme": "light", "x": 488.8, "y": 320.0, "t3d": null, "t0": 45.0267, "t1": 45.86, "emph": false, "track": null, "lines": [{"html": "some of the", "cls": "sm", "size": 45.0}, {"html": "<span class=\"k\">best</span> clients", "cls": "", "size": 97.9}]}, {"layer": "front", "mode": "lower", "scheme": "light", "x": 540, "y": 1440, "t3d": null, "t0": 45.86, "t1": 46.7, "emph": false, "track": null, "lines": [{"html": "we've", "cls": "sm", "size": 44.2}, {"html": "worked with.", "cls": "", "size": 96}]}, {"layer": "front", "mode": "end", "scheme": "light", "x": 540, "y": 1560, "t3d": null, "t0": 46.7, "t1": 47.8, "emph": false, "gentle": true, "track": null, "lines": [{"html": "Next in", "cls": "sm", "size": 55.2}, {"html": "Part 2", "cls": "kw", "size": 141.6}]}], "paper": [3.2, 4.3], "pages": [0, 5, 10, 20, 27], "pay": [20.566666666666666, 21.933333333333334], "notpub": [35.766666666666666, 36.666666666666664], "flashcuts": [[3.2, "paper", 1], [4.3, "flash", 2], [6.8, "flash", 3], [8.4, "flash", 2], [9.2333, "paper", 1], [9.7667, "flash", 2], [10.9667, "flash", 2], [12.8333, "flash", 2], [15.3333, "flash", 2], [15.9, "paper", 1], [16.2667, "paper", 1], [17.9, "flash", 3], [20.5667, "paper", 2], [21.9333, "paper", 1], [23.1, "flash", 2], [25.4667, "paper", 1], [26.8, "paper", 1], [28.0, "flash", 3], [29.8667, "flash", 3], [31.9333, "flash", 2], [32.7, "paper", 1], [35.7667, "paper", 2], [36.6667, "flash", 1], [37.3667, "paper", 1]], "logo": {"x": 160.0, "y": 386.9439071566731}};
+      const tl = gsap.timeline({ paused: true });
+      const FR = 1 / 30;
+
+      /* ---------- captions ---------- */
+      D.caps.forEach((c, k) => {
+        const host = document.getElementById(c.layer);
+        const w = document.createElement("div");
+        w.className = `cw ${c.scheme}${c.mode === "lower" ? " lower" : ""}`;
+        w.id = `c${k}`;
+        w.style.left = c.x + "px";
+        w.style.top = c.y + "px";
+        const lines = c.lines.map((l) => `<span class="ln ${l.cls}" style="font-size:${l.size}px">${l.html}</span>`).join("");
+        w.innerHTML = `<div class="c3" style="transform:${c.t3d || "none"}"><div class="ci">${lines}</div></div>`;
+        host.appendChild(w);
+        const inner = `#c${k} .ci`;
+        tl.set(w, { opacity: 1 }, c.t0);
+        if (c.gentle) {
+          tl.fromTo(inner, { opacity: 0 }, { opacity: 1, duration: 12 * FR, ease: "sine.out", immediateRender: false }, c.t0);
+        } else if (c.emph) {
+          tl.fromTo(inner, { opacity: 0, scale: 0.86, y: 22, filter: "blur(6px)" },
+            { opacity: 1, scale: 1, y: 0, filter: "blur(0px)", duration: 9 * FR, ease: "back.out(1.5)", immediateRender: false }, c.t0);
+        } else {
+          tl.fromTo(inner, { opacity: 0, scale: 0.88, y: 16 },
+            { opacity: 1, scale: 1, y: 0, duration: 8 * FR, ease: "power3.out", immediateRender: false }, c.t0);
+        }
+        if (c.t1 < D.total - 0.02) {
+          tl.to(inner, { opacity: 0, y: -10, duration: 4 * FR, ease: "power1.in" }, c.t1 - 4 * FR);
+          tl.set(w, { opacity: 0 }, c.t1);
+        }
+        // planar / damped subject tracking: one set per frame
+        if (c.track) c.track.forEach(([f, x, y, s, r]) => tl.set(w, { x, y, scale: s, rotation: r }, f * FR));
+      });
+      gsap.set(".ci", { opacity: 0 });
+
+      /* ---------- newspaper match cut: hard page swaps, each page lands with a 3-frame blur/scale settle ---------- */
+      const [m0, m1] = D.paper;
+      tl.set("#mc", { opacity: 1 }, m0);
+      tl.set("#mc", { opacity: 0 }, m1);
+      D.pages.forEach((f, k) => {
+        const t = m0 + f * FR;
+        const end = k + 1 < D.pages.length ? m0 + D.pages[k + 1] * FR : m1;
+        tl.set(`#np${k + 1}`, { opacity: 1 }, t);
+        if (k + 1 < D.pages.length) tl.set(`#np${k + 1}`, { opacity: 0 }, end);
+        const last = k === D.pages.length - 1;
+        tl.fromTo(`#np${k + 1}`, { scale: last ? 1.045 : 1.06, filter: `blur(${last ? 3 : 7}px)` },
+          { scale: 1, filter: "blur(0px)", duration: (last ? 5 : 3) * FR, ease: "power2.out", immediateRender: false }, t);
+      });
+      gsap.set("#np5 img", { left: D.logo.x, top: D.logo.y });
+
+      /* ---------- ₹1,500 receipt (L-cut under Prahalad's voice) ---------- */
+      const [a0, a1] = D.pay;
+      tl.fromTo("#pay", { opacity: 0 }, { opacity: 1, duration: 3 * FR, ease: "none", immediateRender: false }, a0);
+      tl.fromTo("#payCard", { y: 40, scale: 0.97 }, { y: 0, scale: 1, duration: 0.22, ease: "power3.out", immediateRender: false }, a0);
+      tl.to("#payCard", { scale: 1.05, duration: a1 - a0 - 0.22, ease: "sine.inOut" }, a0 + 0.22);
+      tl.to("#pay", { opacity: 0, duration: 2 * FR, ease: "none" }, a1 - 2 * FR);
+
+      /* ---------- website held offline (clean factual cut, 3-4 frame settle) ---------- */
+      const [n0, n1] = D.notpub;
+      tl.set("#notpub", { opacity: 1 }, n0);
+      tl.fromTo("#notpub img", { scale: 1.035, y: 8 }, { scale: 1, y: 0, duration: 4 * FR, ease: "power2.out", immediateRender: false }, n0);
+      tl.fromTo("#npTag", { opacity: 0 }, { opacity: 1, duration: 4 * FR, ease: "none", immediateRender: false }, n0 + 3 * FR);
+      tl.set("#notpub", { opacity: 0 }, n1);
+
+      /* ---------- flash cuts: every change to the next clip or speaker ---------- */
+      // flash: 2-frame rise peaking on the first incoming frame (picture still reads through it), 0.16-0.24 s recovery,
+      // whole-frame punch that settles
+      // paper: clean cut with a 1-frame light snap (the paper-cut SFX does the work)
+      const FL = { 3: [0.68, 0.5, 0.4, 1.045], 2: [0.52, 0.38, 0.28, 1.035], 1: [0.36, 0.26, 0, 1.025] };
+      const PP = { 2: 0.3, 1: 0.2 };
+      D.flashcuts.forEach(([t, kind, lvl]) => {
+        if (kind === "paper") {
+          tl.fromTo("#fxWash", { opacity: PP[lvl] }, { opacity: 0, duration: 4 * FR, ease: "power2.out", immediateRender: false }, t);
+          tl.fromTo("#stage", { scale: 1.012 }, { scale: 1, duration: 6 * FR, ease: "power2.out", immediateRender: false }, t);
+          return;
+        }
+        const [wash, core, sweep, punch] = FL[lvl];
+        const rise = 2 * FR;
+        tl.fromTo("#fxWash", { opacity: 0 }, { opacity: wash, duration: rise, ease: "power2.in", immediateRender: false }, t - rise);
+        tl.to("#fxWash", { opacity: 0, duration: 0.16, ease: "power3.out" }, t);
+        tl.fromTo("#fxCore", { opacity: 0, scale: 0.86 }, { opacity: core, scale: 1, duration: rise, ease: "power2.in", immediateRender: false }, t - rise);
+        tl.to("#fxCore", { opacity: 0, scale: 1.18, duration: 0.24, ease: "power3.out" }, t);
+        if (sweep) {
+          tl.fromTo("#fxSweep", { opacity: 0, xPercent: -14 }, { opacity: sweep, xPercent: 4, duration: rise, ease: "power2.in", immediateRender: false }, t - rise);
+          tl.to("#fxSweep", { opacity: 0, xPercent: 26, duration: 0.2, ease: "power3.out" }, t);
+        }
+        // outgoing pushes in a touch, incoming lands slightly large and settles
+        tl.fromTo("#stage", { scale: 1 }, { scale: 1 + (punch - 1) * 0.6, duration: 3 * FR, ease: "power2.in", immediateRender: false }, t - 3 * FR);
+        tl.fromTo("#stage", { scale: punch }, { scale: 1, duration: 0.36, ease: "power3.out", immediateRender: false }, t);
+      });
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
