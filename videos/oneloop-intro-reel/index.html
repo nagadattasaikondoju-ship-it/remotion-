@@ -1,0 +1,536 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>OneLoop Intro Reel</title>
+<style>
+@font-face{font-family:A;src:url(fonts/Almarai-Light.ttf);font-weight:300}
+@font-face{font-family:A;src:url(fonts/Almarai-Regular.ttf);font-weight:400}
+@font-face{font-family:A;src:url(fonts/Almarai-Bold.ttf);font-weight:700}
+@font-face{font-family:A;src:url(fonts/Almarai-ExtraBold.ttf);font-weight:800}
+html,body{margin:0;background:#000;overflow:hidden}
+#stage{position:relative;width:1080px;height:1920px;overflow:hidden;background:#000;font-family:A,sans-serif;color:#E1E0CC;-webkit-font-smoothing:antialiased}
+.scene{position:absolute;left:0;top:0;width:1080px;height:1920px;opacity:0}
+.cam{position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0}
+.a{position:absolute}
+.m{overflow:hidden}
+.r{display:block}
+.k{color:#E59C69}
+.ln{white-space:pre}
+.lt{display:inline-block}
+/* hook */
+.hl{position:absolute;left:0;width:1080px;height:250px;overflow:hidden;text-align:center}
+.hl .r{font-weight:800;font-size:212px;line-height:250px;letter-spacing:-6px;color:#E1E0CC;white-space:pre}
+.half{display:inline-block}
+/* page: button, cards, path */
+.btn{background:#DEDBC8;border-radius:64px;box-shadow:0 18px 30px -8px rgba(0,0,0,.5)}
+.btnlab{position:absolute;left:52px;top:0;height:128px;line-height:132px;font-size:44px;font-weight:700;color:#000;letter-spacing:-1px;white-space:nowrap}
+.card{background:#161616;border:1.5px solid rgba(255,255,255,.07);border-radius:28px;box-sizing:border-box}
+.num{font-size:26px;letter-spacing:.18em;color:rgba(225,224,204,.5);font-weight:700}
+.ttl{font-weight:700;color:#fff;white-space:nowrap}
+.tag{display:inline-block;border:1.5px solid rgba(225,224,204,.3);border-radius:999px;color:#E1E0CC;font-weight:700;white-space:nowrap}
+.body{color:#9CA3AF;font-weight:300}
+.row{position:absolute;left:56px;height:60px;display:flex;align-items:center;gap:22px;font-size:40px;white-space:nowrap}
+/* products */
+.pcard{position:absolute;left:110px;top:800px;width:860px;height:560px;transform-origin:50% 0}
+.plab{position:absolute;left:56px;top:56px;height:56px;border:1.5px solid rgba(225,224,204,.25);border-radius:12px;padding:0 22px 0 54px;font-size:24px;letter-spacing:.16em;line-height:59px;font-weight:700;white-space:nowrap}
+.pdot{position:absolute;left:22px;top:19px;width:18px;height:18px;border-radius:9px}
+/* results */
+.tab{position:relative;display:inline-block;height:84px;line-height:88px;padding:0 36px;border-radius:42px;border:1.5px solid rgba(225,224,204,.16);background:#0d0d0d;font-size:30px;white-space:nowrap;margin-right:16px;box-sizing:border-box;color:#E1E0CC}
+.tab b{font-size:22px;letter-spacing:.1em;opacity:.55;margin-right:12px}
+.tile{position:absolute;width:432px;height:400px;border-radius:28px;box-sizing:border-box;overflow:hidden}
+.tile.c{background:#DEDBC8;color:#000}
+.tile.d{background:#161616;border:1.5px solid rgba(255,255,255,.07);color:#E1E0CC}
+.tnum{position:absolute;left:40px;top:34px;font-weight:700;letter-spacing:-2px;white-space:nowrap;line-height:1.15}
+.tlab{position:absolute;left:40px;top:244px;font-size:23px;font-weight:700;letter-spacing:.12em;white-space:nowrap;line-height:30px}
+.tsub{position:absolute;left:40px;top:282px;width:356px;font-size:28px;font-weight:300;line-height:1.3}
+.tile.c .tsub{color:#333}
+.tile.d .tsub{color:#9CA3AF}
+/* node + cursor */
+#node{position:absolute;left:0;top:0;background:#E59C69;overflow:hidden;z-index:50}
+#nlab{position:absolute;left:0;top:0;width:100%;height:100%;color:#000;font-weight:700;font-size:30px;text-align:center;white-space:nowrap}
+#narrow{position:absolute;left:50%;top:50%}
+#cursor{position:absolute;left:0;top:0;z-index:60;transform-origin:0 0}
+</style></head>
+<body>
+<svg width="0" height="0" style="position:absolute"><defs id="fdefs"></defs></svg>
+<div id="stage">
+
+<!-- ============ HOOK ============ -->
+<div class="scene" id="hook"><div class="cam" id="hookcam"></div></div>
+
+<!-- ============ PAGE: button → audit card → growth path ============ -->
+<div class="scene" id="page"><div class="cam" id="pagecam">
+  <svg class="a" id="psvg" width="1080" height="4200" style="left:0;top:0;overflow:visible">
+    <path id="ptrail" fill="none" stroke="#E59C69" stroke-width="6" stroke-linecap="round"/>
+  </svg>
+  <div class="a btn" id="btn" style="left:220px;top:896px;width:640px;height:128px">
+    <div class="btnlab" id="btnlab">Audit my business</div>
+    <div class="a" id="aslot" style="right:12px;top:12px;width:104px;height:104px"></div>
+  </div>
+  <div class="a card" id="c1" style="left:120px;top:610px;width:840px;height:700px">
+    <div class="a m" style="left:56px;top:52px;height:34px"><span class="r num" id="c1n">01</span></div>
+    <div class="a" id="c1dot" style="right:48px;top:58px;width:20px;height:20px"></div>
+    <div class="a m" style="left:56px;top:104px;height:80px"><span class="r ttl" id="c1t" style="font-size:66px;line-height:80px"><span class="k">Audit</span> &amp; Forensics</span></div>
+    <div class="a m" style="left:56px;top:198px;height:52px"><span class="r tag" id="c1g" style="font-size:24px;line-height:46px;padding:0 20px">Diagnostic</span></div>
+    <div id="c1rows"></div>
+    <div class="a m" style="left:56px;top:592px;height:50px"><span class="r body" id="c1f" style="font-size:36px;line-height:50px">before building anything.</span></div>
+  </div>
+  <div id="pcards"></div>
+</div></div>
+
+<!-- ============ PRODUCTS ============ -->
+<div class="scene" id="prod"><div class="cam" id="prodcam">
+  <div class="a m" style="left:0;width:1080px;top:300px;height:40px;text-align:center"><span class="r" id="peb" style="font-size:24px;letter-spacing:.3em;font-weight:700;color:rgba(225,224,204,.6);line-height:40px">SHIPPED PRODUCTS &amp; PLATFORMS</span></div>
+  <div class="a m" style="left:0;width:1080px;top:356px;height:118px;text-align:center"><span class="r" id="pt1" style="font-size:100px;line-height:118px;letter-spacing:-3px"><span class="k">Built</span> &amp; Deployed</span></div>
+  <div class="a m" style="left:0;width:1080px;top:470px;height:118px;text-align:center"><span class="r" id="pt2" style="font-size:100px;line-height:118px;letter-spacing:-3px">by OneLoop</span></div>
+  <div id="pstack"></div>
+</div></div>
+
+<!-- ============ RESULTS ============ -->
+<div class="scene" id="res"><div class="cam" id="rescam">
+  <div class="a m" style="left:0;width:1080px;top:270px;height:40px;text-align:center"><span class="r" id="reb" style="font-size:24px;letter-spacing:.3em;font-weight:700;color:rgba(225,224,204,.6);line-height:40px">AUDITED &amp; VERIFIED TRACK RECORDS</span></div>
+  <div class="a m" style="left:0;width:1080px;top:326px;height:118px;text-align:center"><span class="r" id="rt1" style="font-size:100px;line-height:118px;letter-spacing:-3px"><span class="k">Proven</span> Results.</span></div>
+  <div class="a m" style="left:0;width:1080px;top:440px;height:118px;text-align:center"><span class="r" id="rt2" style="font-size:100px;line-height:118px;letter-spacing:-3px">Zero Fluff.</span></div>
+  <div class="a" id="strip" style="left:0;top:620px;white-space:nowrap"></div>
+  <div class="a m" style="left:84px;top:750px;width:900px;height:40px"><span class="r" id="rmeta" style="font-size:25px;line-height:40px;color:#9CA3AF;letter-spacing:.02em;white-space:nowrap"></span></div>
+  <div id="tiles"></div>
+</div></div>
+
+<!-- ============ PAYOFF + END ============ -->
+<div class="scene" id="end"><div class="cam" id="endcam">
+  <div class="a" id="flood" style="background:#DEDBC8"></div>
+  <div class="a" id="giant" style="left:0;top:0;font-weight:700;font-size:440px;line-height:1;letter-spacing:-14px;color:#000;white-space:nowrap"><span id="g9">~9</span><span id="gx" style="color:transparent">x</span></div>
+  <div class="a m" style="left:0;width:1080px;top:1110px;height:50px;text-align:center"><span class="r" id="gs1" style="font-size:34px;line-height:50px;letter-spacing:.2em;font-weight:700;color:#000">RETURN ON AD SPEND</span></div>
+  <div class="a m" style="left:0;width:1080px;top:1170px;height:60px;text-align:center"><span class="r" id="gs2" style="font-size:46px;line-height:60px;color:#000">Sustained across 17 months</span></div>
+  <div class="a m" style="left:0;width:1080px;top:1290px;height:60px;text-align:center"><span class="r" id="gs3" style="font-size:46px;line-height:60px;color:#000;font-weight:700">$753K revenue on $88K ad spend</span></div>
+  <svg class="a" id="lsvg" width="1080" height="1920" viewBox="0 0 1080 1920" style="left:0;top:0;overflow:visible">
+    <defs>
+      <mask id="lmask" maskUnits="userSpaceOnUse" x="-5" y="-5" width="10" height="10"><path id="f8m" fill="none" stroke="#fff" stroke-width="0.27" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1 1"/></mask>
+      <clipPath id="wclip" clipPathUnits="userSpaceOnUse"><rect id="wcr" x="-1.2" y="0.55" width="2.4" height="0.29"/></clipPath>
+    </defs>
+    <g id="mark"><g id="loops" mask="url(#lmask)" fill="#E59C69" fill-rule="evenodd"></g>
+      <polygon id="xp" fill="#000" stroke="#E59C69" stroke-linejoin="miter" pathLength="1" stroke-dasharray="1 1"/></g>
+    <g id="word" clip-path="url(#wclip)" fill="#E1E0CC" fill-rule="evenodd"></g>
+  </svg>
+  <div class="a" id="tagl" style="left:0;width:1080px;top:1000px;height:50px;text-align:center;font-size:34px;font-weight:700;letter-spacing:.2em;white-space:nowrap"></div>
+  <div class="a" id="uline" style="height:4px;background:#E1E0CC;border-radius:2px"></div>
+  <div class="a btn" id="cta" style="left:240px;top:1130px;width:600px;height:128px">
+    <div class="btnlab" id="ctalab">Audit my business</div>
+    <div class="a" id="cslot" style="right:12px;top:12px;width:104px;height:104px"></div>
+  </div>
+  <div class="a" id="url" style="left:0;width:1080px;top:1300px;text-align:center;font-size:44px;letter-spacing:.04em;color:rgba(225,224,204,.75);white-space:pre"></div>
+</div></div>
+
+<div id="node"><div id="nlab"></div>
+  <svg id="narrow" width="44" height="44" viewBox="-22 -22 44 44" style="margin:-22px 0 0 -22px"><path d="M-12 0 H12 M3 -9 L12 0 L3 9" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+<svg id="cursor" width="60" height="80" viewBox="-4 -4 60 80"><path d="M0 0 L0 52 L13 40 L22 61 L31 57 L22 37 L39 37 Z" fill="#fff" stroke="#000" stroke-width="3.2" stroke-linejoin="round"/></svg>
+</div>
+
+<script src="logo.js"></script>
+<script>
+/* ======================= maths ======================= */
+const W = 1080, H = 1920, COP = "#E59C69", CRM = "#E1E0CC", DT = 1 / 240;
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, u) => a + (b - a) * u;
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const eo = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const ei = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : (Math.pow(2, 10 * x - 10) - 0.001) / 0.999);
+const eio = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? Math.pow(2, 20 * x - 10) / 2 : (2 - Math.pow(2, -20 * x + 10)) / 2);
+// closed-form damped spring (ζ = 0.8 → ~1.5 % overshoot), settles (1 %) at d seconds after t0
+function sp(t, t0, d = 0.4) {
+  const x = t - t0; if (x <= 0) return 0;
+  const z = 0.8, w = 4.6 / (z * d), wd = w * 0.6, e = Math.exp(-z * w * x);
+  return e < 2e-4 ? 1 : 1 - e * (Math.cos(wd * x) + ((z * w) / wd) * Math.sin(wd * x));
+}
+// sum of springs: value starts at v0 and springs to each key [t, v, d]
+const track = (t, v0, keys) => { let v = v0, prev = v0; for (const [tk, vk, d] of keys) { v += (vk - prev) * sp(t, tk, d); prev = vk; } return v; };
+// decaying wobble for impacts
+const kick = (t, t0, f = 26, k = 11) => (t < t0 ? 0 : Math.exp(-(t - t0) * k) * Math.sin((t - t0) * f));
+const camT = (c) => `translate(540px,960px) scale(${c.z}) translate(${-c.cx}px,${-c.cy}px)`;
+const map = (c, x, y) => [(x - c.cx) * c.z + 540, (y - c.cy) * c.z + 960];
+const unmap = (c, x, y) => [(x - 540) / c.z + c.cx, (y - 960) / c.z + c.cy];
+const R = (el) => { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height }; };
+const lr = (a, b, u) => ({ x: lerp(a.x, b.x, u), y: lerp(a.y, b.y, u), w: lerp(a.w, b.w, u), h: lerp(a.h, b.h, u) });
+const mk = (tag, cls, html, parent, style) => { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; if (style) e.style.cssText = style; parent.appendChild(e); return e; };
+// reveal from a mask: element rises from below its clipping parent
+const rise = (el, t, t0, d = 0.32, dist = 1.1) => { const s = sp(t, t0, d); el.style.transform = `translateY(${(1 - s) * dist * 100}%)`; return s; };
+// out: slides up and out of its mask
+const riseOut = (el, t, t0, d = 0.16) => { const s = ei(P(t, t0, t0 + d)); return s; };
+
+/* velocity-driven blur: an SVG Gaussian per element, axis-aligned to the motion */
+const FD = $("fdefs"), FILT = {};
+function blur(el, id, vx, vy, k = 1 / 420) {
+  const sx = Math.min(36, Math.abs(vx) * k), sy = Math.min(36, Math.abs(vy) * k);
+  if (sx < 0.5 && sy < 0.5) { el.style.filter = "none"; return; }
+  let g = FILT[id];
+  if (!g) { const f = document.createElementNS("http://www.w3.org/2000/svg", "filter"); f.id = id; f.setAttribute("x", "-50%"); f.setAttribute("y", "-50%"); f.setAttribute("width", "200%"); f.setAttribute("height", "200%");
+    f.setAttribute("color-interpolation-filters", "sRGB"); g = document.createElementNS("http://www.w3.org/2000/svg", "feGaussianBlur"); f.appendChild(g); FD.appendChild(f); FILT[id] = g; }
+  g.setAttribute("stdDeviation", `${sx.toFixed(2)} ${sy.toFixed(2)}`); el.style.filter = `url(#${id})`;
+}
+const camBlur = (el, id, camf, t) => { const a = camf(t - DT), b = camf(t); blur(el, id, (b.cx - a.cx) * b.z / DT, (b.cy - a.cy) * b.z / DT, 1 / 700); };
+const show = (el, on) => { el.style.visibility = on ? "visible" : "hidden"; };
+
+/* ======================= HOOK (0 – 2 s) ======================= */
+const HOOK = { lines: ["GROWTH", "BREAKS", "IN THE", "GAPS"], split: [3, 3, 3, 2], y: [600, 800, 1000, 1200], t: [-0.1, 0.25, 0.5, 0.75], delay: [0.05, 0.0, 0.03, 0.0] };
+const hookEls = HOOK.lines.map((L, li) => {
+  const wrap = mk("div", "hl", null, $("hookcam"), `top:${HOOK.y[li] - 125}px`);
+  const r = mk("span", "r", null, wrap);
+  const halves = [L.slice(0, HOOK.split[li]), L.slice(HOOK.split[li])].map((s) => { const h = mk("span", "half", null, r); return { el: h, letters: [...s].map((c) => mk("span", "lt", c === " " ? "&nbsp;" : c, h)) }; });
+  return { wrap, r, halves };
+});
+const camHook = (t) => { const z = 1 + 0.04 * eio(P(t, 0, 1.5)); const d = eio(P(t, 1.5, 2.0)); return { cx: 540, cy: lerp(960, 1080, d), z: z * lerp(1, 1.18, d) }; };
+function hook(t) {
+  const c = camHook(t); $("hookcam").style.transform = camT(c);
+  const s1 = sp(t, 1.0, 0.3), imp = kick(t, 1.0);
+  hookEls.forEach((L, li) => {
+    rise(L.r, t, HOOK.t[li], 0.3);
+    const all = [...L.halves[0].letters, ...L.halves[1].letters], n = all.length;
+    all.forEach((e, i) => { let dx = (i - (n - 1) / 2) * 20 * s1; if (li === 3) dx += (i < HOOK.split[3] ? -88 : 88) * s1; e.style.transform = `translateX(${dx}px)`; });
+    const dl = HOOK.delay[li], p = P(t, 1.25 + dl, 1.5 + dl), off = 1300 * p * p * p, v = 1300 * 3 * p * p / 0.25;
+    const dy = li === 3 ? imp * 14 : imp * 5 * (li - 1.5) / 1.5;
+    L.halves[0].el.style.transform = `translate(${-off}px,${dy}px)`; L.halves[1].el.style.transform = `translate(${off}px,${dy}px)`;
+    blur(L.halves[0].el, `hb${li}a`, p > 0 && p < 1 ? v : 0, 0, 1 / 300); blur(L.halves[1].el, `hb${li}b`, p > 0 && p < 1 ? v : 0, 0, 1 / 300);
+  });
+}
+
+/* ======================= PAGE (2 – 8 s): button → audit card → growth path ======================= */
+const ROWS = ["unit economics", "ad waste", "conversion leakages", "team friction"];
+const rowEls = ROWS.map((s, i) => { const row = mk("div", "row", null, $("c1"), `top:${276 + i * 76}px`);
+  const ic = mk("div", "", `<svg width="44" height="44" viewBox="0 0 44 44"><circle cx="22" cy="22" r="19" fill="none" stroke="rgba(225,224,204,.35)" stroke-width="2.5"/><path class="ck" d="M13 22.5 L19.5 29 L31.5 15.5" fill="none" stroke="#E1E0CC" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="1"/></svg>`, row, "width:44px;height:44px");
+  const tx = mk("div", "", s, row, "color:rgba(225,224,204,.45)"); return { row, ic, ck: ic.querySelector(".ck"), tx }; });
+const STA = [ // growth path stations (node world positions) and their cards
+  { n: [860, 1700], side: "L", num: "02", key: "Build", rest: " &amp; Deploy", tag: "Engineering", body: "sub-second loads, and verified tracking." },
+  { n: [220, 2300], side: "R", num: "03", key: "Market", rest: " &amp; Track", tag: "9x ROAS", body: "Full-funnel Google Search, Shopping, and Meta campaigns." },
+  { n: [860, 2900], side: "L", num: "04", key: "Automate", rest: " Operations", tag: "Zero Waste", body: "automated lead routing, and self-correcting AI." },
+  { n: [220, 3500], side: "R", num: "05", key: "Scale", rest: " &amp; Expand", tag: "Compounding", body: "Ongoing month-over-month optimization." },
+];
+const STA_T = [4.0, 5.0, 6.0, 7.0];
+const pcEls = STA.map((s, i) => {
+  const w = 600, h = 330, x = s.side === "L" ? 100 : 380, y = s.n[1] - h / 2;
+  const c = mk("div", "a card", null, $("pcards"), `left:${x}px;top:${y}px;width:${w}px;height:${h}px`);
+  const num = mk("span", "r num", s.num, mk("div", "a m", null, c, "left:44px;top:40px;height:34px"));
+  const ttl = mk("span", "r ttl", `<span class="k">${s.key}</span>${s.rest}`, mk("div", "a m", null, c, "left:44px;top:86px;height:68px"), "font-size:54px;line-height:68px");
+  const tag = mk("span", "r tag", s.tag, mk("div", "a m", null, c, "left:44px;top:164px;height:48px"), "font-size:22px;line-height:42px;padding:0 18px");
+  const body = mk("span", "r body", s.body, mk("div", "a m", null, c, "left:44px;top:224px;width:512px;height:96px"), "font-size:32px;line-height:46px");
+  return { c, num, ttl, tag, body, x, y, w, h };
+});
+// path: the corner dot of card 01 → the gutter → the S-curve through every station
+const PATHD = "M902 678 C990 678 1015 720 1015 820 L1015 1400 C1015 1560 860 1560 860 1700 C860 2000 220 2000 220 2300 C220 2600 860 2600 860 2900 C860 3200 220 3200 220 3500 C220 3700 540 3700 540 3900";
+$("ptrail").setAttribute("d", PATHD);
+const PATHN = 2400, PPTS = [], PCUM = [];
+{ const pe = $("ptrail"), L = pe.getTotalLength(); for (let i = 0; i <= PATHN; i++) { const q = pe.getPointAtLength((L * i) / PATHN); PPTS.push([q.x, q.y]); } let c = 0; PCUM.push(0); for (let i = 1; i <= PATHN; i++) { c += Math.hypot(PPTS[i][0] - PPTS[i - 1][0], PPTS[i][1] - PPTS[i - 1][1]); PCUM.push(c); } }
+const PLEN = PCUM[PATHN];
+const atLen = (s) => { s = clamp(s, 0, PLEN); let lo = 0, hi = PATHN; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (PCUM[m] < s) lo = m; else hi = m; } const u = (s - PCUM[lo]) / (PCUM[hi] - PCUM[lo] || 1); return [lerp(PPTS[lo][0], PPTS[hi][0], u), lerp(PPTS[lo][1], PPTS[hi][1], u)]; };
+const lenNear = (x, y) => { let b = 0, bd = 1e9; for (let i = 0; i <= PATHN; i++) { const d = Math.hypot(PPTS[i][0] - x, PPTS[i][1] - y); if (d < bd) { bd = d; b = i; } } return PCUM[b]; };
+const SLEN = [0, ...STA.map((s) => lenNear(s.n[0], s.n[1]))];
+// node arc-length along the path: drags on the half beats, lands on the beat
+const nodeS = (t) => { let s = lerp(SLEN[0], SLEN[1], eio(P(t, 3.75, 4.0))); for (let k = 1; k < 4; k++) s += (SLEN[k + 1] - SLEN[k]) * eio(P(t, 3.5 + k, 4.0 + k)); return s; };
+const camPage = (t) => {
+  let cx = track(t, 796, [[2.0, 540, 0.5], [3.0, 540, 0.4]]), cy = 960, z = track(t, 1.32, [[2.0, 1.36, 0.5], [3.0, 1.1, 0.42]]);
+  const f = eio(P(t, 3.72, 4.0)); const ny = atLen(nodeS(t))[1];
+  const nx = atLen(nodeS(t))[0]; cx = lerp(cx, 540 - (nx - 540) * 0.156, f); cy = lerp(cy, ny + 20, f); z = lerp(z, 1.18 + 0.04 * P(t, 4.0, 8.0), f);
+  return { cx, cy, z };
+};
+function page(t) {
+  const c = camPage(t); $("pagecam").style.transform = camT(c);
+  // button: unfolds left out of the Node, label wipes on, hover, click, retracts into the Node
+  const open = eo(P(t, 2.0, 2.3)) * (1 - eio(P(t, 3.0, 3.16)));
+  const press = 1 - 0.045 * Math.sin(Math.PI * P(t, 2.72, 2.9));
+  $("btn").style.clipPath = `inset(0 0 0 ${(1 - open) * 512}px round 64px)`;
+  $("btn").style.transform = `scale(${press})`; $("btn").style.transformOrigin = "576px 64px";
+  const wipe = eo(P(t, 2.08, 2.38)); $("btnlab").style.clipPath = `inset(0 ${(1 - wipe) * 100}% 0 0)`;
+  // card 01 unfolds out of the pill
+  const u = sp(t, 3.0, 0.38);
+  $("c1").style.clipPath = `inset(${lerp(286, 0, u)}px ${lerp(100, 0, u)}px ${lerp(286, 0, u)}px ${lerp(100, 0, u)}px round ${lerp(64, 28, u)}px)`;
+  show($("c1"), t >= 3.0);
+  rise($("c1n"), t, 3.06); rise($("c1t"), t, 3.1); rise($("c1g"), t, 3.14); rise($("c1f"), t, 3.5);
+  rowEls.forEach((r, i) => { const t0 = 3.25 + i * 0.125; r.row.style.clipPath = `inset(0 ${(1 - eo(P(t, 3.12 + i * 0.03, 3.4 + i * 0.03))) * 100}% 0 0)`;
+    r.ck.setAttribute("stroke-dashoffset", (1 - eo(P(t, t0, t0 + 0.12))).toFixed(3)); r.tx.style.color = t >= t0 ? CRM : "rgba(225,224,204,.45)"; });
+  // the trail the Node leaves
+  const s = nodeS(t); $("ptrail").setAttribute("stroke-dasharray", `${Math.max(0.01, s)} 99999`); $("ptrail").style.visibility = t >= 3.75 ? "visible" : "hidden";
+  pcEls.forEach((e, i) => { const t0 = STA_T[i], u = sp(t, t0, 0.36), side = STA[i].side;
+    e.c.style.clipPath = side === "L" ? `inset(0 0 0 ${(1 - u) * 100}% round 28px)` : `inset(0 ${(1 - u) * 100}% 0 0 round 28px)`;
+    show(e.c, t >= t0 && t < 8); rise(e.num, t, t0 + 0.04); rise(e.ttl, t, t0 + 0.07); rise(e.tag, t, t0 + 0.12); rise(e.body, t, t0 + 0.25); });
+  camBlur($("page"), "bpage", camPage, t);
+}
+const nodeWorldPage = (t) => atLen(nodeS(t));
+
+/* ======================= PRODUCTS (8 – 10 s) ======================= */
+const PRODS = [
+  ["LIVE WEB APP", "XP Academy", "EdTech &amp; Gamification", "Gamified EdTech platform engineered for student engagement, interactive skill leveling, and dynamic retention."],
+  ["GOOGLE PLAY STORE", "Nirvaha", "Mental Wellness &amp; Mobile", "Wellness &amp; mindfulness mobile application crafted with calming UX, meditation tracking, and daily balance routines."],
+  ["LIVE WEBSITE", "LN Sports Arena", "Elite Sports Infrastructure", "Elite gym, olympic swimming &amp; badminton facility digital booking portal and brand hub in Hyderabad."],
+  ["LIVE PORTAL", "Sithiyam Travel", "Bespoke Luxury Travel", "Tailor-made Sri Lanka luxury tours, boutique holiday planning, and private experience curations."],
+];
+const THROW = [8.45, 8.95, 9.45];
+const prEls = PRODS.map((p, k) => {
+  const c = mk("div", "pcard card", null, $("pstack"), `z-index:${10 - k}`);
+  const cont = mk("div", "a", null, c, "left:0;top:0;width:860px;height:560px");
+  const lab = mk("div", "plab", p[0], cont); const dot = mk("div", "pdot", null, lab);
+  mk("div", "a ttl", p[1], cont, "left:56px;top:146px;font-size:80px;line-height:96px");
+  mk("div", "a", p[2], cont, "left:56px;top:252px;font-size:34px;color:rgba(225,224,204,.6);white-space:nowrap");
+  mk("div", "a body", p[3], cont, "left:56px;top:322px;width:748px;font-size:32px;line-height:46px");
+  return { c, dot, cont };
+});
+const camProd = (t) => ({ cx: 540, cy: 960, z: 1.0 + 0.04 * P(t, 8, 10) });
+// card k pose: depth in the stack + the cursor's grab-and-throw
+const prPose = (t, k) => {
+  let d = k; for (let j = 0; j < THROW.length; j++) if (j < k) d -= sp(t, THROW[j], 0.32);
+  let x = 0, rot = 0;
+  if (k < THROW.length) { const T = THROW[k], g = eio(P(t, T - 0.22, T)), th = P(t, T, T + 0.2); x = -230 * g - 1300 * th * th; rot = -3 * g - 7 * th; }
+  return { d, x, rot, gone: k < THROW.length && t > THROW[k] + 0.2 };
+};
+function prod(t) {
+  const c = camProd(t); $("prodcam").style.transform = camT(c);
+  rise($("peb"), t, 8.0); rise($("pt1"), t, 8.04); rise($("pt2"), t, 8.1);
+  prEls.forEach((e, k) => {
+    const p = prPose(t, k), p0 = prPose(t - DT, k);
+    const unf = k === 0 ? sp(t, 8.0, 0.34) : sp(t, 8.06 + 0.05 * k, 0.36);
+    const yUp = (1 - unf) * 500 * (k === 0 ? 0 : 1);
+    e.c.style.transform = `translate(${p.x}px,${p.d * 44 + yUp}px) rotate(${p.rot}deg) scale(${1 - 0.055 * p.d})`;
+    e.c.style.background = `rgb(${Math.round(22 - 7 * Math.min(2, p.d))},${Math.round(22 - 7 * Math.min(2, p.d))},${Math.round(22 - 7 * Math.min(2, p.d))})`;
+    e.c.style.clipPath = k === 0 ? `inset(0 ${(1 - unf) * 92}% ${(1 - unf) * 82}% 0 round 28px)` : "none";
+    show(e.c, !p.gone && p.d < 2.6 && t >= 8.0 - 1e-6);
+    if (k > 0) { const r = eo(P(t, THROW[k - 1] - 0.04, THROW[k - 1] + 0.2)); e.cont.style.clipPath = `inset(0 0 ${(1 - r) * 100}% 0)`; }
+    blur(e.c, `bp${k}`, (p.x - p0.x) / DT, 0, 1 / 450);
+  });
+  camBlur($("prodcam"), "bprod", camProd, t);
+}
+const prodFront = (t) => { let f = 0; for (const T of THROW) if (t > T) f++; return f; };
+
+/* ======================= RESULTS (10 – 16 s) ======================= */
+const TABS = [["AU", "RMC Plumbing Services"], ["NZ", "Bamboo Spa"], ["AU", "Bikers Wear Australia"], ["UK", "Bikers Gear UK"]];
+const tabEls = TABS.map(([c, n]) => mk("div", "tab", `<b>${c}</b>${n}`, $("strip")));
+const moreTab = mk("div", "tab", "+&nbsp; More Brands", $("strip"), "border-style:dashed;color:rgba(225,224,204,.55)");
+const CLIENTS = [
+  { tab: 0, at: 10.0, meta: "Australia · Local Services &amp; Lead Gen · Google Ads (Search)", tiles: [["6.1x", "LEAD GROWTH", "Scaled from 11/mo to 66/mo"], ["−79%", "COST PER LEAD", "Plummeted from $92 to $19"], ["1,327", "TOTAL LEADS", "Delivered on AUD $32,499 spend"], ["~$24", "BLENDED CPL", "Across full engagement"]] },
+  { tab: 1, at: 12.0, meta: "New Zealand · Wellness &amp; Local Bookings · Google Ads (Search)", tiles: [["2.1x", "CONVERSION GROWTH", "Scaled from 1,237/mo to 2,587/mo"], ["−46%", "COST PER CONVERSION", "Dropped from $1.44 to $0.78"], ["40,624", "TOTAL CONVERSIONS", "Delivered on NZD $38,778 spend"], ["NZD $38.8K", "TOTAL AD SPEND", "Full engagement to date"]] },
+  { tab: 3, at: 13.5, meta: "United Kingdom · E-commerce Revenue &amp; ROAS · Google Ads", tiles: [["4.6x", "BLENDED ROAS", "Across full tracking period"], ["£123.9K", "10-MONTH REVENUE", "On £26,723 ad spend"], ["£26.7K", "10-MONTH AD SPEND", "Stable verified spend"], ["4–5x", "CONSISTENT ROAS", "Month after month consistency"]] },
+  { tab: 2, at: 15.0, meta: "Australia · E-commerce Revenue &amp; ROAS · Google Ads", tiles: [["$51.4K", "MONTHLY REVENUE", "Up from $39.9K/mo"], ["$5.8K", "MONTHLY SPEND", "Scaled from $4.3K/mo"], ["~9x", "RETURN ON AD SPEND", "Sustained across 17 months"], ["$753K", "17-MONTH REVENUE", "On $88K ad spend"]] },
+];
+const CLICKS = [11.75, 13.25, 14.75];
+const TPOS = [[84, 830], [548, 830], [84, 1254], [548, 1254]], TCOL = ["c", "d", "c", "d"];
+const tileEls = TPOS.map(([x, y], i) => { const tl = mk("div", "tile " + TCOL[i], null, $("tiles"), `left:${x}px;top:${y}px`);
+  const slots = CLIENTS.map(() => ({ num: mk("div", "tnum", "", tl), lab: mk("div", "tlab", "", tl), sub: mk("div", "tsub", "", tl) }));
+  return { tl, slots }; });
+const meas = document.createElement("canvas").getContext("2d");
+const parseNum = (s) => { const m = s.match(/^([^\d]*)([\d,]*\.?\d+)([^\d]*)$/); if (!m) return null; const n = m[2]; return { pre: m[1], v: parseFloat(n.replace(/,/g, "")), d: (n.split(".")[1] || "").length, comma: n.includes(","), suf: m[3] }; };
+const fmt = (q, v) => { let s = v.toFixed(q.d); if (q.comma) s = Number(s).toLocaleString("en-US", { minimumFractionDigits: q.d, maximumFractionDigits: q.d }); return q.pre + s + q.suf; };
+const clientAt = (t) => { let c = 0; CLIENTS.forEach((C, i) => { if (t >= C.at) c = i; }); return c; };
+const camRes = (t) => {
+  const cx = track(t, 540, [[10.5, 300, 0.5], [11.35, 540, 0.4], [12.3, 300, 0.45], [13.0, 540, 0.35], [13.65, 764, 0.45], [14.45, 540, 0.3], [15.15, 300, 0.6]]);
+  const cy = track(t, 960, [[10.5, 1030, 0.5], [11.35, 960, 0.4], [12.3, 1030, 0.45], [13.0, 960, 0.35], [13.65, 1030, 0.45], [14.45, 960, 0.3], [15.15, 1454, 0.6]]);
+  const z = track(t, 1.04, [[10.5, 2.1, 0.5], [11.35, 1.04, 0.4], [12.3, 2.0, 0.45], [13.0, 1.04, 0.35], [13.65, 2.0, 0.45], [14.45, 1.04, 0.3], [15.15, 1.75, 0.6]]);
+  return { cx, cy, z: z * (1 + 0.04 * P(t, 10, 16)) };
+};
+let TABC = null;
+const stripX = (t) => { const ctr = (i) => TABC[i]; let x = 540 - ctr(CLIENTS[0].tab); for (let i = 1; i < CLIENTS.length; i++) x += (ctr(CLIENTS[i - 1].tab) - ctr(CLIENTS[i].tab)) * sp(t, CLIENTS[i].at, 0.34); return x; };
+function res(t) {
+  if (!TABC) TABC = tabEls.map((e) => e.offsetLeft + e.offsetWidth / 2);
+  const c = camRes(t); $("rescam").style.transform = camT(c);
+  rise($("reb"), t, 10.0); rise($("rt1"), t, 10.04); rise($("rt2"), t, 10.1);
+  $("strip").style.transform = `translateX(${stripX(t)}px)`;
+  [...tabEls, moreTab].forEach((e, i) => { const g = i === 0 ? 1 : sp(t, 10.0 + 0.05 * i, 0.3); e.style.transform = `scaleX(${g})`; e.style.opacity = 1; });
+  const ci = clientAt(t);
+  $("rmeta").innerHTML = CLIENTS[ci].meta; rise($("rmeta"), t, CLIENTS[ci].at + 0.1);
+  tileEls.forEach((T, i) => {
+    const u = sp(t, 10.2 + 0.05 * i, 0.38);
+    T.tl.style.clipPath = `inset(0 0 ${(1 - u) * 100}% 0 round 28px)`;
+    show(T.tl, t >= 10.2 + 0.05 * i);
+    CLIENTS.forEach((C, k) => {
+      const S = T.slots[k], [num, lab, sub] = C.tiles[i];
+      if (!S.fs) { meas.font = `700 100px A`; S.fs = Math.min(116, (352 / meas.measureText(num).width) * 100); S.num.style.fontSize = S.fs + "px"; S.lab.textContent = lab; S.sub.textContent = sub; S.q = parseNum(num); S.raw = num; }
+      const tin = C.at + 0.12 + 0.04 * i, nxt = CLIENTS[k + 1], tout = nxt ? nxt.at + 0.02 * i : 99;
+      const vis = t >= tin - 0.0 && t < tout + 0.2; S.num.style.visibility = S.lab.style.visibility = S.sub.style.visibility = vis ? "visible" : "hidden";
+      if (!vis) return;
+      const sIn = sp(t, tin, 0.3), o = ei(P(t, tout, tout + 0.14));
+      const yy = (1 - sIn) * 90 - o * 120;
+      S.num.style.transform = `translateY(${yy * 1.3}px)`; S.lab.style.transform = `translateY(${yy}px)`; S.sub.style.transform = `translateY(${yy * 0.8}px)`;
+      const clipT = `inset(0 0 0 0)`; S.num.style.clipPath = clipT;
+      S.num.textContent = S.q ? fmt(S.q, S.q.v * eo(P(t, tin, tin + 0.55))) : S.raw;
+    });
+  });
+  camBlur($("res"), "bres", camRes, t);
+}
+
+/* ======================= PAYOFF + END (16 – 25 s) ======================= */
+const RL = LOGO.meta.rl, SW = LOGO.meta.sw, TH = Math.asin(2 * RL), XL = 0.2076, XH = 0.0369, XLW = 0.0316;
+function fig8Raw() { const p = [], seg = (a, b, m) => { for (let i = 0; i < m; i++) { const u = i / m; p.push([lerp(a[0], b[0], u), lerp(a[1], b[1], u)]); } };
+  const arc = (cx, a0, a1, m) => { for (let i = 0; i < m; i++) { const a = lerp(a0, a1, i / m); p.push([cx + RL * Math.cos(a), RL * Math.sin(a)]); } };
+  const sn = Math.sin(TH), cs = Math.cos(TH), T = [-0.5 * cs * cs, 0.5 * sn * cs], a0 = Math.PI / 2 - TH, span = Math.PI + 2 * TH;
+  seg([0, 0], T, 40); arc(-0.5, a0, a0 + span, 280); seg([T[0], -T[1]], [0, 0], 40); seg([0, 0], [-T[0], T[1]], 40); arc(0.5, Math.PI - a0, Math.PI - a0 - span, 280); seg([-T[0], -T[1]], [0, 0], 41); return p; }
+const F8 = fig8Raw(), F8C = [0]; for (let i = 1; i < F8.length; i++) F8C.push(F8C[i - 1] + Math.hypot(F8[i][0] - F8[i - 1][0], F8[i][1] - F8[i - 1][1]));
+const f8At = (u) => { const s = clamp(u) * F8C[F8C.length - 1]; let i = 1; while (i < F8C.length - 1 && F8C[i] < s) i++; const v = (s - F8C[i - 1]) / (F8C[i] - F8C[i - 1] || 1); return [lerp(F8[i - 1][0], F8[i][0], v), lerp(F8[i - 1][1], F8[i][1], v)]; };
+$("f8m").setAttribute("d", "M" + F8.map((q) => q[0].toFixed(4) + " " + q[1].toFixed(4)).join(" L"));
+const polyD = (polys) => polys.map((poly) => "M" + poly.map(([x, y]) => x.toFixed(5) + " " + y.toFixed(5)).join(" L") + " Z").join(" ");
+[LOGO.CL, LOGO.CR].forEach((g) => { const pth = document.createElementNS("http://www.w3.org/2000/svg", "path"); pth.setAttribute("d", polyD(g)); $("loops").appendChild(pth); });
+const wordEls = LOGO.WORD.map((L) => { const g = document.createElementNS("http://www.w3.org/2000/svg", "path"); g.setAttribute("d", polyD(L.paths)); $("word").appendChild(g); return g; });
+{ const pts = [[XH, XH], [XH, XL], [-XH, XL], [-XH, XH], [-XL, XH], [-XL, -XH], [-XH, -XH], [-XH, -XL], [XH, -XL], [XH, -XH], [XL, -XH], [XL, XH]].map(([x, y]) => { const c = Math.SQRT1_2; return [(x - y) * c, (x + y) * c]; });
+  $("xp").setAttribute("points", pts.map((q) => q.join(",")).join(" ")); $("xp").setAttribute("stroke-width", XLW); }
+const XHALF = (XL + XH) * Math.SQRT1_2; // half-width of the X's bounding box, in units
+const LX = 540, LY = 700, LS = 300; // logo centre and unit (px between loop centres)
+const TAGW = ["AUDIT", "BUILD", "MARKET", "AUTOMATE"];
+const tagEls = TAGW.map((w, i) => { const m = mk("span", "", null, $("tagl"), "display:inline-block;overflow:hidden;vertical-align:top;height:50px;line-height:52px;margin:0 12px");
+  const r = mk("span", "r", `${w}<span style="color:#E59C69">.</span>`, m); return { m, r }; });
+const URL = "oneloop.in"; const urlEls = [...URL].map((ch) => mk("span", "", ch, $("url"), "display:inline-block"));
+const camEnd = (t) => ({ cx: 540, cy: 960, z: 1 + 0.04 * P(t, 16, 18) + 0.04 * P(t, 18, 25) });
+let PAY0 = null; // measured once at 16.0: the ~9x tile and its number
+function end(t) {
+  const c = camEnd(t); $("endcam").style.transform = camT(c);
+  // giant ~9x: grows out of the tile's own number
+  const g = $("giant"), gw = g.offsetWidth, gh = g.offsetHeight, gx0 = 540 - gw / 2, gy0 = 860 - gh / 2;
+  g.style.left = gx0 + "px"; g.style.top = gy0 + "px";
+  const nm = PAY0.num, s0 = nm.fs / 440, gu = sp(t, 16.0, 0.4);
+  const sc = lerp(s0, 1, gu), tx = lerp(nm.l - gx0, 0, gu), ty = lerp(nm.t - gy0, 0, gu);
+  const out = ei(P(t, 17.0, 17.24));
+  g.style.transformOrigin = "0 0"; g.style.transform = `translate(${tx}px,${ty}px) scale(${sc})`;
+  $("g9").style.transform = `translateX(${-1300 * out}px)`; blur($("g9"), "bg9", out > 0 && out < 1 ? 1300 * 10 * out / 0.24 : 0, 0, 1 / 300);
+  // ---- the ~9x tile floods the frame, then drains into the x ----
+  const fT = PAY0.tile, fl = sp(t, 16.0, 0.34), dr = eio(P(t, 17.0, 17.5));
+  const xc = R($("gx")); const xcL = unmap(c, xc.x, xc.y + xc.h * 0.12);
+  const full = { x: 540, y: 960, w: 1300, h: 2140 };
+  let F = lr(fT, full, fl); const rad = lerp(28 * PAY0.z, 0, fl);
+  F = lr(F, { x: xcL[0], y: xcL[1], w: 0, h: 0 }, dr);
+  Object.assign($("flood").style, { left: F.x - F.w / 2 + "px", top: F.y - F.h / 2 + "px", width: F.w + "px", height: F.h + "px", borderRadius: lerp(rad, Math.min(F.w, F.h) / 2, dr) + "px" });
+  show($("flood"), t >= 16.0 && dr < 1);
+  rise($("gs1"), t, 16.02, 0.26); rise($("gs2"), t, 16.07, 0.28); rise($("gs3"), t, 16.5);
+  ["gs1", "gs2", "gs3"].forEach((id, i) => { const o = ei(P(t, 16.95 + 0.04 * i, 17.15 + 0.04 * i)); if (o > 0) $(id).style.transform = `translateY(${110 * o}%)`; });
+  // ---- the x becomes the logo's X; the Node draws the loops ----
+  const xs = R($("gx")); const xU = (xs.w * 0.96) / 2 / XHALF; // unit that makes the X fill the glyph box
+  const mv = eio(P(t, 17.45, 18.0));
+  const [lxs, lys] = map(c, LX, LY), lUs = LS * c.z;
+  const xcx = lerp(xs.x, lxs, mv), xcy = lerp(xs.y + xs.h * 0.12, lys, mv), U = lerp(xU, lUs, mv);
+  const lock = 1 + 0.035 * kick(t, 19.0, 18, 7);
+  // svg is in end-cam space: convert stage → local
+  const [ux, uy] = unmap(c, xcx, xcy), Ul = (U / c.z) * lock;
+  $("mark").setAttribute("transform", `translate(${ux.toFixed(2)},${uy.toFixed(2)}) scale(${Ul.toFixed(4)})`);
+  $("xp").setAttribute("stroke-dashoffset", (1 - eo(P(t, 17.0, 17.4))).toFixed(3));
+  $("xp").style.visibility = t >= 16.0 ? "visible" : "hidden";
+  $("f8m").setAttribute("stroke-dashoffset", (1 - loopP(t)).toFixed(4));
+  $("loops").style.visibility = t >= 18.0 ? "visible" : "hidden";
+  // wordmark rises letter by letter
+  $("word").setAttribute("transform", `translate(${LX},${LY}) scale(${LS})`);
+  wordEls.forEach((e, i) => { const s = sp(t, 19.4 + 0.035 * i, 0.32); e.setAttribute("transform", `translate(0,${((1 - s) * 0.3).toFixed(4)})`); });
+  // tagline
+  tagEls.forEach((e, i) => rise(e.r, t, 20.0 + 0.25 * i, 0.3));
+  // CTA unfolds out of the Node, cursor clicks it
+  const open = eo(P(t, 21.0, 21.3)); $("cta").style.clipPath = `inset(0 0 0 ${(1 - open) * 472}px round 64px)`; show($("cta"), t >= 21.0);
+  $("cta").style.transform = `scale(${1 - 0.045 * Math.sin(Math.PI * P(t, 22.42, 22.6))})`; $("cta").style.transformOrigin = "536px 64px";
+  $("ctalab").style.clipPath = `inset(0 ${(1 - eo(P(t, 21.08, 21.38))) * 100}% 0 0)`;
+  urlEls.forEach((e, i) => { const t0 = 23.0 + 0.045 * i; e.style.visibility = t >= t0 ? "visible" : "hidden"; e.style.transform = `translateY(${(1 - sp(t, t0, 0.2)) * 30}px)`; });
+  // underline walks the promise, one word per beat
+  const ul = $("uline"); if (t >= 23.0) { const wr = tagEls.map((e) => { const r = R(e.m); const [x0, y0] = unmap(c, r.x - r.w / 2, r.y + r.h / 2); return { x: x0, y: y0, w: r.w / c.z }; });
+    let x = wr[0].x, w = 0, y = wr[0].y + 6; w = wr[0].w * eo(P(t, 23.0, 23.25));
+    for (let k = 1; k < 4; k++) { const u = sp(t, 23.0 + 0.5 * k, 0.3); x = lerp(x, wr[k].x, u); w = lerp(w, wr[k].w, u); }
+    Object.assign(ul.style, { left: x + "px", top: y + "px", width: w + "px", visibility: "visible" }); } else ul.style.visibility = "hidden";
+}
+const loopP = (t) => eio(P(t, 18.0, 19.0));
+
+/* ======================= THE NODE ======================= */
+// returns the Node in stage px: centre, size, radius, ring, content
+function nodeAt(t) {
+  const dot = (x, y, d) => ({ x, y, w: d, h: d });
+  if (t < 2.0) {
+    const L = hookEls[3], a = L.halves[0].letters[1].getBoundingClientRect(), p = L.halves[1].letters[0].getBoundingClientRect();
+    const gx = (a.right + p.left) / 2, gy = a.top + a.height * 0.47;
+    if (t < 1.0) { const f = P(t, 0.8, 1.0); return { ...dot(gx, lerp(-90, gy, f * f), 112), sq: 0 }; }
+    const sq = kick(t, 1.0, 30, 9);
+    let n = { ...dot(gx, gy, 112), sq };
+    const m = eio(P(t, 1.5, 1.74)); n = { x: lerp(n.x, 540, m), y: lerp(n.y, 960, m), w: lerp(112, 150, m), h: lerp(112, 150, m), sq: sq * (1 - m) };
+    const st = Math.sin(Math.PI * P(t, 1.74, 1.86)) * (t < 1.86 ? 1 : 0); n.w += 46 * st; n.h -= 30 * st;
+    if (t >= 1.86) { const tg = R($("aslot")); n = lr(n, tg, eio(P(t, 1.86, 2.0))); }
+    return n;
+  }
+  if (t < 3.0) { const n = R($("aslot")); n.content = "arrow"; n.nudge = 8 * sp(t, 2.48, 0.25) * (1 - P(t, 2.9, 3.0)); return n; }
+  if (t < 3.75) { const a = R($("aslot")), b = R($("c1dot")); const n = lr(a, b, eio(P(t, 3.0, 3.28))); n.content = P(t, 3.0, 3.12) < 1 ? "arrow" : ""; return n; }
+  if (t < 7.75) { const c = camPage(t), [wx, wy] = nodeWorldPage(t), [x, y] = map(c, wx, wy); const d = lerp(20 * c.z, 30, eo(P(t, 3.75, 3.95)));
+    let ring = 0; for (const T of STA_T) ring = Math.max(ring, sp(t, T, 0.3) * (1 - eio(P(t, T + 0.5, T + 0.62))) * (T + 0.62 > t ? 1 : 0));
+    if (t > 7.0) ring = sp(t, 7.0, 0.3);
+    return { x, y, w: d, h: d, ring }; }
+  if (t < 8.0) { const c = camPage(t), [wx, wy] = nodeWorldPage(t), [x, y] = map(c, wx, wy); const b = R(prEls[0].dot); const n = lr({ x, y, w: 30, h: 30 }, b, eio(P(t, 7.75, 8.0))); n.ring = 1 - P(t, 7.75, 7.85); return n; }
+  if (t < 9.75) { const f = prodFront(t); let n = R(prEls[Math.min(3, f)].dot);
+    for (let k = 0; k < THROW.length; k++) { const T = THROW[k]; if (t >= T - 0.06 && t < T + 0.14) { const a = R(prEls[k].dot), b = R(prEls[k + 1].dot), u = eio(P(t, T - 0.06, T + 0.14)); n = lr(a, b, u); n.y -= 70 * Math.sin(Math.PI * u); } }
+    return n; }
+  if (t < 16.0) {
+    const ci = clientAt(t), C = CLIENTS[ci];
+    let n = R(tabEls[C.tab]); n.label = TABS[C.tab];
+    if (ci > 0) { const u = sp(t, C.at, 0.3); if (u < 1) { const a = R(tabEls[CLIENTS[ci - 1].tab]); const b = n; n = lr(a, b, u); n.w += 80 * Math.sin(Math.PI * clamp(u)); n.label = u < 0.5 ? TABS[CLIENTS[ci - 1].tab] : TABS[C.tab]; } }
+    if (t < 10.0) { const a = R(prEls[3].dot); n = lr(a, n, eio(P(t, 9.75, 10.0))); n.label = P(t, 9.75, 10.0) > 0.7 ? n.label : null; }
+    if (t >= 15.72) { const nr = tileEls[2].slots[3].num.getBoundingClientRect(); const tg = { x: nr.right - nr.height * 0.3, y: nr.top + nr.height * 0.62, w: 34, h: 34 }; n = lr(n, tg, eio(P(t, 15.72, 16.0))); if (P(t, 15.72, 16.0) > 0.25) n.label = null; }
+    return n;
+  }
+  if (t < 18.0) { const xs = R($("gx")); const c = camEnd(t); const mv = eio(P(t, 17.45, 18.0)); const [lxs, lys] = map(c, LX, LY);
+    const x = lerp(xs.x, lxs, mv), y = lerp(xs.y + xs.h * 0.12, lys, mv); const d = lerp(lerp(34, 46, sp(t, 16.0, 0.35)), 26, mv); return { ...dot(x, y, d) }; }
+  if (t < 20.75) { const c = camEnd(t), [lx, ly] = map(c, LX, LY), U = LS * c.z * (1 + 0.035 * kick(t, 19.0, 18, 7)), q = f8At(loopP(t));
+    const d = 26 * (1 - eio(P(t, 19.0, 19.14))); return dot(lx + q[0] * U, ly + q[1] * U, d); }
+  { const c = camEnd(t), [lx, ly] = map(c, LX, LY); const tg = R($("cslot")); const g = eo(P(t, 20.75, 20.85));
+    let n = dot(lx, ly, 26 * g); n = lr(n, tg, eio(P(t, 20.82, 21.0))); n.content = t > 20.95 ? "arrow" : ""; n.nudge = 8 * sp(t, 22.2, 0.25) * (1 - P(t, 22.7, 22.9)); return n; }
+}
+function drawNode(t) {
+  const n = nodeAt(t), el = $("node");
+  if (!n || n.w < 0.5) { el.style.visibility = "hidden"; return n; }
+  el.style.visibility = "visible";
+  const sq = n.sq || 0, w = n.w * (1 + 0.22 * sq), h = n.h * (1 - 0.22 * sq);
+  Object.assign(el.style, { width: w + "px", height: h + "px", borderRadius: Math.min(w, h) / 2 + "px", transform: `translate(${n.x - w / 2}px,${n.y - h / 2}px)` });
+  const ring = n.ring || 0; el.style.boxShadow = ring > 0.01 ? `0 0 0 ${9 * ring}px #000, 0 0 0 ${12.5 * ring}px ${COP}` : "none"; el.style.overflow = ring > 0.01 ? "visible" : "hidden";
+  $("narrow").style.visibility = n.content === "arrow" ? "visible" : "hidden";
+  $("narrow").style.transform = `translateX(${n.nudge || 0}px) scale(${clamp(n.w / 104, 0, 1.3)})`;
+  const lab = $("nlab"); if (n.label) { const kk = h / 84; lab.innerHTML = `<span style="font-size:${22 * kk}px;letter-spacing:.1em;opacity:.55;margin-right:${12 * kk}px">${n.label[0]}</span>${n.label[1]}`; lab.style.fontSize = 30 * kk + "px"; lab.style.lineHeight = h + 4 + "px"; lab.style.visibility = "visible"; } else lab.style.visibility = "hidden";
+  return n;
+}
+
+/* ======================= THE CURSOR ======================= */
+// key points are live functions (measured each frame); the cursor springs between them
+const C = (el, dx = 0, dy = 0) => () => { const r = R(el); return [r.x + dx, r.y + dy]; };
+const FIX = (x, y) => () => [x, y];
+const NODEP = (dx = 4, dy = 6) => (t) => { const n = nodeAt(t); return [n.x + dx, n.y + dy]; };
+const CUR = [
+  [0, FIX(1250, 1650), 0.3], [2.2, C($("aslot"), 6, 10), 0.3],
+  [2.98, C(rowEls[0].ic, 6, 8), 0.2], [3.18, C(rowEls[1].ic, 6, 8), 0.12], [3.31, C(rowEls[2].ic, 6, 8), 0.12], [3.44, C(rowEls[3].ic, 6, 8), 0.12],
+  [3.56, C($("c1dot"), 4, 6), 0.18], [3.74, "drag"], [7.55, FIX(1000, 1700), 0.35],
+  [7.95, FIX(840, 1140), 0.28], [8.45, FIX(610, 1150), 0.01], [8.5, FIX(840, 1140), 0.2], [8.95, FIX(610, 1150), 0.01], [9.0, FIX(840, 1140), 0.2], [9.45, FIX(610, 1150), 0.01], [9.5, FIX(1250, 1900), 0.4], [11.0, FIX(1000, 1500), 0.3],
+  [11.38, C(tabEls[1], 0, 10), 0.36], [11.95, FIX(820, 1580), 0.4], [12.9, C(tabEls[3], -40, 10), 0.34], [13.45, FIX(860, 1560), 0.4],
+  [14.4, C(tabEls[2], 0, 10), 0.34], [14.95, FIX(860, 1700), 0.3], [15.4, C(tileEls[2].tl, 60, 40), 0.33], [15.92, FIX(1350, 2100), 0.4],
+  [21.7, C($("cslot"), 6, 10), 0.5], [22.85, FIX(1300, 2000), 0.6],
+];
+const GRAB = [[8.23, 8.45, 0], [8.73, 8.95, 1], [9.23, 9.45, 2]];
+const CLICKT = [2.75, 3.25, 3.375, 3.5, 3.625, 11.75, 13.25, 14.75, 15.75, 22.5];
+function cursorAt(t) {
+  if (t >= 3.74 && t < 7.55) { const n = nodeAt(t); return [n.x + 4, n.y + 6]; }
+  for (const [a, b, k] of GRAB) if (t >= a && t < b + 0.02) { const r = R(prEls[k].c); return [r.x + 300 * 1, r.y + 60]; }
+  let x = 1250, y = 1650, px = x, py = y, started = false;
+  for (const [tk, fn, d] of CUR) { if (fn === "drag") { const n = nodeAt(Math.min(t, 7.549)); if (t >= 7.55) { /* release point */ } const q = [nodeAt(7.549).x + 4, nodeAt(7.549).y + 6]; if (t >= tk) { x += (q[0] - px) * 1; y += (q[1] - py) * 1; px = q[0]; py = q[1]; } continue; }
+    const q = fn(t); const u = sp(t, tk, d); x += (q[0] - px) * u; y += (q[1] - py) * u; px = q[0]; py = q[1]; }
+  return [x, y];
+}
+function drawCursor(t) {
+  const [x, y] = cursorAt(t); let s = 1.18;
+  for (const tc of CLICKT) s *= 1 - 0.16 * Math.sin(Math.PI * P(t, tc - 0.05, tc + 0.09));
+  if (t >= 3.74 && t < 7.55) s *= 0.88; // pressed while dragging
+  for (const [a, b] of GRAB) if (t >= a && t < b) s *= 0.88;
+  const [x0, y0] = cursorAt(t - DT);
+  const el = $("cursor"); el.style.transform = `translate(${x}px,${y}px) scale(${s})`;
+  el.style.visibility = x > -80 && x < 1160 && y > -100 && y < 2000 ? "visible" : "hidden";
+  blur(el, "bcur", (x - x0) / DT, (y - y0) / DT, 1 / 500);
+}
+
+/* ======================= SEEK ======================= */
+const SCN = [["hook", 0, 2.0, hook], ["page", 2.0, 8.0, page], ["prod", 8.0, 10.0, prod], ["res", 10.0, 16.0, res], ["end", 16.0, 99, end]];
+function layout(t) {
+  for (const [id, a, b, f] of SCN) { if (id === "end") continue; f(clamp(t, a, b - 1e-4)); $(id).style.opacity = t >= a && t < (id === "res" ? 16.3 : b) ? 1 : 0; }
+  if (!PAY0) { // measure the ~9x tile at the cut (16.0) once, in end-cam local space
+    res(15.9999); const tl = R(tileEls[2].tl), nm = tileEls[2].slots[3].num.getBoundingClientRect(), c = camEnd(16.0), cr = camRes(15.9999);
+    const [x, y] = unmap(c, tl.x, tl.y), [l, tp] = unmap(c, nm.left, nm.top);
+    PAY0 = { tile: { x, y, w: tl.w / c.z, h: tl.h / c.z }, z: cr.z, num: { l, t: tp, fs: (tileEls[2].slots[3].fs * cr.z) / c.z } };
+    for (const [id, a, b, f] of SCN) if (id !== "end") f(clamp(t, a, b - 1e-4));
+  }
+  end(Math.max(16.0, t)); $("end").style.opacity = t >= 16.0 ? 1 : 0;
+}
+window.seek = (t) => {
+  layout(t - DT); const n0 = nodeAt(t - DT);
+  layout(t); const n = drawNode(t);
+  if (n && n0) blur($("node"), "bnode", (n.x - n0.x) / DT, (n.y - n0.y) / DT, 1 / 520);
+  drawCursor(t);
+};
+window.ready = document.fonts.ready.then(() => { window.seek(0); return true; });
+</script>
+</body></html>
