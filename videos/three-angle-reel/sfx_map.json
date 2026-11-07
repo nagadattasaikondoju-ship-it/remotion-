@@ -1,0 +1,14 @@
+{
+ "whoosh": {"ids": [53, 56, 50, 51, 52, 57, 53, 56], "role": "whoosh"},
+ "strike": {"ids": [50], "role": "whoosh"},
+ "pop": {"ids": [10, 9, 13, 23, 14, 21, 10, 9], "role": "ui"},
+ "click": {"ids": [33, 34, 37, 35], "role": "click"},
+ "scan": {"ids": [58], "role": "ui"},
+ "riser": {"ids": [44, 43], "role": "riser"},
+ "hit": {"ids": [29], "role": "hit"},
+ "type": {"ids": [39, 40], "role": "click"},
+ "stamp": {"ids": [24], "role": "hit"},
+ "cut": {"ids": [15], "role": "hit"},
+ "win": {"ids": [59], "role": "ui"},
+ "send": {"ids": [61], "role": "ui"}
+}

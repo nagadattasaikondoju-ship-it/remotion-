@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Three Angle Method — captions and motion graphics</title>
+<style>
+  @font-face { font-family: "Geist"; src: url("fonts/Geist-VF.ttf"); font-weight: 100 900; }
+  @font-face { font-family: "GeistMono"; src: url("fonts/GeistMono-VF.ttf"); font-weight: 100 900; }
+  @font-face { font-family: "Serif"; src: url("fonts/InstrumentSerif-Italic.ttf"); font-style: italic; }
+  :root { --ink: #111110; --paper: #F6F5F1; --mint: #3DDBB0; --red: #FF5A4E; --grey: #8B8B92; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
+  #stage { position: absolute; inset: 0; overflow: hidden; font-family: "Geist", sans-serif; color: #fff; }
+  #stage * { position: absolute; box-sizing: border-box; }
+  .scrim { left: 0; width: 1080px; pointer-events: none; }
+  /* captions: the reference's clean white sans, lowercase as spoken, soft shadow; letters rise out of a blur */
+  .cap { white-space: nowrap; font-weight: 640; letter-spacing: -0.02em; line-height: 1; transform-origin: 50% 50%;
+         text-shadow: 0 2px 3px rgba(0,0,0,.30), 0 6px 26px rgba(0,0,0,.42); }
+  .cap span { position: relative !important; display: inline-block; white-space: pre; }
+  .serif { font-family: "Serif", serif; font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+  .mono { font-family: "GeistMono", monospace; font-weight: 500; letter-spacing: 0.02em; }
+  .card { overflow: hidden; }
+  .ui { font-family: "Geist"; color: var(--ink); }
+  svg { overflow: visible; }
+</style>
+</head>
+<body>
+<div id="stage"></div>
+<script>
+/* ============================================================================================================
+   Three Angle Method reel — every caption and graphic is a pure function of time: window.seek(t) sets it all.
+   Times come from timeline.json (Whisper words mapped onto the cut), injected by render.mjs as window.TL.
+   Motion: closed-form springs (zeta 0.82: a hair of overshoot at most) and expo outs; blur follows speed.
+   One through-line object: #card. It morphs (size, radius, colour) from the audience panel → targeting pill →
+   ad creative → the angle cards → the budget chart → the DM composer; its content swaps with a short blur.
+   ============================================================================================================ */
+const S = document.getElementById("stage");
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const eOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * clamp(x)));
+const eIn = (x) => (x <= 0 ? 0 : Math.pow(2, 10 * clamp(x) - 10));
+const eIO = (x) => { x = clamp(x); return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+const lerp = (a, b, u) => a + (b - a) * u;
+function spring(dt, f = 2.6, z = 0.82) {                   // step response 0 → 1, f in Hz
+  if (dt <= 0) return 0; const w = 2 * Math.PI * f, wd = w * Math.sqrt(1 - z * z);
+  return 1 - Math.exp(-z * w * dt) * (Math.cos(wd * dt) + (z * w / wd) * Math.sin(wd * dt));
+}
+// a value that changes target many times = the sum of one spring per change (stays a pure function of time)
+function track(keys, t, f = 2.6, z = 0.82) {
+  let v = keys[0][1];
+  for (let i = 1; i < keys.length; i++) v += (keys[i][1] - keys[i - 1][1]) * spring(t - keys[i][0], keys[i][2] || f, z);
+  return v;
+}
+function trackInstant(keys, t) { let v = keys[0][1]; for (const k of keys) if (t >= k[0]) v = k[1]; return v; }
+const mk = (cls, css = "", html = "", parent = S) => { const d = document.createElement("div"); if (cls) d.className = cls; d.style.cssText = css; d.innerHTML = html; parent.appendChild(d); return d; };
+const show = (el, o, extra = "") => { el.style.opacity = o; el.style.visibility = o > 0.002 ? "visible" : "hidden"; if (extra) el.style.cssText += extra; };
+
+/* ---------- words ---------- */
+let WORDS = [], END = 48.857, T_SPLIT = 2.05, T_MAIN = 12.817;
+const norm = (s) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+function W(phrase, after = 0, who = null) {           // find a spoken phrase at or after a time → its words
+  const toks = phrase.split(" ").map(norm).filter(Boolean);
+  for (let i = 0; i < WORDS.length; i++) {
+    if (WORDS[i].t0 < after - 0.01 || (who && WORDS[i].who !== who)) continue;
+    let ok = true; for (let j = 0; j < toks.length; j++) if (!WORDS[i + j] || norm(WORDS[i + j].w) !== toks[j]) { ok = false; break; }
+    if (ok) return { t0: WORDS[i].t0, t1: WORDS[i + toks.length - 1].t1, ws: WORDS.slice(i, i + toks.length) };
+  }
+  throw new Error("phrase not found: " + phrase + " after " + after);
+}
+
+/* ---------- captions ---------- */
+// chunk = words shown together; each word appears when it is spoken, its letters rising out of a blur (18 ms apart).
+// Placement: 'chest' (y≈1480, reference position) unless the card is up, then 'top' (y≈235, above his hair).
+const CAPS = [];
+function cap(phrase, o = {}) {
+  const f = W(phrase, o.after || 0, o.who || null);
+  const disp = o.text ? [{ w: o.text, t0: f.t0 }] : f.ws.map((w) => ({ w: w.w.replace(/^"|"$/g, ""), t0: w.t0 }));
+  const el = mk("cap", `font-size:${o.size || 64}px;`);
+  if (o.cls) el.classList.add(...o.cls.split(" "));
+  const spans = [];
+  disp.forEach((d, wi) => {
+    const hl = o.hl && o.hl.includes(norm(d.w)) ? o.hlColor || "var(--mint)" : null;
+    const serif = o.serifWords && o.serifWords.includes(norm(d.w));
+    [...(d.w + (wi < disp.length - 1 ? " " : ""))].forEach((ch, ci) => {
+      const s = document.createElement("span"); s.textContent = ch;
+      if (hl) s.style.color = hl;
+      if (serif) { s.style.fontFamily = '"Serif", serif'; s.style.fontStyle = "italic"; s.style.fontWeight = 400; s.style.fontSize = "1.12em"; s.style.letterSpacing = "-0.01em"; }
+      el.appendChild(s); spans.push({ s, t: d.t0 + ci * 0.018 });
+    });
+  });
+  const c = { el, spans, t0: f.t0, t1: o.t1 || null, y: o.y, x: o.x ?? 540, anchor: o.anchor || "c", place: o.place || "auto", lead: o.lead ?? 0.06, who: o.who || null };
+  CAPS.push(c); return c;
+}
+function finishCaps() {                                // each chunk is replaced by the next (hard swap, like the reference)
+  const auto = CAPS.filter((c) => c.place !== "free").sort((a, b) => a.t0 - b.t0);
+  auto.forEach((c, i) => {
+    if (c.t1 != null) return;
+    const nk = KIN.filter((k) => k.t0 > c.t0 + 0.05).reduce((m, k) => Math.min(m, k.t0), 1e9);
+    c.t1 = Math.min(i + 1 < auto.length ? auto[i + 1].t0 - auto[i + 1].lead : END, nk, c.spans[c.spans.length - 1].t + 1.6) - 0.02;
+  });
+  CAPS.forEach((c) => { if (c.t1 == null) c.t1 = END; });
+}
+function drawCaps(t, cardUp) {
+  for (const c of CAPS) {
+    const on = t >= c.t0 - c.lead && t < c.t1;
+    if (!on) { c.el.style.visibility = "hidden"; continue; }
+    c.el.style.visibility = "visible";
+    if (inPlate(t)) { c.el.style.visibility = "hidden"; continue; }
+    if (c.yAuto == null) c.yAuto = cardUp(c.t0 + 0.05) ? 235 : 1480;        // a chunk keeps its place for its whole life
+    let y = c.y != null ? c.y : c.yAuto;
+    if (c.who === "sample") {                            // her captions ride the seam while the split opens and closes
+      const p = eOut((t - T_SPLIT) / 0.38) * (1 - eIO((t - T_MAIN) / 0.40)); y = 960 * p - (960 - c.y);
+    }
+    const tx = c.anchor === "l" ? "0" : c.anchor === "r" ? "-100%" : "-50%";
+    const out = P(t, c.t1 - 0.09, c.t1);
+    c.el.style.cssText += `left:${c.x}px;top:${y}px;transform:translate(${tx},-50%) scale(${1 - 0.04 * out});opacity:${1 - out};`;
+    for (const sp of c.spans) {
+      const u = eOut(P(t + c.lead, sp.t, sp.t + 0.2));
+      sp.s.style.opacity = u; sp.s.style.filter = u < 1 ? `blur(${(1 - u) * 9}px)` : "none";
+      sp.s.style.transform = `translateY(${(1 - u) * 14}px)`;
+    }
+  }
+}
+
+/* ---------- kinetic type (the reference's big/small word pairs, placed around his head) ---------- */
+const KIN = [];
+function kin(phrase, o) {
+  const f = W(phrase, o.after || 0, o.who || null);
+  const el = mk("cap " + (o.cls || ""), `font-size:${o.size}px;font-weight:${o.weight || 800};letter-spacing:${o.ls ?? -0.045}em;${o.color ? "color:" + o.color + ";" : ""}`);
+  const txt = o.text || f.ws.map((w) => w.w).join(" ");
+  const spans = [...txt].map((ch, i) => { const s = document.createElement("span"); s.textContent = ch; el.appendChild(s); return { s, t: f.t0 + i * (o.stagger ?? 0.022) }; });
+  const d = o.delay || 0; spans.forEach((sp) => (sp.t += d));
+  const k = { el, spans, t0: f.t0 + d, t1: o.t1, x: o.x, y: o.y, anchor: o.anchor || "l", drift: o.drift || 0 };
+  KIN.push(k); return k;
+}
+function drawKin(t) {
+  for (const k of KIN) {
+    const on = t >= k.t0 - 0.06 && t < k.t1;
+    if (!on) { k.el.style.visibility = "hidden"; continue; }
+    k.el.style.visibility = "visible";
+    const out = eIn(P(t, k.t1 - 0.14, k.t1));
+    const tx = k.anchor === "l" ? "0" : k.anchor === "r" ? "-100%" : "-50%";
+    const dx = k.drift * (t - k.t0);
+    k.el.style.cssText += `left:${k.x + dx}px;top:${k.y}px;transform:translate(${tx},-50%) translateY(${-out * 30}px);opacity:${1 - out};filter:blur(${out * 10}px);`;
+    for (const sp of k.spans) {
+      const u = eOut(P(t + 0.06, sp.t, sp.t + 0.24));
+      sp.s.style.opacity = u; sp.s.style.filter = u < 1 ? `blur(${(1 - u) * 14}px)` : "none";
+      sp.s.style.transform = `translateY(${(1 - u) * 26}px) scale(${0.92 + 0.08 * u})`;
+    }
+  }
+}
+
+/* ---------- cursor ---------- */
+const CUR = mk("", "left:0;top:0;width:46px;height:46px;z-index:50;",
+  `<svg width="46" height="46" viewBox="0 0 46 46"><path d="M6 3 L6 37 L15 28.5 L21.5 42 L27.5 39.2 L21 26 L33 26 Z" fill="#111" stroke="#fff" stroke-width="3" stroke-linejoin="round"/></svg>`);
+let CURK = [];                                         // [t, x, y, down]
+function drawCursor(t) {
+  if (!CURK.length || t < CURK[0][0] - 0.25 || t > CURK[CURK.length - 1][0] + 0.25) { CUR.style.visibility = "hidden"; return; }
+  let i = 0; while (i < CURK.length - 1 && t >= CURK[i + 1][0]) i++;
+  const gap = CURK[i + 1] && CURK[i + 1][0] - CURK[i][0] > 1.2;           // between interactions the cursor leaves
+  if (gap && t > CURK[i][0] + 0.25 && t < CURK[i + 1][0] - 0.25) { CUR.style.visibility = "hidden"; return; }
+  const a = CURK[i], b = CURK[Math.min(i + 1, CURK.length - 1)];
+  const u = b[0] > a[0] ? eIO(P(t, a[0], b[0])) : 1;
+  const x = lerp(a[1], b[1], u), y = lerp(a[2], b[2], u);
+  let press = 0; for (const k of CURK) if (k[3]) press = Math.max(press, 1 - Math.abs(t - k[0]) / 0.09);
+  let fade = Math.min(eOut(P(t, CURK[0][0] - 0.25, CURK[0][0])), 1 - eIn(P(t, CURK[CURK.length - 1][0], CURK[CURK.length - 1][0] + 0.25)));
+  if (gap) fade = Math.min(fade, 1 - eIn(P(t, CURK[i][0], CURK[i][0] + 0.25)), eOut(P(t, CURK[i + 1][0] - 0.25, CURK[i + 1][0])));
+  if (i > 0 && CURK[i][0] - CURK[i - 1][0] > 1.2) fade = Math.min(fade, eOut(P(t, CURK[i][0] - 0.25, CURK[i][0])));
+  const v = Math.hypot(b[1] - a[1], b[2] - a[2]) / Math.max(0.01, b[0] - a[0]) * (u > 0 && u < 1 ? 1 : 0);
+  CUR.style.cssText += `visibility:visible;opacity:${fade};transform:translate(${x}px,${y}px) scale(${1 - 0.14 * clamp(press)});filter:blur(${Math.min(3, v / 900)}px);`;
+}
+
+/* ---------- scrims (dimming only behind type, never blur) ---------- */
+const SCRIM_T = mk("scrim", "top:0;height:560px;background:linear-gradient(180deg, rgba(10,8,8,.42) 0%, rgba(10,8,8,.22) 55%, rgba(10,8,8,0) 100%);");
+const SCRIM_B = mk("scrim", "top:1160px;height:760px;background:linear-gradient(0deg, rgba(10,8,8,.40) 0%, rgba(10,8,8,.18) 60%, rgba(10,8,8,0) 100%);");
+
+/* ---------- the split: tags + progress seam ---------- */
+const SEAM = mk("", "left:0;top:958px;width:1080px;height:5px;background:rgba(255,255,255,.22);");
+const SEAMF = mk("", "left:0;top:0;height:5px;width:0;background:var(--mint);", "", SEAM);
+const TAG_A = mk("mono", "left:40px;top:40px;padding:12px 20px 12px 18px;border-radius:999px;background:rgba(17,17,16,.72);font-size:24px;color:#fff;display:flex;align-items:center;gap:12px;",
+  `<b style="position:relative;width:12px;height:12px;border-radius:50%;background:var(--red);display:inline-block"></b><span style="position:relative">watch this</span>`);
+const TAG_B = mk("mono", "left:40px;top:1000px;padding:12px 22px 12px 18px;border-radius:999px;background:rgba(17,17,16,.72);font-size:24px;color:#fff;display:flex;align-items:center;gap:12px;",
+  `<svg style="position:relative" width="16" height="18" viewBox="0 0 16 18"><rect x="1" y="1" width="5" height="16" rx="1.5" fill="#fff"/><rect x="10" y="1" width="5" height="16" rx="1.5" fill="#fff"/></svg><span style="position:relative">paused</span>`);
+
+/* ---------- THE CARD (through-line object) ---------- */
+const CARD = mk("card", "left:0;top:0;border-radius:40px;");
+const CK = { cx: [], cy: [], w: [], h: [], r: [], op: [], col: [] };
+function key(t, s, f) { for (const k in s) if (k !== "col") CK[k].push([t, s[k], f]); if (s.col) CK.col.push([t, s.col]); }
+function cardState(t) {
+  const g = (k) => track(CK[k], t);
+  return { cx: g("cx"), cy: g("cy"), w: g("w"), h: g("h"), r: g("r"), op: clamp(g("op")) };
+}
+// content blocks inside the card, each with its own enter/exit so swapped text never overlaps
+const BLOCKS = [];
+function block(t0, t1, html, css = "") { const el = mk("ui", `left:0;top:0;width:100%;height:100%;${css}`, html, CARD); BLOCKS.push({ el, t0, t1 }); return el; }
+function drawBlocks(t) {
+  for (const b of BLOCKS) {
+    const ui = eOut(P(t, b.t0 + 0.05, b.t0 + 0.24)), uo = eIn(P(t, b.t1 - 0.12, b.t1));
+    const o = ui * (1 - uo);
+    b.el.style.visibility = o > 0.002 ? "visible" : "hidden"; b.el.style.opacity = o;
+    b.el.style.filter = o < 1 ? `blur(${(1 - o) * 10}px)` : "none";
+    b.el.style.transform = `translateY(${(1 - ui) * 18 - uo * 10}px)`;
+  }
+}
+
+/* ============================================================================================================
+   BUILD (called once the timeline arrives)
+   ============================================================================================================ */
+let SC = {};                                            // scene-specific nodes and times
+function build() {
+  /* ----- intro: "Guys, watch this first." — reference word pairs ----- */
+  const g = W("guys watch this first");
+  kin("guys", { x: 74, y: 196, size: 62, weight: 640, ls: -0.02, t1: T_SPLIT });
+  kin("watch", { x: 62, y: 300, size: 236, t1: T_SPLIT, stagger: 0.03 });
+  kin("this", { x: 1010, y: 230, size: 62, weight: 640, ls: -0.02, anchor: "r", t1: T_SPLIT });
+  kin("first", { x: 1012, y: 400, size: 168, weight: 400, cls: "serif", ls: -0.01, anchor: "r", t1: T_SPLIT, stagger: 0.03 });
+
+  /* ----- split: her words, at the seam ----- */
+  const sw = { who: "sample", y: 868, size: 60 };
+  cap("I spent", { ...sw });
+  cap("15 ,000 rupees", { ...sw, text: "₹15,000", size: 118, cls: "", hl: ["15000"], after: T_SPLIT });
+  cap("on ads", { ...sw });
+  cap("and this is the audience", { ...sw });
+  cap("that my ads are reaching", { ...sw });
+  cap("after selecting", { ...sw });
+  cap("the age range, the gender,", { ...sw });
+  cap("all of the audience metrics.", { ...sw });
+  cap("So what are you doing", { ...sw });
+  cap("Meta?", { ...sw, size: 112, hl: ["meta"] });
+  cap("What are you doing?", { ...sw, t1: T_MAIN, after: W("Meta?", 0, "sample").t1 });
+
+  /* ----- main ----- */
+  const A = (p) => W(p, T_MAIN, "host");
+  cap("Pick the age,", { after: T_MAIN, who: "host" });
+  cap("pick the gender.", { after: A("pick the age").t1, who: "host" });
+  // "Meta still decides" — pair: small lead, big verb
+  const md = A("meta still decides");
+  kin("meta still", { after: T_MAIN, x: 74, y: 190, size: 62, weight: 640, ls: -0.02, t1: A("who sees").t0 - 0.02 });
+  kin("decides", { after: T_MAIN, x: 62, y: 300, size: 196, t1: A("who sees").t0 - 0.02, stagger: 0.026, color: "#fff" });
+  cap("who sees your ad.", { after: T_MAIN, who: "host", hl: [] });
+  cap("it reads", { after: T_MAIN, who: "host" });
+  cap("your creative,", { after: T_MAIN, who: "host", hl: ["creative"] });
+  cap("not your targeting.", { after: T_MAIN, who: "host", hl: ["targeting"], hlColor: "var(--red)" });
+  // "So here's what we do."
+  kin("so here's", { after: T_MAIN, x: 540, y: 1388, size: 64, weight: 640, ls: -0.02, anchor: "c", t1: A("we call it").t0 + 0.02 });
+  kin("what we do.", { after: T_MAIN, x: 540, y: 1508, size: 150, anchor: "c", t1: A("we call it").t0 + 0.02 });
+
+  // ---- three angle method (plate scene 1: the host is a small tilted card at the top) ----
+  const m = A("we call it the three angle method");
+  SC.m = { t0: m.t0, three: A("three angle").t0, angle: A("angle method").t0, method: A("method").t0, one: A("one").t0 };
+  kin("we call it", { after: T_MAIN, x: 540, y: 1062, size: 30, weight: 500, cls: "mono", ls: 0.12, anchor: "c", t1: SC.m.one + 0.05, text: "WE CALL IT", delay: 0.4 });
+  kin("the three angle", { after: T_MAIN, x: 540, y: 1140, size: 98, anchor: "c", t1: SC.m.one + 0.05, stagger: 0.02 });
+  kin("method.", { after: T_MAIN, x: 540, y: 1238, size: 112, weight: 400, cls: "serif", ls: -0.01, anchor: "c", t1: SC.m.one + 0.05, color: "var(--mint)" });
+  const FAN = [["01", "PROBLEM", "the pain"], ["02", "PROOF", "the result"], ["03", "OFFER", "the deal"]];
+  SC.fan = FAN.map(([n, a, b], i) => mk("ui", `left:0;top:0;width:250px;height:316px;border-radius:30px;background:var(--paper);padding:26px 24px;transform-origin:50% 100%;`,
+    `<div class="mono" style="left:24px;top:22px;font-size:26px;color:var(--grey)">${n}</div>
+     <div style="left:24px;top:188px;font-size:44px;font-weight:760;letter-spacing:-0.035em">${a}</div>
+     <div class="serif" style="left:24px;top:244px;font-size:38px;color:#444">${b}</div>
+     <div style="left:196px;top:22px;width:30px;height:30px;border-radius:50%;background:${["var(--red)", "var(--mint)", "#111"][i]}"></div>`));
+
+  // ---- the card's journey ----
+  const pa = A("pick the age"), pg = A("pick the gender"), dec = A("decides"), rd = A("it reads"), nt = A("not your targeting");
+  const sh = A("so here's"), one = A("one a problem"), pain = A("pain"), two = A("two a proof"), res = A("result"), test = A("testimonial");
+  const thr = A("three an offer"), deal = A("deal"), same = A("same product"), mf = A("meta finds"), aud = A("different audience");
+  const run = A("run all three"), sb = A("same budget"), cut = A("cut the weakest"), win = A("winner"), we = A("we tested");
+  const want = A("want us"), dm = A("dm us"), meta = A("dm us meta");
+  Object.assign(SC, { pa, pg, dec, rd, nt, sh, one, pain, two, res, test, thr, deal, same, mf, aud, run, sb, cut, win, we, want, dm, meta });
+  const C0 = { cx: 540, cy: 1478, r: 44, op: 1 };
+  key(0, { cx: 540, cy: 1900, w: 300, h: 90, r: 45, op: 0, col: "#F6F5F1" });
+  key(pa.t0 - 0.06, { ...C0, w: 900, h: 420, col: "#F6F5F1" });                         // audience panel
+  key(dec.t0 - 0.1, { cx: 540, cy: 1500, w: 620, h: 128, r: 64, op: 1 });               // collapses into a targeting pill
+  key(rd.t0 - 0.04, { cx: 540, cy: 1470, w: 820, h: 440, r: 40, op: 1, col: "#FFFFFF" });   // the ad creative
+  key(sh.t0 - 0.02, { cx: 540, cy: 1700, w: 120, h: 120, r: 60, op: 0 });              // gone for the method scene
+  key(one.t0 - 0.06, { cx: 540, cy: 1480, w: 900, h: 420, r: 44, op: 1, col: "#121211" });   // angle card (dark)
+  key(same.t0 - 0.02, { cx: 540, cy: 1060, w: 190, h: 190, r: 28, op: 0 });            // shrinks into the product box
+  key(mf.t0, { cx: 540, cy: 1760, w: 700, h: 140, r: 44, op: 0 });                     // parked below, invisible
+  key(run.t0 - 0.05, { cx: 540, cy: 1478, w: 900, h: 430, r: 44, op: 1, col: "#F6F5F1" });   // budget chart
+  key(we.t0 - 0.34, { cx: 540, cy: 1620, w: 200, h: 80, r: 40, op: 0 }, 3.4);
+  key(want.t0 + 0.2, { cx: 540, cy: 1560, w: 900, h: 148, r: 74, op: 1, col: "#FFFFFF" });  // DM composer
+
+  // ---- card contents ----
+  // audience panel (sliders + gender segmented control)
+  SC.audP = block(pa.t0 - 0.06, dec.t0 - 0.06, `
+    <div style="left:44px;top:34px;font-size:40px;font-weight:700;letter-spacing:-0.03em">Audience</div>
+    <div class="mono" style="left:44px;top:86px;font-size:23px;color:var(--grey)">ad set · targeting</div>
+    <div class="mono" style="right:44px;top:42px;font-size:23px;color:var(--grey)">est. reach ▾</div>
+    <div style="left:44px;top:164px;font-size:30px;font-weight:600">Age</div>
+    <div id="agev" class="mono" style="right:44px;top:166px;font-size:28px;color:#111">18 – 65+</div>
+    <div style="left:44px;top:226px;width:812px;height:8px;border-radius:4px;background:#E2E1DC"></div>
+    <div id="ager" style="left:44px;top:226px;width:812px;height:8px;border-radius:4px;background:#111"></div>
+    <div id="k1" style="left:30px;top:211px;width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25), 0 0 0 1.5px #111 inset"></div>
+    <div id="k2" style="left:832px;top:211px;width:38px;height:38px;border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.25), 0 0 0 1.5px #111 inset"></div>
+    <div style="left:44px;top:296px;font-size:30px;font-weight:600">Gender</div>
+    <div style="left:250px;top:282px;width:606px;height:68px;border-radius:34px;background:#E9E8E3"></div>
+    <div id="gi" style="left:256px;top:288px;width:196px;height:56px;border-radius:28px;background:#111"></div>
+    <div id="g0" style="left:256px;top:288px;width:196px;height:56px;display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:600">All</div>
+    <div id="g1" style="left:454px;top:288px;width:196px;height:56px;display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:600">Men</div>
+    <div id="g2" style="left:652px;top:288px;width:196px;height:56px;display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:600">Women</div>`);
+  // targeting pill, struck through
+  SC.pill = block(dec.t0 - 0.06, rd.t0 - 0.04, `
+    <div style="left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;gap:18px;font-size:44px;font-weight:650;letter-spacing:-0.03em">
+      <span class="mono" style="position:relative;font-size:24px;color:var(--grey);font-weight:500">your</span><span style="position:relative">targeting</span></div>
+    <div id="strike" style="left:70px;top:61px;height:6px;border-radius:3px;background:var(--red);width:0"></div>`);
+  // ad creative being read
+  SC.ad = block(rd.t0 - 0.04, sh.t0 - 0.02, `
+    <div style="left:36px;top:34px;width:56px;height:56px;border-radius:50%;background:#111"></div>
+    <div style="left:108px;top:36px;font-size:28px;font-weight:650">your brand</div>
+    <div class="mono" style="left:108px;top:72px;font-size:21px;color:var(--grey)">Sponsored</div>
+    <div style="left:36px;top:118px;width:330px;height:286px;border-radius:24px;background:#EDEBE5"></div>
+    <svg style="left:120px;top:186px" width="160" height="150" viewBox="0 0 160 150"><path d="M80 10 L148 44 L148 112 L80 146 L12 112 L12 44 Z" fill="#fff" stroke="#111" stroke-width="5" stroke-linejoin="round"/><path d="M12 44 L80 78 L148 44 M80 78 L80 146" fill="none" stroke="#111" stroke-width="5" stroke-linejoin="round"/></svg>
+    <div style="left:396px;top:124px;width:270px;height:30px;border-radius:8px;background:#111"></div>
+    <div style="left:396px;top:168px;width:210px;height:30px;border-radius:8px;background:#111"></div>
+    <div style="left:396px;top:230px;width:270px;height:16px;border-radius:8px;background:#D9D7D0"></div>
+    <div style="left:396px;top:258px;width:230px;height:16px;border-radius:8px;background:#D9D7D0"></div>
+    <div style="left:396px;top:334px;width:200px;height:62px;border-radius:31px;background:#111;display:flex;align-items:center;justify-content:center;color:#fff;font-size:25px;font-weight:600">Shop now</div>
+    <div id="scan" style="left:0;top:0;width:100%;height:4px;background:var(--mint)"></div>
+    <div id="scanband" style="left:0;top:0;width:100%;height:120px;background:linear-gradient(180deg, rgba(61,219,176,0) 0%, rgba(61,219,176,.18) 100%)"></div>
+    ${["copy", "visual", "offer"].map((s, i) => `<div id="chip${i}" class="mono" style="right:30px;top:${130 + i * 62}px;padding:8px 16px;border-radius:999px;background:#111;color:#fff;font-size:21px;display:flex;gap:10px;align-items:center"><span style="position:relative;color:var(--mint)">✓</span><span style="position:relative">${s}</span></div>`).join("")}`);
+  // angle cards (dark): problem → proof → offer, same shape, content swaps
+  const head = (n, a) => `<div class="mono" style="left:44px;top:38px;font-size:26px;color:var(--grey)">${n} / 03</div>
+    <div style="left:44px;top:80px;font-size:58px;font-weight:780;letter-spacing:-0.04em;color:#fff">${a} <span class="serif" style="position:relative;font-weight:400;color:var(--mint)">ad</span></div>`;
+  SC.c1 = block(one.t0 - 0.06, two.t0 - 0.05, head("01", "PROBLEM") + `
+    <div style="left:44px;top:182px;width:812px;height:200px;border-radius:26px;background:#000;border:2px solid #2A2A28"></div>
+    <div id="ptype" style="left:80px;top:218px;width:740px;font-size:46px;font-weight:700;letter-spacing:-0.03em;color:#fff;line-height:1.12;white-space:normal"></div>`);
+  SC.c2 = block(two.t0 - 0.05, thr.t0 - 0.05, head("02", "PROOF") + `
+    <div style="left:44px;top:182px;width:380px;height:200px;border-radius:26px;background:#1C1C1A"></div>
+    <svg style="left:64px;top:206px" width="340" height="150" viewBox="0 0 340 150"><path id="resline" d="M8 136 C 70 130, 110 110, 150 96 S 230 60, 260 40 S 310 14, 332 8" fill="none" stroke="var(--mint)" stroke-width="7" stroke-linecap="round"/></svg>
+    <div class="mono" style="left:64px;top:340px;font-size:21px;color:var(--grey)">result</div>
+    <div id="quote" style="left:448px;top:182px;width:408px;height:200px;border-radius:26px;background:#F6F5F1">
+      <div style="left:26px;top:24px;font-size:30px;letter-spacing:4px;color:#111">★★★★★</div>
+      <div style="left:26px;top:82px;width:330px;height:16px;border-radius:8px;background:#CFCDC6"></div>
+      <div style="left:26px;top:110px;width:280px;height:16px;border-radius:8px;background:#CFCDC6"></div>
+      <div style="left:26px;top:146px;width:36px;height:36px;border-radius:50%;background:#111"></div>
+      <div class="mono" style="left:74px;top:152px;font-size:20px;color:var(--grey)">testimonial</div></div>`);
+  SC.c3 = block(thr.t0 - 0.05, same.t0 - 0.02, head("03", "OFFER") + `
+    <div style="left:44px;top:182px;width:812px;height:200px;border-radius:26px;background:#F6F5F1"></div>
+    <div style="left:84px;top:212px;font-size:30px;font-weight:600;color:#111">This week only</div>
+    <div style="left:84px;top:256px;font-size:76px;font-weight:800;letter-spacing:-0.045em;color:#111">Free delivery</div>
+    <div id="stamp" style="left:640px;top:206px;width:176px;height:150px;border-radius:24px;background:var(--mint);transform:rotate(-8deg);display:flex;align-items:center;justify-content:center"><span class="serif" style="position:relative;font-size:72px;color:#111">deal</span></div>`);
+  // budget chart: equal budget → run → cut the weakest → money to the winner
+  SC.chart = block(run.t0 - 0.05, we.t0 - 0.3, `
+    <div style="left:44px;top:34px;font-size:40px;font-weight:700;letter-spacing:-0.03em">Budget</div>
+    <div id="budchip" class="mono" style="right:44px;top:40px;padding:8px 16px;border-radius:999px;background:#111;color:#fff;font-size:21px">same budget</div>
+    <div style="left:44px;top:368px;width:812px;height:3px;background:#111"></div>
+    ${[0, 1, 2].map((i) => `<div id="bar${i}" style="left:${120 + i * 250}px;top:0;width:160px;height:0;border-radius:18px 18px 6px 6px;background:#111"></div>
+      <div id="bl${i}" class="mono" style="left:${120 + i * 250}px;top:384px;width:160px;text-align:center;font-size:22px;color:#111">${["problem", "proof", "offer"][i]}</div>`).join("")}
+    <div id="cutx" style="left:0;top:0;width:220px;height:6px;border-radius:3px;background:var(--red);transform-origin:0 50%"></div>
+    <div id="winchip" class="mono" style="left:0;top:0;padding:8px 16px;border-radius:999px;background:var(--mint);color:#111;font-size:21px">winner</div>`);
+  // DM composer
+  SC.dmc = block(want.t0 + 0.2, END + 1, `
+    <div style="left:30px;top:24px;width:100px;height:100px;border-radius:50%;background:#111;display:flex;align-items:center;justify-content:center">
+      <svg style="position:relative" width="46" height="46" viewBox="0 0 46 46"><path d="M5 22 L41 5 L30 41 L22 26 Z" fill="none" stroke="#fff" stroke-width="3.5" stroke-linejoin="round"/></svg></div>
+    <div id="dmtxt" style="left:156px;top:40px;font-size:52px;font-weight:700;letter-spacing:-0.02em;color:#111"></div>
+    <div id="dmph" style="left:156px;top:46px;font-size:40px;font-weight:500;color:#A9A8A2">Message…</div>
+    <div id="caret" style="left:156px;top:44px;width:4px;height:60px;background:#111"></div>
+    <div id="send" style="right:26px;top:24px;width:150px;height:100px;border-radius:50px;background:#E9E8E3;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:650;color:#111">Send</div>`);
+  SC.bubble = mk("", "left:0;top:0;padding:26px 40px;border-radius:44px 44px 12px 44px;background:var(--mint);color:#111;font-size:66px;font-weight:800;letter-spacing:-0.03em;",
+    `<span style="position:relative">META</span>`);
+  SC.sent = mk("mono", "left:0;top:0;font-size:24px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.5)", "sent ✓");
+
+  // ---- captions while the card is up (they move to the top) ----
+  cap("show the pain", { after: T_MAIN, who: "host", serifWords: ["pain"], hl: ["pain"] });
+  cap("your customer already feels.", { after: T_MAIN, who: "host" });
+  cap("two,", { after: T_MAIN, who: "host" });
+  cap("a proof ad,", { after: T_MAIN, who: "host", hl: ["proof"] });
+  cap("a result", { after: T_MAIN, who: "host" });
+  cap("or a testimonial.", { after: T_MAIN, who: "host" });
+  cap("three,", { after: SC.thr.t0 - 0.1, who: "host" });
+  cap("an offer ad.", { after: T_MAIN, who: "host", hl: ["offer"] });
+  cap("straight up", { after: T_MAIN, who: "host" });
+  cap("the deal.", { after: T_MAIN, who: "host", serifWords: ["deal"], hl: ["deal"] });
+  cap("one,", { after: T_MAIN, who: "host" });
+  cap("a problem ad.", { after: T_MAIN, who: "host", hl: ["problem"] });
+  // same product, three completely different ads (plate scene 2)
+  kin("same product,", { after: T_MAIN, x: 540, y: 910, size: 66, weight: 640, ls: -0.02, anchor: "c", t1: SC.mf.t0 - 0.12, delay: 0.36 });
+  kin("three completely different ads.", { after: T_MAIN, x: 540, y: 1636, size: 70, weight: 760, anchor: "c", t1: SC.mf.t0 - 0.12, stagger: 0.016 });
+  SC.cube = mk("", "left:450px;top:970px;width:180px;height:180px;perspective:900px;");
+  SC.cubeIn = mk("", "left:0;top:0;width:180px;height:180px;transform-style:preserve-3d;", ["front", "back", "right", "left", "top", "bottom"].map((f) => {
+    const tr = { front: "translateZ(90px)", back: "rotateY(180deg) translateZ(90px)", right: "rotateY(90deg) translateZ(90px)", left: "rotateY(-90deg) translateZ(90px)", top: "rotateX(90deg) translateZ(90px)", bottom: "rotateX(-90deg) translateZ(90px)" }[f];
+    const bg = { front: "#F6F5F1", back: "#E4E2DC", right: "#D9D7D0", left: "#ECEAE4", top: "#FFFFFF", bottom: "#CFCDC6" }[f];
+    return `<div style="left:0;top:0;width:180px;height:180px;background:${bg};border:3px solid #111;border-radius:14px;transform:${tr};backface-visibility:hidden"></div>`;
+  }).join(""), SC.cube);
+  SC.trio = ["PROBLEM", "PROOF", "OFFER"].map((a, i) => mk("ui", `left:0;top:0;width:270px;height:300px;border-radius:30px;background:${["#000", "var(--paper)", "var(--mint)"][i]};border:${i === 0 ? "2px solid #333" : "none"};`,
+    `<div class="mono" style="left:24px;top:22px;font-size:22px;color:${i === 0 ? "#888" : "#555"}">0${i + 1}</div>
+     <div style="left:24px;top:200px;font-size:40px;font-weight:780;letter-spacing:-0.035em;color:${i === 0 ? "#fff" : "#111"}">${a}</div>
+     <div style="left:24px;top:76px;width:${[200, 160, 120][i]}px;height:14px;border-radius:7px;background:${i === 0 ? "#444" : "rgba(0,0,0,.18)"}"></div>
+     <div style="left:24px;top:102px;width:${[150, 190, 170][i]}px;height:14px;border-radius:7px;background:${i === 0 ? "#444" : "rgba(0,0,0,.18)"}"></div>`));
+  // Meta finds a different audience for each one: three mini cards, each with its own cluster of people
+  SC.mini = [0, 1, 2].map((i) => mk("ui", `left:${70 + i * 330}px;top:1520px;width:280px;height:120px;border-radius:26px;background:${["#000", "var(--paper)", "var(--mint)"][i]};border:${i === 0 ? "2px solid #333" : "none"};display:flex;align-items:center;justify-content:center;font-size:36px;font-weight:760;letter-spacing:-0.03em;color:${i === 0 ? "#fff" : "#111"}`,
+    `<span style="position:relative">${["problem", "proof", "offer"][i]}</span>`));
+  SC.dots = [];
+  for (let i = 0; i < 3; i++) for (let k = 0; k < 9; k++) {
+    const a = (k / 9) * Math.PI * 2 + i, rr = 70 + (k % 3) * 34;
+    SC.dots.push({ i, k, x: 210 + i * 330 + Math.cos(a) * rr * 0.9, y: 1330 + Math.sin(a) * rr * 0.55, el: mk("", `left:0;top:0;width:34px;height:34px;border-radius:50%;background:${["#fff", "#C9C7C0", "var(--mint)"][i]};border:3px solid rgba(0,0,0,.55);`) });
+  }
+  cap("meta finds", { after: T_MAIN, who: "host" });
+  cap("a different audience", { after: T_MAIN, who: "host", hl: ["different", "audience"] });
+  cap("for each one.", { after: T_MAIN, who: "host" });
+  cap("run all three", { after: T_MAIN, who: "host" });
+  cap("at the same budget.", { after: T_MAIN, who: "host", hl: ["budget"] });
+  cap("cut the weakest,", { after: T_MAIN, who: "host", hl: ["weakest"], hlColor: "var(--red)" });
+  cap("put the money", { after: T_MAIN, who: "host" });
+  cap("on the winner.", { after: T_MAIN, who: "host", serifWords: ["winner"], hl: ["winner"] });
+  // we tested this on different brands — pair at chest (no card)
+  kin("we tested this", { after: T_MAIN, x: 540, y: 1400, size: 132, anchor: "c", t1: A("there are more").t0 - 0.02, stagger: 0.02 });
+  kin("on different brands.", { after: T_MAIN, x: 540, y: 1536, size: 62, weight: 640, ls: -0.02, anchor: "c", t1: A("there are more").t0 - 0.02 });
+  // more strategies like this for Meta and Google that bring you leads and sales
+  const tam = A("there are more");
+  kin("there are more", { after: T_MAIN, x: 74, y: 190, size: 62, weight: 640, ls: -0.02, t1: A("for meta and google").t0 - 0.02 });
+  kin("strategies", { after: T_MAIN, x: 62, y: 296, size: 176, t1: A("for meta and google").t0 - 0.02, stagger: 0.02 });
+  kin("like this", { after: T_MAIN, x: 1012, y: 410, size: 62, weight: 640, ls: -0.02, anchor: "r", t1: A("for meta and google").t0 - 0.02 });
+  SC.chips = ["Meta", "Google"].map((s) => mk("", "left:0;top:0;padding:22px 40px;border-radius:999px;background:#fff;color:#111;font-size:60px;font-weight:720;letter-spacing:-0.03em;box-shadow:0 10px 30px rgba(0,0,0,.25)", `<span style="position:relative">${s}</span>`));
+  SC.fmg = A("for meta and google"); SC.lead = A("leads and sales"); SC.tby = A("that bring you");
+  kin("that bring you", { after: T_MAIN, x: 540, y: 1340, size: 62, weight: 640, ls: -0.02, anchor: "c", t1: SC.want.t0 - 0.02 });
+  kin("leads and", { after: T_MAIN, x: 540, y: 1470, size: 150, anchor: "c", t1: SC.want.t0 - 0.02, stagger: 0.02 });
+  kin("sales.", { after: T_MAIN, x: 540, y: 1612, size: 170, weight: 400, cls: "serif", ls: -0.01, anchor: "c", t1: SC.want.t0 - 0.02, color: "var(--mint)" });
+  cap("want us to do this", { after: T_MAIN, who: "host" });
+  cap("for your business?", { after: T_MAIN, who: "host" });
+  cap("dm us meta", { after: T_MAIN, who: "host", text: "DM us “META”", t1: END });
+  finishCaps();
+
+  // ---- cursor path ----
+  const KX = (v) => 90 + 44 + 812 * v - 6, KY = 1268 + 230 - 3;     // slider knob centre → cursor tip position
+  CURK = [
+    [pa.t0 - 0.15, 900, 1820, 0], [pa.t0 + 0.14, KX(0), KY, 0], [pa.t0 + 0.2, KX(0), KY, 1],
+    [pa.t0 + 0.5, KX(0.14), KY, 0], [pa.t0 + 0.62, KX(1), KY, 1], [pa.t1 + 0.18, KX(0.53), KY, 0],
+    [pg.t0 + 0.32, 834, 1581, 0], [pg.t0 + 0.42, 834, 1581, 1], [dec.t0 - 0.12, 900, 1760, 0],
+  ];
+  // cut the weakest: click the shortest bar (bar 0, "problem")
+  CURK.push([cut.t0 - 0.45, 700, 1820, 0], [cut.t0 - 0.06, 284, 1582, 0], [cut.t0 + 0.02, 284, 1582, 1], [cut.t0 + 0.5, 420, 1760, 0]);
+  // DM: click the field, type, send
+  CURK.push([dm.t0 - 0.55, 980, 1820, 0], [dm.t0 - 0.12, 324, 1557, 0], [dm.t0 - 0.06, 324, 1557, 1], [meta.t1 - 0.14, 883, 1557, 0], [meta.t1 - 0.05, 883, 1557, 1], [meta.t1 + 0.45, 940, 1740, 0]);
+}
+
+/* ============================================================================================================
+   SEEK
+   ============================================================================================================ */
+function inPlate(x) { return (x > SC.m.t0 && x < SC.one.t0 - 0.05) || (x > SC.same.t0 - 0.02 && x < SC.mf.t0 - 0.1); }
+function cardUp(t) { const c = cardState(t); return (c.op > 0.3 && c.cy > 1200) || (t >= SC.mf.t0 - 0.06 && t < SC.run.t0); }
+function seek(t) {
+  /* scrims */
+  const avg = (f) => [-0.24, -0.12, 0, 0.12, 0.24].reduce((a, d) => a + (f(t + d) ? 1 : 0), 0) / 5;
+  const usesTop = (x) => !inPlate(x) && !(x >= T_SPLIT && x < T_MAIN) && (CAPS.some((c) => x >= c.t0 && x < c.t1 && c.y == null && cardUp(x)) || KIN.some((k) => x >= k.t0 && x < k.t1 && k.y < 600));
+  const usesBot = (x) => !inPlate(x) && !(x >= T_SPLIT && x < T_MAIN) && (CAPS.some((c) => x >= c.t0 && x < c.t1 && c.y == null && !cardUp(x)) || KIN.some((k) => x >= k.t0 && x < k.t1 && k.y > 1200));
+  SCRIM_T.style.opacity = avg(usesTop); SCRIM_B.style.opacity = avg(usesBot);
+
+  /* split dressing */
+  const sIn = eOut(P(t, T_SPLIT + 0.18, T_SPLIT + 0.5)), sOut = eIn(P(t, T_MAIN - 0.12, T_MAIN + 0.05));
+  const so = sIn * (1 - sOut);
+  show(SEAM, so); SEAMF.style.width = `${1080 * P(t, T_SPLIT, T_MAIN)}px`;
+  show(TAG_A, so, `transform:translateY(${(1 - sIn) * -20}px);filter:blur(${(1 - so) * 8}px);`);
+  show(TAG_B, so, `transform:translateY(${(1 - sIn) * 20}px);filter:blur(${(1 - so) * 8}px);`);
+
+  /* card */
+  const c = cardState(t), col = trackInstant(CK.col, t);
+  show(CARD, c.op, `left:${c.cx - c.w / 2}px;top:${c.cy - c.h / 2}px;width:${c.w}px;height:${c.h}px;border-radius:${c.r}px;background:${col};box-shadow:0 24px 60px rgba(0,0,0,.28);`);
+  // the card sits in a 900-wide frame: content is laid out for that, the card's own size does the morph
+  drawBlocks(t);
+  // audience: sliders and gender
+  { const pa = SC.pa, pg = SC.pg;
+    const v1 = 0.14 * eIO(P(t, pa.t0 + 0.2, pa.t0 + 0.5)), v2 = 1 - 0.47 * eIO(P(t, pa.t0 + 0.62, pa.t1 + 0.18));
+    const kx = (v) => 44 + 812 * v - 19, a1 = Math.round(18 + v1 * 47), a2 = Math.round(18 + v2 * 47);
+    const q = (id) => SC.audP.querySelector("#" + id);
+    q("k1").style.left = `${kx(v1)}px`; q("k2").style.left = `${kx(v2)}px`;
+    q("ager").style.left = `${44 + 812 * v1}px`; q("ager").style.width = `${812 * (v2 - v1)}px`;
+    q("agev").textContent = `${a1} – ${a2 >= 65 ? "65+" : a2}`;
+    // liquid segmented indicator: leading edge on a faster spring than the trailing edge
+    const tc = pg.t0 + 0.42, L = 256 + 398 * spring(t - tc, 3.6), R = 452 + 398 * spring(t - tc, 2.2);
+    const Lx = Math.min(L, R - 196 + 0.0), Rx = Math.max(R, L + 196);
+    q("gi").style.left = `${Math.min(256 + 398 * spring(t - tc, 2.2), 256 + 398 * spring(t - tc, 3.6))}px`;
+    q("gi").style.width = `${196 + Math.abs(398 * (spring(t - tc, 3.6) - spring(t - tc, 2.2)))}px`;
+    const sel = t >= tc + 0.08 ? 2 : 0;
+    ["g0", "g1", "g2"].forEach((id, i) => (q(id).style.color = i === sel ? "#fff" : "#111"));
+  }
+  // targeting pill: strike draws on "decides"
+  SC.pill.querySelector("#strike").style.width = `${480 * eOut(P(t, SC.dec.t0 + 0.05, SC.dec.t0 + 0.35))}px`;
+  // ad: scan sweeps on "reads", chips tick as it passes
+  { const u = eIO(P(t, SC.rd.t0 + 0.1, SC.rd.t0 + 1.1)), y = 20 + 400 * u;
+    SC.ad.querySelector("#scan").style.top = `${y}px`; SC.ad.querySelector("#scan").style.opacity = u > 0 && u < 1 ? 1 : 0;
+    SC.ad.querySelector("#scanband").style.top = `${y - 120}px`; SC.ad.querySelector("#scanband").style.opacity = u > 0 && u < 1 ? 1 : 0;
+    [0, 1, 2].forEach((i) => { const ch = SC.ad.querySelector("#chip" + i), tt = SC.rd.t0 + 0.35 + i * 0.22, v = spring(t - tt, 3.2);
+      ch.style.opacity = clamp(v * 2); ch.style.transform = `scale(${0.6 + 0.4 * v})`; }); }
+  // problem: type the pain
+  { const s = "Paying for ads that never sell?", n = Math.round(s.length * P(t, SC.pain.t0 - 0.1, SC.pain.t0 + 0.7));
+    SC.c1.querySelector("#ptype").textContent = s.slice(0, n) + (n < s.length && t > SC.one.t0 + 0.2 ? "▍" : ""); }
+  // proof: the line draws, the testimonial slides up
+  { const L = SC.c2.querySelector("#resline"), len = 420, u = eOut(P(t, SC.res.t0 - 0.05, SC.res.t0 + 0.6));
+    L.style.strokeDasharray = len; L.style.strokeDashoffset = len * (1 - u);
+    const q = SC.c2.querySelector("#quote"), v = spring(t - (SC.test.t0 - 0.05), 3.0); q.style.transform = `translateY(${(1 - v) * 230}px)`; q.style.opacity = clamp(v * 1.5); }
+  // offer: the stamp lands on "deal"
+  { const st = SC.c3.querySelector("#stamp"), v = spring(t - (SC.deal.t0 - 0.06), 3.4, 0.7);
+    st.style.transform = `rotate(-8deg) scale(${t < SC.deal.t0 - 0.06 ? 0 : 1.6 - 0.6 * v})`; st.style.opacity = t < SC.deal.t0 - 0.06 ? 0 : clamp(v * 2); }
+  // chart
+  { const run = SC.run, cut = SC.cut, win = SC.win;
+    const grow = [0, 1, 2].map((i) => spring(t - (run.t0 + 0.08 * i), 2.8));
+    const eq = 150;                                                         // equal budget
+    const perf = [0.55, 1.05, 0.8];                                         // after "run" the bars become results (no numbers claimed)
+    const pr = spring(t - (SC.sb.t1 + 0.05), 2.6);
+    const cu = spring(t - (cut.t0 + 0.04), 3.2), wi = spring(t - (win.t0 - 0.2), 2.4);
+    [0, 1, 2].forEach((i) => {
+      let h = eq * grow[i] * (1 - pr) + eq * perf[i] * pr * grow[i];
+      if (i === 0) h *= 1 - 0.85 * cu;
+      if (i === 1) h += 110 * wi;
+      const b = SC.chart.querySelector("#bar" + i);
+      b.style.height = `${h}px`; b.style.top = `${368 - h}px`;
+      b.style.background = i === 0 && cu > 0.05 ? "var(--red)" : i === 1 && wi > 0.05 ? "var(--mint)" : "#111";
+      b.style.opacity = i === 0 ? 1 - 0.6 * cu : 1;
+    });
+    const cx = SC.chart.querySelector("#cutx"); cx.style.left = "92px"; cx.style.top = `${368 - 0.15 * 0.55 * eq - 30}px`;
+    cx.style.width = `${216 * eOut(P(t, cut.t0 + 0.02, cut.t0 + 0.24))}px`; cx.style.transform = "rotate(-24deg)";
+    const wc = SC.chart.querySelector("#winchip"); wc.style.left = "386px"; wc.style.top = `${368 - (eq * perf[1] + 110 * wi) - 58}px`; wc.style.opacity = clamp(wi * 2);
+    const bc = SC.chart.querySelector("#budchip"); bc.style.opacity = 1 - pr * 0.0; bc.textContent = pr > 0.5 ? "results" : "same budget";
+  }
+  // DM: type META, send, bubble
+  { const dm = SC.dm, me = SC.meta, s = "META";
+    const n = Math.round(4 * P(t, dm.t0 + 0.02, me.t1 - 0.2));
+    const tx = SC.dmc.querySelector("#dmtxt"), ph = SC.dmc.querySelector("#dmph"), ca = SC.dmc.querySelector("#caret");
+    const sent = t >= me.t1 - 0.05;
+    tx.textContent = sent ? "" : s.slice(0, n); ph.style.opacity = n === 0 && !sent ? 1 : 0;
+    ca.style.opacity = t > dm.t0 - 0.06 && !sent ? 1 : 0; ca.style.left = `${156 + (n ? tx.offsetWidth : 0) + 6}px`;
+    SC.dmc.querySelector("#send").style.background = n === 4 && !sent ? "var(--mint)" : "#E9E8E3";
+    const bv = spring(t - (me.t1 - 0.05), 3.0);
+    show(SC.bubble, sent ? clamp(bv * 2) : 0, `left:${700 - 300 * 0}px;top:${1370 - 60 * bv}px;transform:translate(-50%,0) scale(${0.5 + 0.5 * bv});transform-origin:100% 100%;`);
+    show(SC.sent, sent ? eOut(P(t, me.t1 + 0.2, me.t1 + 0.5)) : 0, `left:540px;top:1658px;transform:translateX(-50%);`);
+  }
+
+  /* plate scene 1: the three angle method fan */
+  { const tIn = [SC.m.three, SC.m.angle, SC.m.method], outT = SC.m.one - 0.12;
+    SC.fan.forEach((el, i) => {
+      const v = spring(t - tIn[i] + 0.04, 2.6), o = 1 - eIn(P(t, outT, outT + 0.22));
+      const x = 540 + (i - 1) * 270, y = 1480, rot = (i - 1) * 7;
+      // card 01 hands off to the through-line card (it flies into the lower card's spot), the others leave
+      const fly = eIn(P(t, outT - 0.1, outT + 0.2));
+      const fx = x + (i - 1) * 120 * fly, fy = y + 520 * fly, sc = 1;
+      const op = t < tIn[i] - 0.05 ? 0 : clamp(v * 1.6) * (1 - P(t, outT - 0.02, outT + 0.16));
+      show(el, op, `transform:translate(${fx - 125}px,${fy - 158 + (1 - v) * 260}px) rotate(${rot * v}deg) perspective(900px) rotateY(${(1 - v) * (i - 1) * 40}deg) scale(${sc});filter:blur(${(1 - clamp(v)) * 12}px);`);
+    }); }
+  /* plate scene 2: same product → three different ads */
+  { const s0 = SC.same.t0, thr = W("three completely", T_MAIN).t0, dif = W("completely different", T_MAIN).t1, outT = SC.mf.t0 - 0.26;
+    const cv = spring(t - (s0 + 0.1), 2.4), co = 1 - P(t, outT, outT + 0.16);
+    show(SC.cube, t < s0 ? 0 : clamp(cv * 2) * co, `transform:scale(${0.4 + 0.6 * cv});`);
+    SC.cubeIn.style.transform = `rotateX(-24deg) rotateY(${30 + (t - s0) * 70}deg)`;
+    SC.trio.forEach((el, i) => {
+      const v = spring(t - (thr + 0.1 * i), 2.6), fl = spring(t - (dif - 0.15 + 0.08 * i), 2.2);
+      const x = lerp(540, 540 + (i - 1) * 310, v), y = lerp(1060, 1380, v);
+      show(el, t < thr ? 0 : clamp(v * 2) * co, `transform:translate(${x - 135}px,${y - 150}px) perspective(1000px) rotateY(${(1 - v) * 90}deg) rotate(${(i - 1) * 4 * v}deg) scale(${0.35 + 0.65 * v});filter:blur(${(1 - clamp(v)) * 10}px);`);
+    }); }
+  /* meta finds a different audience for each one */
+  { const t0 = SC.mf.t0 - 0.05, t1 = SC.run.t0 - 0.28, on = t >= t0 && t < t1 + 0.3;
+    const out = P(t, t1 - 0.05, t1 + 0.18);
+    SC.mini.forEach((el, i) => { const v = spring(t - (t0 + 0.07 * i), 2.8); show(el, on ? clamp(v * 2) * (1 - out) : 0, `transform:translateY(${(1 - v) * 120}px) scale(${0.8 + 0.2 * v});filter:blur(${(1 - clamp(v)) * 10}px);`); });
+    for (const d of SC.dots) { const tt = SC.aud.t0 + d.i * 0.16 + d.k * 0.025, v = spring(t - tt, 3.0);
+      const ox = 210 + d.i * 330, oy = 1500;
+      show(d.el, on && t >= tt ? clamp(v * 2) * (1 - out) : 0, `transform:translate(${lerp(ox, d.x, v) - 17}px,${lerp(oy, d.y, v) - 17}px) scale(${0.3 + 0.7 * v});`); } }
+  /* Meta / Google chips */
+  { const f = SC.fmg; SC.chips.forEach((el, i) => { const tt = W(i ? "google" : "meta and google", T_MAIN).t0 - 0.04, v = spring(t - tt, 3.0), out = eIn(P(t, SC.tby.t0 - 0.12, SC.tby.t0 + 0.08));
+      show(el, t >= tt && t < SC.tby.t0 + 0.1 ? clamp(v * 2) * (1 - out) : 0, `left:${i ? 600 : 140}px;top:${i ? 250 : 200}px;transform:translateY(${(1 - v) * 80}px) rotate(${(i ? 4 : -5) * v}deg) scale(${0.6 + 0.4 * v});`); }); }
+
+  drawKin(t);
+  drawCaps(t, cardUp);
+  drawCursor(t);
+}
+window.seek = seek;
+window.init = (tl) => { WORDS = tl.words; END = tl.END; T_SPLIT = tl.T_SPLIT; T_MAIN = tl.T_MAIN; build(); window.TIMES = { END, T_SPLIT, T_MAIN }; return true; };
+window.ready = (async () => {
+  await document.fonts.load('700 60px "Geist"'); await document.fonts.load('500 30px "GeistMono"'); await document.fonts.load('italic 60px "Serif"');
+  return true;
+})();
+</script>
+</body>
+</html>
