@@ -1,4 +1,38 @@
 [
- {"name": "three angle method", "t0": 19.80, "t1": 21.55, "in": 0.42, "out": 0.40, "s": 0.46, "cx": 540, "cy": 560, "rot": -3.0, "r": 44},
- {"name": "same product, three ads", "t0": 30.15, "t1": 32.70, "in": 0.42, "out": 0.40, "s": 0.40, "cx": 540, "cy": 470, "rot": 2.5, "r": 44}
+ {
+  "name": "three angle method",
+  "t0": 19.8,
+  "t1": 21.55,
+  "in": 0.42,
+  "out": 0.4,
+  "s": 0.46,
+  "cx": 540,
+  "cy": 560,
+  "rot": -3.0,
+  "r": 44
+ },
+ {
+  "name": "same product, three ads",
+  "t0": 30.15,
+  "t1": 32.7,
+  "in": 0.42,
+  "out": 0.4,
+  "s": 0.4,
+  "cx": 540,
+  "cy": 470,
+  "rot": 2.5,
+  "r": 44
+ },
+ {
+  "name": "proof: four real client accounts",
+  "t0": 39.03,
+  "t1": 45.25,
+  "in": 0.42,
+  "out": 0.4,
+  "s": 0.34,
+  "cx": 540,
+  "cy": 382,
+  "rot": -2.0,
+  "r": 44
+ }
 ]

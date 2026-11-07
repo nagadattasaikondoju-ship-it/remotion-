@@ -189,25 +189,79 @@
   "note": "money moves to the winner (mint bar grows)"
  },
  {
-  "t": 39.057,
+  "t": 39.127,
   "type": "whoosh",
-  "g": 0.4,
-  "note": "chart leaves: 'we tested this'"
- },
- {
-  "t": 42.497,
-  "type": "pop",
   "g": 0.5,
-  "note": "Meta chip"
+  "note": "his frame shrinks: the proof wall"
  },
  {
-  "t": 43.057,
-  "type": "pop",
+  "t": 39.267,
+  "type": "card",
   "g": 0.5,
-  "note": "Google chip"
+  "note": "account card unfolds: Bamboo Spa"
  },
  {
-  "t": 45.527,
+  "t": 39.507,
+  "type": "card",
+  "g": 0.5,
+  "note": "account card unfolds: India account"
+ },
+ {
+  "t": 39.807,
+  "type": "card",
+  "g": 0.5,
+  "note": "account card unfolds: RMC Plumbing"
+ },
+ {
+  "t": 40.147,
+  "type": "card",
+  "g": 0.5,
+  "note": "account card unfolds: e-commerce account"
+ },
+ {
+  "t": 40.947,
+  "type": "click",
+  "g": 0.5,
+  "note": "cursor clicks the first account"
+ },
+ {
+  "t": 41.027,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "camera dives into Bamboo Spa 1,237 \u2192 2,587"
+ },
+ {
+  "t": 42.287,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "camera dives into India 6,406 conversions"
+ },
+ {
+  "t": 43.327,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "camera dives into RMC 11 \u2192 66 leads"
+ },
+ {
+  "t": 44.447,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "camera dives into e-commerce 8.43\u00d7 ROAS"
+ },
+ {
+  "t": 43.807,
+  "type": "hit",
+  "g": 0.45,
+  "note": "RMC 6.1\u00d7 lands (the biggest jump: loudest stack of the second half)"
+ },
+ {
+  "t": 45.107,
+  "type": "whoosh",
+  "g": 0.45,
+  "note": "pull back to the wall of results, frame returns"
+ },
+ {
+  "t": 45.747,
   "type": "pop",
   "g": 0.45,
   "note": "DM composer grows in"

@@ -56,6 +56,12 @@ The reference analysis and the edit blueprint are in `ANALYSIS.md`. The structur
   - Warm-neutral white balance, soft highlight knee, gentle S-curve, light local contrast, +6 % chroma, 9 % vignette.
   - Following the user's standing note: no background blur and no background dimming. Gradient scrims sit only behind type.
 
+## Proof scene (39.0–45.3 s, added after the first cut)
+- **Where:** on "We tested this on different brands… for Meta and Google that bring you leads and sales". The claim gets its proof right there, and each result lands on its word: RMC's leads on "leads", the e-commerce ROAS on "sales".
+- **What:** four real Google Ads accounts from the user's screenshots, rebuilt as vector UI (Google's tile colours, real values only). A cursor clicks the first account, the camera dives into each hero number as it counts up, then pulls back to the wall of all four.
+- **Verified:** RMC Plumbing and Bamboo Spa match One Loop's *Client Success Stories* PDF exactly.
+- **Unnamed:** the Q2 2025 e-commerce account (8.43×; its figures fit Bikers Wear AU's profile) and the March 2026 India account are labelled by what their screenshots show. The user should confirm before either is named.
+
 ## Notes
 - No numbers or results are claimed on screen beyond what's spoken. The budget chart shows relative bars with no values.
 - The "Free delivery" offer card is an illustrative mock ad, not a client's offer.

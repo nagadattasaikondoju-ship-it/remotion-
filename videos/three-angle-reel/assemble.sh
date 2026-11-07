@@ -10,12 +10,12 @@ END=$(python3 -I -c "import json; print(json.load(open('timeline.json'))['END'])
 export REAL_SFX_CONFIG=$REPO/tools/real-sfx.config.json REAL_SFX_INDEX=$REPO/tools/real-sfx.index.json
 for f in out/base4k.mp4 out/overlay4k.mkv out/voice_dn_full.wav; do [ -f "$f" ] || { echo "missing $f (see README)"; exit 1; }; done
 
-# ---- picture: base + overlay, one 4K master encode (skipped when out/video4k.mp4 is newer than both; REDO_VIDEO=1 forces) ----
+# ---- picture: base + overlay, one 4K master encode at CRF 14, capped 60 Mbps (skipped when out/video4k.mp4 is newer than both; REDO_VIDEO=1 forces) ----
 if [ -n "${REDO_VIDEO:-}" ] || [ ! -f out/video4k.mp4 ] || [ out/video4k.mp4 -ot out/overlay4k.mkv ] || [ out/video4k.mp4 -ot out/base4k.mp4 ]; then
 ffmpeg -nostdin -v error -y -i out/base4k.mp4 -i out/overlay4k.mkv -filter_complex "
   [0:v]settb=1/30,setpts=N,format=gbrp[b];[1:v]settb=1/30,setpts=N,format=gbrap[o];
   [b][o]overlay=format=gbrp:shortest=1,format=yuv420p[v]" -map "[v]" \
-  -c:v libx264 -preset medium -crf 12 -tune film -profile:v high -level 5.2 -pix_fmt yuv420p \
+  -c:v libx264 -preset slow -crf 14 -maxrate 60M -bufsize 120M -tune film -profile:v high -level 5.2 -pix_fmt yuv420p \
   -colorspace bt709 -color_primaries bt709 -color_trc bt709 -r 30 -movflags +faststart out/video4k.mp4
 ffmpeg -nostdin -v error -y -i out/video4k.mp4 -vf scale=1080:1920:flags=lanczos -c:v libx264 -preset veryfast -crf 20 out/proxy1080.mp4
 fi
@@ -57,7 +57,7 @@ J=$(ffmpeg -nostdin -hide_banner -i out/_pre.wav -af loudnorm=I=-14:TP=-1.5:LRA=
 m() { echo "$J" | python3 -I -c "import json,sys; print(json.load(sys.stdin)['$1'])" 2>/dev/null; }
 ffmpeg -nostdin -v error -y -i out/_pre.wav -af "loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(m input_i):measured_TP=$(m input_tp):measured_LRA=$(m input_lra):measured_thresh=$(m input_thresh):offset=$(m target_offset):linear=true,aresample=48000,apad=whole_dur=$END,atrim=0:$END" -c:a pcm_s24le out/mix_master.wav
 
-# ---- deliverables: 4K master (picture copied from the CRF 12 encode) + 4K share copy ----
+# ---- deliverables: 4K master (picture copied from the CRF 14 / 60 Mbps encode, fits the app's 400 MiB limit) + 4K share copy ----
 ffmpeg -nostdin -v error -y -i out/video4k.mp4 -i out/mix_master.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 320k -movflags +faststart -shortest out/${N}_MASTER.mp4
 ffmpeg -nostdin -v error -y -i out/video4k.mp4 -i out/mix_master.wav -map 0:v -map 1:a -c:v libx264 -preset slow -crf 17 -maxrate 40M -bufsize 80M -profile:v high -level 5.2 -pix_fmt yuv420p \
   -colorspace bt709 -color_primaries bt709 -color_trc bt709 -c:a aac -b:a 256k -movflags +faststart -shortest out/${N}_share.mp4
