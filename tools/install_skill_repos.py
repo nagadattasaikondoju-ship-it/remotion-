@@ -37,6 +37,8 @@ REPOS = [  # (owner/repo, commit, prefix, licensed)
     ("talsiach/take-one", "830621c", "takeone", True), ("NiazMorshed2007/reanimate", "3f7a55a", "reanimate", True),
     ("shreyaskarnik/argo", "5f71549", "argo", True), ("vincentsch/explainroo", "e95232c", "explainroo", True),
     ("win4r/video-director", "4747e5c", "vdir", True),
+    # Nov 2026: stickman storyboard/prompt director + narrated "Autopilot" videos (MIT). Its Autopilot/A6 modes call the paid Gemini API.
+    ("kaomei/stickman-video-director", "eb4bb37", "stickman", True),
 ]
 REFERENCE_ONLY = [("Dakkshin/after-effects-mcp", "88d5fbf"), ("Arman-Luthra/aftr", "628397d"),
                   ("lanayepifanova/Claude-Editor", "b9a2e27"), ("iart-ai/motion-skills", "238dfc5")]

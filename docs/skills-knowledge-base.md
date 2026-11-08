@@ -1,6 +1,6 @@
 # Skills knowledge base
 
-Generated 2026-11-06 by `python3 tools/build_skills_kb.py` from every `.claude/skills/*/SKILL.md` in this repo. **160 project skills.** Re-run the script after installing or removing skills.
+Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/skills/*/SKILL.md` in this repo. **161 project skills.** Re-run the script after installing or removing skills.
 
 ## How the skills fit together (house rules win)
 
@@ -280,6 +280,12 @@ Generated 2026-11-06 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`motion-brief-writer`](#motion-brief-writer) | Turns a rough idea for an animated graphic into a precise build brief for Claude Code, in your own brand. | charlie947/motion-graphics-skills |
 | [`motion-pricing`](#motion-pricing) | This skill should be used when the user asks to "quote a motion project", "estimate this animation job", "how much should I charge for this video", "what's my day rate",… | iart-ai/freelance-motion-skills |
 | [`motion-prompt-writer`](#motion-prompt-writer) | Write a complete 8-part Claude Motion prompt (The bar, Format, The one rule, Look, Motion, Never, Before you finish, The scene) for one short looping motion graphic, in … | charlie947/motion-graphics-skills |
+
+### Other (1)
+
+| Skill | What it does | Source |
+|---|---|---|
+| [`directing-stickman-videos`](#directing-stickman-videos) | Turn topics, requirements, articles or scripts into stickman videos. | kaomei/stickman-video-director |
 
 ## Full catalogue (A–Z)
 
@@ -588,6 +594,14 @@ A chain of bevelled cuboids rides a travelling wave as a content carousel. Hyper
 - **Folder:** `.claude/skills/diagram-animation/` (3 files, SKILL.md 163 lines)
 
 This skill should be used when the user asks to "animate this diagram", "build a flowchart that reveals step by step", "animate an architecture/sequence diagram", "make a chart animate in", "grow the bars / draw the line / count up the number", "show data flowing along a connector", or "turn a static diagram into a guided reveal". Covers SVG, Framer Motion, D3, and Remotion.
+
+### directing-stickman-videos
+- **Job:** Other
+- **Source:** kaomei/stickman-video-director
+- **Licence:** licensed
+- **Folder:** `.claude/skills/directing-stickman-videos/` (98 files, SKILL.md 110 lines, with scripts/tools)
+
+Turn topics, requirements, articles or scripts into stickman videos. Director mode creates approved storyboards and standalone video prompts; Autopilot mode produces narrated, captioned illustration-and-micro-animation videos through configured generation tools and a local renderer. Also guide installation handoff, first use and setup of this specific Skill.
 
 ### dsk-elevenlabs
 - **Job:** Sound, music and audio QA

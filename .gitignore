@@ -19,6 +19,10 @@ tools/lemo-opuscar/
 # Reference clones of the skill repos (python3 tools/install_skill_repos.py)
 tools/skill-repos/
 
+
+# Chromium path links for reanimate (tools/setup_skill_clis.sh)
+tools/pw-compat/
+
 # Skills from repos without a licence: used locally, not re-published (python3 tools/install_skill_repos.py)
 .claude/skills/ai-audio-sound-design/
 .claude/skills/arcads-broll/
@@ -42,6 +46,3 @@ tools/skill-repos/
 .claude/skills/video-edit-pipeline/
 .claude/skills/video-qa/
 .claude/skills/video-review-canvas/
-
-# Chromium path links for reanimate (tools/setup_skill_clis.sh)
-tools/pw-compat/

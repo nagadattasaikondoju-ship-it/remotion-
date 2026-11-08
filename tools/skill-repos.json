@@ -754,5 +754,11 @@
   "from": "win4r/video-director",
   "original_name": "video-director",
   "licensed": true
+ },
+ {
+  "skill": "directing-stickman-videos",
+  "from": "kaomei/stickman-video-director",
+  "original_name": "directing-stickman-videos",
+  "licensed": true
  }
 ]

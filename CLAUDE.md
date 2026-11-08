@@ -50,6 +50,10 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
   - Routing: launch film from a site → `huashu-motion`; product-in-use / ad / music video with a reviewer → `take-one`; app demo with voiceover → `argo-guide`; word-synced explainer → `explainroo`;
     copy an animation from a site/video/GIF → `reanimate`; mascot/icon/logo idle motion → `rossark-motion-skill`; direction + QA on any coded video → `video-director` (`scripts/qa_video.py`, `check_timeline.py`).
   - House rules still win (sound pipeline, captions, One Loop brief, no fabricated clients). Their sound goes through the pipeline below.
+- `directing-stickman-videos` (kaomei/stickman-video-director @ eb4bb37, MIT; Nov 2026). Installed with `python3 tools/install_skill_repos.py --only kaomei/stickman-video-director`.
+  - **Director mode (A1–A5):** approved storyboards plus standalone ~10 s prompts for Gemini Omni Flash clips. Free to use here.
+  - **Autopilot (B1–B4) and A6:** call Google's Gemini API (`scripts/gemini-media.mjs`, needs `GEMINI_API_KEY`) for images, TTS and video. This is paid generation that uploads prompts and media to Google, so ask first. The key goes through `request_credential`, never the chat.
+  - Its sound rules don't replace this repo's sound pipeline.
 - **Sound pipeline for EVERY video (user's standing rule):**
   1. Openverse API (`tools/openverse_sfx.py`): search and fetch real recorded SFX (CC0).
   2. Real SFX skill (`real-sfx`): analyse the video and place the sounds on the timeline.
