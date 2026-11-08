@@ -1,0 +1,438 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Three Angle Stickman</title>
+<style>
+@font-face{font-family:M;src:url(fonts/Montserrat-VF.ttf);font-weight:100 900}
+html,body{margin:0;background:#fff;overflow:hidden}
+svg{display:block}
+</style></head>
+<body>
+<svg id="svg" width="1920" height="1080" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1920" height="1080" fill="#fff"/>
+  <g id="cam"></g>
+</svg>
+<script>
+/* Three Angle Method, stickman explainer. Pure seek(t): every frame is rebuilt from t (and the boil frame) only. */
+const INK = "#141414", PUR = "#7B2FF7", GRN = "#12B84A", COR = "#FF5A4F", WHT = "#fff";
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const lerp = (a, b, u) => a + (b - a) * u;
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const eo = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : 1 - Math.pow(1 - x, 3));
+const ei = (x) => clamp(x) ** 3;
+const eio = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+// cartoon pop: overshoots a little, settles
+const pop = (t, t0, d = 0.35) => { const x = (t - t0) / d; if (x <= 0) return 0; if (x >= 1) return 1; return 1 - Math.exp(-6 * x) * Math.cos(9 * x); };
+const R = Math.PI / 180;
+const W = 1920, H = 1080;
+
+/* ---------- hand-drawn boil: points jitter on a 12 fps grid, seeds by draw order ---------- */
+let BF = 0, SEED = 0;
+const hsh = (n) => { n = (n << 13) ^ n; return 1 - ((n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824; };
+const jit = (a = 1.5) => hsh((++SEED) * 7919 + BF * 104729) * a;
+const f2 = (v) => v.toFixed(1);
+let OUT = [];
+const add = (s) => OUT.push(s);
+const st = (o = {}) => `stroke="${o.c || INK}" stroke-width="${o.w ?? 8}" stroke-linecap="round" stroke-linejoin="round" fill="${o.fill || "none"}"${o.op != null ? ` opacity="${o.op}"` : ""}${o.draw != null ? ` pathLength="1" stroke-dasharray="1 1" stroke-dashoffset="${f2(1 - o.draw)}"` : ""}${o.dash ? ` stroke-dasharray="${o.dash}"` : ""}`;
+function pl(pts, o = {}) { // polyline / polygon with boil
+  const a = o.j ?? 1.4; const d = pts.map(([x, y], i) => `${i ? "L" : "M"}${f2(x + jit(a))} ${f2(y + jit(a))}`).join("") + (o.close ? "Z" : "");
+  add(`<path d="${d}" ${st(o)}/>`);
+}
+function curve(d, o = {}) { add(`<path d="${d}" ${st(o)}/>`); }
+function circ(x, y, r, o = {}) { add(`<circle cx="${f2(x + jit(1))}" cy="${f2(y + jit(1))}" r="${f2(Math.max(0.1, r + jit(0.8)))}" ${st(o)}/>`); }
+function dot(x, y, r, c = INK) { add(`<circle cx="${f2(x + jit(0.6))}" cy="${f2(y + jit(0.6))}" r="${f2(r)}" fill="${c}"/>`); }
+function rrect(x, y, w, h, r, o = {}) { // x,y = centre; drawn as a jittered rounded polygon
+  const pts = []; const cs = [[x + w / 2 - r, y - h / 2 + r, -90], [x + w / 2 - r, y + h / 2 - r, 0], [x - w / 2 + r, y + h / 2 - r, 90], [x - w / 2 + r, y - h / 2 + r, 180]];
+  for (const [cx, cy, a0] of cs) for (let k = 0; k <= 4; k++) { const a = (a0 + k * 22.5) * R; pts.push([cx + r * Math.cos(a), cy + r * Math.sin(a)]); }
+  pl(pts, { ...o, close: true, j: o.j ?? 1.2 });
+}
+const grp = (tr, fn) => { add(`<g transform="${tr}">`); fn(); add(`</g>`); };
+const at = (x, y, s = 1, rot = 0) => `translate(${f2(x)} ${f2(y)}) rotate(${f2(rot)}) scale(${s.toFixed(4)})`;
+function txt(s, x, y, size, o = {}) { add(`<text x="${f2(x)}" y="${f2(y)}" font-family="M" font-weight="${o.weight || 800}" font-size="${size}" fill="${o.c || INK}" text-anchor="${o.anchor || "middle"}" letter-spacing="${o.ls || 2}">${s}</text>`); }
+
+/* ---------- the stick figure rig ---------- */
+// angles in degrees from straight down; positive = towards the way the figure faces
+const LIMB = { ua: 80, fa: 74, th: 92, sh: 88, torso: 150, head: 44 };
+function seg(p, a, len, dir) { return [p[0] + Math.sin(a * R) * len * dir, p[1] + Math.cos(a * R) * len]; }
+function figure(o) {
+  const s = o.s || 1, f = o.face ?? 1; // face: 1 right, -1 left, 0 camera
+  const d1 = f === 0 ? -1 : f, d2 = f === 0 ? 1 : f;
+  const hip = [0, 0], lean = (o.lean || 0) * (f === 0 ? 1 : f);
+  const neck = [hip[0] + Math.sin(lean * R) * LIMB.torso, hip[1] - Math.cos(lean * R) * LIMB.torso];
+  const shp = [lerp(hip[0], neck[0], 0.9), lerp(hip[1], neck[1], 0.9)];
+  const hc = [neck[0] + Math.sin((lean + (o.tilt || 0)) * R) * (LIMB.head + 10), neck[1] - Math.cos((lean + (o.tilt || 0)) * R) * (LIMB.head + 10)];
+  const limb = (base, a, b, l1, l2, dir) => { const m = seg(base, a, l1, dir); const e = seg(m, a + b, l2, dir); return [base, m, e]; };
+  const arm1 = limb(shp, o.a1[0], o.a1[1], LIMB.ua, LIMB.fa, d1), arm2 = limb(shp, o.a2[0], o.a2[1], LIMB.ua, LIMB.fa, d2);
+  const leg1 = limb(hip, o.l1[0], o.l1[1], LIMB.th, LIMB.sh, d1), leg2 = limb(hip, o.l2[0], o.l2[1], LIMB.th, LIMB.sh, d2);
+  const w = 9;
+  grp(at(o.x, o.y, s), () => {
+    // ponytail behind the head
+    if (o.pony) { const side = f === 0 ? 1 : -f, sw = o.swing || 0; const a0 = [hc[0] + side * 36, hc[1] - 22];
+      curve(`M${f2(a0[0])} ${f2(a0[1])} Q${f2(a0[0] + side * 46)} ${f2(a0[1] + 10)} ${f2(a0[0] + side * (34 + sw))} ${f2(a0[1] + 70)}`, { w: 9 });
+      dot(a0[0] + side * 4, a0[1] - 2, 8); }
+    pl([hip, neck], { w }); pl(leg1, { w }); pl(leg2, { w }); pl(arm1, { w }); pl(arm2, { w });
+    circ(hc[0], hc[1], LIMB.head, { w, fill: WHT });
+    // face
+    const lx = (o.look ?? (f === 0 ? 0 : 9 * f)), ly = o.lookY || 0, ex = f === 0 ? 15 : 13;
+    const eyes = [[hc[0] + lx - ex, hc[1] - 6 + ly], [hc[0] + lx + ex, hc[1] - 6 + ly]];
+    if (o.blink) eyes.forEach(([x, y]) => pl([[x - 6, y], [x + 6, y]], { w: 5 }));
+    else eyes.forEach(([x, y]) => dot(x, y, 5.5));
+    const mx = hc[0] + lx * 0.9, my = hc[1] + 16 + ly * 0.5, m = o.mouth || "flat";
+    if (m === "flat") pl([[mx - 11, my], [mx + 11, my]], { w: 5 });
+    else if (m === "smile") curve(`M${f2(mx - 14)} ${f2(my - 3)} Q${f2(mx)} ${f2(my + 12)} ${f2(mx + 14)} ${f2(my - 3)}`, { w: 5 });
+    else if (m === "frown") curve(`M${f2(mx - 12)} ${f2(my + 6)} Q${f2(mx)} ${f2(my - 6)} ${f2(mx + 12)} ${f2(my + 6)}`, { w: 5 });
+    else if (m === "open") { add(`<ellipse cx="${f2(mx)}" cy="${f2(my + 2)}" rx="9" ry="7" fill="${INK}"/>`); }
+    else if (m === "o") circ(mx, my + 2, 6, { w: 4 });
+  });
+  const T = (p) => [o.x + p[0] * s, o.y + p[1] * s];
+  return { hand1: T(arm1[2]), hand2: T(arm2[2]), head: T(hc), hip: T(hip), neck: T(neck) };
+}
+const STAND = { lean: 0, tilt: 0, a1: [14, 6], a2: [14, 6], l1: [9, 0], l2: [9, 0] };
+// keyframed pose: keys = [[t, partialPose, dur, ease?]]; numbers blend, other fields switch at the key's midpoint
+const NUM = ["x", "y", "lean", "tilt", "look", "lookY", "a1.0", "a1.1", "a2.0", "a2.1", "l1.0", "l1.1", "l2.0", "l2.1"];
+const getp = (o, k) => (k.includes(".") ? o[k.split(".")[0]][+k.split(".")[1]] : o[k]);
+function animPose(t, base, keys) {
+  const cur = JSON.parse(JSON.stringify(base));
+  let prev = JSON.parse(JSON.stringify(base));
+  for (const [tk, part, d = 0.35, ez = eio] of keys) {
+    const tgt = JSON.parse(JSON.stringify(prev)); for (const k in part) tgt[k] = Array.isArray(part[k]) ? [...part[k]] : part[k];
+    const u = ez(P(t, tk, tk + d));
+    for (const k of NUM) { const a = getp(prev, k), b = getp(tgt, k); if (a == null || b == null) continue; const v = getp(cur, k) + (b - a) * u;
+      if (k.includes(".")) cur[k.split(".")[0]][+k.split(".")[1]] = v; else cur[k] = v; }
+    if (t >= tk + d * 0.5) for (const k in part) if (!NUM.includes(k) && !Array.isArray(part[k])) cur[k] = part[k];
+    prev = tgt;
+  }
+  return cur;
+}
+// walking: legs and arms swing, body bobs, inside [t0, t1]
+function walk(p, t, t0, t1, rate = 2.4) {
+  const w = Math.min(eo(P(t, t0, t0 + 0.15)), 1 - eo(P(t, t1 - 0.15, t1))); if (w <= 0) return p;
+  const ph = (t - t0) * rate * Math.PI * 2, s = Math.sin(ph);
+  const q = JSON.parse(JSON.stringify(p));
+  q.l1 = [lerp(p.l1[0], 26 * s, w), lerp(p.l1[1], -18 * Math.max(0, -s), w)]; q.l2 = [lerp(p.l2[0], -26 * s, w), lerp(p.l2[1], -18 * Math.max(0, s), w)];
+  q.a1 = [lerp(p.a1[0], -20 * s, w), lerp(p.a1[1], 14, w)]; q.a2 = [lerp(p.a2[0], 20 * s, w), lerp(p.a2[1], 14, w)];
+  q.y = p.y - 7 * Math.abs(Math.cos(ph)) * w; return q;
+}
+const blinkAt = (t, list) => list.some((b) => t >= b && t < b + 0.1);
+const breathe = (p, t, k = 1) => ({ ...p, y: p.y + Math.sin(t * 2.6) * 2.5 * k });
+
+/* ---------- props ---------- */
+function adCard(x, y, sc = 1, rot = 0, o = {}) { // the creative: a phone-sized card with a product picture and two bars
+  grp(at(x, y, sc, rot), () => {
+    rrect(0, 0, 190, 270, 22, { w: 7, fill: WHT, c: o.outline || INK });
+    rrect(0, -38, 150, 130, 12, { w: 5, fill: o.picFill || "#fff" });
+    bag(0, -34, 0.62, PUR);
+    pl([[-60, 62], [60, 62]], { w: 7 }); pl([[-60, 90], [24, 90]], { w: 7 });
+    if (o.scan != null) { const yy = lerp(-120, 120, o.scan); pl([[-92, yy], [92, yy]], { w: 6, c: GRN }); }
+  });
+}
+function bag(x, y, s = 1, c = PUR) { grp(at(x, y, s), () => { pl([[-42, -20], [42, -20], [50, 52], [-50, 52]], { w: 7, close: true, fill: c }); curve(`M-20 -20 C-20 -58 20 -58 20 -20`, { w: 7 }); }); }
+function panel(x, y, sc, rot, t0) { // targeting panel: age slider + gender toggles + launch button
+  const k = (tt) => tt; // knob position comes from the owner's drag
+  grp(at(x, y, sc, rot), () => {
+    rrect(0, 0, 460, 320, 28, { w: 7, fill: WHT });
+    // age slider: a short and a tall figure at the ends
+    pl([[-150, -70], [150, -70]], { w: 7 });
+    mini(-190, -70, 0.42, INK); mini(190, -70, 0.62, INK);
+    circ(lerp(-110, 70, PANEL.knob), -70, 20, { w: 6, fill: PUR });
+    // gender toggles
+    [[-90, false], [90, true]].forEach(([gx, pony], i) => { const on = PANEL.toggle[i]; circ(gx, 50, 52, { w: 6, fill: on ? PUR : WHT }); mini(gx, 58, 0.5, on ? WHT : INK, pony); });
+  });
+}
+const PANEL = { knob: 0, toggle: [0, 0] };
+function mini(x, y, s, c = INK, pony = false) { // a tiny person icon (head + shoulders)
+  grp(at(x, y, s), () => { circ(0, -38, 22, { w: 7, c, fill: c === WHT ? "none" : "none" }); curve(`M-34 26 C-34 -10 34 -10 34 26`, { w: 7, c });
+    if (pony) curve(`M18 -52 Q40 -46 34 -16`, { w: 7, c }); });
+}
+function eye(x, y, r, open, iris = PUR, look = [0, 0]) { // the generic ad platform: a round machine with one eye
+  circ(x, y, r, { w: 9, fill: WHT });
+  [[-1, 0], [1, 0], [0, -1]].forEach(([dx, dy]) => dot(x + dx * (r + 16), y + dy * (r + 16), 7));
+  const ew = r * 1.22, eh = r * 0.62 * open;
+  if (open < 0.05) { pl([[x - ew / 2, y], [x + ew / 2, y]], { w: 8 }); return; }
+  curve(`M${f2(x - ew / 2)} ${f2(y)} Q${f2(x)} ${f2(y - eh)} ${f2(x + ew / 2)} ${f2(y)} Q${f2(x)} ${f2(y + eh)} ${f2(x - ew / 2)} ${f2(y)}Z`, { w: 8, fill: WHT });
+  const ir = Math.min(r * 0.24, eh * 0.55);
+  if (ir > 2) { circ(x + look[0], y + look[1], ir, { w: 6, fill: iris }); dot(x + look[0], y + look[1], ir * 0.42); dot(x + look[0] + ir * 0.35, y + look[1] - ir * 0.35, ir * 0.16, WHT); }
+}
+function angleCard(i, x, y, sc, rot, t, o = {}) { // the three ads: problem (coral), proof (green), offer (purple)
+  const C = [COR, GRN, PUR][i];
+  grp(at(x, y, sc, rot), () => {
+    rrect(0, 0, 300, 390, 26, { w: 8, fill: WHT });
+    // accent band with angle number dots
+    rrect(0, -150, 252, 46, 14, { w: 6, fill: C });
+    for (let k = 0; k <= i; k++) dot(-100 + k * 30, -150, 9, WHT);
+    if (o.product) bag(96, -150, 0.42 * o.product, WHT === C ? PUR : WHT);
+    if (i === 0) { // the pain: a customer holding their head under a storm
+      const sh = o.shake || 0;
+      grp(at(sh, 30, 1), () => { circ(0, -10, 46, { w: 7, fill: WHT }); dot(-15, -16, 5); dot(15, -16, 5);
+        curve(`M-13 14 Q0 2 13 14`, { w: 5 }); pl([[-46, -4], [-70, 30], [-40, 70]], { w: 7 }); pl([[46, -4], [70, 30], [40, 70]], { w: 7 });
+        pl([[0, 36], [0, 120]], { w: 7 }); });
+      const b = o.bolt || 0;
+      if (b > 0) grp(at(70, -60, b), () => pl([[0, -40], [-22, 4], [4, 4], [-14, 46], [30, -10], [6, -10], [22, -40]], { w: 6, fill: COR, close: true }));
+      curve(`M-110 -70 q20 -30 50 -14 q20 -26 50 -4 q24 -6 30 18 q-60 10 -130 0Z`, { w: 6, fill: WHT });
+    }
+    if (i === 1) { // proof: a result (bars) and a testimonial (stars)
+      const g = o.bars || 0;
+      [[-80, 70], [-30, 110], [20, 150]].forEach(([bx, bh]) => { const hh = bh * g; if (hh > 2) rrect(bx, 90 - hh / 2, 36, hh, 6, { w: 6, fill: GRN }); });
+      pl([[-110, 92], [70, 92]], { w: 7 });
+      const q = o.stars || 0;
+      if (q > 0) grp(at(70, -60, q), () => { rrect(0, 0, 120, 70, 18, { w: 6, fill: WHT }); pl([[-20, 34], [-36, 56], [0, 35]], { w: 6, fill: WHT });
+        for (let k = 0; k < 3; k++) star(-34 + k * 34, 0, 13, GRN); });
+    }
+    if (i === 2) { // offer: a gift box whose lid pops and a tag swings out
+      const l = o.lid || 0;
+      rrect(0, 70, 170, 130, 10, { w: 7, fill: PUR }); pl([[0, 5], [0, 135]], { w: 7, c: WHT });
+      grp(at(0, 0 - 40 * l, 1, -18 * l), () => { rrect(0, 0, 196, 40, 10, { w: 7, fill: PUR }); curve(`M0 -20 C-30 -60 -60 -30 0 -20 C60 -30 30 -60 0 -20`, { w: 6 }); });
+      if (l > 0.05) grp(at(80, -50 - 60 * l, l, 18 * Math.sin(t * 6) * (1 - P(t, 21.6, 22.4))), () => {
+        pl([[-26, -38], [26, -38], [26, 30], [0, 52], [-26, 30]], { w: 6, fill: WHT, close: true }); circ(0, -22, 7, { w: 5 }); pl([[-12, 6], [12, 6]], { w: 5, c: PUR }); pl([[-12, 22], [8, 22]], { w: 5, c: PUR }); });
+    }
+    if (o.x) { const u = o.x; pl([[-120, -160], [-120 + 240 * Math.min(1, u * 2), -160 + 320 * Math.min(1, u * 2)]], { w: 12, c: COR }); if (u > 0.5) pl([[120, -160], [120 - 240 * (u * 2 - 1), -160 + 320 * (u * 2 - 1)]], { w: 12, c: COR }); }
+    if (o.crown) grp(at(0, -232, o.crown), () => pl([[-60, 30], [-66, -26], [-30, 4], [0, -40], [30, 4], [66, -26], [60, 30]], { w: 7, fill: GRN, close: true }));
+  });
+}
+function star(x, y, r, c) { const pts = []; for (let k = 0; k < 10; k++) { const a = (-90 + k * 36) * R, rr = k % 2 ? r * 0.45 : r; pts.push([x + rr * Math.cos(a), y + rr * Math.sin(a)]); } pl(pts, { w: 4, fill: c, close: true, j: 0.6 }); }
+function coin(x, y, c = GRN) { add(`<ellipse cx="${f2(x + jit(0.8))}" cy="${f2(y + jit(0.8))}" rx="46" ry="15" ${st({ w: 6, fill: c })}/>`); }
+function coinStack(x, base, n, c = GRN) { for (let k = 0; k < Math.floor(n + 1e-6); k++) coin(x, base - k * 22, c); const fr = n - Math.floor(n); if (fr > 0.02) coin(x, base - Math.floor(n) * 22 - (1 - fr) * 60, c); }
+function crowd(x, y, n, c, u) { // an audience: mini people in the card's colour
+  for (let k = 0; k < n; k++) { const s = pop(u * 1, k * 0.08, 0.5); if (s <= 0.01) continue; const row = k < 3 ? 0 : 1; const xx = x + (row ? (k - 3.5) * 70 : (k - 1) * 70), yy = y + row * 64;
+    grp(at(xx, yy, 0.62 * s), () => { circ(0, -40, 26, { w: 8, c, fill: WHT }); curve(`M-38 30 C-38 -8 38 -8 38 30`, { w: 8, c }); }); }
+}
+function store(x, y, i, sc) { const C = [PUR, GRN, COR][i];
+  grp(at(x, y, sc), () => { rrect(0, 40, 260, 250, 12, { w: 7, fill: WHT });
+    const pts = [[-150, -86], [150, -86], [150, -36], [-150, -36]]; pl(pts, { w: 7, fill: C, close: true });
+    for (let k = -2; k <= 2; k++) pl([[k * 60, -86], [k * 60, -36]], { w: 5, c: WHT });
+    curve(`M-150 -36 q30 30 60 0 q30 30 60 0 q30 30 60 0 q30 30 60 0 q30 30 60 0`, { w: 6, fill: C });
+    rrect(60, 70, 70, 130, 8, { w: 6 }); rrect(-50, 40, 110, 90, 8, { w: 6 }); });
+}
+function scissors(x, y, sc, open) { grp(at(x, y, sc), () => { const a = 18 * open;
+  grp(`rotate(${-a})`, () => { pl([[0, 0], [130, -8]], { w: 9 }); circ(-34, -14, 22, { w: 8, fill: COR }); });
+  grp(`rotate(${a})`, () => { pl([[0, 0], [130, 8]], { w: 9 }); circ(-34, 14, 22, { w: 8, fill: COR }); }); dot(0, 0, 7); }); }
+function magnifier(x, y, r) { circ(x, y, r, { w: 9, fill: WHT }); circ(x - 8, y - 8, r * 0.42, { w: 8, fill: GRN }); pl([[x + r * 0.15, y + r * 0.15], [x + r * 0.45, y + r * 0.45]], { w: 10 }); }
+function qmark(x, y, s) { grp(at(x, y, s), () => { curve(`M-16 -18 C-16 -46 26 -46 24 -18 C22 0 0 2 0 22`, { w: 9, c: PUR }); dot(0, 46, 7, PUR); }); }
+function phone(x, y, sc, t) {
+  grp(at(x, y, sc), () => {
+    rrect(0, 0, 360, 640, 46, { w: 9, fill: WHT }); pl([[-40, -292], [40, -292]], { w: 7 });
+    // a generic chat: header avatar + one incoming bubble
+    circ(-120, -230, 26, { w: 6 }); pl([[-80, -238], [20, -238]], { w: 7 }); pl([[-80, -214], [-20, -214]], { w: 5 });
+    rrect(-46, -120, 200, 64, 22, { w: 6 }); pl([[-110, -128], [10, -128]], { w: 5 }); pl([[-110, -108], [-30, -108]], { w: 5 });
+    // composer: META typed, then sent
+    const typed = Math.floor(clamp((t - 40.86) / 0.11, 0, 4)), sent = eo(P(t, 41.55, 41.8));
+    const word = "META".slice(0, typed);
+    rrect(-40, 250, 230, 70, 30, { w: 6, fill: WHT });
+    if (sent < 0.02 && typed) txt(word, -40, 266, 40, { ls: 4 });
+    circ(120, 250, 36, { w: 6, fill: PUR }); pl([[104, 262], [138, 250], [104, 238], [112, 250]], { w: 5, c: WHT, close: true });
+    if (sent > 0) { const yy = lerp(250, 40, sent); grp(at(lerp(-40, 60, sent), yy, 1), () => { rrect(0, 0, 200, 80, 26, { w: 6, fill: PUR }); txt("META", 0, 16, 44, { c: WHT, ls: 4 }); }); }
+    const ok = pop(t, 41.85, 0.4); if (ok > 0) grp(at(170, 50, ok), () => { circ(0, 0, 26, { w: 6, fill: GRN }); pl([[-11, 1], [-3, 10], [12, -8]], { w: 6, c: WHT }); });
+  });
+}
+
+/* ---------- camera ---------- */
+// world: scene 1 at x 0, scene 2 at 2200, scenes 3–5 at 4400, scene 6 at 6600; the camera looks at (cx, cy) with zoom z
+function cam(t) {
+  let cx = 960, cy = 540, z = 1.08 + 0.03 * P(t, 0, 4.15);
+  const pan1 = eio(P(t, 4.15, 4.95)); cx += 2200 * pan1; z = lerp(z, 1.08, pan1);
+  z += 0.03 * P(t, 5, 11.55);
+  const pan2 = eio(P(t, 11.55, 12.3)); cx += 2200 * pan2; z = lerp(z, 1.15, pan2); cy = lerp(cy, 520, pan2);
+  cx += -70 * eio(P(t, 12.0, 12.6)) + 70 * eio(P(t, 15.9, 16.5)) + 70 * eio(P(t, 18.9, 19.5)) - 70 * eio(P(t, 21.8, 22.6)); // follow the pops left → right
+  const s4 = eio(P(t, 24.6, 25.5)); z = lerp(z, 1.0, s4); cy = lerp(cy, 600, s4);
+  cy = lerp(cy, 640, eio(P(t, 27.2, 27.9))); z += 0.02 * P(t, 25.5, 31.8);
+  const s5 = eio(P(t, 31.85, 32.45)); cy = lerp(cy, 560, s5); z = lerp(z, 1.0, s5);
+  const pan3 = eio(P(t, 33.85, 34.6)); cx += 2200 * pan3; cy = lerp(cy, 540, pan3); z = lerp(z, 1.06, pan3);
+  z += 0.03 * P(t, 34.6, 42.5) + 0.06 * eio(P(t, 39.0, 40.4)); cy += 20 * eio(P(t, 39.0, 40.4));
+  return { cx, cy, z };
+}
+
+/* ---------- characters ---------- */
+function owner(t) {
+  const B = { ...STAND, x: 640, y: 620, face: 1, mouth: "flat" };
+  let p = animPose(t, B, [
+    [0.0, { a2: [70, 40] }, 0.4],                                  // hand towards the panel
+    [2.1, { a2: [96, 10], lean: 6 }, 0.25], [2.95, { a2: [70, 40], lean: 0 }, 0.3],  // drag the age slider
+    [3.15, { a2: [92, -10] }, 0.15], [3.45, { a2: [60, 50] }, 0.2],  // tap a gender toggle
+    [3.55, { a1: [150, 70], tilt: -10, mouth: "o" }, 0.3],         // scratch head
+    [3.92, { a1: [14, 6], a2: [100, 0], tilt: 0, mouth: "smile" }, 0.18], // press launch
+    [4.3, { a2: [30, 20] }, 0.3],
+    // scene 2: walks in from the left, then shrugs at "not your targeting"
+    [5.8, { x: 2200 - 160, mouth: "flat" }, 0.01], [6.2, { x: 2200 + 240 }, 1.0, (u) => u],
+    [7.6, { face: 0, a1: [52, 100], a2: [52, 100], tilt: 8, mouth: "frown", lookY: -3 }, 0.3], [8.5, { face: 1, a1: [14, 6], a2: [14, 6], tilt: 0, mouth: "flat" }, 0.4],
+    [10.5, { look: 12, mouth: "o" }, 0.3],
+    // tracks with the camera into scene 3, stands at the left edge
+    [11.55, { x: 4400 + 250 }, 0.75], [12.4, { face: 1, mouth: "smile" }, 0.2],
+    [21.9, { a2: [150, 30], mouth: "open" }, 0.3], [22.6, { a2: [14, 6], mouth: "smile" }, 0.4],      // "same product": points up
+    [29.0, { mouth: "o", tilt: -8 }, 0.25], [30.4, { mouth: "smile", tilt: 0 }, 0.3],
+    [31.3, { a2: [165, 20], a1: [160, 20] }, 0.3], [32.0, { a2: [14, 6], a1: [14, 6] }, 0.4],              // winner: arms up
+    // scene 6: tracks along, then steps up to the phone
+    [33.85, { x: 6600 + 170 }, 0.75], [38.8, { x: 6600 + 640 }, 0.8], [39.7, { a2: [86, 30] }, 0.35],
+    [40.8, { a2: [92, 18], lookY: 2 }, 0.15], [41.45, { a2: [100, 6] }, 0.08], [41.55, { a2: [88, 22], mouth: "smile" }, 0.15],
+    [41.95, { a1: [165, 25], mouth: "open" }, 0.3],
+  ]);
+  p = walk(p, t, 6.2, 7.2); p = walk(p, t, 11.55, 12.3, 3); p = walk(p, t, 33.85, 34.6, 3); p = walk(p, t, 38.8, 39.6);
+  p.blink = blinkAt(t, [1.6, 5.0, 9.4, 14.6, 20.4, 25.1, 28.3, 33.2, 36.8, 40.2]);
+  return breathe(p, t, 0.8);
+}
+function explainer(t) {
+  const B = { ...STAND, x: 1560, y: 620, face: 0, mouth: "smile", pony: true };
+  let p = animPose(t, B, [
+    [0.25, { a2: [165, 10] }, 0.25], [1.05, { face: -1, a2: [14, 6], a1: [92, 0], look: -9 }, 0.3], [2.0, { a1: [14, 6] }, 0.4],
+    // scene 2: walks in from the right, draws the triangle
+    [8.5, { x: 2200 + 2080, face: -1 }, 0.01], [8.8, { x: 2200 + 1440 }, 1.0, (u) => u],
+    [9.9, { face: 0, a2: [150, 20], mouth: "open" }, 0.3], [10.4, { face: -1, a1: [110, 0], a2: [14, 6], mouth: "smile" }, 0.25],
+    // tracks to scene 3, right edge; points at each card
+    [11.55, { x: 4400 + 1680, face: -1, a1: [14, 6] }, 0.75],
+    [12.25, { a1: [96, 0], look: -10 }, 0.25], [15.6, { a1: [14, 6] }, 0.4],
+    [16.25, { a1: [104, 0] }, 0.25], [18.9, { a1: [14, 6] }, 0.4],
+    [19.25, { a1: [88, 20] }, 0.25], [21.6, { a1: [14, 6] }, 0.4],
+    [24.8, { face: 0, a1: [150, 30], a2: [150, 30], mouth: "open" }, 0.3], [25.7, { face: -1, a1: [14, 6], a2: [14, 6], mouth: "smile" }, 0.4],
+    [27.3, { a1: [70, 40] }, 0.3], [28.8, { a1: [14, 6] }, 0.3],
+    [30.4, { a1: [120, 20] }, 0.3], [31.4, { a1: [14, 6] }, 0.4],
+    [31.9, { face: 0, a2: [90, 60] }, 0.3], [33.4, { a2: [14, 6] }, 0.3],
+    // scene 6
+    [33.85, { x: 6600 + 1760, face: -1 }, 0.75], [34.2, { a1: [80, 20] }, 0.3], [35.6, { a1: [110, 0] }, 0.3], [37.2, { a1: [14, 6] }, 0.4],
+    [38.8, { face: 0, a1: [60, 50], a2: [60, 50], mouth: "open" }, 0.3], [39.8, { x: 6600 + 1380, face: -1, a1: [80, 10], a2: [14, 6], mouth: "smile" }, 0.6],
+    [41.95, { face: 0, a2: [160, 20], a1: [14, 6], mouth: "smile" }, 0.3],
+  ]);
+  p = walk(p, t, 8.8, 9.8); p = walk(p, t, 11.55, 12.3, 3); p = walk(p, t, 33.85, 34.6, 3); p = walk(p, t, 39.8, 40.4);
+  if (t >= 0.25 && t < 1.05) { const k = Math.min(eo(P(t, 0.25, 0.4)), 1 - eo(P(t, 0.9, 1.05))); p.a2 = [165 + 14 * Math.sin((t - 0.25) * 16) * k, 10]; } // wave
+  p.blink = blinkAt(t, [2.4, 7.0, 13.3, 17.9, 23.5, 27.9, 32.6, 36.2, 40.5]);
+  p.swing = 6 * Math.sin(t * 3.1);
+  return breathe(p, t);
+}
+
+/* ---------- the film ---------- */
+function frame(t) {
+  OUT = []; SEED = 0;
+  const c = cam(t);
+  add(`<g transform="translate(960 540) scale(${c.z.toFixed(4)}) translate(${f2(-c.cx)} ${f2(-c.cy)})">`);
+
+  // ===== scene 1: the targeting panel (world 0) =====
+  PANEL.knob = eio(P(t, 2.3, 2.95)); PANEL.toggle = [0, eo(P(t, 3.3, 3.45))];
+  const panFly = eio(P(t, 4.05, 4.95));
+  if (t < 6.0) {
+    const px = lerp(980, 2200 + 520, panFly), py = lerp(400, 840, panFly) - 220 * Math.sin(Math.PI * panFly), ps = lerp(0.85, 0.62, panFly), pr = lerp(0, -8, panFly);
+    if (t < 5.0) panel(px, py, ps, pr);
+  }
+  // launch button glow-free press, and the question mark
+  if (t > 3.55 && t < 4.05) qmark(640 + 90, 250 - 20 * eo(P(t, 3.55, 3.8)), pop(t, 3.55) * (1 - P(t, 3.9, 4.05)));
+
+  // ===== scene 2: the platform reads the creative (world 2200) =====
+  const X2 = 2200;
+  const eyeOpen = eo(P(t, 4.45, 4.85)) * (t > 7.0 && t < 7.12 ? 0.1 : 1);
+  const eyeMove = eio(P(t, 8.7, 9.3));
+  const ex2 = lerp(X2 + 1250, X2 + 1640, eyeMove), ey2 = lerp(470, 230, eyeMove), er2 = lerp(250, 110, eyeMove);
+  if (t > 4.0 && t < 12.5) eye(ex2, ey2, er2, eyeOpen, PUR, [lerp(-30, -20, P(t, 5.5, 6)) * (1 - eyeMove), 8 * (1 - eyeMove)]);
+  // the ad card: flies in from scene 1, gets scanned, then the eye takes it in
+  const cardIn = eio(P(t, 4.0, 5.6));
+  if (t > 3.9 && t < 9.3) {
+    const cx2 = lerp(1120, X2 + 640, cardIn), cy2 = lerp(300, 500, cardIn) - 260 * Math.sin(Math.PI * cardIn) * (1 - P(t, 5.0, 5.6));
+    const sc = lerp(0.5, 1.15, eo(P(t, 3.9, 4.3))) * (1 - 0.15 * eyeMove);
+    const take = eio(P(t, 8.75, 9.25));
+    const scan = t > 6.3 && t < 7.4 ? P(t, 6.35, 7.25) : null;
+    if (scan != null) { const yy = cy2 + lerp(-135, 135, scan) * sc; add(`<polygon points="${f2(ex2 - 50)},${f2(ey2)} ${f2(cx2 + 100)},${f2(yy - 18)} ${f2(cx2 + 100)},${f2(yy + 18)}" fill="${GRN}" opacity="0.28"/>`); }
+    adCard(lerp(cx2, ex2, take), lerp(cy2, ey2, take), sc * (1 - take * 0.9), lerp(-4 * Math.sin(t * 2), 0, cardIn) + 8 * Math.sin(Math.PI * cardIn), { scan, outline: t > 7.25 && t < 8.8 ? GRN : INK });
+  }
+  // the targeting panel in scene 2: rejected with a coral X, then tumbles away
+  if (t >= 5.0 && t < 9.2) {
+    const fall = ei(P(t, 8.05, 8.9));
+    const ppx = X2 + 520 - 160 * fall, ppy = 840 + 500 * fall;
+    grp(at(ppx, ppy, 0.62, -8 - 70 * fall), () => { panel(0, 0, 1, 0); const u = P(t, 7.55, 7.95);
+      if (u > 0) { pl([[-200, -140], [lerp(-200, 200, Math.min(1, u * 2)), lerp(-140, 140, Math.min(1, u * 2))]], { w: 16, c: COR }); if (u > 0.5) pl([[200, -140], [lerp(200, -200, u * 2 - 1), lerp(-140, 140, u * 2 - 1)]], { w: 16, c: COR }); } });
+  }
+  // the three angle method: a triangle drawn in the air, its corners become the three card slots
+  const TRI = [[X2 + 760, 260], [X2 + 1000, 680], [X2 + 520, 680]];
+  const SLOT = [[4400 + 520, 440], [4400 + 960, 440], [4400 + 1400, 440]];
+  const triDraw = P(t, 10.5, 11.3), spread = eio(P(t, 11.55, 12.3));
+  if (t > 10.5 && t < 12.6) {
+    const v = TRI.map((p, i) => [lerp(p[0], SLOT[[1, 2, 0][i]][0], spread), lerp(p[1], SLOT[[1, 2, 0][i]][1], spread)]);
+    if (spread < 0.3) pl([...v, v[0]], { w: 10, c: PUR, draw: triDraw * (1 - spread / 0.3), j: 1 });
+    v.forEach((p, i) => { const s = pop(t, 10.75 + i * 0.27, 0.3) * (1 + 0.25 * Math.sin(Math.PI * P(t, 11.3, 11.6))); if (s > 0) circ(p[0], p[1], 20 * s, { w: 7, fill: [COR, GRN, PUR][[1, 2, 0][i]] }); });
+  }
+
+  // ===== scenes 3–5: the three angles, audiences, budget (world 4400) =====
+  const CT = [12.26, 16.26, 19.28];
+  const cut = P(t, 29.55, 29.9), cutFall = ei(P(t, 29.85, 30.6));
+  const winGrow = eo(P(t, 30.9, 31.4)), exitRow = eio(P(t, 31.85, 32.4)), win = eio(P(t, 32.0, 32.6));
+  // the platform finds a different audience for each
+  const eyeBack = eo(P(t, 24.8, 25.15)), eyeAway = eio(P(t, 27.1, 27.5));
+  if (t > 24.8 && t < 27.6) {
+    eye(4400 + 960, lerp(-120, 175, eyeBack) - 300 * eyeAway, 70, eo(P(t, 25.0, 25.25)), PUR, [0, 6]);
+    for (let i = 0; i < 3; i++) { const d = eo(P(t, 25.3 + i * 0.12, 25.7 + i * 0.12)); if (d > 0) pl([[4400 + 960, 255], [SLOT[i][0], 740]], { w: 5, c: [COR, GRN, PUR][i], dash: "6 16", draw: d, op: 1 - eyeAway }); }
+  }
+  for (let i = 0; i < 3; i++) { const u = clamp(t - (25.6 + i * 0.25)); if (t > 25.6 && t < 27.6) { const drop = ei(P(t, 27.15, 27.55)); grp(at(0, 600 * drop, 1), () => crowd(SLOT[i][0], 790, [5, 4, 5][i], [COR, GRN, PUR][i], u)); } }
+  for (let i = 0; i < 3; i++) {
+    const [sx, sy] = SLOT[i];
+    // empty dashed slot until the pop
+    if (t > 11.9 && t < CT[i] + 0.1) { const g = eo(P(t, 11.95 + i * 0.05, 12.35 + i * 0.05)); add(`<rect x="${f2(sx - 150 * g)}" y="${f2(sy - 195 * g)}" width="${f2(300 * g)}" height="${f2(390 * g)}" rx="26" fill="none" stroke="#c9c9c9" stroke-width="6" stroke-dasharray="18 16"/>`); }
+    if (t < CT[i] || t > 34.6) continue;
+    let sc = pop(t, CT[i], 0.42), rot = 0, x = sx, y = sy;
+    rot += [-5, 4, -3][i] * Math.sin(Math.PI * P(t, 23.0 + i * 0.3, 23.6 + i * 0.3));
+    sc *= 1 + 0.08 * Math.sin(Math.PI * P(t, 23.0 + i * 0.3, 23.6 + i * 0.3));
+    const o = { t, product: pop(t, 22.15 + i * 0.12, 0.35) };
+    if (i === 0) { o.bolt = pop(t, 13.9, 0.3) * (1 + 0.12 * Math.sin(t * 22) * (t < 15.4 ? 1 : 0)); o.shake = t > 13.9 && t < 15.4 ? 3 * Math.sin(t * 40) : 0; }
+    if (i === 1) { o.bars = eo(P(t, 17.5, 18.1)); o.stars = pop(t, 18.3, 0.4); }
+    if (i === 2) o.lid = pop(t, 20.75, 0.45);
+    if (i === 0) { o.x = cut > 0 ? 0 : 0; if (t > 29.55) { x -= 30 * cutFall; y += 900 * cutFall; rot += -40 * cutFall; } }
+    if (i === 1) { sc *= 1 + 0.15 * winGrow; o.crown = pop(t, 31.15, 0.45); if (t > 31.85) { x = lerp(sx, sx, win); y = lerp(sy, 230, win); sc *= lerp(1, 0.55, win); } }
+    if (i === 2 && t > 31.85) { y += 900 * ei(P(t, 31.85, 32.3)); rot += 25 * ei(P(t, 31.85, 32.3)); }
+    if (i === 1 && t > 33.85) { const fl = eio(P(t, 33.85, 34.6)); x = lerp(sx, 6600 + 520, fl); y = lerp(230, 470, fl); sc = lerp(sc, 0.62, fl); }
+    if (i === 0 && t > 29.55) { // the cut: two halves
+      if (t < 30.7) { const sp = 60 * cutFall; add(`<clipPath id="cl"><rect x="-200" y="-260" width="200" height="520"/></clipPath><clipPath id="cr"><rect x="0" y="-260" width="200" height="520"/></clipPath>`);
+        add(`<g clip-path="url(#cl)" transform="${at(x - sp, y, sc, rot - 10 * cutFall)}">`); angleCard(i, 0, 0, 1, 0, t, o); add(`</g>`);
+        add(`<g clip-path="url(#cr)" transform="${at(x + sp, y, sc, rot + 10 * cutFall)}">`); angleCard(i, 0, 0, 1, 0, t, o); add(`</g>`);
+        if (cut > 0 && cut < 1) pl([[sx, sy - 220], [sx, lerp(sy - 220, sy + 220, cut)]], { w: 6, c: COR, dash: "14 12" }); }
+      continue;
+    }
+    angleCard(i, x, y, sc, rot, t, o);
+  }
+  // one product → all three cards
+  if (t > 21.9 && t < 23.4) { const u = pop(t, 21.9, 0.35) * (1 - eo(P(t, 23.0, 23.4))); bag(4400 + 960, 150, 0.9 * u, PUR);
+    if (u > 0.3) for (let i = 0; i < 3; i++) pl([[4400 + 960, 200], [SLOT[i][0] + 96, 290]], { w: 5, c: PUR, dash: "4 14", draw: eo(P(t, 22.1, 22.5)) }); }
+  // same budget: equal coin stacks; the cut card's money moves to the winner
+  if (t > 27.35 && t < 32.4) {
+    const fall = ei(P(t, 31.85, 32.35));
+    for (let i = 0; i < 3; i++) {
+      let n = 3 * eo(P(t, 27.45 + i * 0.1, 28.4 + i * 0.1));
+      if (i === 0) n *= 1 - P(t, 30.45, 30.95);
+      if (i === 1) n += 3 * eo(P(t, 30.75, 31.25));
+      grp(at(0, 700 * fall, 1), () => coinStack(SLOT[i][0], 880, n));
+    }
+    // coins in flight, cut card → winner
+    for (let k = 0; k < 3; k++) { const u = eio(P(t, 30.45 + k * 0.1, 30.95 + k * 0.1)); if (u > 0 && u < 1) coin(lerp(SLOT[0][0], SLOT[1][0], u), lerp(880 - k * 22, 880 - (3 + k) * 22, u) - 230 * Math.sin(Math.PI * u)); }
+    // scissors
+    const sIn = eo(P(t, 28.95, 29.3)), sOut = ei(P(t, 29.95, 30.3));
+    if (sIn > 0 && sOut < 1) grp(at(lerp(4400 + 160, SLOT[0][0], sIn) - 700 * sOut, lerp(160, SLOT[0][1] - 330 + 470 * cut, sIn), 1, 90), () => scissors(0, 0, 1.0, Math.abs(Math.sin((t - 29.1) * 14)) * (t < 29.95 ? 1 : 0.2)));
+  }
+  // tested on different brands: three shopfronts each get the winner
+  if (t > 31.95 && t < 34.6) {
+    for (let i = 0; i < 3; i++) { const sx = SLOT[i][0] + 1400 * (1 - eo(P(t, 32.0 + i * 0.12, 32.5 + i * 0.12))) - 900 * eio(P(t, 33.85, 34.5)); store(sx, 690, i, 0.95);
+      const s = pop(t, 32.6 + i * 0.25, 0.35); if (s > 0) { adCard(sx - 50, 728, 0.3 * s, 0); grp(at(sx + 92, 600, s), () => { circ(0, 0, 26, { w: 6, fill: GRN }); pl([[-11, 1], [-3, 10], [12, -8]], { w: 6, c: WHT }); }); } }
+  }
+
+  // ===== scene 6: more strategies → platforms → leads & sales → phone (world 6600) =====
+  const X6 = 6600, fold = eio(P(t, 38.75, 39.4));
+  if (t > 34.2 && t < 39.6) {
+    // a fan of strategy cards opening from the winner
+    for (let k = 0; k < 5; k++) { const u = eo(P(t, 34.55 + k * 0.06, 35.05 + k * 0.06)); if (u <= 0 || k === 2) continue; const a = (k - 2) * 13 * u;
+      const fx = lerp(X6 + 520, X6 + 960, fold), fy = lerp(470, 540, fold), fs = lerp(0.62, 0.1, fold);
+      grp(at(fx, fy + 180, fs, a), () => { rrect(0, -180, 300, 390, 26, { w: 8, fill: WHT }); rrect(0, -330, 252, 46, 14, { w: 6, fill: [PUR, GRN, COR, PUR, GRN][k] }); pl([[-90, -230], [90, -230]], { w: 7 }); pl([[-90, -190], [50, -190]], { w: 7 }); pl([[-90, -150], [70, -150]], { w: 7 }); }); }
+    // two generic platforms
+    const pIn1 = pop(t, 35.7, 0.4), pIn2 = pop(t, 36.3, 0.4), f = 1 - fold;
+    const p1 = [lerp(X6 + 1040, X6 + 960, fold), lerp(330, 540, fold)], p2 = [lerp(X6 + 1040, X6 + 960, fold), lerp(690, 540, fold)];
+    if (pIn1 > 0) { grp(at(p1[0], p1[1], pIn1 * f), () => eye(0, 0, 70, 1, PUR)); pl([[X6 + 720, 470], [p1[0] - 100, p1[1]]], { w: 5, dash: "6 14", draw: eo(P(t, 35.7, 36.0)), op: f }); }
+    if (pIn2 > 0) { grp(at(p2[0], p2[1], pIn2 * f), () => magnifier(0, 0, 70)); pl([[X6 + 720, 520], [p2[0] - 100, p2[1]]], { w: 5, dash: "6 14", draw: eo(P(t, 36.3, 36.6)), op: f }); }
+    // leads: people arrive; sales: bags
+    for (let k = 0; k < 4; k++) { const u = pop(t, 37.3 + k * 0.1, 0.35); if (u > 0) grp(at(lerp(X6 + 1360 + (k % 2) * 90, X6 + 960, fold), lerp(300 + Math.floor(k / 2) * 110, 540, fold), u * f), () => mini(0, 0, 0.8, INK, k % 2 === 1)); }
+    for (let k = 0; k < 3; k++) { const u = pop(t, 37.9 + k * 0.1, 0.35); if (u > 0) bag(lerp(X6 + 1340 + k * 95, X6 + 960, fold), lerp(690, 540, fold), 0.75 * u * f, [GRN, PUR, COR][k]); }
+    if (t > 37.3) { pl([[X6 + 1130, 330], [X6 + 1290, 330]], { w: 6, draw: eo(P(t, 37.25, 37.45)), op: f }); pl([[X6 + 1130, 690], [X6 + 1280, 690]], { w: 6, draw: eo(P(t, 37.85, 38.05)), op: f }); }
+  }
+  if (t > 34.6 && t < 39.6) { const fx = lerp(X6 + 520, X6 + 960, fold), fy = lerp(470, 540, fold); angleCard(1, fx, fy, lerp(0.62, 0.1, fold) * 1.15, 0, t, { t, product: 1, bars: 1, stars: 1, crown: 1 }); }
+  if (t > 38.9) phone(X6 + 960, 540, 0.95 * pop(t, 39.05, 0.5), t);
+
+  // ===== characters (drawn last, in front) =====
+  const ow = owner(t), ex = explainer(t);
+  figure(ow); figure(ex);
+
+  add(`</g>`);
+  return OUT.join("");
+}
+
+window.seek = (t, boilT) => { BF = Math.floor((boilT ?? t) * 12 + 1e-6); document.getElementById("cam").innerHTML = frame(t); };
+window.ready = document.fonts.load("800 40px M").then(() => { window.seek(0); return true; });
+</script>
+</body></html>
