@@ -1,0 +1,12 @@
+# clip      in(s)  dur(s)  what                                     (20 half-second beats = 10.0 s)
+MVI_0456   5.75   1.0     bike POV, road ahead (opens the loop)
+MVI_0436   1.70   0.5     walking, feet on concrete
+MVI_0422   5.00   1.0     arrives, laptop out of the bag onto the table
+MVI_0431   1.50   0.5     typing, over-the-shoulder close-up
+MVI_0440   2.00   1.0     headphones on
+MVI_0432   5.00   1.0     on a call, smiling
+MVI_0433   4.60   1.0     two at the table, pointing at the laptop
+MVI_0449   3.20   0.5     a guest walks in
+MVI_0450   3.80   1.5     stands up, handshake (hero beat)
+MVI_0447   5.85   1.0     high-five across the table
+MVI_0456   4.75   1.0     bike POV again: ends on the frame the reel opens with, so it loops seamlessly
