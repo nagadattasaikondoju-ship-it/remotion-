@@ -4,12 +4,15 @@
 
 ## Caption (on screen for the whole reel, styled after the user's reference)
 - **White headline:** Fraunces Bold (soft): "Your network is your / net worth".
-- **Yellow block:** Poppins Bold in the reference's exact golden yellow, **#FCD400** (sampled from the user's photo). It's flat, with no outline.
-  - **Wobble:** a wave travels through every line. As it passes, each letter bobs, leans italic, swells slightly and gets heavier, like Instagram's wobble text. The period is 1 s, so it repeats exactly inside the 10 s loop.
+- **Yellow block:** a 3D perspective-warp caption matched side by side to the user's reference photo.
+  - **Type:** Poppins Bold, with "CHANNEL"/"COMMENTS" ExtraBold, in the reference's exact golden yellow **#FCD400** (sampled from the photo).
+  - **Perspective:** the block sits on a plane turned 14° so its right edge is nearer the camera. Letters on the left are smaller and the right side is bigger and heavier, so the top line rises and the bottom lines dip to the right. The plane bows slightly toward the camera right of centre, and the first letter or two of the far-left words lean italic.
+  - **Separation:** a soft drop shadow and glow on the letters, plus a faint dark glow behind the block, keep the gold readable over the bright foliage shots.
+  - **Kinetic:** a gentle 3D drift (±3° turn, ±1.6° tilt, 6 px float) with periods of 5 s and 2.5 s, so it repeats exactly inside the 10 s loop.
+  - All of these are parameters at the top of `overlay.html`, and can be overridden for tests with `QS="rotY=-10&fs=80" node render_overlay.mjs comments still 0`.
   - **Two caption versions:**
     - default: "If you are a Founder| / Entrepreneur / building something / for the future / Join the CHANNEL / (link in bio), / let's connect 🥂"
     - `_COMMENTS`: "Introduce yourself / in the COMMENTS," in place of the channel lines, as in the reference.
-- **Readability:** a soft dark band sits behind the white headline only; the yellow block has just a faint shadow, to stay true to the reference.
 
 ## Cut (`edl.txt`, all from the One Loop b-roll Drive folder)
 20 half-second beats, so the cuts land on the beat of most 100–130 BPM songs:

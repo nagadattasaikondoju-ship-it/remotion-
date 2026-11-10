@@ -10,11 +10,11 @@ const dir = path.dirname(fileURLToPath(import.meta.url));
 const v = process.argv[2] || "channel", FPS = 60, N = 600;
 const b = await chromium.launch();
 const p = await b.newPage({ viewport: { width: 1080, height: 1920 }, deviceScaleFactor: 1 });
-await p.goto("file://" + path.join(dir, "overlay.html") + "?v=" + v);
+await p.goto("file://" + path.join(dir, "overlay.html") + "?v=" + v + (process.env.QS ? "&" + process.env.QS : ""));
 await p.evaluate(() => window.ready);
 if (process.argv[3] === "still") {
   await p.evaluate((t) => window.seek(t), Number(process.argv[4] || 0));
-  await p.screenshot({ path: path.join(dir, `out/still_${v}.png`), omitBackground: true });
+  await p.screenshot({ path: path.join(dir, `out/still_${v}${process.env.TAG || ""}.png`), omitBackground: true });
 } else {
   const od = path.join(dir, `out/ov_${v}`); fs.mkdirSync(od, { recursive: true });
   for (let f = 0; f < N; f++) {
