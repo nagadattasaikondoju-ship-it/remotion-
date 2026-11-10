@@ -3,66 +3,70 @@
 <style>
   @font-face { font-family: "Fraunces"; src: url("fonts/Fraunces-VF.ttf"); font-weight: 100 900; }
   @font-face { font-family: "ColorEmoji"; src: url("file:///usr/share/fonts/truetype/noto/NotoColorEmoji.ttf"); }
-  @font-face { font-family: "Poppins"; src: url("fonts/Poppins-600.woff"); font-weight: 600; }
   @font-face { font-family: "Poppins"; src: url("fonts/Poppins-700.woff"); font-weight: 700; }
   @font-face { font-family: "Poppins"; src: url("fonts/Poppins-800.woff"); font-weight: 800; }
   html, body { margin: 0; width: 1080px; height: 1920px; background: transparent; overflow: hidden; }
-  /* Soft dark bands behind both text blocks, so the yellow reads over bright foliage. */
-  .shade { position: absolute; left: 0; right: 0; }
-  .shade.top { top: 150px; height: 360px; background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(0,0,0,.42), rgba(0,0,0,0) 74%); }
-  .shade.mid { top: 600px; height: 760px; background: radial-gradient(ellipse 62% 50% at 50% 50%, rgba(0,0,0,.44), rgba(0,0,0,0) 76%); }
+  .shade { position: absolute; left: 0; right: 0; top: 150px; height: 360px;
+    background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(0,0,0,.42), rgba(0,0,0,0) 74%); }
   .head { position: absolute; top: 236px; left: 0; right: 0; text-align: center; color: #fff;
     font-family: "Fraunces", Georgia, serif; font-weight: 700; font-size: 74px; line-height: 1.04; letter-spacing: -0.5px;
     font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 72;
     text-shadow: 0 2px 12px rgba(0,0,0,.45); -webkit-text-stroke: 2px rgba(0,0,0,.18); paint-order: stroke fill; }
-  .block { position: absolute; top: 690px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .line { white-space: pre; font-family: "Poppins", sans-serif; font-weight: 600; font-size: 72px; line-height: 1.12; color: #FFD21F;
-    text-shadow: 0 2px 10px rgba(0,0,0,.42); -webkit-text-stroke: 2.5px rgba(40,25,0,.30); paint-order: stroke fill; }
-  .line span { display: inline-block; }
+  /* Yellow block: the reference's flat golden yellow (#FCD400, sampled from the photo), no outline. */
+  .block { position: absolute; top: 640px; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; }
+  .line { white-space: pre; font-family: "Poppins", sans-serif; font-weight: 700; font-size: 86px; line-height: 1.06;
+    letter-spacing: -0.5px; color: #FCD400; text-shadow: 0 1px 4px rgba(0,0,0,.22); }
+  .line span { display: inline-block; transform-origin: 50% 80%; -webkit-text-stroke: 0 #FCD400; }
   .line .b { font-weight: 800; }
-  .emoji { font-family: "ColorEmoji", "Noto Color Emoji"; font-size: 60px; -webkit-text-stroke: 0; text-shadow: none; }
+  .emoji { font-family: "ColorEmoji", "Noto Color Emoji"; font-size: 70px; text-shadow: none; }
 </style></head>
 <body>
-<div class="shade top"></div><div class="shade mid"></div>
+<div class="shade"></div>
 <div class="head">Your network is your<br>net worth</div>
 <div class="block" id="block"></div>
 <script>
-// Each line sits on a gentle wave (letter by letter), like the reference's wavy caption.
-// [text, amplitude px, wavelength px, phase, tilt deg, bold words]
-const LINES = [
-  ["If you are a Founder |", 7, 520, 0.0, -2.2],
-  ["Entrepreneur", 6, 460, 1.4, 1.2],
-  ["building something", 8, 560, 2.6, 0.8],
-  ["for the future", 6, 480, 0.6, -0.6],
-  ["Join the CHANNEL", 8, 540, 2.0, 1.4, ["CHANNEL"]],
-  ["(link in bio),", 6, 460, 0.9, -1.0],
-  ["let’s connect 🥂", 7, 500, 2.4, 0.6],
-];
+const V = new URLSearchParams(location.search).get("v") || "channel";
+const CTA = V === "comments"
+  ? [["Introduce yourself"], ["in the COMMENTS,", ["COMMENTS,"]]]
+  : [["Join the CHANNEL", ["CHANNEL"]], ["(link in bio),"]];
+const LINES = [["If you are a Founder|"], ["Entrepreneur"], ["building something"], ["for the future"], ...CTA, ["let’s connect 🥂"]];
+
 const block = document.getElementById("block");
-for (const [text, amp, wl, ph, tilt, bold = []] of LINES) {
-  const el = document.createElement("div"); el.className = "line"; el.style.transform = `rotate(${tilt}deg)`;
-  const words = text.split(/( )/);
-  for (const w of words) {
-    const isBold = bold.includes(w);
+const letters = []; // {el, x (0..1 across its line), line}
+LINES.forEach(([text, bold = []], li) => {
+  const el = document.createElement("div"); el.className = "line";
+  for (const w of text.split(/( )/)) {
     for (const ch of Array.from(w)) {
       const s = document.createElement("span"); s.textContent = ch === " " ? " " : ch;
-      if (isBold) s.classList.add("b");
+      if (bold.includes(w)) s.classList.add("b");
       if (/\p{Extended_Pictographic}/u.test(ch)) s.classList.add("emoji");
-      el.appendChild(s);
+      el.appendChild(s); letters.push({ el: s, line: li, x: 0 });
     }
   }
   block.appendChild(el);
-  // place the wave after layout, from each letter's x centre
-  requestAnimationFrame(() => {
-    const W = el.getBoundingClientRect();
-    for (const s of el.children) {
-      const r = s.getBoundingClientRect(); const x = r.left + r.width / 2 - W.left;
-      const y = amp * Math.sin((2 * Math.PI * x) / wl + ph);
-      const slope = (amp * 2 * Math.PI / wl) * Math.cos((2 * Math.PI * x) / wl + ph);
-      s.style.transform = `translateY(${y.toFixed(2)}px) rotate(${(Math.atan(slope) * 180 / Math.PI).toFixed(2)}deg)`;
-    }
-  });
+});
+
+// Wobble: a wave travels left → right through every line. As it passes, each letter bobs, leans italic,
+// swells a little and gets heavier, like Instagram's wobble text. Period 1.0 s, so 10 s loops exactly.
+const T = 1.0, LAMBDA = 0.9;
+function layout() {
+  for (const L of letters) {
+    const line = L.el.parentElement.getBoundingClientRect(), r = L.el.getBoundingClientRect();
+    L.x = (r.left + r.width / 2 - line.left) / line.width;
+  }
 }
-window.ready = document.fonts.ready.then(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+window.seek = (t) => {
+  for (const L of letters) {
+    const ph = 2 * Math.PI * (t / T - L.x / LAMBDA) + L.line * 0.75;
+    const y = 7 * Math.sin(ph);
+    const skew = -11 * Math.max(0, Math.cos(ph)) ** 1.5;      // leans italic as the crest arrives
+    const sc = 1 + 0.06 * Math.sin(ph + 0.6);                  // swells slightly
+    const rot = 2.2 * Math.cos(ph + 1.2);
+    const weight = Math.max(0, Math.sin(ph + 0.6)) * 1.8;     // same-colour stroke makes the letter heavier
+    L.el.style.transform = `translateY(${y.toFixed(2)}px) rotate(${rot.toFixed(2)}deg) skewX(${skew.toFixed(2)}deg) scale(${sc.toFixed(3)})`;
+    if (!L.el.classList.contains("emoji")) L.el.style.webkitTextStroke = `${weight.toFixed(2)}px #FCD400`;
+  }
+};
+window.ready = document.fonts.ready.then(() => new Promise((r) => requestAnimationFrame(() => { layout(); window.seek(0); requestAnimationFrame(r); })));
 </script>
 </body></html>

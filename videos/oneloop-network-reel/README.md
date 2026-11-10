@@ -4,9 +4,12 @@
 
 ## Caption (on screen for the whole reel, styled after the user's reference)
 - **White headline:** Fraunces Bold (soft): "Your network is your / net worth".
-- **Yellow block:** Poppins SemiBold, #FFD21F. Each line sits on its own gentle wave and tilt, like the reference. "CHANNEL" is ExtraBold.
-  - Text: "If you are a Founder | / Entrepreneur / building something / for the future / Join the CHANNEL / (link in bio), / let's connect 🥂".
-- **Readability:** soft dark radial bands sit behind both blocks, with a light shadow and stroke, because many shots have bright yellow-green foliage behind the text.
+- **Yellow block:** Poppins Bold in the reference's exact golden yellow, **#FCD400** (sampled from the user's photo). It's flat, with no outline.
+  - **Wobble:** a wave travels through every line. As it passes, each letter bobs, leans italic, swells slightly and gets heavier, like Instagram's wobble text. The period is 1 s, so it repeats exactly inside the 10 s loop.
+  - **Two caption versions:**
+    - default: "If you are a Founder| / Entrepreneur / building something / for the future / Join the CHANNEL / (link in bio), / let's connect 🥂"
+    - `_COMMENTS`: "Introduce yourself / in the COMMENTS," in place of the channel lines, as in the reference.
+- **Readability:** a soft dark band sits behind the white headline only; the yellow block has just a faint shadow, to stay true to the reference.
 
 ## Cut (`edl.txt`, all from the One Loop b-roll Drive folder)
 20 half-second beats, so the cuts land on the beat of most 100–130 BPM songs:
@@ -35,7 +38,7 @@ None. The user adds the song in Instagram's editor. The files carry a silent ste
 
 ## Build
 ```bash
-bash assemble.sh   # renders overlay.html → out/overlay.png, cuts the EDL from the camera originals (transpose=2), writes MASTER (CRF 10) + share (CRF 18)
+bash assemble.sh [channel] [comments]   # renders overlay.html frame by frame (60 fps), cuts the EDL from the camera originals (transpose=2), writes MASTER (CRF 10) + share (CRF 18)
 ```
 `SRC` points at the downloaded camera originals (Drive folder 1hD2ac0YRejkVVhFfPBrYrpVGIjxQAKNY).
 
