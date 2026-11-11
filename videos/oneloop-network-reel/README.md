@@ -13,6 +13,9 @@
   - **Two caption versions:**
     - default: "If you are a Founder| / Entrepreneur / building something / for the future / Join the CHANNEL / (link in bio), / let's connect 🥂"
     - `_COMMENTS`: "Introduce yourself / in the COMMENTS," in place of the channel lines, as in the reference.
+    - `_BLACK` (`bash assemble.sh black`): the channel wording in solid black #000, with "Founder/" and 🤝. Everything else is unchanged (perspective, font, size, line breaks, position, white headline).
+      - Separation flips to a soft light glow around the letters, plus a faint light glow behind the block.
+      - The 🤝 is rendered in dark grey so the hands stay visible.
 
 ## Cut (`edl.txt`, all from the One Loop b-roll Drive folder)
 20 half-second beats, so the cuts land on the beat of most 100–130 BPM songs:

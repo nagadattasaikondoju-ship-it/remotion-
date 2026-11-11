@@ -1,9 +1,9 @@
 #!/bin/bash
 # Cuts the EDL from the camera originals (shot sideways, so transpose=2 turns them upright), joins them
-# frame-exact at 60 fps, lays the animated caption overlay on top (wobble, period 1 s, so 10 s loops cleanly)
+# frame-exact at 60 fps, lays the 3D perspective caption overlay on top (its drift repeats every 5 s, so 10 s loops cleanly)
 # and writes the master and share copies for each caption variant.
 # No music or SFX: the user adds the song in Instagram's editor. A silent audio track is included for compatibility.
-# usage: bash assemble.sh [channel] [comments]   (default: both)
+# usage: bash assemble.sh [channel] [comments] [black]   (default: channel comments; black = channel wording in black ink)
 set -euo pipefail
 cd "$(dirname "$0")"
 SRC=${SRC:-/tmp/claude-0/-home-user-remotion-/b8e0fea9-ddb3-5f50-9983-de131f1aa53e/scratchpad/ol/drive}
@@ -21,7 +21,7 @@ done
 ffmpeg -nostdin -v error -y -f concat -safe 0 -i $list -c copy out/base.mp4
 for v in $VARIANTS; do
   node render_overlay.mjs "$v"
-  tag=$([ "$v" = comments ] && echo "_COMMENTS" || echo "")
+  tag=$(case $v in comments) echo "_COMMENTS";; black) echo "_BLACK";; *) echo "";; esac)
   mk() { ffmpeg -nostdin -v error -y -i out/base.mp4 -framerate 60 -i "out/ov_$v/f_%04d.png" -f lavfi -i anullsrc=r=48000:cl=stereo \
     -filter_complex "[0:v][1:v]overlay=0:0,format=yuv420p[v]" -map "[v]" -map 2:a -t 10 \
     -c:v libx264 -preset slow -crf $1 -profile:v high -r 60 -c:a aac -b:a 128k -shortest -movflags +faststart "$2"; }

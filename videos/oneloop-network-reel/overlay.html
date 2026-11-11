@@ -26,6 +26,12 @@
     text-shadow: 0 5px 10px rgba(0,0,0,.32), 0 1px 2px rgba(0,0,0,.25), 0 0 22px rgba(0,0,0,.22); }
   .line .b { font-weight: 800; }
   .emoji { font-family: "ColorEmoji", "Noto Color Emoji"; font-size: calc(var(--fs) * 0.82); text-shadow: 0 4px 8px rgba(0,0,0,.25) !important; }
+  /* Black ink version (?ink=black): solid #000 letters; separation flips to a soft light glow, and the emoji
+     becomes a black silhouette to match the text. */
+  body.black .line { color: #000; }
+  body.black .line span { text-shadow: 0 0 2px rgba(255,255,255,.55), 0 0 10px rgba(255,255,255,.45), 0 0 24px rgba(255,255,255,.30); }
+  body.black .shade.mid { background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(255,255,255,.22), rgba(255,255,255,0) 76%); }
+  body.black .emoji { filter: grayscale(1) contrast(2.6) brightness(.32) drop-shadow(0 0 6px rgba(255,255,255,.6)); text-shadow: none !important; }
 </style></head>
 <body>
 <div class="shade"></div><div class="shade mid"></div>
@@ -49,10 +55,14 @@ st.setProperty("--persp", P.persp + "px"); st.setProperty("--fs", P.fs + "px"); 
 document.getElementById("plane").style.setProperty("--top", P.top + "px");
 
 const V = Q.get("v") || "channel";
+const INK = Q.get("ink") || "gold";
+if (INK === "black") document.body.classList.add("black");
 const CTA = V === "comments"
   ? [["Introduce yourself"], ["in the COMMENTS,", ["COMMENTS,"]]]
   : [["Join the CHANNEL", ["CHANNEL"]], ["(link in bio),"]];
-const LINES = [["If you are a Founder|"], ["Entrepreneur"], ["building something"], ["for the future"], ...CTA, ["let’s connect 🥂"]];
+const LINES = INK === "black"
+  ? [["If you are a Founder/"], ["Entrepreneur"], ["building something"], ["for the future"], ...CTA, ["let’s connect 🤝"]]
+  : [["If you are a Founder|"], ["Entrepreneur"], ["building something"], ["for the future"], ...CTA, ["let’s connect 🥂"]];
 
 const plane = document.getElementById("plane");
 const letters = [];
