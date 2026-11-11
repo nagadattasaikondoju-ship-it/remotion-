@@ -13,10 +13,11 @@ The recording also carries player chrome: black side bars (content is columns 12
 
 ## What `build.sh` does
 1. **Cartoon:** takes the same 181 frames and crops off the side bars. It undoes the bottom gradient (a measured multiplicative ramp, 1.0 → 0.733), removes the timer with `delogo`, and upscales with lanczos plus a light sharpen.
-2. **End card:** white, 44 frames, the same as the original.
-   - Dr. Sri Sushma's logo (from the user's PDF) pops in: ease-out-back over 0.3 s, from 30 % size with a small overshoot.
+2. **End card:** white, 44 frames, the same as the original. It uses the **blue 3D logo** the user chose (image, 1056×992), 870 px wide at full size.
+   - The logo pops in: ease-out-back over 0.3 s, from 30 % size with a small overshoot.
    - It then keeps growing slowly (+6 %), like the original card.
-   - The card is composed in RGB with the logo rendered on solid white, so there is no visible edge or box around the logo.
+   - The card is composed in RGB. The logo image's near-white background (≥250) is lifted to pure white and its edges are feathered 90 px, so there is no visible box.
+   - The flat black PDF version still works: pass `LOGO=…pdf`.
 3. **Audio:** the original audio for the same loop, untouched. The card stays silent, as in the original.
 
 ```bash
