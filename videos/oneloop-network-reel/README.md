@@ -1,5 +1,12 @@
 # One Loop: "Your network is your net worth" loop reel
 
+**Final (11 Nov 2026): the `_SCROLL` version** (`SHARE_CRF=15 bash assemble.sh scroll`):
+- **White hook on top** (Fraunces): "If you don't own a business, / keep scrolling…"
+- **Black 3D block:** "Everyone else, / comment what you do / & join our CHANNEL / (link in bio). / Let's network! 🤝". The wording is the user's own; it's split into 5 lines so it stays large.
+- **Bold words:** "comment", "CHANNEL" and "network!" are ExtraBold.
+- **Separation:** stronger glows than the earlier versions. A dark one sits behind the white hook, and a light one sits behind and around the black block.
+- **Encoding:** the share copy is CRF 15 (about 43 Mb/s) for maximum clarity before Instagram recompresses it.
+
 10.0 s · 1080×1920 · 60 fps · 600 frames. A founder's-day b-roll montage under one static caption, cut so the last frame flows into the first and the reel loops seamlessly.
 
 ## Caption (on screen for the whole reel, styled after the user's reference)

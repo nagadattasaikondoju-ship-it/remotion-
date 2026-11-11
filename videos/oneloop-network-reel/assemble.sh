@@ -21,12 +21,12 @@ done
 ffmpeg -nostdin -v error -y -f concat -safe 0 -i $list -c copy out/base.mp4
 for v in $VARIANTS; do
   node render_overlay.mjs "$v"
-  tag=$(case $v in comments) echo "_COMMENTS";; black) echo "_BLACK";; *) echo "";; esac)
+  tag=$(case $v in comments) echo "_COMMENTS";; black) echo "_BLACK";; scroll) echo "_SCROLL";; *) echo "";; esac)
   mk() { ffmpeg -nostdin -v error -y -i out/base.mp4 -framerate 60 -i "out/ov_$v/f_%04d.png" -f lavfi -i anullsrc=r=48000:cl=stereo \
     -filter_complex "[0:v][1:v]overlay=0:0,format=yuv420p[v]" -map "[v]" -map 2:a -t 10 \
     -c:v libx264 -preset slow -crf $1 -profile:v high -r 60 -c:a aac -b:a 128k -shortest -movflags +faststart "$2"; }
   mk 10 "out/OneLoop_NetworkReel${tag}_1080x1920_60fps_MASTER.mp4"
-  mk 18 "out/OneLoop_NetworkReel${tag}_1080x1920_60fps_share.mp4"
+  mk ${SHARE_CRF:-18} "out/OneLoop_NetworkReel${tag}_1080x1920_60fps_share.mp4"
   rm -rf "out/ov_$v"
 done
 rm -rf out/seg out/base.mp4
