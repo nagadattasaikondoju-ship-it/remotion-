@@ -22,7 +22,7 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
 - Project briefs override the house standard for that project (e.g. One Loop: no music bed, dialogue dominant).
 - Ultimate Editors SFX library: not yet available in this repo. Ask for its Drive folder before a sound pass.
   Synthesised SFX are a fallback only, and the user must be told when they're used.
-- Lemo-Opuscar (github.com/lemomo-ai/lemo-opuscar, MIT; films and styles CC BY 4.0): skill `lemo-opuscar` with 66 code-made film styles.
+- Lemo-Opuscar (github.com/lemomo-ai/lemo-opuscar, MIT; films and styles CC BY 4.0): skill `lemo-opuscar` with 99 code-made film styles (library updated to f2471ca, 12 Nov 2026).
   - Keep the library in the repo: `LEMO_OPUSCAR_HOME=/home/user/remotion-/tools/lemo-opuscar sh .claude/skills/lemo-opuscar/scripts/setup.sh` (gitignored, re-fetch per container).
   - The user approved its render packages (Oct 2026). In a fresh container, `cd tools/lemo-opuscar`, then run `npm install` and create `.venv` with python3.12 from `requirements.txt`.
     Skip `setup.sh deps`: it downloads a second browser.
