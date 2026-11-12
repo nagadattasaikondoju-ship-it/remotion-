@@ -1,0 +1,56 @@
+[
+ {
+  "t": 3.3,
+  "type": "step0",
+  "g": 0.45,
+  "note": "1. Who sees the ads card cuts in"
+ },
+ {
+  "t": 4.3,
+  "type": "step1",
+  "g": 0.45,
+  "note": "2. The offer card cuts in"
+ },
+ {
+  "t": 5.4,
+  "type": "step2",
+  "g": 0.45,
+  "note": "3. Live ads card cuts in"
+ },
+ {
+  "t": 6.3,
+  "type": "step0",
+  "g": 0.45,
+  "note": "4. Ad age card cuts in"
+ },
+ {
+  "t": 7.2333,
+  "type": "step1",
+  "g": 0.45,
+  "note": "5. Cost per booking card cuts in"
+ },
+ {
+  "t": 8.4,
+  "type": "step2",
+  "g": 0.45,
+  "note": "6. Lead form card cuts in"
+ },
+ {
+  "t": 9.6,
+  "type": "step0",
+  "g": 0.45,
+  "note": "7. Reply speed card cuts in"
+ },
+ {
+  "t": 10.7,
+  "type": "step1",
+  "g": 0.45,
+  "note": "8. Booking page card cuts in"
+ },
+ {
+  "t": 11.8667,
+  "type": "step2",
+  "g": 0.45,
+  "note": "9. Tracking card cuts in"
+ }
+]
