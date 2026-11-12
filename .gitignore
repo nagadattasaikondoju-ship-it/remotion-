@@ -46,3 +46,4 @@ tools/pw-compat/
 .claude/skills/video-edit-pipeline/
 .claude/skills/video-qa/
 .claude/skills/video-review-canvas/
+.claude/settings.local.json
