@@ -1,0 +1,254 @@
+[
+ {
+  "t": 1.5,
+  "type": "tick",
+  "g": 0.55,
+  "note": "hand lands on tooth 1"
+ },
+ {
+  "t": 3.0,
+  "type": "tick",
+  "g": 0.55,
+  "note": "hand lands on tooth 2"
+ },
+ {
+  "t": 4.5,
+  "type": "tick",
+  "g": 0.55,
+  "note": "hand lands on tooth 3"
+ },
+ {
+  "t": 6.0,
+  "type": "tick",
+  "g": 0.55,
+  "note": "hand lands on tooth 4"
+ },
+ {
+  "t": 7.5,
+  "type": "tick",
+  "g": 0.55,
+  "note": "hand lands on tooth 5"
+ },
+ {
+  "t": 9.0,
+  "type": "tick",
+  "g": 0.55,
+  "note": "hand lands on tooth 6"
+ },
+ {
+  "t": 10.5,
+  "type": "tick",
+  "g": 0.55,
+  "note": "hand lands on tooth 7"
+ },
+ {
+  "t": 12.0,
+  "type": "tick",
+  "g": 0.7,
+  "note": "hand lands on tooth 8"
+ },
+ {
+  "t": 12.45,
+  "type": "swoosh",
+  "g": 0.35,
+  "note": "clock dissolves into the end card; logo glides up"
+ },
+ {
+  "t": 12.88,
+  "type": "pop",
+  "g": 0.35,
+  "note": "clinic name banner"
+ },
+ {
+  "t": 13.359,
+  "type": "key1",
+  "g": 0.32,
+  "note": "typing: Act Early\u2026"
+ },
+ {
+  "t": 13.418,
+  "type": "key2",
+  "g": 0.32,
+  "note": "typing: Act Early\u2026"
+ },
+ {
+  "t": 13.477,
+  "type": "key3",
+  "g": 0.32,
+  "note": "typing: Act Early\u2026"
+ },
+ {
+  "t": 13.536,
+  "type": "key1",
+  "g": 0.32,
+  "note": "typing: Act Early\u2026"
+ },
+ {
+  "t": 13.595,
+  "type": "key2",
+  "g": 0.32,
+  "note": "typing: Act Early\u2026"
+ },
+ {
+  "t": 13.655,
+  "type": "key3",
+  "g": 0.32,
+  "note": "typing: Act Early\u2026"
+ },
+ {
+  "t": 13.714,
+  "type": "key1",
+  "g": 0.32,
+  "note": "typing: Act Early\u2026"
+ },
+ {
+  "t": 13.773,
+  "type": "key2",
+  "g": 0.32,
+  "note": "typing: Act Early\u2026"
+ },
+ {
+  "t": 13.832,
+  "type": "key3",
+  "g": 0.32,
+  "note": "typing: Act Early\u2026"
+ },
+ {
+  "t": 13.891,
+  "type": "key1",
+  "g": 0.32,
+  "note": "typing: Act Early\u2026"
+ },
+ {
+  "t": 13.95,
+  "type": "key2",
+  "g": 0.32,
+  "note": "typing: Act Early\u2026"
+ },
+ {
+  "t": 14.161,
+  "type": "key3",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.221,
+  "type": "key1",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.282,
+  "type": "key2",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.343,
+  "type": "key3",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.404,
+  "type": "key1",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.464,
+  "type": "key2",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.525,
+  "type": "key3",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.586,
+  "type": "key1",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.646,
+  "type": "key2",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.707,
+  "type": "key3",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.768,
+  "type": "key1",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.829,
+  "type": "key2",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.889,
+  "type": "key3",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 14.95,
+  "type": "key1",
+  "g": 0.32,
+  "note": "typing: Choose Wisely!"
+ },
+ {
+  "t": 15.12,
+  "type": "pop2",
+  "g": 0.45,
+  "note": "BOOK AN APPOINTMENT button pops"
+ },
+ {
+  "t": 15.52,
+  "type": "soft",
+  "g": 0.28,
+  "note": "doctor's name"
+ },
+ {
+  "t": 15.97,
+  "type": "soft",
+  "g": 0.28,
+  "note": "phone"
+ },
+ {
+  "t": 16.22,
+  "type": "soft",
+  "g": 0.28,
+  "note": "website"
+ },
+ {
+  "t": 16.62,
+  "type": "soft",
+  "g": 0.28,
+  "note": "address"
+ },
+ {
+  "t": 17.07,
+  "type": "chime",
+  "g": 0.35,
+  "note": "social icons"
+ },
+ {
+  "t": 20.45,
+  "type": "swoosh2",
+  "g": 0.28,
+  "note": "card dissolves back into the clock (loop)"
+ }
+]
