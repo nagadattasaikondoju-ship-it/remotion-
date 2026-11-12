@@ -1,0 +1,183 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>
+@font-face{font-family:IS;src:url(fonts/InstrumentSerif-Regular.ttf)}
+:root{--paper:#FBF8F2;--paper2:#F6F1E8;--ink:#141210;--char:#1E1A18;--char2:#2A2522;--copper:#E59C69;--rule:#d9d2c6;--mut:#8a8178}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1920px;background:transparent;overflow:hidden}
+body{font-family:Inter,sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased}
+.scene{position:absolute;inset:0;display:none}
+.scene.on{display:block}
+/* serif titles, white with a soft shadow like the reference's IG text */
+.ttl{position:absolute;left:0;right:0;text-align:center;font-family:IS;color:#fff;letter-spacing:-.01em;
+  text-shadow:0 2px 14px rgba(0,0,0,.45),0 0 2px rgba(0,0,0,.35)}
+.hook{top:300px;font-size:76px;line-height:.98}
+.lab{font-size:92px;line-height:1}
+.pg{position:absolute;background:var(--paper);box-shadow:0 18px 40px rgba(0,0,0,.28),0 2px 6px rgba(0,0,0,.18);overflow:hidden}
+.dk{position:absolute;background:var(--char);color:#F4EEE6;box-shadow:0 18px 40px rgba(0,0,0,.32);overflow:hidden}
+.t6{font-size:11px;line-height:1.45;color:#3d3833}
+.t5{font-size:9.5px;line-height:1.5;color:#5b544d}
+.cap{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#6c645c}
+.h{font-weight:800;letter-spacing:-.01em;color:var(--ink)}
+.line{height:1px;background:var(--rule);margin:7px 0}
+.dot{color:var(--copper)}
+.box{border:1px solid #cfc7ba;height:34px;border-radius:2px;margin:6px 0 12px}
+.ph{background-size:cover;background-position:center}
+.logo{background:url(img/logo.png) center/contain no-repeat;mix-blend-mode:screen}
+.row{display:flex;justify-content:space-between}
+</style></head><body>
+
+<!-- 1 · HOOK -->
+<div class="scene" id="hook"><div class="ttl hook">What we send a client<br>the day they sign</div></div>
+
+<!-- 2 · CONTRACT -->
+<div class="scene" id="contract">
+  <div class="ttl lab" style="top:822px">Contract</div>
+  <div class="pg" style="left:660px;top:964px;width:372px;height:560px;transform:rotate(8deg);transform-origin:0 0;background:var(--paper2);padding:44px 34px">
+    <div class="h" style="font-size:12px;text-align:center;letter-spacing:.06em">[CLIENT BUSINESS NAME]</div>
+    <div class="t5" style="margin-top:14px">Client name ..........................<br>Address ..................................<br>Start date ...............................<br>Term: 6 months, then month to month</div>
+    <div class="h" style="font-size:11px;margin-top:16px">1 · SCOPE</div>
+    <div class="t5">One Loop will audit, build, market and automate as set out in the Growth Plan: a business audit, website build, Google &amp; Meta campaigns and lead-routing automation.</div>
+    <div class="line"></div>
+    <div class="h" style="font-size:11px">2 · FEES</div>
+    <div class="t5">Monthly retainer [₹ 0,000] payable in advance. Ad spend billed at cost, never marked up.</div>
+    <div class="line"></div>
+    <div class="h" style="font-size:11px">3 · REPORTING</div>
+    <div class="t5">Live dashboard plus a monthly review call. You own every account, asset and line of code.</div>
+    <div class="line"></div>
+    <div class="h" style="font-size:11px">4 · SIGNED</div>
+    <div class="t5" style="margin-top:8px">One Loop ......................<br><br>Client ...........................<br><br>Date ............................</div>
+  </div>
+  <div class="pg" style="left:196px;top:930px;width:472px;height:648px;padding:40px 40px">
+    <div class="row cap"><span>growth agreement</span><span>[client business name]</span></div>
+    <div style="position:absolute;left:40px;bottom:96px">
+      <div class="h" style="font-size:40px;line-height:1.04">GROWTH<br>PARTNERSHIP<br>AGREEMENT</div>
+      <div style="font-size:19px;margin-top:16px;color:#2b2622">[YOUR BUSINESS NAME]</div>
+    </div>
+    <div class="cap" style="position:absolute;left:40px;bottom:40px">One Loop<span class="dot">.</span> &nbsp;Audit<span class="dot">.</span> Build<span class="dot">.</span> Market<span class="dot">.</span> Automate<span class="dot">.</span></div>
+  </div>
+</div>
+
+<!-- 3 · INVOICE -->
+<div class="scene" id="invoice">
+  <div class="ttl lab" style="top:822px">Invoice</div>
+  <div class="dk" style="left:256px;top:930px;width:180px;height:640px;padding:36px 22px">
+    <div style="font-weight:800;font-size:22px;letter-spacing:.02em">INVOICE</div>
+    <div class="logo" style="width:120px;height:82px;margin:22px 0 18px -6px"></div>
+    <div style="font-size:9.5px;line-height:1.6;color:#cfc6bb">Invoice no.<br><b style="color:#fff">[OL-0000]</b><br><br>Issued<br><b style="color:#fff">[DD/MM/YYYY]</b><br><br>Due<br><b style="color:#fff">On receipt</b><br><br>From<br>One Loop<br>Hyderabad, India<br>oneloop.in</div>
+    <div style="position:absolute;left:22px;bottom:30px;font-size:8.5px;color:#9a9087">Thank you for growing with us.</div>
+  </div>
+  <div class="pg" style="left:436px;top:930px;width:404px;height:640px;padding:36px 30px">
+    <div class="t5">Bill to</div>
+    <div class="h" style="font-size:15px">[Client Name]</div>
+    <div class="t5">[Business address]<br>[City, PIN]</div>
+    <div class="line" style="margin:18px 0 10px"></div>
+    <div class="row t5" style="font-weight:700;color:#2b2622"><span style="width:52%">Service</span><span>Qty</span><span>Rate</span><span>Total</span></div>
+    <div class="line"></div>
+    <div class="row t5"><span style="width:52%">Business audit &amp; forensics</span><span>1</span><span>[0.00]</span><span>[0.00]</span></div>
+    <div class="line"></div>
+    <div class="row t5"><span style="width:52%">Website build</span><span>1</span><span>[0.00]</span><span>[0.00]</span></div>
+    <div class="line"></div>
+    <div class="row t5"><span style="width:52%">Google &amp; Meta ads (month 1)</span><span>1</span><span>[0.00]</span><span>[0.00]</span></div>
+    <div class="line"></div>
+    <div class="row t5"><span style="width:52%">Lead-routing automation</span><span>1</span><span>[0.00]</span><span>[0.00]</span></div>
+    <div class="line"></div>
+    <div style="margin:22px 0 0 auto;width:200px">
+      <div class="row t5"><span>Subtotal</span><span>[0.00]</span></div>
+      <div class="row t5"><span>GST 18%</span><span>[0.00]</span></div>
+      <div class="row" style="background:var(--char);color:#fff;font-size:11px;font-weight:700;padding:8px 10px;margin-top:8px"><span>Total due</span><span>[₹0.00]</span></div>
+    </div>
+    <div class="t5" style="position:absolute;left:30px;bottom:34px;width:340px">Notes<br>Pay by UPI or bank transfer to the account on file. Questions? Reply to this email.</div>
+  </div>
+</div>
+
+<!-- 4 · WELCOME PACK -->
+<div class="scene" id="welcome">
+  <div class="ttl lab" style="top:822px">Welcome pack</div>
+  <div class="pg" style="left:182px;top:930px;width:600px;height:330px">
+    <div style="position:absolute;left:0;top:0;width:330px;height:330px;padding:34px 30px">
+      <div class="cap" style="font-size:8.5px">One Loop · onboarding</div>
+      <div class="h" style="font-size:22px;margin-top:8px">WELCOME TO THE LOOP</div>
+      <div class="t5" style="margin-top:12px">Thank you for choosing One Loop. Over the next 7 days we'll audit your numbers, set up tracking and plan your first 90 days.</div>
+      <div class="t5" style="margin-top:8px">Here's who you'll talk to, what we need from you and when you'll see results.</div>
+      <div style="position:absolute;left:30px;bottom:34px;font-family:IS;font-style:italic;font-size:17px">The One Loop team</div>
+    </div>
+    <div class="ph" style="position:absolute;left:330px;top:0;width:270px;height:330px;background-image:url(img/towers.jpg)"></div>
+  </div>
+  <div class="dk" style="left:370px;top:1140px;width:560px;height:330px;padding:30px 34px">
+    <div class="row" style="font-weight:700;font-size:28px;letter-spacing:.04em"><span>WELCOME</span><span>PACK</span></div>
+    <div class="row" style="margin-top:26px;padding:0 20px">
+      <div class="ph" style="width:118px;height:118px;background-image:url(img/handshake.jpg)"></div>
+      <div class="ph" style="width:118px;height:118px;background-image:url(img/planning.jpg)"></div>
+      <div class="ph" style="width:118px;height:118px;background-image:url(img/vision.jpg)"></div>
+    </div>
+    <div style="text-align:center;font-size:9.5px;color:#cfc6bb;margin-top:22px">Prepared for [Client Name]</div>
+    <div style="text-align:center;font-size:8.5px;color:#9a9087;margin-top:4px">oneloop.in</div>
+  </div>
+</div>
+
+<!-- 5 · QUESTIONNAIRE -->
+<div class="scene" id="questionnaire">
+  <div class="ttl lab" style="top:806px">Questionnaire</div>
+  <div class="pg" style="left:672px;top:946px;width:356px;height:580px;transform:rotate(9deg);transform-origin:0 0;background:var(--paper2);padding:40px 30px">
+    <div class="t5">What do your best customers have in common?</div><div class="box"></div>
+    <div class="t5">Which tools run your sales and operations?</div><div class="box"></div>
+    <div class="t5">Where do customers drop off today?</div><div class="box"></div>
+    <div class="t5">Who signs off on budget?</div><div class="box"></div>
+    <div class="t5">Anything we should never do?</div><div class="box"></div>
+    <div class="t5">Your growth goal for the next 12 months</div><div class="box"></div>
+  </div>
+  <div class="pg" style="left:196px;top:914px;width:496px;height:640px;padding:34px 34px">
+    <div class="cap" style="font-size:8.5px">One Loop · step 1 of the Growth Path</div>
+    <div class="h" style="font-size:19px;margin-top:6px">BUSINESS AUDIT QUESTIONNAIRE</div>
+    <div class="t5" style="margin-top:8px">Before we build anything, we study the numbers. Answer what you can; we'll fill the rest on our audit call.</div>
+    <div class="row t5" style="margin-top:10px"><span>Name ..............................</span><span>Date ..................</span></div>
+    <div class="h" style="font-size:12px;margin-top:16px">01 &nbsp;About your business</div>
+    <div class="t5" style="margin-top:8px">What do you sell, and to whom?</div><div class="box"></div>
+    <div class="t5">Where do your leads come from today?</div><div class="box"></div>
+    <div class="t5">What do you spend on ads each month?</div><div class="box"></div>
+    <div class="t5">What does one customer pay you, on average?</div><div class="box"></div>
+    <div class="t5">Your website and social links</div><div class="box"></div>
+  </div>
+</div>
+
+<!-- 6 · BRAND STRATEGY -->
+<div class="scene" id="strategy">
+  <div class="ttl lab" style="top:840px">Brand strategy</div>
+  <div class="dk" style="left:176px;top:962px;width:420px;height:340px;padding:30px 28px">
+    <div style="font-size:8.5px;color:#9a9087;letter-spacing:.08em">ONE LOOP · BRAND SYSTEM</div>
+    <div style="font-weight:700;font-size:17px;margin-top:4px">PROFILE &amp; FEED</div>
+    <div class="row" style="margin-top:18px;font-size:9px;color:#cfc6bb"><span>Bio</span><span style="margin-right:60px">Highlights</span></div>
+    <div style="font-size:8.5px;color:#9a9087;margin-top:4px;width:150px;line-height:1.5">[Who you help] · [result you deliver] · [city]<br>Book your free audit ↓</div>
+    <div style="position:absolute;right:28px;top:96px;display:flex;gap:8px">
+      <div style="width:26px;height:26px;border-radius:50%;background:#F7E8DA"></div><div style="width:26px;height:26px;border-radius:50%;background:#E59C69"></div><div style="width:26px;height:26px;border-radius:50%;background:#8F432E"></div>
+    </div>
+    <div style="font-size:9px;color:#cfc6bb;margin-top:22px">Colours</div>
+    <div style="display:flex;gap:6px;margin-top:6px">
+      <div style="width:30px;height:30px;background:#E59C69"></div><div style="width:30px;height:30px;background:#F7E8DA"></div><div style="width:30px;height:30px;background:#8F432E"></div><div style="width:30px;height:30px;background:#F9F6F1"></div>
+    </div>
+    <div style="position:absolute;right:28px;bottom:40px;font-size:9px;color:#cfc6bb;text-align:right">Fonts<br><span style="font-family:IS;font-size:22px;color:#fff">Aa</span> <span style="font-weight:700;font-size:20px;color:#fff">Aa</span></div>
+  </div>
+  <div class="pg" style="left:520px;top:1010px;width:452px;height:250px;padding:26px 26px">
+    <div style="font-size:8.5px;color:#8a8178;letter-spacing:.08em">WEEK ONE</div>
+    <div class="h" style="font-size:16px;margin-top:2px">YOUR POSTING PLAN</div>
+    <div style="display:flex;gap:10px;margin-top:20px">
+      <div style="flex:1;text-align:center"><div style="background:var(--char);color:#fff;height:70px;display:grid;place-items:center;font-size:20px">[X]</div><div class="t5" style="margin-top:6px">Mon · reel</div></div>
+      <div style="flex:1;text-align:center"><div style="background:var(--char);color:#fff;height:70px;display:grid;place-items:center;font-size:20px">[X]</div><div class="t5" style="margin-top:6px">Wed · carousel</div></div>
+      <div style="flex:1;text-align:center"><div style="background:var(--char);color:#fff;height:70px;display:grid;place-items:center;font-size:20px">[X]</div><div class="t5" style="margin-top:6px">Fri · case study</div></div>
+      <div style="flex:1;text-align:center"><div style="background:var(--char);color:#fff;height:70px;display:grid;place-items:center;font-size:20px">[X]</div><div class="t5" style="margin-top:6px">Sun · story</div></div>
+    </div>
+  </div>
+  <div class="dk" style="left:420px;top:1200px;width:420px;height:300px;text-align:center;padding-top:26px">
+    <div class="ph" style="width:110px;height:76px;margin:0 auto;background-image:url(img/site.jpg)"></div>
+    <div style="font-size:34px;line-height:1.05;margin-top:16px;letter-spacing:.02em">BRAND<br>STRATEGY</div>
+    <div style="font-size:9px;color:#9a9087;margin-top:22px;font-style:italic">Prepared for [Client Name] &nbsp;·&nbsp; [Month Year]</div>
+  </div>
+</div>
+
+<script>
+const S=["hook","contract","invoice","welcome","questionnaire","strategy"];
+window.show=(id)=>{for(const s of S)document.getElementById(s).classList.toggle('on',s===id);};
+window.ready=document.fonts.ready.then(()=>Promise.all([...document.images].map(i=>i.decode&&i.decode().catch(()=>0))));
+</script>
+</body></html>
