@@ -97,29 +97,57 @@ Source: the user's screen recording (`20261112-2003-01`, 542×966, 30 fps, 17.9 
   - no CTA;
   - the sticker hides the creator's laptop action.
 
-## 17. Our One Loop version
-- **Kept:**
-  - the 8.0 s loop and the exact cut frame (60 fps: the grid at frame 184);
-  - the hook line, verbatim;
-  - the sticker → 3×3 grid format;
-  - all nine post layouts, in the same order with the same structures;
-  - the song.
-- **Ours:**
-  - **The "1 photo":** a still of the One Loop website on a laptop (MVI_0727), as a white-bordered sticker.
-  - **The posts become One Loop's own feed.** Each reference line is re-worded for One Loop:
-    1. "Join the One Loop club";
-    2. "Happy hour" ("your growth audit is free");
-    3. "Growth fuel · FULL";
-    4. "Your daily fix", "Signature growth loop";
-    5. "Your free audit is ready";
-    6. "The perfect … growth" (sub-second website, tracking you can trust);
-    7. "Consider this your sign";
-    8. "Signature growth loop";
-    9. "GROWTH" × 6.
-  - The matcha green became One Loop's terracotta, cream and copper.
-  - **Footage:** MVI_0680 (floral shirt sketching in a notebook), the first 7.4 s stretched to 8.2 s. The last 0.2 s cross-fades into the opening frames, so the footage itself loops smoothly.
-  - **SFX:** one real paper drop as the grid lands.
-- **Why not the matcha posts themselves:** they are another creator's designs for a matcha product. Copying them would show nothing about One Loop, so we kept the exact layouts and wording pattern instead.
+## 17. Our One Loop version (v2: the drink photo the user supplied)
+**Kept from the reference:**
+- the 8.0 s loop and the exact cut frame (60 fps: the grid at frame 184);
+- the hook line, verbatim;
+- the sticker → 3×3 grid format;
+- all nine post layouts, in the same order, with the same structures;
+- the song.
+
+### The photo: visual analysis (BRIO Yerba Mate, Strawberry & Lime, sparkling can on strawberries)
+- **Composition:**
+  - A top-down flat-lay with a single hero: the can, centred, vertical, filling about 30 % of the width.
+  - Bedded in whole strawberries edge to edge, so there is no negative space. The fruit *is* the background.
+  - The can sits slightly above centre, its logo in the upper third.
+- **Colour:**
+  - A near-monochrome red: strawberry red ≈ #D6262E, shadows ≈ #5A0E12.
+  - Two tiny accents: the white typography and the lime green on the can's illustration. The green is the only complementary colour, so it draws the eye straight to the flavour icon.
+  - Silver rims at the top and bottom frame the can.
+- **Light:**
+  - Soft, even top light with specular highlights on every strawberry and condensation droplets on the can. That reads as "ice cold, fresh".
+  - Mid-high contrast with deep shadows between the berries, which gives depth and texture.
+- **Message:**
+  - "the flavour is real" (fruit literally surrounds the product);
+  - "organic / natural" (no props, no plastic);
+  - "refreshing" (the droplets).
+- **What it lends to posts:**
+  - a natural brand palette (red, cream, lime);
+  - a hero object that cuts out cleanly (straight can edges);
+  - a texture plate (the strawberries) for full-bleed backgrounds;
+  - the brand's own words to reuse: Organic Energy, Yerba Mate, Strawberry & Lime, Sparkling.
+
+### How the 9 posts are built from it
+- **The sticker:** the can, cut out along its edges, with a white outline (like the reference's glass).
+- **Palette:** strawberry red #D6262E, deep red #9C1820, cream #FFF4EA, blush #F8DCD3, lime accent #8CC63F.
+- **The posts**, the reference's wording pattern with matcha swapped for the drink:
+  1. "Join the organic energy club"
+  2. "Happy hour" (the can on a tray)
+  3. A fuel gauge, "Organic energy · FULL" with a lime needle
+  4. "Your daily fix", "Signature strawberry & lime"
+  5. A strawberry close-up with "Your strawberry & lime is ready" (Decline / Accept)
+  6. "The perfect pick-me-up", with callouts "Organic yerba mate" and "Strawberry & lime, sparkling"
+  7. "Consider this your sign" on a full-bleed strawberry crop
+  8. "Signature strawberry & lime"
+  9. "ENERGY" × 6 behind the can
+
+**Claims:** the copy only uses words printed on the can (organic, yerba mate, strawberry & lime, sparkling), plus neutral serving lines. There are no prices, health claims or invented offers. The hook is "how **I'd** turn…": a spec demo, not a claim that BRIO is a One Loop client.
+
+**Footage:** MVI_0680 (floral shirt sketching in a notebook), the first 7.4 s stretched to 8.2 s. The last 0.2 s cross-fades into the opening frames.
+
+**SFX:** one real paper drop as the grid lands.
+
+**Captions (v2):** pure white with a 1.2 px stroke for weight, a stronger shadow, and a soft dark radial backing behind the hook, so it reads over the bright café background.
 
 ## 18. Alternatives
 1. **"How we'd turn 1 client photo into 9 posts":** the same format on a real client's product photo. That needs the client's permission.

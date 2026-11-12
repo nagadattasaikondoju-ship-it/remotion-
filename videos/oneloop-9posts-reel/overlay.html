@@ -4,109 +4,110 @@
 @font-face{font-family:IS;src:url(fonts/InstrumentSerif-Regular.ttf)}
 @font-face{font-family:P;font-weight:700;src:url(fonts/Poppins-700.woff)}
 @font-face{font-family:P;font-weight:800;src:url(fonts/Poppins-800.woff)}
-:root{--terra:#8F432E;--copper:#E59C69;--cream:#F4E8DA;--beige:#E7DACB;--char:#1E1A18;--off:#FBF7F1}
+:root{--red:#D6262E;--deep:#9C1820;--cream:#FFF4EA;--blush:#F8DCD3;--lime:#8CC63F;--ink:#3A0D10}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{width:1080px;height:1920px;background:transparent;overflow:hidden}
 body{font-family:Inter,sans-serif;-webkit-font-smoothing:antialiased}
 .scene{position:absolute;inset:0;display:none}.scene.on{display:block}
-.ph{background:url(assets/photo.jpg) center/cover no-repeat}
-.sq{background:url(assets/photo_sq.jpg) center/cover no-repeat}
-/* hook: the one photo as a white-bordered sticker + the serif line */
-.sticker{position:absolute;left:50%;top:478px;width:400px;height:500px;margin-left:-200px;border:13px solid #fff;border-radius:44px;
-  box-shadow:0 22px 46px rgba(0,0,0,.35),0 0 0 1px rgba(0,0,0,.05)}
-.hook{position:absolute;left:0;right:0;top:1046px;text-align:center;font-family:IS;font-size:92px;line-height:.94;color:#fff;
-  text-shadow:0 2px 16px rgba(0,0,0,.45),0 0 3px rgba(0,0,0,.35)}
-/* the 3×3 grid of 4:5 posts */
+.berry{background:url(assets/drink.jpg) center/cover no-repeat}
+.can{position:absolute;background:url(assets/can_cut.png) center/contain no-repeat;filter:drop-shadow(0 10px 12px rgba(0,0,0,.35))}
+/* hook: the one photo as a white-outlined cut-out sticker + the serif line on a soft scrim (brighter, higher contrast) */
+.sticker{position:absolute;left:50%;top:430px;width:240px;height:591px;margin-left:-120px;background:url(assets/can_sticker.png) center/contain no-repeat;
+  filter:drop-shadow(0 18px 26px rgba(0,0,0,.40))}
+.scrim{position:absolute;left:90px;right:90px;top:1010px;height:400px;background:radial-gradient(closest-side,rgba(0,0,0,.42),rgba(0,0,0,0));}
+.hook{position:absolute;left:0;right:0;top:1058px;text-align:center;font-family:IS;font-size:96px;line-height:.94;color:#fff;
+  -webkit-text-stroke:1.2px #fff;text-shadow:0 3px 18px rgba(0,0,0,.70),0 0 4px rgba(0,0,0,.55)}
 .grid{position:absolute;left:87px;top:392px;width:906px;height:1132px;background:#fff;display:grid;
-  grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:5px;padding:0;box-shadow:0 20px 50px rgba(0,0,0,.25)}
+  grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:5px;box-shadow:0 20px 50px rgba(0,0,0,.25)}
 .p{position:relative;overflow:hidden}
 .big{font-family:P;font-weight:800;line-height:.92;letter-spacing:-.01em;text-transform:uppercase}
 .cp{font-size:9.5px;line-height:1.4}
-.card{position:absolute;border-radius:12px;box-shadow:0 12px 22px rgba(0,0,0,.28)}
 </style></head><body>
 
 <div class="scene" id="hook">
-  <div class="sticker ph"></div>
+  <div class="sticker"></div>
+  <div class="scrim"></div>
   <div class="hook">how I’d turn<br>1 photo<br>into 9 posts</div>
 </div>
 
 <div class="scene" id="grid"><div class="grid">
   <!-- 1 · JOIN THE CLUB -->
-  <div class="p" style="background:var(--terra);color:#fff">
-    <div class="big" style="position:absolute;left:18px;top:22px;font-size:27px">Join the<br>One Loop<br>club</div>
-    <div class="cp" style="position:absolute;right:16px;top:116px;width:120px;text-align:right;color:#f6dccb">Audit, build, market &amp; automate. Your new growth obsession.<br><br>Consider this your official invitation to join the loop.</div>
-    <div class="card ph" style="left:-18px;bottom:30px;width:120px;height:150px"></div>
-    <div class="card ph" style="left:58px;bottom:-14px;width:120px;height:150px"></div>
+  <div class="p" style="background:var(--red);color:#fff">
+    <div class="big" style="position:absolute;left:18px;top:22px;font-size:26px">Join the<br>organic<br>energy club</div>
+    <div class="cp" style="position:absolute;right:14px;top:122px;width:118px;text-align:right;color:#ffe3dc">Sparkling yerba mate with strawberry &amp; lime. Your new daily obsession.<br><br>Consider this your official invitation to join the club.</div>
+    <div class="can" style="left:4px;bottom:-30px;width:70px;height:184px;transform:rotate(-8deg)"></div>
+    <div class="can" style="left:62px;bottom:-44px;width:70px;height:184px;transform:rotate(6deg)"></div>
   </div>
   <!-- 2 · HAPPY HOUR -->
-  <div class="p" style="background:var(--cream);color:var(--terra)">
-    <div class="big" style="text-align:center;margin-top:24px;font-size:40px">Happy<br>hour</div>
-    <div class="card ph" style="left:84px;top:128px;width:130px;height:150px"></div>
-    <div style="position:absolute;left:62px;top:270px;width:174px;height:14px;border-radius:50%;background:linear-gradient(#d6d0c8,#a9a39b);box-shadow:0 6px 10px rgba(0,0,0,.18)"></div>
-    <div class="cp" style="position:absolute;left:18px;bottom:22px;width:170px;color:#6b3a2b">Your growth audit is free.<br>Book it any day this week.</div>
+  <div class="p" style="background:var(--cream);color:var(--red)">
+    <div class="big" style="text-align:center;margin-top:22px;font-size:42px">Happy<br>hour</div>
+    <div class="can" style="left:117px;top:118px;width:64px;height:168px"></div>
+    <div style="position:absolute;left:62px;top:278px;width:174px;height:14px;border-radius:50%;background:linear-gradient(#e6e0d9,#b4ada5);box-shadow:0 6px 10px rgba(0,0,0,.18)"></div>
+    <div class="cp" style="position:absolute;left:18px;bottom:20px;width:200px;color:var(--deep)">Strawberry &amp; lime, sparkling.<br>Your 3 PM pick-me-up.</div>
   </div>
   <!-- 3 · FUEL GAUGE -->
-  <div class="p" style="background:var(--beige);color:var(--char)">
+  <div class="p" style="background:var(--blush);color:var(--ink)">
     <svg viewBox="0 0 298 373" style="position:absolute;inset:0">
-      <g transform="translate(149,190)" stroke="#3a322d" stroke-width="3" stroke-linecap="round">
+      <g transform="translate(149,186)" stroke="#3A0D10" stroke-width="3" stroke-linecap="round">
         <line x1="-104" y1="0" x2="-90" y2="0"/><line x1="-90" y1="-52" x2="-78" y2="-45"/><line x1="-52" y1="-90" x2="-45" y2="-78"/>
         <line x1="0" y1="-104" x2="0" y2="-90"/><line x1="52" y1="-90" x2="45" y2="-78"/><line x1="90" y1="-52" x2="78" y2="-45"/><line x1="104" y1="0" x2="90" y2="0"/>
-        <line x1="0" y1="0" x2="86" y2="-24" stroke="#C8784A" stroke-width="5"/>
+        <line x1="0" y1="0" x2="86" y2="-24" stroke="#8CC63F" stroke-width="5"/>
       </g>
-      <text x="38" y="216" font-family="P" font-weight="800" font-size="22" fill="#3a322d">E</text>
-      <text x="246" y="216" font-family="P" font-weight="800" font-size="22" fill="#3a322d">F</text>
+      <text x="38" y="212" font-family="P" font-weight="800" font-size="22" fill="#3A0D10">E</text>
+      <text x="246" y="212" font-family="P" font-weight="800" font-size="22" fill="#3A0D10">F</text>
     </svg>
-    <div class="card ph" style="left:114px;top:176px;width:70px;height:86px;border-radius:8px"></div>
-    <div style="position:absolute;left:0;right:0;bottom:44px;text-align:center;font-size:12px;color:#3a322d">Growth fuel · <b>FULL</b></div>
+    <div class="can" style="left:128px;top:150px;width:42px;height:112px"></div>
+    <div style="position:absolute;left:0;right:0;bottom:44px;text-align:center;font-size:12px;color:#3A0D10">Organic energy · <b>FULL</b></div>
   </div>
   <!-- 4 · YOUR DAILY FIX -->
-  <div class="p" style="background:var(--cream);color:var(--terra)">
-    <div class="big" style="text-align:center;margin-top:18px;font-size:39px">Your<br>daily fix</div>
-    <div style="position:absolute;left:30px;top:118px;width:238px;height:200px;border-radius:14px;background:linear-gradient(145deg,#e9e3db,#c9c1b6);box-shadow:inset 0 2px 8px rgba(0,0,0,.18)"></div>
-    <div class="card ph" style="left:74px;top:128px;width:150px;height:180px"></div>
-    <div style="position:absolute;left:0;right:0;bottom:18px;text-align:center;font-family:P;font-weight:700;font-size:10px;letter-spacing:.06em">SIGNATURE GROWTH LOOP</div>
+  <div class="p" style="background:var(--cream);color:var(--red)">
+    <div class="big" style="text-align:center;margin-top:16px;font-size:39px">Your<br>daily fix</div>
+    <div style="position:absolute;left:34px;top:116px;width:230px;height:206px;border-radius:14px;background:linear-gradient(145deg,#f1ebe4,#cfc7bd);box-shadow:inset 0 2px 8px rgba(0,0,0,.18)"></div>
+    <div class="can" style="left:113px;top:110px;width:72px;height:190px"></div>
+    <div style="position:absolute;left:0;right:0;bottom:16px;text-align:center;font-family:P;font-weight:700;font-size:10px;letter-spacing:.06em;color:var(--deep)">SIGNATURE STRAWBERRY &amp; LIME</div>
   </div>
   <!-- 5 · POP-UP -->
-  <div class="p sq" style="background-size:200% auto;background-position:40% 58%">
-    <div style="position:absolute;left:60px;top:116px;width:178px;background:#fff;border-radius:12px;box-shadow:0 14px 30px rgba(0,0,0,.35);padding:14px 12px 10px;text-align:center">
-      <div style="font-family:P;font-weight:800;font-size:10px;color:var(--terra);letter-spacing:.04em">YOUR FREE AUDIT IS READY</div>
-      <div style="font-size:8px;color:#7a6f66;margin-top:2px">One Loop wants to send you a report</div>
-      <div class="ph" style="width:60px;height:72px;margin:10px auto;border-radius:6px"></div>
-      <div style="display:flex;justify-content:space-between;font-size:9px;border-top:1px solid #eee;padding-top:7px"><span style="color:#8a8178">Decline</span><b style="color:var(--terra)">Accept</b></div>
+  <div class="p berry" style="background-size:220% auto;background-position:50% 28%">
+    <div style="position:absolute;left:58px;top:104px;width:182px;background:#fff;border-radius:12px;box-shadow:0 14px 30px rgba(0,0,0,.4);padding:14px 12px 10px;text-align:center">
+      <div style="font-family:P;font-weight:800;font-size:10px;color:var(--red);letter-spacing:.03em">YOUR STRAWBERRY &amp; LIME<br>IS READY</div>
+      <div style="font-size:8px;color:#7a6f66;margin-top:3px">Grab it cold</div>
+      <div class="can" style="position:relative;width:34px;height:90px;margin:8px auto;filter:none"></div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;border-top:1px solid #eee;padding-top:7px"><span style="color:#8a8178">Decline</span><b style="color:var(--red)">Accept</b></div>
     </div>
   </div>
   <!-- 6 · THE PERFECT -->
-  <div class="p" style="background:var(--cream);color:var(--terra)">
-    <div class="big" style="position:absolute;left:18px;top:26px;font-size:24px">The<br>perfect</div>
-    <div class="card ph" style="right:-24px;top:58px;width:170px;height:226px"></div>
-    <div class="cp" style="position:absolute;left:18px;top:136px;width:96px;color:#6b3a2b">Sub-second website</div>
-    <div style="position:absolute;left:18px;top:168px;width:116px;border-top:1px solid #6b3a2b"></div>
-    <div class="cp" style="position:absolute;left:18px;top:222px;width:96px;color:#6b3a2b">Tracking you can trust</div>
-    <div style="position:absolute;left:18px;top:254px;width:116px;border-top:1px solid #6b3a2b"></div>
-    <div class="big" style="position:absolute;left:18px;bottom:24px;font-size:22px">Growth</div>
+  <div class="p" style="background:var(--cream);color:var(--red)">
+    <div class="big" style="position:absolute;left:18px;top:24px;font-size:24px">The<br>perfect</div>
+    <div class="can" style="right:14px;top:40px;width:96px;height:252px"></div>
+    <div class="cp" style="position:absolute;left:18px;top:132px;width:110px;color:var(--deep)">Organic yerba mate</div>
+    <div style="position:absolute;left:18px;top:164px;width:150px;border-top:1px solid var(--deep)"></div>
+    <div class="cp" style="position:absolute;left:18px;top:218px;width:110px;color:var(--deep)">Strawberry &amp; lime, sparkling</div>
+    <div style="position:absolute;left:18px;top:250px;width:150px;border-top:1px solid var(--deep)"></div>
+    <div class="big" style="position:absolute;left:18px;bottom:22px;font-size:22px">Pick-me-up</div>
   </div>
   <!-- 7 · CONSIDER THIS YOUR SIGN -->
-  <div class="p ph" style="background-size:170% auto;background-position:30% 62%">
-    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.35))"></div>
-    <div class="big" style="position:absolute;left:0;right:0;top:150px;text-align:center;color:#fff;font-size:30px;text-shadow:0 2px 10px rgba(0,0,0,.4)">Consider<br>this your<br>sign</div>
+  <div class="p berry" style="background-size:300% auto;background-position:8% 82%">
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.35))"></div>
+    <div class="big" style="position:absolute;left:0;right:0;top:132px;text-align:center;color:#fff;font-size:31px;text-shadow:0 2px 12px rgba(0,0,0,.5)">Consider<br>this your<br>sign</div>
   </div>
   <!-- 8 · SIGNATURE -->
-  <div class="p" style="background:var(--beige);color:var(--terra)">
-    <div class="cp" style="position:absolute;left:22px;right:22px;top:24px;text-align:center;color:#5d4c42">Audit. Build. Market. Automate. One team owning the outcome, from the first click to the closed deal.</div>
-    <div class="card ph" style="left:94px;top:96px;width:110px;height:140px"></div>
-    <div class="big" style="position:absolute;left:0;right:0;bottom:30px;text-align:center;font-size:25px">Signature<br>growth loop</div>
+  <div class="p" style="background:var(--blush);color:var(--red)">
+    <div class="cp" style="position:absolute;left:22px;right:22px;top:22px;text-align:center;color:#6b2a2c">Organic yerba mate, sparkling and chilled, with strawberry &amp; lime. Pour it over ice or drink it straight from the can.</div>
+    <div class="can" style="left:120px;top:92px;width:58px;height:154px"></div>
+    <div class="big" style="position:absolute;left:0;right:0;bottom:28px;text-align:center;font-size:23px">Signature<br>strawberry<br>&amp; lime</div>
   </div>
   <!-- 9 · WORD STACK -->
-  <div class="p" style="background:var(--terra)">
-    <div class="big" style="position:absolute;left:8px;top:8px;font-size:52px;line-height:.98;color:var(--cream)">Growth<br>Growth<br>Growth<br>Growth<br>Growth<br>Growth</div>
-    <div class="card ph" style="left:92px;top:96px;width:150px;height:186px;box-shadow:0 16px 30px rgba(0,0,0,.4)"></div>
+  <div class="p" style="background:var(--red)">
+    <div class="big" style="position:absolute;left:10px;top:6px;font-size:62px;line-height:.97;color:var(--cream)">Energy<br>Energy<br>Energy<br>Energy<br>Energy<br>Energy</div>
+    <div class="can" style="left:104px;top:60px;width:96px;height:252px;transform:rotate(-6deg);filter:drop-shadow(0 16px 18px rgba(0,0,0,.45))"></div>
   </div>
 </div></div>
+
 
 <script>
 const S=["hook","grid"];
 window.show=(id)=>{for(const s of S)document.getElementById(s).classList.toggle('on',s===id);};
 window.SCENES=S;
-window.ready=document.fonts.ready.then(()=>Promise.all(["assets/photo.jpg","assets/photo_sq.jpg"].map(u=>new Promise(r=>{const i=new Image();i.onload=r;i.onerror=r;i.src=u;}))));
+window.ready=document.fonts.ready.then(()=>Promise.all(["assets/drink.jpg","assets/can_cut.png","assets/can_sticker.png"].map(u=>new Promise(r=>{const i=new Image();i.onload=r;i.onerror=r;i.src=u;}))));
 </script>
 </body></html>
