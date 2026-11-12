@@ -22,7 +22,7 @@ if (mode === "stills") {
     await p.screenshot({ path: path.join(dir, `out/stills/t_${t}.png`) });
   }
 } else {
-  const fps = Number(process.argv[3] || 60), DUR = 21.0, N = Math.round(DUR * fps);
+  const fps = Number(process.argv[3] || 60), DUR = 18.73, N = Math.round(DUR * fps);
   const ff = spawn("ffmpeg", ["-v", "error", "-y", "-f", "image2pipe", "-framerate", String(fps), "-i", "-",
     "-c:v", "libx264", "-preset", "slow", "-crf", "8", "-tune", "animation", "-pix_fmt", "yuv420p",
     "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", path.join(dir, "out/video.mp4")], { stdio: ["pipe", "inherit", "inherit"] });

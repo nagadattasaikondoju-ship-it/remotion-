@@ -198,8 +198,8 @@ async function prepLogo() {
 }
 
 /* ---------------- timeline ---------------- */
-const DUR = 21.0;
-const ARR = [1.5, 3.0, 4.5, 6.0, 7.5, 9.0, 10.5, 12.0];      // hand arrives at 45°, 90° … 360°
+const DUR = 18.73;                                           // = one loop of the reference song
+const ARR = [0.80, 2.17, 3.60, 5.27, 6.80, 8.30, 9.97, 11.33];  // hand arrives at 45° … 360°: the reference's own step times, on the music
 const MOVE = 0.42;                                           // seconds each step takes
 function sweepAngle(t) {
   let a = 0;
@@ -210,7 +210,7 @@ function place(el, x, y, s = 1, o = 1, extra = "") { el.style.transform = `trans
 
 window.seek = (t) => {
   // card phase: 0 = clock, 1 = end card. In at 12.15–13.0, back out at 20.35–21.0 (so 21.0 == 0.0 for the loop).
-  const cin = easeInOut(prog(t, 12.15, 0.85)), cout = easeInOut(prog(t, 20.35, 0.65));
+  const cin = easeInOut(prog(t, 11.5, 0.8)), cout = easeInOut(prog(t, 18.13, 0.6));
   const C = cin * (1 - cout);
   $("bgCard").setAttribute("opacity", C.toFixed(3));
 
@@ -223,7 +223,7 @@ window.seek = (t) => {
   toothEls.forEach((g, i) => {
     const deg = i * 45, [x, y] = pos(deg);
     // the tooth the hand has just reached gives a little bounce and a blue glow
-    const k = i === 0 ? 7 : i - 1, hit = prog(t, ARR[k], 0.55), live = t >= ARR[k] && t < (ARR[k + 1] ?? 12.4) - MOVE;
+    const k = i === 0 ? 7 : i - 1, hit = prog(t, ARR[k], 0.55), live = t >= ARR[k] && t < (ARR[k + 1] ?? 11.7) - MOVE;
     const bump = hit > 0 && hit < 1 ? Math.sin(hit * Math.PI) * 0.13 * (1 - hit * 0.4) : 0;
     const s = TS * (1 + bump + (live ? 0.04 : 0));
     g.setAttribute("transform", `translate(${x - 100 * s},${y - 120 * s}) scale(${s})`);
@@ -239,7 +239,7 @@ window.seek = (t) => {
 
   // logo: small above the clock → large at the top of the end card
   const wSmall = 250, wBig = 350, w = lerp(wSmall, wBig, C), h = w * LH / LW;
-  const cy = lerp(258, 300, C), breathe = 1 + 0.012 * Math.sin(2 * Math.PI * t / 3.5);   // 3.5 s × 6 = 21 s, loops
+  const cy = lerp(258, 300, C), breathe = 1 + 0.012 * Math.sin(2 * Math.PI * t / (DUR / 5));   // 5 cycles per loop
   place(logo, 540 - w / 2, cy - h / 2, 1, 1); logo.style.width = w + "px"; logo.style.height = h + "px";
   logo.style.transformOrigin = "50% 50%"; logo.style.transform += ` scale(${breathe})`;
 
@@ -247,18 +247,18 @@ window.seek = (t) => {
   const vis = (start, dur = 0.42) => prog(t, start, dur) * (1 - cout);
   const pop = (id, start, dy = 26) => { const p = vis(start); const el = $(id); el.style.opacity = clamp(p * 1.6).toFixed(3);
     el.style.transform = `translateY(${((1 - easeOut(p)) * dy).toFixed(1)}px) scale(${(0.86 + 0.14 * spring(p)).toFixed(3)})`; };
-  pop("cBanner", 12.85);
+  pop("cBanner", 12.2);
   // typewriter: "Act Early…" 13.3–13.95, "Choose Wisely!" 14.1–14.95
-  const n1 = 11, n2 = 14, tp = (t < 14.1) ? Math.round(clamp((t - 13.3) / 0.65) * n1) : n1 + 1 + Math.round(clamp((t - 14.1) / 0.85) * n2);
-  const shown = TAG.slice(0, Math.max(0, tp)); const blink = (t < 15.6) && (Math.floor(t * 3.2) % 2 === 0) && t > 13.25;
+  const n1 = 11, n2 = 14, tp = (t < 13.35) ? Math.round(clamp((t - 12.6) / 0.6) * n1) : n1 + 1 + Math.round(clamp((t - 13.35) / 0.8) * n2);
+  const shown = TAG.slice(0, Math.max(0, tp)); const blink = (t < 14.8) && (Math.floor(t * 3.2) % 2 === 0) && t > 12.55;
   $("cTag").innerHTML = shown.replace(/&/g, "&amp;").replace(/\n/g, "<br>") + (blink ? '<span class="cur"></span>' : '<span class="cur" style="opacity:0"></span>');
   $("cTag").style.opacity = (1 - cout).toFixed(3);
-  pop("cBtn", 15.1, 0);
-  pop("cDoc", 15.5); pop("cRole", 15.68); pop("cPhone", 15.95); pop("cWeb", 16.2); pop("cPinI", 16.45); pop("cAddr", 16.6); pop("cFollow", 16.95);
-  pop("cSoc", 17.05, 0);
-  ["s1", "s2", "s3"].forEach((id, i) => { const p = vis(17.05 + i * 0.12, 0.4); $(id).style.transform = `scale(${(0.4 + 0.6 * spring(p)).toFixed(3)})`; });
+  pop("cBtn", 14.3, 0);
+  pop("cDoc", 14.62); pop("cRole", 14.78); pop("cPhone", 15.0); pop("cWeb", 15.2); pop("cPinI", 15.4); pop("cAddr", 15.52); pop("cFollow", 15.82);
+  pop("cSoc", 15.9, 0);
+  ["s1", "s2", "s3"].forEach((id, i) => { const p = vis(15.9 + i * 0.12, 0.4); $(id).style.transform = `scale(${(0.4 + 0.6 * spring(p)).toFixed(3)})`; });
   // a light sweep across the button now and then
-  const sh = [16.0, 17.9, 19.5].map((s0) => prog(t, s0, 0.7)).find((p) => p > 0 && p < 1);
+  const sh = [15.1, 16.6, 17.5].map((s0) => prog(t, s0, 0.7)).find((p) => p > 0 && p < 1);
   $("cShine").style.left = sh ? `${-160 + sh * 900}px` : "-300px";
 };
 window.ready = (async () => { await document.fonts.ready; await prepLogo(); window.seek(0); })();
