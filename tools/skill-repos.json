@@ -760,5 +760,83 @@
   "from": "kaomei/stickman-video-director",
   "original_name": "directing-stickman-videos",
   "licensed": true
+ },
+ {
+  "skill": "ultimate-video-editor",
+  "from": "Rajbharti06/Ultimate-Video-Editing-Skills",
+  "original_name": "ultimate-video-editor",
+  "licensed": true
+ },
+ {
+  "skill": "free247editor",
+  "from": "riecodes/free247editor",
+  "original_name": "free247editor",
+  "licensed": true
+ },
+ {
+  "skill": "animate",
+  "from": "cth9191/animate",
+  "original_name": "animate",
+  "licensed": true
+ },
+ {
+  "skill": "chorono",
+  "from": "codie1982/chorono-editor",
+  "original_name": "chorono",
+  "licensed": true
+ },
+ {
+  "skill": "chorono-setup",
+  "from": "codie1982/chorono-editor",
+  "original_name": "chorono-setup",
+  "licensed": true
+ },
+ {
+  "skill": "captions-overlay",
+  "from": "heygen-com/hyperframes",
+  "original_name": "captions-overlay",
+  "licensed": true
+ },
+ {
+  "skill": "changelog-video",
+  "from": "heygen-com/hyperframes",
+  "original_name": "changelog-video",
+  "licensed": true
+ },
+ {
+  "skill": "cut-the-curve",
+  "from": "heygen-com/hyperframes",
+  "original_name": "cut-the-curve",
+  "licensed": true
+ },
+ {
+  "skill": "motion-doctrine",
+  "from": "heygen-com/hyperframes",
+  "original_name": "motion-doctrine",
+  "licensed": true
+ },
+ {
+  "skill": "oversized-cursor",
+  "from": "heygen-com/hyperframes",
+  "original_name": "oversized-cursor",
+  "licensed": true
+ },
+ {
+  "skill": "seam-craft",
+  "from": "heygen-com/hyperframes",
+  "original_name": "seam-craft",
+  "licensed": true
+ },
+ {
+  "skill": "reverse-any-video",
+  "from": "heygen-com/hyperframes",
+  "original_name": "reverse-any-video",
+  "licensed": true
+ },
+ {
+  "skill": "style-sampling",
+  "from": "heygen-com/hyperframes",
+  "original_name": "style-sampling",
+  "licensed": true
  }
 ]

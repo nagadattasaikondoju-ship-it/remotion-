@@ -23,6 +23,8 @@ tools/skill-repos/
 # Chromium path links for reanimate (tools/setup_skill_clis.sh)
 tools/pw-compat/
 
+.claude/settings.local.json
+
 # Skills from repos without a licence: used locally, not re-published (python3 tools/install_skill_repos.py)
 .claude/skills/ai-audio-sound-design/
 .claude/skills/arcads-broll/
@@ -46,4 +48,3 @@ tools/pw-compat/
 .claude/skills/video-edit-pipeline/
 .claude/skills/video-qa/
 .claude/skills/video-review-canvas/
-.claude/settings.local.json

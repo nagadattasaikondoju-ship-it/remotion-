@@ -56,6 +56,12 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
   - **Director mode (A1–A5):** approved storyboards plus standalone ~10 s prompts for Gemini Omni Flash clips. Free to use here.
   - **Autopilot (B1–B4) and A6:** call Google's Gemini API (`scripts/gemini-media.mjs`, needs `GEMINI_API_KEY`) for images, TTS and video. This is paid generation that uploads prompts and media to Google, so ask first. The key goes through `request_credential`, never the chat.
   - Its sound rules don't replace this repo's sound pipeline.
+- Nov 13 2026 skills (user's list for split screen / overlays / captions; all MIT, pinned in `tools/install_skill_repos.py`):
+  `ultimate-video-editor` (Rajbharti06), `free247editor` (riecodes), `animate` (cth9191), `chorono` + `chorono-setup` (codie1982, needs the user's local Chorono editor),
+  and HyperFrames' `captions-overlay`, `motion-doctrine`, `cut-the-curve`, `seam-craft`, `oversized-cursor`, `changelog-video`, `style-sampling`, `reverse-any-video`.
+  `davidcervinka/vibe-editing` has no SKILL.md: reference clone in `tools/skill-repos/`. House rules still win (sound pipeline, captions, no fabricated clients).
+- Freesound CDN and Wikimedia downloads return 403 from cloud sessions: SFX the library lacks are made with `earshot forge` into `assets/sfx/earshot/` and
+  APPENDED to `tools/real-sfx.index.json` (never rebuild the index: `build_index.py` renumbers every id and breaks older reels' `sfx_map.json`). Music is composed in code.
 - **Sound pipeline for EVERY video (user's standing rule):**
   1. Openverse API (`tools/openverse_sfx.py`): search and fetch real recorded SFX (CC0).
   2. Real SFX skill (`real-sfx`): analyse the video and place the sounds on the timeline.

@@ -1,0 +1,339 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:transparent}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="img/logo.js"></script>
+<script>
+// Captions + motion graphics for the BUILD reel. Every frame is a pure function of t (window.seek), no timers, no state.
+// Timing comes from out/timeline.json (window.TIMELINE), so a re-cut moves everything with it.
+const TLD = window.TIMELINE, W = 1080, H = 1920;
+const cv = document.getElementById("c"), ctx = cv.getContext("2d");
+const COP = "#E59C69", CREAM = "#F7E8DA", RED = "#FF4D4F", GREEN = "#3DDC97", INK = "#0E0F12";
+const SEG = {}; TLD.segments.forEach(s => SEG[s.id] = s);
+const S = id => SEG[id].start, E = id => SEG[id].start + SEG[id].dur;
+// source-time → output-time for the takes that carry motion graphics
+const T1 = x => S("frz") + 0.60 + (x - 1.85), T2 = x => S("t2a") + (x - 0.60), T3 = x => S("t3") + (x - 0.55);
+const T7 = x => S("t7a") + (x - 0.45), T8 = x => S("t8") + (x - 0.75), T9 = x => S("t9") + (x - 0.70);
+const PIP = { x: 250, y: 1590, r: 196 };
+
+const cl = (u, a = 0, b = 1) => Math.min(b, Math.max(a, u));
+const P = (t, a, b) => cl((t - a) / (b - a));
+const eOut = u => 1 - Math.pow(1 - u, 3), eIn = u => u * u * u, eIO = u => u < .5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+const back = u => { const c = 1.5; return 1 + (c + 1) * Math.pow(u - 1, 3) + c * Math.pow(u - 1, 2); }; // small overshoot only
+const lerp = (a, b, u) => a + (b - a) * u;
+const hash = n => { const x = Math.sin(n * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+
+const IMG = {};
+// images arrive as data URLs (window.IMGDATA, set by render.mjs) so the canvas stays exportable
+["nirvaha_s1", "nirvaha_s2", "nirvaha_icon", "lnsports_t"].forEach(n => { const i = new Image(); i.src = (window.IMGDATA || {})[n] || `img/${n}.png`; IMG[n] = i; });
+const fonts = [["P", "fonts/Poppins-600.woff", "600"], ["P", "fonts/Poppins-700.woff", "700"], ["P", "fonts/Poppins-800.woff", "800"],
+  ["IS", "fonts/InstrumentSerif-Regular.ttf", "400"], ["ISI", "fonts/InstrumentSerif-Italic.ttf", "400"]];
+window.ready = Promise.all([...fonts.map(([f, u, w]) => new FontFace(f, `url(${u})`, { weight: w }).load().then(ff => document.fonts.add(ff))),
+  ...Object.values(IMG).map(i => i.decode().catch(() => 0))]);
+
+// ---------- drawing helpers ----------
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function font(w, s, f = "P") { ctx.font = `${w} ${s}px ${f}`; }
+function txt(s, x, y, { size = 60, weight = 800, fam = "P", color = "#fff", align = "center", alpha = 1, shadow = 0, stroke = 0 } = {}) {
+  ctx.save(); ctx.globalAlpha *= alpha; font(weight, size, fam); ctx.textAlign = align; ctx.textBaseline = "middle";
+  if (shadow) { ctx.shadowColor = `rgba(0,0,0,${shadow})`; ctx.shadowBlur = 22; ctx.shadowOffsetY = 4; }
+  if (stroke) { ctx.lineJoin = "round"; ctx.lineWidth = stroke; ctx.strokeStyle = "rgba(0,0,0,.55)"; ctx.strokeText(s, x, y); }
+  ctx.fillStyle = color; ctx.fillText(s, x, y); ctx.restore();
+}
+function chip(label, x, y, { bg = "rgba(255,255,255,.12)", fg = "#fff", size = 30, dot = null, alpha = 1, pad = 22 } = {}) {
+  ctx.save(); ctx.globalAlpha *= alpha; font(700, size); const w = ctx.measureText(label).width + pad * 2 + (dot ? 26 : 0), h = size * 1.75;
+  rr(x - w / 2, y - h / 2, w, h, h / 2); ctx.fillStyle = bg; ctx.fill();
+  if (dot) { ctx.beginPath(); ctx.arc(x - w / 2 + pad + 8, y, 8, 0, 7); ctx.fillStyle = dot; ctx.fill(); }
+  ctx.fillStyle = fg; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(label, x - w / 2 + pad + (dot ? 26 : 0), y + 1); ctx.restore();
+}
+function check(x, y, r, u, color = GREEN) { // a tick that draws itself
+  if (u <= 0) return; ctx.save(); ctx.beginPath(); ctx.arc(x, y, r * back(cl(u * 1.6)), 0, 7); ctx.fillStyle = color; ctx.fill();
+  const k = eOut(P(u, 0.25, 1)); ctx.strokeStyle = "#fff"; ctx.lineWidth = r * 0.22; ctx.lineCap = ctx.lineJoin = "round";
+  const pts = [[-0.42, 0.02], [-0.12, 0.32], [0.45, -0.3]]; ctx.beginPath(); ctx.moveTo(x + pts[0][0] * r, y + pts[0][1] * r);
+  if (k < 0.4) { const v = k / 0.4; ctx.lineTo(x + lerp(pts[0][0], pts[1][0], v) * r, y + lerp(pts[0][1], pts[1][1], v) * r); }
+  else { const v = (k - 0.4) / 0.6; ctx.lineTo(x + pts[1][0] * r, y + pts[1][1] * r); ctx.lineTo(x + lerp(pts[1][0], pts[2][0], v) * r, y + lerp(pts[1][1], pts[2][1], v) * r); }
+  ctx.stroke(); ctx.restore();
+}
+function cross(x, y, r, u, color = RED) {
+  if (u <= 0) return; ctx.save(); ctx.beginPath(); ctx.arc(x, y, r * back(cl(u * 1.6)), 0, 7); ctx.fillStyle = color; ctx.fill();
+  ctx.strokeStyle = "#fff"; ctx.lineWidth = r * 0.22; ctx.lineCap = "round"; const k = eOut(P(u, 0.2, 1)) * 0.36 * r;
+  ctx.beginPath(); ctx.moveTo(x - k, y - k); ctx.lineTo(x + k, y + k); ctx.moveTo(x + k, y - k); ctx.lineTo(x - k, y + k); ctx.stroke(); ctx.restore();
+}
+function pipHole(u) { // cut the picture-in-picture circle out of a full-screen panel, then ring it in copper
+  ctx.save(); ctx.globalCompositeOperation = "destination-out"; ctx.beginPath(); ctx.arc(PIP.x, PIP.y, PIP.r, 0, 7); ctx.fill(); ctx.restore();
+  ctx.save(); ctx.globalAlpha = u; ctx.beginPath(); ctx.arc(PIP.x, PIP.y, PIP.r + 5, 0, 7); ctx.lineWidth = 8; ctx.strokeStyle = COP; ctx.stroke(); ctx.restore();
+}
+function vignette(color, a) { const g = ctx.createRadialGradient(W / 2, H / 2, H * 0.28, W / 2, H / 2, H * 0.72);
+  g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(1, color.replace("A", a)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); }
+function logo(cx, cy, width, { word = true, tag = true, alpha = 1 } = {}) { // the traced One Loop logo (logo.js)
+  const M = LOGO.meta, S0 = width / (M.right - M.left); ctx.save(); ctx.globalAlpha *= alpha; ctx.translate(cx, cy);
+  const path = polys => { ctx.beginPath(); for (const poly of polys) { poly.forEach(([x, y], i) => i ? ctx.lineTo(x * S0, y * S0) : ctx.moveTo(x * S0, y * S0)); ctx.closePath(); } };
+  ctx.fillStyle = COP; path(LOGO.CL); ctx.fill("evenodd"); path(LOGO.CR); ctx.fill("evenodd"); path(LOGO.X); ctx.fill("evenodd");
+  if (word) { ctx.fillStyle = "#fff"; for (const L of LOGO.WORD) { path(L.paths); ctx.fill("evenodd"); } }
+  if (tag) { ctx.fillStyle = "#fff"; path(LOGO.TAGW); ctx.fill("evenodd"); ctx.fillStyle = COP; path(LOGO.TAGC); ctx.fill(); }
+  ctx.restore();
+}
+function toast(label, u, y = 330) { // red error toast that pops in
+  if (u <= 0) return; const k = back(cl(u / 0.28)); ctx.save(); ctx.translate(W / 2, y); ctx.scale(lerp(0.75, 1, k), lerp(0.75, 1, k)); ctx.globalAlpha = cl(u / 0.12);
+  font(700, 40); const w = ctx.measureText(label).width + 130; rr(-w / 2, -42, w, 84, 42); ctx.fillStyle = "#E5484D";
+  ctx.shadowColor = "rgba(0,0,0,.45)"; ctx.shadowBlur = 30; ctx.shadowOffsetY = 8; ctx.fill(); ctx.shadowColor = "transparent";
+  cross(-w / 2 + 50, 0, 20, 1, "#fff"); ctx.strokeStyle = "#E5484D"; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.beginPath(); ctx.moveTo(-w / 2 + 43, -7); ctx.lineTo(-w / 2 + 57, 7); ctx.moveTo(-w / 2 + 57, -7); ctx.lineTo(-w / 2 + 43, 7); ctx.stroke();
+  ctx.fillStyle = "#fff"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(label, -w / 2 + 88, 2); ctx.restore();
+}
+
+// ---------- captions (rail): white Poppins 800, word by word, the punch word in copper ----------
+const CAP = { co1: { y: 1500 }, k0: { y: 1520 }, k1: { y: 1520 }, k2: { y: 1520 }, k3: { y: 1520 }, k4a: { y: 1540 }, k4b: { y: 1540 }, k5a: { y: 1540 }, k5b: { y: 1540 },
+  frz: { y: 1540 }, t1b: { y: 1470 }, t1c: { y: 1770, size: 74 }, t2b: { y: 1600 }, t2c: { y: 1610 }, t2d: { x: 700, y: 1600, maxW: 640, size: 68 },
+  t3: { y: 1470 }, t4a: { y: 1470 }, t4b: { x: 700, y: 1600, maxW: 640, size: 68 }, t5: { x: 700, y: 1600, maxW: 640, size: 68 }, t6: { x: 700, y: 1600, maxW: 640, size: 68 },
+  t7a: { y: 1470 }, t9: { y: 1470 } };
+function segAt(t) { let s = TLD.segments[0]; for (const x of TLD.segments) if (t >= x.start - 1e-6) s = x; return s; }
+function captions(t) {
+  const sg = segAt(t), cfg = CAP[sg.id]; if (!cfg) return;
+  const c = TLD.captions.find(c => t >= c.start && t < c.end); if (!c) return;
+  const size = cfg.size || 84, maxW = cfg.maxW || 920, cx = cfg.x || W / 2; font(800, size);
+  const sp = ctx.measureText(" ").width, ws = c.words.map(w => ({ ...w, wd: ctx.measureText(w.w).width })), lines = [[]]; let lw = 0;
+  for (const w of ws) { if (lw && lw + sp + w.wd > maxW) { lines.push([]); lw = 0; } lines[lines.length - 1].push(w); lw += (lw ? sp : 0) + w.wd; }
+  const lh = size * 1.12, y0 = cfg.y - (lines.length - 1) * lh / 2;
+  lines.forEach((ln, li) => {
+    const tw = ln.reduce((a, w, i) => a + w.wd + (i ? sp : 0), 0); let x = cx - tw / 2;
+    for (const w of ln) {
+      const u = P(t, w.t - 0.02, w.t + 0.12); if (u > 0) {
+        const k = back(u); ctx.save(); ctx.translate(x + w.wd / 2, y0 + li * lh + (1 - eOut(u)) * 18); ctx.scale(lerp(0.82, 1, k), lerp(0.82, 1, k));
+        txt(w.w, 0, 0, { size, color: w.e ? COP : "#fff", alpha: cl(u * 2.5), shadow: 0.85, stroke: 12 }); ctx.restore();
+      }
+      x += w.wd + sp;
+    }
+  });
+}
+
+// ---------- scenes ----------
+function sCrash(id, t) { // the deployment crashes: red toast + red edge pulse on the punch-in
+  const u = t - S(id), hit = 0.30; if (u < hit) return;
+  vignette("rgba(229,72,77,A)", 0.55 * Math.exp(-(u - hit) * 3.2) + 0.12); toast("Deployment failed", u - hit, 300);
+}
+function sBlack(t) { // He had no idea what was coming.
+  const u = t - S("co2"); ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
+  const l1 = ["He", "had", "no", "idea"], l2 = ["what", "was", "coming."];
+  const row = (ws, y, t0, color) => { font(400, 104, "ISI"); const sp = ctx.measureText(" ").width; const tw = ws.reduce((a, w) => a + ctx.measureText(w).width, 0) + sp * (ws.length - 1); let x = W / 2 - tw / 2;
+    ws.forEach((w, i) => { const v = eOut(P(u, t0 + i * 0.07, t0 + i * 0.07 + 0.32)); const wd = ctx.measureText(w).width;
+      txt(w, x + wd / 2, y + (1 - v) * 22, { size: 104, weight: 400, fam: "ISI", color, alpha: v }); font(400, 104, "ISI"); x += wd + sp; }); };
+  row(l1, 880, 0.12, "#fff"); row(l2, 1010, 0.45, COP);
+}
+function sFreeze(t) { // the record-scratch freeze
+  const u = t - S("frz");
+  for (let y = 0; y < H; y += 6) { ctx.fillStyle = "rgba(0,0,0,.07)"; ctx.fillRect(0, y, W, 2); }
+  ctx.save(); ctx.globalAlpha = 0.85; ctx.fillStyle = "#fff"; rr(70, 120, 22, 70, 6); ctx.fill(); rr(108, 120, 22, 70, 6); ctx.fill(); ctx.restore();
+  txt("PAUSED", 220, 156, { size: 34, weight: 700, color: "rgba(255,255,255,.85)", align: "left" });
+  const a = eOut(P(u, 0.12, 0.45)), b = eOut(P(u, 0.5, 0.8));
+  txt("The demo worked.", W / 2, 760 + (1 - a) * 24, { size: 104, weight: 400, fam: "ISI", alpha: a, shadow: 0.8 });
+  txt("Deployment didn't.", W / 2, 880 + (1 - b) * 24, { size: 92, weight: 800, color: COP, alpha: b, shadow: 0.8, stroke: 10 });
+}
+function sECG(t) { // "nobody plans to build software that dies": a heartbeat that flatlines on "dies"
+  const t0 = S("t1b") + 0.05, td = T1(4.40), t1 = E("t1b"); if (t < t0 || t > t1) return;
+  const x0 = 60, x1 = 1020, xd = 790, speed = (xd - x0) / (td - t0), head = Math.min(x1, x0 + (t - t0) * speed), y = 1200;
+  const a = P(t, t0, t0 + 0.25) * (1 - P(t, t1 - 0.3, t1));
+  const sig = x => { if (x > xd) return 0; const p = ((x - x0) % 230) / 230; return p > 0.55 && p < 0.62 ? -150 * Math.sin((p - 0.55) / 0.07 * Math.PI) : p > 0.62 && p < 0.67 ? 60 * Math.sin((p - 0.62) / 0.05 * Math.PI) : p > 0.4 && p < 0.48 ? -14 * Math.sin((p - 0.4) / 0.08 * Math.PI) : 0; };
+  ctx.save(); ctx.globalAlpha = a; ctx.lineWidth = 7; ctx.lineJoin = ctx.lineCap = "round"; ctx.shadowBlur = 18;
+  for (const [from, to, col] of [[x0, Math.min(head, xd), GREEN], [xd, head, RED]]) { if (to <= from) continue;
+    ctx.strokeStyle = col; ctx.shadowColor = col; ctx.beginPath(); for (let x = from; x <= to; x += 3) { const yy = y + sig(x); x === from ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy); } ctx.stroke(); }
+  ctx.beginPath(); ctx.arc(head, y + sig(head), 11, 0, 7); ctx.fillStyle = head > xd ? RED : GREEN; ctx.fill(); ctx.restore();
+}
+function demoPanel(t, g) { // top half of the split: the demo, where everything works (drawn into context g)
+  const u = t - S("t1c"), e = eOut(P(u, 0, 0.4)); const bg = g.createLinearGradient(0, 0, 0, 960); bg.addColorStop(0, "#FBF7F1"); bg.addColorStop(1, "#EFE6DA");
+  g.fillStyle = bg; g.fillRect(0, 0, W, 960);
+  const au = g.createRadialGradient(860, 180, 20, 860, 180, 520); au.addColorStop(0, "rgba(229,156,105,.38)"); au.addColorStop(1, "rgba(229,156,105,0)"); g.fillStyle = au; g.fillRect(0, 0, W, 960);
+  g.save(); g.translate(0, (1 - e) * 140); g.globalAlpha = e;
+  g.shadowColor = "rgba(60,40,20,.18)"; g.shadowBlur = 50; g.shadowOffsetY = 18; g.beginPath(); g.roundRect(90, 150, 900, 720, 44); g.fillStyle = "#fff"; g.fill(); g.shadowColor = "transparent";
+  g.font = "700 30px P"; g.textBaseline = "middle"; g.beginPath(); g.roundRect(140, 200, 220, 60, 30); g.fillStyle = "rgba(61,220,151,.16)"; g.fill();
+  g.beginPath(); g.arc(172, 230, 9, 0, 7); g.fillStyle = "#19A86A"; g.fill(); g.fillStyle = "#19A86A"; g.textAlign = "left"; g.fillText("DEMO", 192, 231);
+  g.fillStyle = "#9A9088"; g.font = "600 28px P"; g.textAlign = "right"; g.fillText("localhost:3000", 940, 231);
+  g.fillStyle = INK; g.font = "800 62px P"; g.textAlign = "left"; g.fillText("Everything works.", 140, 330);
+  const rows = [["Data", "clean", T1(6.90)], ["Users online", "1", T1(7.72)], ["Network", "perfect", T1(8.74)]];
+  rows.forEach(([k, v, tt], i) => { const y = 470 + i * 140, ru = P(t, tt - 0.05, tt + 0.35);
+    g.fillStyle = "#F4EFE8"; g.beginPath(); g.roundRect(140, y - 52, 800, 104, 26); g.fill();
+    g.fillStyle = "#6E655D"; g.font = "600 36px P"; g.textAlign = "left"; g.fillText(k, 180, y + 2);
+    g.globalAlpha = e * cl(ru * 3); g.fillStyle = INK; g.font = "800 42px P"; g.textAlign = "right"; g.fillText(v, 830, y + 2); g.globalAlpha = e;
+    if (i === 1 && ru > 0) { g.fillStyle = COP; g.beginPath(); g.arc(500, y, 22 * back(cl(ru * 1.5)), 0, 7); g.fill(); }
+    if (i === 2) { for (let b = 0; b < 4; b++) { g.fillStyle = ru > 0 ? INK : "#D8D0C6"; g.fillRect(470 + b * 22, y + 20 - (b + 1) * 11, 14, (b + 1) * 11); } }
+    if (i === 0) { for (let r = 0; r < 3; r++) { g.fillStyle = ru > 0 ? "#CDE9DB" : "#E6DED4"; g.fillRect(440, y - 28 + r * 20, 120, 12); } }
+    g.save(); const cx = 890, cy = y; if (ru > 0) { g.beginPath(); g.arc(cx, cy, 26 * back(cl(ru * 1.6)), 0, 7); g.fillStyle = "#19A86A"; g.fill();
+      g.strokeStyle = "#fff"; g.lineWidth = 6; g.lineCap = g.lineJoin = "round"; g.beginPath(); g.moveTo(cx - 11, cy); g.lineTo(cx - 3, cy + 8); g.lineTo(cx + 12, cy - 8); g.stroke(); } g.restore();
+  });
+  g.restore();
+}
+const off = document.createElement("canvas"); off.width = W; off.height = 960; const og = off.getContext("2d");
+function sSplit(t) {
+  const u = t - S("t1c"), dur = SEG.t1c.dur; og.clearRect(0, 0, W, 960); demoPanel(t, og);
+  const gl = P(u, dur - 0.30, dur); // the demo breaks right before the real world walks in
+  if (gl <= 0) ctx.drawImage(off, 0, 0);
+  else for (let k = 0; k < 24; k++) { const y = k * 40, dx = (hash(k + Math.floor(u * 30)) - 0.5) * 160 * gl; ctx.drawImage(off, 0, y, W, 40, dx, y, W, 40);
+    if (hash(k * 3 + Math.floor(u * 30)) > 0.75) { ctx.fillStyle = `rgba(255,77,79,${0.35 * gl})`; ctx.fillRect(0, y, W, 40); } }
+  ctx.fillStyle = COP; ctx.fillRect(0, 957, W, 6);
+}
+function sRealWorld(t) { // b-roll + REAL WORLD title
+  const u = t - S("t2a"); const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "rgba(0,0,0,.55)"); g.addColorStop(0.45, "rgba(0,0,0,.15)"); g.addColorStop(1, "rgba(0,0,0,.6)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  const a = eOut(P(u, 0, 0.28)), b = eOut(P(t, T2(1.40) - 0.05, T2(1.40) + 0.25)), c = eOut(P(t, T2(1.78) - 0.03, T2(1.78) + 0.22));
+  chip("THE REAL WORLD", W / 2, 520, { bg: "rgba(255,77,79,.9)", dot: "#fff", size: 32, alpha: a });
+  txt("THE REAL", W / 2 + (1 - a) * 160, 760, { size: 150, alpha: a, shadow: 0.7 });
+  txt("WORLD", W / 2 + (1 - b) * 220, 920, { size: 230, color: COP, alpha: b, shadow: 0.7 });
+  txt("walks in.", W / 2 + (1 - c) * 160, 1080, { size: 84, weight: 700, fam: "P", alpha: c, shadow: 0.8 });
+}
+function sPeople(t) { // hundreds of people
+  const u = t - S("t2b"); ctx.fillStyle = "#0B0D12"; ctx.fillRect(0, 0, W, H);
+  const n = Math.round(1 + 499 * eIn(P(u, 0.02, 0.9))), cols = 20, rows = 25, sx = 50, x0 = W / 2 - (cols - 1) * sx / 2, y0 = 470;
+  const cells = []; for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { const x = x0 + c * sx, y = y0 + r * sx; cells.push([Math.hypot(x - W / 2, (y - 1070) * 0.8) + hash(r * 31 + c) * 60, x, y, r, c]); }
+  cells.sort((a, b) => a[0] - b[0]);
+  cells.slice(0, n).forEach(([d, x, y, r, c], i) => { const col = [COP, CREAM, "#8C94A3", "#5E6675"][Math.floor(hash(r * 7 + c * 13) * 4)];
+    ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y - 6, 8, 0, 7); ctx.fill(); ctx.beginPath(); ctx.ellipse(x, y + 12, 13, 9, 0, Math.PI, 0); ctx.fill(); });
+  txt("USERS ONLINE", W / 2, 230, { size: 36, weight: 700, color: "#8C94A3" });
+  txt(String(n), W / 2, 360, { size: 170, color: n > 1 ? COP : "#fff" });
+}
+const ROWS = [["Ravi Kumar", "98480 12345", "Hyderabad", "₹1,200", ""], ["ravi kumar.", "+91 9848012345", "HYD", "1200", "dup"],
+  ["NULL", "—", "undefined", "NaN", "bad"], ["Priya S", "99999 99999", "Secundrabad", "₹ -0", "bad"], ["Arjun", "#ERROR", "Vizag", "₹1,2,00", "bad"],
+  ["", "000", "  ", "null", "bad"], ["Sneha R", "90000 00000", "Hyderabad", "₹950", ""], ["SNEHA R", "9000000000", "hyderabad ", "950.00", "dup"],
+  ["Kiran", "98xx", "N/A", "₹???", "bad"], ["Test User", "1234567890", "Test", "₹0", "bad"], ["Meena", "+91 9", "Warangal", "₹-120", "bad"], ["Ravi Kumar", "98480 12345", "Hyderabad", "₹1,200", "dup"]];
+function sData(t) { // messy data
+  const u = t - S("t2c"); ctx.fillStyle = "#0B0D12"; ctx.fillRect(0, 0, W, H);
+  chip("MESSY DATA", W / 2, 250, { bg: "rgba(255,77,79,.18)", fg: RED, dot: RED, size: 34 });
+  ctx.save(); rr(60, 340, 960, 1100, 36); ctx.fillStyle = "#14171E"; ctx.fill(); ctx.clip();
+  const cols = [[100, "NAME"], [370, "PHONE"], [640, "CITY"], [860, "AMOUNT"]]; font(700, 26); ctx.textBaseline = "middle";
+  ctx.fillStyle = "#1B1F28"; ctx.fillRect(60, 340, 960, 90); cols.forEach(([x, h]) => { ctx.fillStyle = "#8C94A3"; ctx.textAlign = "left"; ctx.fillText(h, x, 386); });
+  const scroll = u * 380, rh = 96;
+  for (let k = 0; k < 24; k++) { const y = 470 + k * rh - (scroll % (rh * ROWS.length)), r = ROWS[k % ROWS.length]; if (y < 400 || y > 1460) continue;
+    const bad = r[4] === "bad", dup = r[4] === "dup";
+    if (bad || dup) { ctx.fillStyle = bad ? "rgba(255,77,79,.14)" : "rgba(229,156,105,.13)"; ctx.fillRect(60, y - rh / 2 + 4, 960, rh - 8); }
+    r.slice(0, 4).forEach((v, i) => { const weird = bad && (v === "" || /NULL|null|undefined|NaN|#ERROR|N\/A|\?|—|xx|000|-/.test(v)); font(weird ? 700 : 600, 32);
+      ctx.fillStyle = weird ? RED : dup ? COP : "#E9ECF2"; ctx.textAlign = "left"; ctx.fillText(v === "" ? "(empty)" : v, cols[i][0], y); });
+    ctx.fillStyle = "#222733"; ctx.fillRect(60, y + rh / 2 - 1, 960, 2); }
+  ctx.restore();
+}
+function sNetwork(t) { // phones on bad networks in the middle of nowhere (+ Tarun in the circle)
+  const u = t - S("t2d"), g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#10141B"); g.addColorStop(1, "#1A1F28"); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = "rgba(255,255,255,.05)"; ctx.lineWidth = 2; for (let k = 0; k < 9; k++) { ctx.beginPath(); for (let x = 0; x <= W; x += 30) { const y = 140 + k * 150 + Math.sin(x / 140 + k) * 26; x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); }
+  const px = 520, py = 210, pw = 470, ph = 960, e = eOut(P(u, 0, 0.3)); ctx.save(); ctx.translate((1 - e) * 200, 0); ctx.globalAlpha = e;
+  rr(px, py, pw, ph, 64); ctx.fillStyle = "#050608"; ctx.fill(); rr(px + 16, py + 16, pw - 32, ph - 32, 50); ctx.fillStyle = "#F3F4F6"; ctx.fill();
+  const bars = u < T2(5.22) - S("t2d") ? 4 : u < T2(5.50) - S("t2d") ? 2 : u < T2(5.88) - S("t2d") ? 1 : 0;
+  for (let b = 0; b < 4; b++) { ctx.fillStyle = b < bars ? INK : "#C9CDD4"; ctx.fillRect(px + 60 + b * 16, py + 64 - (b + 1) * 9, 11, (b + 1) * 9); }
+  txt(bars ? "4G" : "No service", px + 140, py + 50, { size: 22, weight: 700, color: bars ? INK : RED, align: "left" });
+  txt("9:41", px + pw - 60, py + 50, { size: 24, weight: 700, color: INK, align: "right" });
+  txt("Book a slot", px + 50, py + 140, { size: 40, weight: 800, color: INK, align: "left" });
+  const fail = T2(6.26) - S("t2d");
+  if (u < fail) { ctx.save(); ctx.translate(px + pw / 2, py + 470); ctx.rotate(u * 7); ctx.strokeStyle = COP; ctx.lineWidth = 12; ctx.lineCap = "round"; ctx.beginPath(); ctx.arc(0, 0, 60, 0, 4.4); ctx.stroke(); ctx.restore();
+    txt("Loading…", px + pw / 2, py + 590, { size: 30, weight: 600, color: "#6B7280" }); }
+  else { const f = P(u, fail, fail + 0.3); cross(px + pw / 2, py + 470, 70, f); txt("Request timed out", px + pw / 2, py + 600, { size: 36, weight: 800, color: RED, alpha: cl(f * 2) });
+    txt("Check your connection", px + pw / 2, py + 650, { size: 26, weight: 600, color: "#6B7280", alpha: cl(f * 2) });
+    rr(px + 120, py + 720, pw - 240, 76, 38); ctx.fillStyle = `rgba(14,15,18,${cl(f * 2)})`; ctx.fill(); txt("Retry", px + pw / 2, py + 758, { size: 30, weight: 700, alpha: cl(f * 2) }); }
+  ctx.restore();
+  const pin = eOut(P(t, T2(5.88), T2(5.88) + 0.3)); if (pin > 0) { ctx.save(); ctx.globalAlpha = pin; ctx.translate(250, 520 + (1 - pin) * 30);
+    ctx.fillStyle = RED; ctx.beginPath(); ctx.arc(0, -40, 34, Math.PI, 0); ctx.lineTo(0, 30); ctx.closePath(); ctx.fill(); ctx.beginPath(); ctx.arc(0, -40, 13, 0, 7); ctx.fillStyle = "#10141B"; ctx.fill(); ctx.restore();
+    txt("middle of", 250, 640, { size: 44, weight: 800, alpha: pin }); txt("nowhere", 250, 700, { size: 56, weight: 800, color: COP, alpha: pin }); }
+  pipHole(e);
+}
+function proofHead(n, u) { chip(`PROOF ${n} / 3`, W / 2, 150, { bg: "rgba(229,156,105,.18)", fg: COP, size: 30, alpha: eOut(P(u, 0, 0.2)) }); }
+function sNirvaha(t) {
+  const u = t - S("t4b"), e = eOut(P(u, 0, 0.3)); const g = ctx.createRadialGradient(W / 2, 700, 50, W / 2, 800, 1300); g.addColorStop(0, "#164A2C"); g.addColorStop(1, "#03120A");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); proofHead("01", u);
+  ctx.save(); ctx.translate((1 - e) * 220, 0); ctx.globalAlpha = e;
+  if (IMG.nirvaha_icon.complete) { ctx.save(); rr(W / 2 - 330, 228, 104, 104, 24); ctx.clip(); ctx.drawImage(IMG.nirvaha_icon, W / 2 - 330, 228, 104, 104); ctx.restore(); }
+  txt("Nirvaha", W / 2 - 200, 285, { size: 120, weight: 400, fam: "IS", align: "left" });
+  txt("AI emotional-wellbeing app", W / 2, 390, { size: 38, weight: 600, color: "#CFE8D6" });
+  chip("LIVE ON GOOGLE PLAY", W / 2, 470, { bg: "#fff", fg: "#0B2A17", dot: "#34A853", size: 32 });
+  [[IMG.nirvaha_s1, 290, -5, 0.05], [IMG.nirvaha_s2, 790, 5, 0.18]].forEach(([im, cx, rot, d]) => { const k = eOut(P(u, d, d + 0.35)); if (!im.complete) return;
+    ctx.save(); ctx.translate(cx + (1 - k) * 260, 905); ctx.rotate(rot * Math.PI / 180); ctx.globalAlpha = e * k; ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 50; ctx.shadowOffsetY = 20;
+    rr(-205, -365, 410, 730, 30); ctx.fillStyle = "#000"; ctx.fill(); ctx.shadowColor = "transparent"; ctx.clip(); ctx.drawImage(im, -205, -365, 410, 730); ctx.restore(); });
+  ctx.restore(); pipHole(e);
+}
+const ROUTES = [[[120, 560], [380, 560], [380, 820], [700, 820], [700, 1080], [960, 1080]], [[960, 520], [760, 520], [760, 760], [520, 760], [520, 1180], [240, 1180]], [[200, 980], [440, 980], [440, 660], [880, 660], [880, 1240]]];
+function along(pts, f) { const L = []; let tot = 0; for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); L.push(d); tot += d; }
+  let s = f * tot; for (let i = 1; i < pts.length; i++) { if (s <= L[i - 1]) { const v = s / L[i - 1]; return [lerp(pts[i - 1][0], pts[i][0], v), lerp(pts[i - 1][1], pts[i][1], v)]; } s -= L[i - 1]; } return pts[pts.length - 1]; }
+function sLogistics(t) {
+  const u = t - S("t5"), e = eOut(P(u, 0, 0.3)); ctx.fillStyle = "#0B1220"; ctx.fillRect(0, 0, W, H); proofHead("02", u);
+  ctx.save(); ctx.translate((1 - e) * 220, 0); ctx.globalAlpha = e;
+  txt("Logistics system", W / 2, 280, { size: 84, weight: 800 }); txt("Real vehicles, tracked live", W / 2, 365, { size: 40, weight: 600, color: "#9FB3C8" });
+  rr(60, 430, 960, 900, 40); ctx.save(); ctx.clip(); ctx.fillStyle = "#101B2E"; ctx.fillRect(60, 430, 960, 900);
+  ctx.strokeStyle = "#1C2A44"; ctx.lineWidth = 18; for (let x = 120; x < 1020; x += 120) { ctx.beginPath(); ctx.moveTo(x + 40, 430); ctx.lineTo(x - 40, 1330); ctx.stroke(); }
+  for (let y = 520; y < 1330; y += 130) { ctx.beginPath(); ctx.moveTo(60, y); ctx.lineTo(1020, y + 30); ctx.stroke(); }
+  ctx.fillStyle = "#14352A"; rr(560, 880, 180, 140, 20); ctx.fill(); rr(150, 640, 150, 110, 20); ctx.fill();
+  ROUTES.forEach((r, i) => { const f = cl([0.02, 0.38, 0.62][i] + u * 0.17), steps = 40; ctx.strokeStyle = [COP, "#5EB1FF", GREEN][i]; ctx.lineWidth = 8; ctx.lineCap = ctx.lineJoin = "round"; ctx.globalAlpha = e * 0.85;
+    ctx.beginPath(); for (let k = 0; k <= steps; k++) { const p = along(r, f * k / steps); k ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]); } ctx.stroke(); ctx.globalAlpha = e;
+    const p = along(r, f); ctx.beginPath(); ctx.arc(p[0], p[1], 26, 0, 7); ctx.fillStyle = "#fff"; ctx.fill(); ctx.beginPath(); ctx.arc(p[0], p[1], 17, 0, 7); ctx.fillStyle = [COP, "#5EB1FF", GREEN][i]; ctx.fill();
+    const lab = ["VAN · on route", "TRUCK · loading", "BIKE · delivered ✓"][i]; font(700, 24); const lw = ctx.measureText(lab).width + 36;
+    const ly = i === 1 ? 62 : -62; rr(p[0] - lw / 2, p[1] + ly - 24, lw, 46, 23); ctx.fillStyle = "rgba(11,18,32,.92)"; ctx.fill(); txt(lab, p[0], p[1] + ly, { size: 24, weight: 700 }); });
+  ctx.restore(); chip("LIVE", 950, 480, { bg: "rgba(255,77,79,.9)", dot: "#fff", size: 26 }); ctx.restore(); pipHole(e);
+}
+const SLOTS = ["6 AM", "7 AM", "8 AM", "5 PM", "6 PM", "7 PM"], COURTS = ["Badminton 1", "Badminton 2", "Cricket net", "Swimming", "Gym"];
+function sLN(t) {
+  const u = t - S("t6"), e = eOut(P(u, 0, 0.3)); const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#132A5C"); g.addColorStop(1, "#08132E");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, H); proofHead("03", u);
+  ctx.save(); ctx.translate((1 - e) * 220, 0); ctx.globalAlpha = e;
+  if (IMG.lnsports_t.complete) ctx.drawImage(IMG.lnsports_t, W / 2 - 110, 205, 220, 212);
+  txt("LN Sports Arena", W / 2, 470, { size: 76, weight: 800 }); txt("Booking app · real players, every day", W / 2, 540, { size: 34, weight: 600, color: "#FFB36B" });
+  rr(50, 600, 980, 700, 36); ctx.fillStyle = "rgba(255,255,255,.06)"; ctx.fill();
+  const cx0 = 280, cw = 122, ry0 = 690, rh = 116; SLOTS.forEach((s, i) => txt(s, cx0 + i * cw + cw / 2, 650, { size: 24, weight: 700, color: "#9FB0D6" }));
+  COURTS.forEach((c, r) => { txt(c, 80, ry0 + r * rh + rh / 2, { size: 28, weight: 700, color: "#E8ECF7", align: "left" });
+    SLOTS.forEach((s, i) => { const k = r * 6 + i, open = hash(k * 5.3) > 0.78, at = 0.15 + hash(k * 1.7) * 1.9, f = P(u, at, at + 0.18);
+      const x = cx0 + i * cw + 8, y = ry0 + r * rh + 10, w = cw - 16, h = rh - 20; rr(x, y, w, h, 16);
+      if (open || f <= 0) { ctx.strokeStyle = open ? "rgba(61,220,151,.7)" : "rgba(255,255,255,.18)"; ctx.lineWidth = 3; ctx.stroke(); if (open) txt("Open", x + w / 2, y + h / 2, { size: 22, weight: 700, color: GREEN }); }
+      else { ctx.save(); ctx.translate(x + w / 2, y + h / 2); const sc = back(f); ctx.scale(sc, sc); rr(-w / 2, -h / 2, w, h, 16); ctx.fillStyle = "#F07C22"; ctx.fill(); txt("Booked", 0, 1, { size: 22, weight: 800 }); ctx.restore(); } }); });
+  ctx.restore(); pipHole(e);
+}
+function sSlam(t) { // "we don't build demos" / "we build software that actually works"
+  const u = t - S("t7b"), flip = T7(2.44) - 0.04;
+  if (t < flip) { ctx.fillStyle = COP; ctx.fillRect(0, 0, W, H);
+    const w = [["WE", T7(1.62)], ["DON'T", T7(1.72)], ["BUILD", T7(1.94)]]; w.forEach(([s, tt], i) => { const k = eOut(P(t, tt - 0.03, tt + 0.16)); txt(s, W / 2, 620 + i * 150 + (1 - k) * 40, { size: 150, color: INK, alpha: k }); });
+    const d = back(P(t, T7(2.14) - 0.02, T7(2.14) + 0.2)); if (d > 0) { ctx.save(); ctx.translate(W / 2, 1120); ctx.scale(lerp(1.4, 1, cl(d)), lerp(1.4, 1, cl(d))); txt("DEMOS.", 0, 0, { size: 230, color: "#fff", alpha: cl(d * 2) }); ctx.restore();
+      const s = eOut(P(t, T7(2.14) + 0.12, T7(2.14) + 0.3)); if (s > 0) { ctx.fillStyle = INK; ctx.fillRect(W / 2 - 400, 1108, 800 * s, 26); } }
+  } else { ctx.fillStyle = INK; ctx.fillRect(0, 0, W, H); const sw = eOut(P(t, flip, flip + 0.18)); // the copper wipes up out of frame
+    ctx.fillStyle = COP; ctx.fillRect(0, 0, W, H * (1 - sw));
+    const w = [["WE BUILD", T7(2.44), 640, 120, "#fff"], ["SOFTWARE", T7(2.80), 790, 150, "#fff"], ["THAT ACTUALLY", T7(3.12), 940, 100, "#fff"], ["WORKS.", T7(3.82), 1140, 250, COP]];
+    w.forEach(([s, tt, y, size, col]) => { const k = back(P(t, tt - 0.03, tt + 0.2)); if (k <= 0) return; ctx.save(); ctx.translate(W / 2, y + (1 - cl(k)) * 50); const sc = s === "WORKS." ? lerp(1.3, 1, cl(k)) : 1; ctx.scale(sc, sc);
+      txt(s, 0, 0, { size, color: col, alpha: cl(k * 2) }); ctx.restore(); }); }
+}
+function sLogo(t) { // Follow OneLoop: the logo lands on "OneLoop"
+  const tl = T9(1.38) - 0.05; const g = ctx.createLinearGradient(0, 0, 0, 900); g.addColorStop(0, "rgba(0,0,0,.78)"); g.addColorStop(1, "rgba(0,0,0,0)");
+  ctx.fillStyle = g; ctx.globalAlpha = P(t, S("t9"), S("t9") + 0.3); ctx.fillRect(0, 0, W, 900); ctx.globalAlpha = 1;
+  const k = P(t, tl, tl + 0.38); if (k <= 0) return; const sc = lerp(0.62, 1, back(k)); ctx.save(); ctx.translate(W / 2, 290); ctx.scale(sc, sc); logo(0, 0, 560, { alpha: cl(k * 3) }); ctx.restore();
+  const h = eOut(P(t, tl + 0.5, tl + 0.8)); chip("Follow @oneloop.in", W / 2, 700, { bg: "rgba(255,255,255,.95)", fg: INK, size: 32, alpha: h });
+}
+function sCTA(t) { // Comment BUILD (+ the 2 s hold)
+  const g = ctx.createLinearGradient(0, 600, 0, H); g.addColorStop(0, "rgba(0,0,0,0)"); g.addColorStop(0.35, "rgba(0,0,0,.62)"); g.addColorStop(1, "rgba(0,0,0,.82)");
+  ctx.fillStyle = g; ctx.fillRect(0, 600, W, H - 600);
+  const a = eOut(P(t, T8(0.80) - 0.04, T8(0.80) + 0.2)), b = P(t, T8(1.36) - 0.03, T8(1.36) + 0.24), c = eOut(P(t, T8(1.64), T8(1.64) + 0.3));
+  const breathe = 1 + 0.03 * P(t, T8(1.6), E("hold"));
+  txt("Comment", W / 2, 900 + (1 - a) * 30, { size: 130, alpha: a, shadow: 0.8 });
+  if (b > 0) { ctx.save(); ctx.translate(W / 2, 1110); const sc = lerp(1.35, 1, back(b)) * breathe; ctx.scale(sc, sc); txt("BUILD", 0, 0, { size: 270, color: COP, alpha: cl(b * 2.5), shadow: 0.8 }); ctx.restore(); }
+  txt("so that we build yours.", W / 2, 1290 + (1 - c) * 20, { size: 58, weight: 700, alpha: c, shadow: 0.8 });
+  const typed = "BUILD".slice(0, Math.max(0, Math.min(5, Math.floor((t - (T8(0.86))) / 0.09)))), y = 1640, fa = eOut(P(t, S("t8"), S("t8") + 0.3));
+  ctx.save(); ctx.globalAlpha = fa; rr(70, y - 60, 940, 120, 60); ctx.fillStyle = "rgba(255,255,255,.96)"; ctx.fill();
+  ctx.beginPath(); ctx.arc(140, y, 38, 0, 7); ctx.fillStyle = COP; ctx.fill(); ctx.save(); ctx.translate(140, y); logo(0, -4, 64, { word: false, tag: false }); ctx.restore();
+  if (typed) { txt(typed, 200, y + 2, { size: 46, weight: 800, color: INK, align: "left" }); font(800, 46); const cw = ctx.measureText(typed).width;
+    if (Math.floor(t * 2.5) % 2 === 0 && typed.length < 5) { ctx.fillStyle = INK; ctx.fillRect(204 + cw, y - 26, 4, 52); } }
+  else txt("Add a comment…", 200, y + 2, { size: 40, weight: 600, color: "#8A8F98", align: "left" });
+  const sent = P(t, T8(1.50), T8(1.50) + 0.2); txt("Post", 950, y + 2, { size: 40, weight: 800, color: sent > 0 ? COP : "#B9C0CC", align: "right" }); ctx.restore();
+  if (t >= S("hold")) { const h = eOut(P(t, S("hold"), S("hold") + 0.4)); logo(W / 2, 330, 420, { alpha: h }); }
+}
+
+window.seek = function (t) {
+  ctx.clearRect(0, 0, W, H); const id = segAt(t).id;
+  if (id === "co1" || id === "k2") sCrash(id, t);
+  if (id === "co2") sBlack(t);
+  if (id === "frz") sFreeze(t);
+  if (id === "t1b") sECG(t);
+  if (id === "t1c") sSplit(t);
+  if (id === "t2a") sRealWorld(t);
+  if (id === "t2b") sPeople(t);
+  if (id === "t2c") sData(t);
+  if (id === "t2d") sNetwork(t);
+  if (id === "t3" && t >= T3(3.20) - 0.05) { const a = eOut(P(t, T3(3.20) - 0.05, T3(3.20) + 0.3)); ctx.save(); ctx.globalAlpha = a; rr(46, 70, 300, 120, 60); ctx.fillStyle = "rgba(0,0,0,.55)"; ctx.fill(); ctx.restore(); logo(196, 118, 230, { tag: false, alpha: a }); }
+  if (id === "t4b") sNirvaha(t);
+  if (id === "t5") sLogistics(t);
+  if (id === "t6") sLN(t);
+  if (id === "t7b") sSlam(t);
+  if (id === "t9") sLogo(t);
+  if (id === "t8" || id === "hold") sCTA(t);
+  captions(t);
+};
+</script>
+</body></html>

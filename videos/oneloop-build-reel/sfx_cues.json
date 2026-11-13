@@ -1,0 +1,242 @@
+[
+ {
+  "t": 0.3,
+  "type": "glitch",
+  "g": 0.5,
+  "note": "cold open: the deployment crashes, punch-in on the dev"
+ },
+ {
+  "t": 1.2,
+  "type": "lowhit",
+  "g": 0.55,
+  "note": "cut to black: He had no idea what was coming."
+ },
+ {
+  "t": 7.15,
+  "type": "glitch",
+  "g": 0.45,
+  "note": "the crash, quick zoom on the dev + red toast"
+ },
+ {
+  "t": 16.22,
+  "type": "scratch",
+  "g": 0.8,
+  "note": "freeze-frame: record scratch (the handoff)"
+ },
+ {
+  "t": 17.955,
+  "type": "beep",
+  "g": 0.32,
+  "note": "heart-monitor beep on the ECG blip"
+ },
+ {
+  "t": 18.5,
+  "type": "beep",
+  "g": 0.32,
+  "note": "heart-monitor beep on the ECG blip"
+ },
+ {
+  "t": 19.045,
+  "type": "beep",
+  "g": 0.32,
+  "note": "heart-monitor beep on the ECG blip"
+ },
+ {
+  "t": 19.37,
+  "type": "lowhit",
+  "g": 0.38,
+  "note": "'dies': the trace flatlines, the beeping stops"
+ },
+ {
+  "t": 20.47,
+  "type": "swoosh",
+  "g": 0.4,
+  "note": "split screen: the DEMO panel slides up"
+ },
+ {
+  "t": 21.87,
+  "type": "tick",
+  "g": 0.5,
+  "note": "tick: data clean"
+ },
+ {
+  "t": 22.69,
+  "type": "tick",
+  "g": 0.5,
+  "note": "tick: one user"
+ },
+ {
+  "t": 23.71,
+  "type": "tick",
+  "g": 0.5,
+  "note": "tick: Wi-Fi perfect"
+ },
+ {
+  "t": 23.8,
+  "type": "glitch",
+  "g": 0.42,
+  "note": "the demo panel glitches apart"
+ },
+ {
+  "t": 24.07,
+  "type": "punch",
+  "g": 0.48,
+  "note": "THE REAL WORLD title on the night-traffic b-roll"
+ },
+ {
+  "t": 25.87,
+  "type": "fastwhoosh",
+  "g": 0.4,
+  "note": "cut: hundreds of people"
+ },
+ {
+  "t": 26.02,
+  "type": "pops",
+  "g": 0.3,
+  "note": "avatars multiplying"
+ },
+ {
+  "t": 26.92,
+  "type": "swoosh2",
+  "g": 0.4,
+  "note": "cut: messy data"
+ },
+ {
+  "t": 27.02,
+  "type": "glitch",
+  "g": 0.28,
+  "note": "bad cells"
+ },
+ {
+  "t": 28.12,
+  "type": "swoosh",
+  "g": 0.4,
+  "note": "cut: phone on a bad network"
+ },
+ {
+  "t": 28.69,
+  "type": "beep",
+  "g": 0.22,
+  "note": "signal drops"
+ },
+ {
+  "t": 28.97,
+  "type": "beep",
+  "g": 0.22,
+  "note": "signal drops again"
+ },
+ {
+  "t": 29.73,
+  "type": "glitch",
+  "g": 0.32,
+  "note": "Request timed out"
+ },
+ {
+  "t": 30.62,
+  "type": "softwhoosh",
+  "g": 0.3,
+  "note": "back to Tarun, one steady shot"
+ },
+ {
+  "t": 33.27,
+  "type": "chime",
+  "g": 0.3,
+  "note": "the OneLoop badge appears"
+ },
+ {
+  "t": 36.92,
+  "type": "impact",
+  "g": 0.6,
+  "note": "PROOF 1: Nirvaha, live on Google Play"
+ },
+ {
+  "t": 36.94,
+  "type": "fastwhoosh",
+  "g": 0.35,
+  "note": "proof card slides in"
+ },
+ {
+  "t": 38.72,
+  "type": "impact",
+  "g": 0.55,
+  "note": "PROOF 2: logistics"
+ },
+ {
+  "t": 41.02,
+  "type": "impact",
+  "g": 0.55,
+  "note": "PROOF 3: LN Sports Arena"
+ },
+ {
+  "t": 44.82,
+  "type": "bigimpact",
+  "g": 0.7,
+  "note": "copper slam"
+ },
+ {
+  "t": 45.53,
+  "type": "swoosh2",
+  "g": 0.45,
+  "note": "DEMOS gets struck through"
+ },
+ {
+  "t": 45.67,
+  "type": "fastwhoosh",
+  "g": 0.4,
+  "note": "copper wipes away, black: we build software"
+ },
+ {
+  "t": 47.09,
+  "type": "punch",
+  "g": 0.55,
+  "note": "WORKS."
+ },
+ {
+  "t": 48.15,
+  "type": "lowhit",
+  "g": 0.75,
+  "note": "bass hit: the OneLoop logo lands"
+ },
+ {
+  "t": 50.93,
+  "type": "key1",
+  "g": 0.45,
+  "note": "typing 'B' into the comment box"
+ },
+ {
+  "t": 51.02,
+  "type": "key2",
+  "g": 0.45,
+  "note": "typing 'U' into the comment box"
+ },
+ {
+  "t": 51.11,
+  "type": "key3",
+  "g": 0.45,
+  "note": "typing 'I' into the comment box"
+ },
+ {
+  "t": 51.2,
+  "type": "key1",
+  "g": 0.45,
+  "note": "typing 'L' into the comment box"
+ },
+ {
+  "t": 51.29,
+  "type": "key2",
+  "g": 0.45,
+  "note": "typing 'D' into the comment box"
+ },
+ {
+  "t": 51.43,
+  "type": "impact",
+  "g": 0.55,
+  "note": "BUILD lands"
+ },
+ {
+  "t": 51.57,
+  "type": "chime",
+  "g": 0.32,
+  "note": "comment posted"
+ }
+]

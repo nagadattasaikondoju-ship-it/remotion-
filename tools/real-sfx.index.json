@@ -1,5 +1,5 @@
 {
- "count": 62,
+ "count": 65,
  "libraries": [
   {
    "name": "main",
@@ -12,7 +12,7 @@
    "name": "earshot",
    "path": "/home/user/remotion-/assets/sfx/earshot",
    "tier": "extra",
-   "files": 4,
+   "files": 7,
    "catalog": false
   }
  ],
@@ -2120,6 +2120,107 @@
     "dry"
    ],
    "id": 61
+  },
+  {
+   "library": "earshot",
+   "tier": "extra",
+   "path": "/home/user/remotion-/assets/sfx/earshot/glitch/glitch_burst.wav",
+   "folder": "glitch",
+   "name": "glitch burst",
+   "role": "glitch",
+   "roles": [
+    "glitch",
+    "whoosh"
+   ],
+   "duration": 0.371,
+   "peak_db": -1.0,
+   "mean_db": -14.7,
+   "peak_time": 0.19,
+   "lr_corr": 0.7,
+   "attack_ms": 150,
+   "decay_ms": 130,
+   "centroid": 900,
+   "rolloff": 1343,
+   "low": 0.014,
+   "high": 0.0,
+   "flat": 0.001,
+   "bumps": 6.7,
+   "active_dur": 0.3,
+   "onset_count": 0,
+   "words": [
+    "swelling",
+    "warm",
+    "thin",
+    "tonal",
+    "short"
+   ],
+   "id": 62
+  },
+  {
+   "library": "earshot",
+   "tier": "extra",
+   "path": "/home/user/remotion-/assets/sfx/earshot/beep/monitor_beep.wav",
+   "folder": "beep",
+   "name": "monitor beep",
+   "role": "ui",
+   "roles": [
+    "ui"
+   ],
+   "duration": 0.286,
+   "peak_db": -1.0,
+   "mean_db": -25.4,
+   "peak_time": 0.09,
+   "lr_corr": 1.0,
+   "attack_ms": 0,
+   "decay_ms": 50,
+   "centroid": 1975,
+   "rolloff": 2062,
+   "low": 0.0,
+   "high": 0.004,
+   "flat": 0.003,
+   "bumps": 3.3,
+   "active_dur": 0.19,
+   "onset_count": 1,
+   "words": [
+    "punchy",
+    "mid",
+    "thin",
+    "tonal",
+    "short",
+    "dry"
+   ],
+   "id": 63
+  },
+  {
+   "library": "earshot",
+   "tier": "extra",
+   "path": "/home/user/remotion-/assets/sfx/earshot/scratch/record_scratch.wav",
+   "folder": "scratch",
+   "name": "record scratch",
+   "role": "misc",
+   "roles": [],
+   "duration": 0.399,
+   "peak_db": -1.0,
+   "mean_db": -7.3,
+   "peak_time": 0.03,
+   "lr_corr": 1.0,
+   "attack_ms": 20,
+   "decay_ms": 250,
+   "centroid": 1023,
+   "rolloff": 1687,
+   "low": 0.034,
+   "high": 0.004,
+   "flat": 0.057,
+   "bumps": 0.0,
+   "active_dur": 0.31,
+   "words": [
+    "punchy",
+    "warm",
+    "thin",
+    "tonal",
+    "short"
+   ],
+   "id": 64
   }
  ]
 }

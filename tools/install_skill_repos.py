@@ -39,8 +39,14 @@ REPOS = [  # (owner/repo, commit, prefix, licensed)
     ("win4r/video-director", "4747e5c", "vdir", True),
     # Nov 2026: stickman storyboard/prompt director + narrated "Autopilot" videos (MIT). Its Autopilot/A6 modes call the paid Gemini API.
     ("kaomei/stickman-video-director", "eb4bb37", "stickman", True),
+    # Nov 13 2026 batch (user's list for split-screen / overlay / caption editing). All MIT (Rajbharti06 states MIT in its README).
+    ("Rajbharti06/Ultimate-Video-Editing-Skills", "7d0af0d", "uve", True), ("riecodes/free247editor", "421f8b5", "f247", True),
+    ("cth9191/animate", "7e5eb56", "cth", True), ("codie1982/chorono-editor", "7305ba8", "chorono", True),
+    # HyperFrames' core skills were installed earlier; only pick the ones this repo doesn't have yet (captions, motion doctrine, seams...).
+    ("heygen-com/hyperframes", "d208281", "hf", True, {"captions-overlay", "motion-doctrine", "seam-craft", "cut-the-curve",
+        "oversized-cursor", "changelog-video", "style-sampling", "reverse-any-video"}),
 ]
-REFERENCE_ONLY = [("Dakkshin/after-effects-mcp", "88d5fbf"), ("Arman-Luthra/aftr", "628397d"),
+REFERENCE_ONLY = [("Dakkshin/after-effects-mcp", "88d5fbf"), ("Arman-Luthra/aftr", "628397d"), ("davidcervinka/vibe-editing", "8faca77"),
                   ("lanayepifanova/Claude-Editor", "b9a2e27"), ("iart-ai/motion-skills", "238dfc5")]
 GENERIC = {"editor", "ffmpeg", "remotion", "sound-design", "frontend-design", "video-edit", "elevenlabs"}
 SKIP_DIRS = {".git", "node_modules", "__pycache__"}
@@ -67,11 +73,15 @@ def main():
     src = sys.argv[sys.argv.index("--src") + 1] if "--src" in sys.argv else None
     only = set(sys.argv[sys.argv.index("--only") + 1].split(",")) if "--only" in sys.argv else None
     found = []  # (repo, prefix, licensed, skill dir, original name)
-    for repo, commit, prefix, licensed in REPOS:
+    for repo, commit, prefix, licensed, *pick in REPOS:
         if only and repo not in only: continue
         d = local_dir(src, repo) if src else os.path.join(CLONES, repo.replace("/", "_"))
         if not src: ensure_clone(repo, commit, d)
-        found += [(repo, prefix, licensed, s, name_of(os.path.join(s, "SKILL.md"))) for s in skill_dirs(d)]
+        seen = set()  # a repo may ship the same skill twice (.claude/ and .agents/): keep the first
+        for sd in sorted(skill_dirs(d)):
+            n = name_of(os.path.join(sd, "SKILL.md"))
+            if n in seen or (pick and n not in pick[0]): continue
+            seen.add(n); found.append((repo, prefix, licensed, sd, n))
     if not src and not only:
         for repo, commit in REFERENCE_ONLY: ensure_clone(repo, commit, os.path.join(CLONES, repo.replace("/", "_")))
     mpath = os.path.join(ROOT, "tools", "skill-repos.json")  # what an earlier run installed is not "ours"
