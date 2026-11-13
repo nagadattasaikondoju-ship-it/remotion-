@@ -1,6 +1,6 @@
 # One Loop: "We don't build demos" (skit + Tarun)
 
-61 s · rendered in 4K (2160×3840, 30 fps), with HD (1080×1920) copies downscaled from it.
+61 s · rendered in 4K (2160×3840, 30 fps; the 4K file is 50 Mbit/s so it stays under the 500 MB upload limit), with HD (1080×1920) copies downscaled from it.
 The skit plays **in story order** (the demo → 3 weeks later the crash → the client calls the manager) and hands over on a record-scratch
 freeze to Tarun's explanation: demo vs real world → three proofs → "We don't build demos" → follow → **Comment BUILD**.
 

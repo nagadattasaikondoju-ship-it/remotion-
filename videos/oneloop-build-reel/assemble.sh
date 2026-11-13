@@ -41,9 +41,9 @@ for q in "1080x1920_30fps_HD_MASTER 12 320k" "1080x1920_30fps_share 17 256k"; do
 ffmpeg -nostdin -v error -y -i out/video.mp4 -i out/mix_master.wav -map 0:v -map 1:a -vf "scale=1080:1920:flags=lanczos" -c:v libx264 -preset slow -crf $2 -pix_fmt yuv420p \
   -colorspace bt709 -color_primaries bt709 -color_trc bt709 -profile:v high -c:a aac -b:a $3 -af apad -t $DUR -movflags +faststart out/${N}_$1.mp4
 done
-# 4K master: the 4K render as is (no second encode) + the mix
-ffmpeg -nostdin -v error -y -i out/video.mp4 -i out/mix_master.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 320k -af apad -t $DUR -movflags +faststart \
-  out/${N}_2160x3840_30fps_4K_MASTER.mp4
+# 4K: 50 Mbit/s keeps the file under the 500 MB the user's app accepts (~345 MB for 61 s)
+ffmpeg -nostdin -v error -y -i out/video.mp4 -i out/mix_master.wav -map 0:v -map 1:a -c:v libx264 -preset medium -b:v 50M -maxrate 58M -bufsize 100M -pix_fmt yuv420p \
+  -colorspace bt709 -color_primaries bt709 -color_trc bt709 -profile:v high -c:a aac -b:a 320k -af apad -t $DUR -movflags +faststart out/${N}_2160x3840_30fps_4K.mp4
 rm -f out/video_v.mov out/_pre.wav out/sfxwork/result/mix.mp4
 for f in out/${N}_*.mp4; do echo "$f $(ffprobe -v error -show_entries format=duration,size:stream=nb_frames -of csv=p=0 "$f" | tr '\n' ' ')"; done
 ffmpeg -nostdin -hide_banner -i out/${N}_1080x1920_30fps_share.mp4 -af ebur128=peak=true -f null - 2>&1 | grep -E "^\s+I:|Peak:"
