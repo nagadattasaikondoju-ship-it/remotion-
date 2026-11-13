@@ -1,0 +1,842 @@
+[
+ {
+  "skill": "motion-brief-writer",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "motion-brief-writer",
+  "licensed": true
+ },
+ {
+  "skill": "motion-prompt-writer",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "motion-prompt-writer",
+  "licensed": true
+ },
+ {
+  "skill": "motion-effects",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "motion-effects",
+  "licensed": true
+ },
+ {
+  "skill": "animated-chart",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "animated-chart",
+  "licensed": true
+ },
+ {
+  "skill": "brand-intake",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "brand-intake",
+  "licensed": true
+ },
+ {
+  "skill": "milestone-reveal",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "milestone-reveal",
+  "licensed": true
+ },
+ {
+  "skill": "cg-launch-video",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "launch-video",
+  "licensed": true
+ },
+ {
+  "skill": "reference-to-motion",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "reference-to-motion",
+  "licensed": true
+ },
+ {
+  "skill": "title-sequence-3d",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "title-sequence-3d",
+  "licensed": true
+ },
+ {
+  "skill": "newsletter-promo",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "newsletter-promo",
+  "licensed": true
+ },
+ {
+  "skill": "model-showdown",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "model-showdown",
+  "licensed": true
+ },
+ {
+  "skill": "loop-cover",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "loop-cover",
+  "licensed": true
+ },
+ {
+  "skill": "apple-launch-film",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "apple-launch-film",
+  "licensed": true
+ },
+ {
+  "skill": "reel-export",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "reel-export",
+  "licensed": true
+ },
+ {
+  "skill": "vox-explainer",
+  "from": "charlie947/motion-graphics-skills",
+  "original_name": "vox-explainer",
+  "licensed": true
+ },
+ {
+  "skill": "howseen-motion-design",
+  "from": "howseen-ai/claude-motion-design",
+  "original_name": "motion-design",
+  "licensed": true
+ },
+ {
+  "skill": "lobzy-motion-design",
+  "from": "LobzyJay/motion-design-with-claude",
+  "original_name": "motion-design",
+  "licensed": true
+ },
+ {
+  "skill": "motion-design-critique",
+  "from": "LobzyJay/motion-design-with-claude",
+  "original_name": "motion-design-critique",
+  "licensed": true
+ },
+ {
+  "skill": "blender-motion",
+  "from": "LobzyJay/motion-design-with-claude",
+  "original_name": "blender-motion",
+  "licensed": true
+ },
+ {
+  "skill": "aftereffects-motion",
+  "from": "LobzyJay/motion-design-with-claude",
+  "original_name": "aftereffects-motion",
+  "licensed": true
+ },
+ {
+  "skill": "mort1d-motion-graphics",
+  "from": "Mort1d/motion-graphics-skills",
+  "original_name": "motion-graphics",
+  "licensed": true
+ },
+ {
+  "skill": "naming-convention",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "naming-convention",
+  "licensed": false
+ },
+ {
+  "skill": "km-sound-design",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "sound-design",
+  "licensed": false
+ },
+ {
+  "skill": "talking-head-image-overlays",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "talking-head-image-overlays",
+  "licensed": false
+ },
+ {
+  "skill": "video-edit-pipeline",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "video-edit-pipeline",
+  "licensed": false
+ },
+ {
+  "skill": "video-qa",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "video-qa",
+  "licensed": false
+ },
+ {
+  "skill": "branded-ad-edit",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "branded-ad-edit",
+  "licensed": false
+ },
+ {
+  "skill": "recap-video",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "recap-video",
+  "licensed": false
+ },
+ {
+  "skill": "edl-tighten",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "edl-tighten",
+  "licensed": false
+ },
+ {
+  "skill": "reel-recut",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "reel-recut",
+  "licensed": false
+ },
+ {
+  "skill": "edits-hook-overlay",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "edits-hook-overlay",
+  "licensed": false
+ },
+ {
+  "skill": "broll-capture",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "broll-capture",
+  "licensed": false
+ },
+ {
+  "skill": "capcut-export",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "capcut-export",
+  "licensed": false
+ },
+ {
+  "skill": "ai-audio-sound-design",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "ai-audio-sound-design",
+  "licensed": false
+ },
+ {
+  "skill": "arcads-broll",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "arcads-broll",
+  "licensed": false
+ },
+ {
+  "skill": "hook-splitter",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "hook-splitter",
+  "licensed": false
+ },
+ {
+  "skill": "openart-broll",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "openart-broll",
+  "licensed": false
+ },
+ {
+  "skill": "arcads-video-edit",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "arcads-video-edit",
+  "licensed": false
+ },
+ {
+  "skill": "video-review-canvas",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "video-review-canvas",
+  "licensed": false
+ },
+ {
+  "skill": "reel-style-clone",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "reel-style-clone",
+  "licensed": false
+ },
+ {
+  "skill": "hook-variations",
+  "from": "krusemediallc/video-editor-agent",
+  "original_name": "hook-variations",
+  "licensed": false
+ },
+ {
+  "skill": "tenfold-video-edit",
+  "from": "tenfoldmarc/video-edit-skill",
+  "original_name": "video-edit",
+  "licensed": false
+ },
+ {
+  "skill": "video_toolkit",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "video_toolkit",
+  "licensed": true
+ },
+ {
+  "skill": "remotion-best-practices",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "remotion-best-practices",
+  "licensed": true
+ },
+ {
+  "skill": "synthetic-ui-demo",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "synthetic-ui-demo",
+  "licensed": true
+ },
+ {
+  "skill": "ltx2",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "ltx2",
+  "licensed": true
+ },
+ {
+  "skill": "qwen-edit",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "qwen-edit",
+  "licensed": true
+ },
+ {
+  "skill": "playwright-recording",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "playwright-recording",
+  "licensed": true
+ },
+ {
+  "skill": "ideogram4",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "ideogram4",
+  "licensed": true
+ },
+ {
+  "skill": "dsk-ffmpeg",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "ffmpeg",
+  "licensed": true
+ },
+ {
+  "skill": "dsk-frontend-design",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "frontend-design",
+  "licensed": true
+ },
+ {
+  "skill": "dsk-remotion",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "remotion",
+  "licensed": true
+ },
+ {
+  "skill": "moviepy",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "moviepy",
+  "licensed": true
+ },
+ {
+  "skill": "dsk-elevenlabs",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "elevenlabs",
+  "licensed": true
+ },
+ {
+  "skill": "acestep",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "acestep",
+  "licensed": true
+ },
+ {
+  "skill": "runpod",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "runpod",
+  "licensed": true
+ },
+ {
+  "skill": "makemyclip-editor",
+  "from": "MakeMyClip/editor",
+  "original_name": "editor",
+  "licensed": true
+ },
+ {
+  "skill": "cinematic-camera",
+  "from": "Liamrjohnston/remotion-motion-graphics-skill",
+  "original_name": "cinematic-camera",
+  "licensed": true
+ },
+ {
+  "skill": "terminal-inserts",
+  "from": "Liamrjohnston/remotion-motion-graphics-skill",
+  "original_name": "terminal-inserts",
+  "licensed": true
+ },
+ {
+  "skill": "liam-motion-graphics",
+  "from": "Liamrjohnston/remotion-motion-graphics-skill",
+  "original_name": "motion-graphics",
+  "licensed": true
+ },
+ {
+  "skill": "article-highlights",
+  "from": "Liamrjohnston/remotion-motion-graphics-skill",
+  "original_name": "article-highlights",
+  "licensed": true
+ },
+ {
+  "skill": "text-to-lottie",
+  "from": "diffusionstudio/lottie",
+  "original_name": "text-to-lottie",
+  "licensed": true
+ },
+ {
+  "skill": "pixel2motion",
+  "from": "nolangz/pixel2motion",
+  "original_name": "pixel2motion",
+  "licensed": true
+ },
+ {
+  "skill": "countdown-video",
+  "from": "iart-ai/tiktok-video-skills",
+  "original_name": "countdown-video",
+  "licensed": true
+ },
+ {
+  "skill": "caption-animation",
+  "from": "iart-ai/tiktok-video-skills",
+  "original_name": "caption-animation",
+  "licensed": true
+ },
+ {
+  "skill": "tiktok-lower-thirds",
+  "from": "iart-ai/tiktok-video-skills",
+  "original_name": "lower-thirds",
+  "licensed": true
+ },
+ {
+  "skill": "short-form-video",
+  "from": "iart-ai/tiktok-video-skills",
+  "original_name": "short-form-video",
+  "licensed": true
+ },
+ {
+  "skill": "text-message-animation",
+  "from": "iart-ai/text-message-video-skills",
+  "original_name": "text-message-animation",
+  "licensed": true
+ },
+ {
+  "skill": "youtube-intro-outro",
+  "from": "iart-ai/youtube-video-skills",
+  "original_name": "youtube-intro-outro",
+  "licensed": true
+ },
+ {
+  "skill": "audiogram",
+  "from": "iart-ai/youtube-video-skills",
+  "original_name": "audiogram",
+  "licensed": true
+ },
+ {
+  "skill": "promo-video",
+  "from": "iart-ai/ecommerce-video-skills",
+  "original_name": "promo-video",
+  "licensed": true
+ },
+ {
+  "skill": "photo-slideshow",
+  "from": "iart-ai/ecommerce-video-skills",
+  "original_name": "photo-slideshow",
+  "licensed": true
+ },
+ {
+  "skill": "product-demo-video",
+  "from": "iart-ai/ecommerce-video-skills",
+  "original_name": "product-demo-video",
+  "licensed": true
+ },
+ {
+  "skill": "testimonial-video",
+  "from": "iart-ai/ad-video-skills",
+  "original_name": "testimonial-video",
+  "licensed": true
+ },
+ {
+  "skill": "ad-launch-video",
+  "from": "iart-ai/ad-video-skills",
+  "original_name": "launch-video",
+  "licensed": true
+ },
+ {
+  "skill": "ad-creative-video",
+  "from": "iart-ai/ad-video-skills",
+  "original_name": "ad-creative-video",
+  "licensed": true
+ },
+ {
+  "skill": "chart-animation",
+  "from": "iart-ai/data-animation-skills",
+  "original_name": "chart-animation",
+  "licensed": true
+ },
+ {
+  "skill": "presentation-video",
+  "from": "iart-ai/data-animation-skills",
+  "original_name": "presentation-video",
+  "licensed": true
+ },
+ {
+  "skill": "animated-infographic",
+  "from": "iart-ai/data-animation-skills",
+  "original_name": "animated-infographic",
+  "licensed": true
+ },
+ {
+  "skill": "explainer-video",
+  "from": "iart-ai/explainer-video-skills",
+  "original_name": "explainer-video",
+  "licensed": true
+ },
+ {
+  "skill": "isometric-animation",
+  "from": "iart-ai/explainer-video-skills",
+  "original_name": "isometric-animation",
+  "licensed": true
+ },
+ {
+  "skill": "whiteboard-animation",
+  "from": "iart-ai/explainer-video-skills",
+  "original_name": "whiteboard-animation",
+  "licensed": true
+ },
+ {
+  "skill": "diagram-animation",
+  "from": "iart-ai/explainer-video-skills",
+  "original_name": "diagram-animation",
+  "licensed": true
+ },
+ {
+  "skill": "wrapped-video",
+  "from": "iart-ai/explainer-video-skills",
+  "original_name": "wrapped-video",
+  "licensed": true
+ },
+ {
+  "skill": "map-animation",
+  "from": "iart-ai/map-animation-skills",
+  "original_name": "map-animation",
+  "licensed": true
+ },
+ {
+  "skill": "60fps-animation",
+  "from": "iart-ai/web-animation-skills",
+  "original_name": "60fps-animation",
+  "licensed": true
+ },
+ {
+  "skill": "svg-animation",
+  "from": "iart-ai/web-animation-skills",
+  "original_name": "svg-animation",
+  "licensed": true
+ },
+ {
+  "skill": "accessible-animation",
+  "from": "iart-ai/web-animation-skills",
+  "original_name": "accessible-animation",
+  "licensed": true
+ },
+ {
+  "skill": "page-transition-animation",
+  "from": "iart-ai/web-animation-skills",
+  "original_name": "page-transition-animation",
+  "licensed": true
+ },
+ {
+  "skill": "glassmorphism",
+  "from": "iart-ai/web-animation-skills",
+  "original_name": "glassmorphism",
+  "licensed": true
+ },
+ {
+  "skill": "gsap-web",
+  "from": "iart-ai/web-animation-skills",
+  "original_name": "gsap-web",
+  "licensed": true
+ },
+ {
+  "skill": "lottie-animation",
+  "from": "iart-ai/web-animation-skills",
+  "original_name": "lottie-animation",
+  "licensed": true
+ },
+ {
+  "skill": "micro-interaction",
+  "from": "iart-ai/web-animation-skills",
+  "original_name": "micro-interaction",
+  "licensed": true
+ },
+ {
+  "skill": "ascii-animation",
+  "from": "iart-ai/web-animation-skills",
+  "original_name": "ascii-animation",
+  "licensed": true
+ },
+ {
+  "skill": "remotion-video",
+  "from": "iart-ai/motion-design-skills",
+  "original_name": "remotion-video",
+  "licensed": true
+ },
+ {
+  "skill": "animation-principles",
+  "from": "iart-ai/motion-design-skills",
+  "original_name": "animation-principles",
+  "licensed": true
+ },
+ {
+  "skill": "motion-background",
+  "from": "iart-ai/motion-design-skills",
+  "original_name": "motion-background",
+  "licensed": true
+ },
+ {
+  "skill": "beat-sync-editing",
+  "from": "iart-ai/motion-design-skills",
+  "original_name": "beat-sync-editing",
+  "licensed": true
+ },
+ {
+  "skill": "logo-animation",
+  "from": "iart-ai/motion-design-skills",
+  "original_name": "logo-animation",
+  "licensed": true
+ },
+ {
+  "skill": "motion-art-direction",
+  "from": "iart-ai/motion-design-skills",
+  "original_name": "motion-art-direction",
+  "licensed": true
+ },
+ {
+  "skill": "color-motion",
+  "from": "iart-ai/motion-design-skills",
+  "original_name": "color-motion",
+  "licensed": true
+ },
+ {
+  "skill": "shot-composition",
+  "from": "iart-ai/motion-design-skills",
+  "original_name": "shot-composition",
+  "licensed": true
+ },
+ {
+  "skill": "after-effects",
+  "from": "iart-ai/motion-design-skills",
+  "original_name": "after-effects",
+  "licensed": true
+ },
+ {
+  "skill": "kinetic-typography",
+  "from": "iart-ai/kinetic-typography-skills",
+  "original_name": "kinetic-typography",
+  "licensed": true
+ },
+ {
+  "skill": "creative-brief",
+  "from": "iart-ai/freelance-motion-skills",
+  "original_name": "creative-brief",
+  "licensed": true
+ },
+ {
+  "skill": "brand-motion-guidelines",
+  "from": "iart-ai/freelance-motion-skills",
+  "original_name": "brand-motion-guidelines",
+  "licensed": true
+ },
+ {
+  "skill": "motion-pricing",
+  "from": "iart-ai/freelance-motion-skills",
+  "original_name": "motion-pricing",
+  "licensed": true
+ },
+ {
+  "skill": "video-delivery-specs",
+  "from": "iart-ai/freelance-motion-skills",
+  "original_name": "video-delivery-specs",
+  "licensed": true
+ },
+ {
+  "skill": "client-revisions",
+  "from": "iart-ai/freelance-motion-skills",
+  "original_name": "client-revisions",
+  "licensed": true
+ },
+ {
+  "skill": "shader-glsl",
+  "from": "iart-ai/webgl-animation-skills",
+  "original_name": "shader-glsl",
+  "licensed": true
+ },
+ {
+  "skill": "threejs-animation",
+  "from": "iart-ai/webgl-animation-skills",
+  "original_name": "threejs-animation",
+  "licensed": true
+ },
+ {
+  "skill": "particle-system",
+  "from": "iart-ai/webgl-animation-skills",
+  "original_name": "particle-system",
+  "licensed": true
+ },
+ {
+  "skill": "manim",
+  "from": "iart-ai/manim-skills",
+  "original_name": "manim",
+  "licensed": true
+ },
+ {
+  "skill": "generative-illustration",
+  "from": "iart-ai/generative-illustration-skills",
+  "original_name": "generative-illustration",
+  "licensed": false
+ },
+ {
+  "skill": "javascript-animation",
+  "from": "iart-ai/javascript-animation-skills",
+  "original_name": "javascript-animation",
+  "licensed": true
+ },
+ {
+  "skill": "soundtrack",
+  "from": "iart-ai/javascript-animation-skills",
+  "original_name": "soundtrack",
+  "licensed": true
+ },
+ {
+  "skill": "lt-lower-thirds",
+  "from": "iart-ai/lower-thirds-skills",
+  "original_name": "lower-thirds",
+  "licensed": true
+ },
+ {
+  "skill": "talking-head-b-roll",
+  "from": "iart-ai/b-roll-skills",
+  "original_name": "talking-head-b-roll",
+  "licensed": true
+ },
+ {
+  "skill": "talking-head",
+  "from": "iart-ai/talking-head-skills",
+  "original_name": "talking-head",
+  "licensed": true
+ },
+ {
+  "skill": "huashu-motion",
+  "from": "alchaincyf/huashu-motion",
+  "original_name": "huashu-motion",
+  "licensed": true
+ },
+ {
+  "skill": "rossark-motion-skill",
+  "from": "rossark0/rossark-motion-skill",
+  "original_name": "rossark-motion-skill",
+  "licensed": true
+ },
+ {
+  "skill": "take-one",
+  "from": "talsiach/take-one",
+  "original_name": "take-one",
+  "licensed": true
+ },
+ {
+  "skill": "reanimate",
+  "from": "NiazMorshed2007/reanimate",
+  "original_name": "reanimate",
+  "licensed": true
+ },
+ {
+  "skill": "argo-guide",
+  "from": "shreyaskarnik/argo",
+  "original_name": "argo-guide",
+  "licensed": true
+ },
+ {
+  "skill": "explainroo",
+  "from": "vincentsch/explainroo",
+  "original_name": "explainroo",
+  "licensed": true
+ },
+ {
+  "skill": "video-director",
+  "from": "win4r/video-director",
+  "original_name": "video-director",
+  "licensed": true
+ },
+ {
+  "skill": "directing-stickman-videos",
+  "from": "kaomei/stickman-video-director",
+  "original_name": "directing-stickman-videos",
+  "licensed": true
+ },
+ {
+  "skill": "ultimate-video-editor",
+  "from": "Rajbharti06/Ultimate-Video-Editing-Skills",
+  "original_name": "ultimate-video-editor",
+  "licensed": true
+ },
+ {
+  "skill": "free247editor",
+  "from": "riecodes/free247editor",
+  "original_name": "free247editor",
+  "licensed": true
+ },
+ {
+  "skill": "animate",
+  "from": "cth9191/animate",
+  "original_name": "animate",
+  "licensed": true
+ },
+ {
+  "skill": "chorono",
+  "from": "codie1982/chorono-editor",
+  "original_name": "chorono",
+  "licensed": true
+ },
+ {
+  "skill": "chorono-setup",
+  "from": "codie1982/chorono-editor",
+  "original_name": "chorono-setup",
+  "licensed": true
+ },
+ {
+  "skill": "captions-overlay",
+  "from": "heygen-com/hyperframes",
+  "original_name": "captions-overlay",
+  "licensed": true
+ },
+ {
+  "skill": "changelog-video",
+  "from": "heygen-com/hyperframes",
+  "original_name": "changelog-video",
+  "licensed": true
+ },
+ {
+  "skill": "cut-the-curve",
+  "from": "heygen-com/hyperframes",
+  "original_name": "cut-the-curve",
+  "licensed": true
+ },
+ {
+  "skill": "motion-doctrine",
+  "from": "heygen-com/hyperframes",
+  "original_name": "motion-doctrine",
+  "licensed": true
+ },
+ {
+  "skill": "oversized-cursor",
+  "from": "heygen-com/hyperframes",
+  "original_name": "oversized-cursor",
+  "licensed": true
+ },
+ {
+  "skill": "seam-craft",
+  "from": "heygen-com/hyperframes",
+  "original_name": "seam-craft",
+  "licensed": true
+ },
+ {
+  "skill": "reverse-any-video",
+  "from": "heygen-com/hyperframes",
+  "original_name": "reverse-any-video",
+  "licensed": true
+ },
+ {
+  "skill": "style-sampling",
+  "from": "heygen-com/hyperframes",
+  "original_name": "style-sampling",
+  "licensed": true
+ }
+]

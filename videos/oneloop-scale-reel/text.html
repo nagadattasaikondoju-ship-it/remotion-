@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>One Loop — scale reel text layers</title>
+<style>
+  @font-face { font-family: "FR"; src: url("fonts/Fraunces-VF.ttf"); font-weight: 100 900; }
+  html, body { margin: 0; width: 1080px; height: 1920px; background: transparent; overflow: hidden; }
+  svg { position: absolute; left: 0; top: 0; }
+  /* the reference screenshot's look: chunky soft serif, lemon yellow; a dark soft shadow so it holds on bright foliage */
+  text { font-family: "FR"; font-weight: 900; font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 72; fill: #F7E81E;
+         letter-spacing: -1px; paint-order: stroke fill; stroke: rgba(40, 30, 0, 0.35); stroke-width: 3px;
+         filter: drop-shadow(0 4px 10px rgba(0,0,0,0.65)) drop-shadow(0 1px 2px rgba(0,0,0,0.5)); }
+</style>
+</head>
+<body>
+<svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920"></svg>
+<script>
+/* Text layers for the One Loop "How we scale brands to 7 figures" grid reel, one transparent PNG per state:
+   hook · centre label 0–5 (flashes in the gap between the two tile rows) · tiles (all six labels inside the grid). */
+const STEPS = [["Growth", "Audit"], ["Market", "Research"], ["Brand", "Strategy"], ["Website", "Build"], ["Paid", "Ads"], ["Automation"]];
+// grid geometry: the reference's 3×2 layout scaled to 1080×1920
+const COLS = [169, 426, 691], TW = 228, TH = 406, ROWS = [440, 996], GAP_Y = 920;
+const svg = document.getElementById("s"), NS = "http://www.w3.org/2000/svg";
+const T = (attrs, txt) => { const t = document.createElementNS(NS, "text"); for (const k in attrs) t.setAttribute(k, attrs[k]); t.textContent = txt; svg.appendChild(t); return t; };
+const fit = (t, max) => { const w = t.getComputedTextLength(); if (w > max) t.setAttribute("font-size", parseFloat(t.getAttribute("font-size")) * max / w); };
+function arc(id, d) { let defs = svg.querySelector("defs") || svg.appendChild(document.createElementNS(NS, "defs")); const p = document.createElementNS(NS, "path"); p.setAttribute("id", id); p.setAttribute("d", d); defs.appendChild(p); }
+function onArc(id, txt, size) { const t = T({ "font-size": size, "text-anchor": "middle" }, ""); const tp = document.createElementNS(NS, "textPath"); tp.setAttribute("href", "#" + id); tp.setAttribute("startOffset", "50%"); tp.textContent = txt; t.appendChild(tp); return t; }
+window.render = (state) => {
+  svg.innerHTML = "";
+  if (state === "hook") {   // How we (arched) / scale / brands to / 7 figures (curved), stacked on his chest like the reference
+    arc("a1", "M 300 905 Q 540 815 780 905"); arc("a2", "M 110 1345 Q 540 1455 970 1345");
+    onArc("a1", "How we", 104);
+    T({ x: 540, y: 1062, "font-size": 176, "text-anchor": "middle" }, "scale");
+    fit(T({ x: 540, y: 1222, "font-size": 168, "text-anchor": "middle" }, "brands to"), 960);
+    onArc("a2", "7 figures", 172);
+  } else if (state.startsWith("c")) {  // centre label in the gap between the rows
+    const t = T({ x: 540, y: GAP_Y + 26, "font-size": 78, "text-anchor": "middle" }, STEPS[+state.slice(1)].join(" ")); fit(t, 940);
+  } else if (state === "tiles") {      // every label inside its own tile
+    STEPS.forEach((lines, i) => {
+      const cx = COLS[i % 3] + TW / 2, cy = ROWS[Math.floor(i / 3)] + TH / 2, size = 50, lh = 52;
+      lines.forEach((s, k) => { const t = T({ x: cx, y: cy + (k - (lines.length - 1) / 2) * lh + size * 0.32, "font-size": size, "text-anchor": "middle" }, s); fit(t, TW - 22); });
+    });
+  }
+};
+window.ready = document.fonts.load("900 80px FR").then(() => true);
+</script>
+</body>
+</html>

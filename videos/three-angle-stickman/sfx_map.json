@@ -1,0 +1,161 @@
+{
+ "swipe": {
+  "ids": [
+   53
+  ],
+  "role": "whoosh"
+ },
+ "swipe2": {
+  "ids": [
+   52
+  ],
+  "role": "whoosh"
+ },
+ "swipe3": {
+  "ids": [
+   56
+  ],
+  "role": "whoosh"
+ },
+ "scan": {
+  "ids": [
+   50
+  ],
+  "role": "whoosh"
+ },
+ "blip": {
+  "ids": [
+   58
+  ],
+  "role": "ui"
+ },
+ "slap": {
+  "ids": [
+   18
+  ],
+  "role": "hit"
+ },
+ "slide": {
+  "ids": [
+   5
+  ],
+  "role": "whoosh"
+ },
+ "slide2": {
+  "ids": [
+   7
+  ],
+  "role": "whoosh"
+ },
+ "pencil": {
+  "ids": [
+   8
+  ],
+  "role": "whoosh"
+ },
+ "pop1": {
+  "ids": [
+   10
+  ],
+  "role": "ui"
+ },
+ "pop2": {
+  "ids": [
+   11
+  ],
+  "role": "ui"
+ },
+ "pop3": {
+  "ids": [
+   24
+  ],
+  "role": "ui"
+ },
+ "zap": {
+  "ids": [
+   17
+  ],
+  "role": "hit"
+ },
+ "snip": {
+  "ids": [
+   21
+  ],
+  "role": "hit"
+ },
+ "rise": {
+  "ids": [
+   43
+  ],
+  "role": "riser"
+ },
+ "ding": {
+  "ids": [
+   60
+  ],
+  "role": "ui"
+ },
+ "key": {
+  "ids": [
+   33,
+   34,
+   37,
+   33
+  ],
+  "role": "click"
+ },
+ "click": {
+  "ids": [
+   38
+  ],
+  "role": "click"
+ },
+ "chime": {
+  "ids": [
+   61
+  ],
+  "role": "ui"
+ },
+ "wood": {
+  "ids": [
+   23
+  ],
+  "role": "ui"
+ },
+ "wood2": {
+  "ids": [
+   21
+  ],
+  "role": "ui"
+ },
+ "can": {
+  "ids": [
+   12
+  ],
+  "role": "ui"
+ },
+ "pa": {
+  "ids": [
+   9
+  ],
+  "role": "ui"
+ },
+ "pb": {
+  "ids": [
+   14
+  ],
+  "role": "ui"
+ },
+ "pc": {
+  "ids": [
+   13
+  ],
+  "role": "ui"
+ },
+ "env": {
+  "ids": [
+   4
+  ],
+  "role": "whoosh"
+ }
+}

@@ -1,0 +1,326 @@
+[
+ {
+  "t": 1.0,
+  "type": "pop",
+  "g": 0.6,
+  "note": "the Node drops into the gap in GAPS"
+ },
+ {
+  "t": 1.32,
+  "type": "w53",
+  "g": 0.45,
+  "note": "the lines split at the gaps and fly out"
+ },
+ {
+  "t": 2.02,
+  "type": "card",
+  "g": 0.5,
+  "note": "the Audit my business pill unfolds out of the Node"
+ },
+ {
+  "t": 2.75,
+  "type": "click",
+  "g": 0.55,
+  "note": "click: Audit my business"
+ },
+ {
+  "t": 3.02,
+  "type": "card",
+  "g": 0.45,
+  "note": "a Growth Path card unfolds out of the node"
+ },
+ {
+  "t": 3.25,
+  "type": "click",
+  "g": 0.3,
+  "note": "tick: unit economics"
+ },
+ {
+  "t": 3.375,
+  "type": "click",
+  "g": 0.3,
+  "note": "tick: ad waste"
+ },
+ {
+  "t": 3.5,
+  "type": "click",
+  "g": 0.3,
+  "note": "tick: conversion leakages"
+ },
+ {
+  "t": 3.625,
+  "type": "click",
+  "g": 0.3,
+  "note": "tick: team friction"
+ },
+ {
+  "t": 3.74,
+  "type": "click",
+  "g": 0.4,
+  "note": "cursor grabs the Node"
+ },
+ {
+  "t": 3.88,
+  "type": "w50",
+  "g": 0.4,
+  "note": "Node dragged out of the card"
+ },
+ {
+  "t": 4.02,
+  "type": "card",
+  "g": 0.45,
+  "note": "a Growth Path card unfolds out of the node"
+ },
+ {
+  "t": 4.75,
+  "type": "w57",
+  "g": 0.4,
+  "note": "drag to Market"
+ },
+ {
+  "t": 5.02,
+  "type": "card",
+  "g": 0.45,
+  "note": "a Growth Path card unfolds out of the node"
+ },
+ {
+  "t": 5.75,
+  "type": "w56",
+  "g": 0.4,
+  "note": "drag to Automate"
+ },
+ {
+  "t": 6.02,
+  "type": "card",
+  "g": 0.45,
+  "note": "a Growth Path card unfolds out of the node"
+ },
+ {
+  "t": 6.75,
+  "type": "w50",
+  "g": 0.4,
+  "note": "drag to Scale"
+ },
+ {
+  "t": 7.02,
+  "type": "card",
+  "g": 0.45,
+  "note": "a Growth Path card unfolds out of the node"
+ },
+ {
+  "t": 7.55,
+  "type": "click",
+  "g": 0.4,
+  "note": "cursor lets go"
+ },
+ {
+  "t": 7.88,
+  "type": "w56",
+  "g": 0.4,
+  "note": "Node flies to the LIVE light"
+ },
+ {
+  "t": 8.02,
+  "type": "card",
+  "g": 0.45,
+  "note": "XP Academy card unfolds around the LIVE light"
+ },
+ {
+  "t": 8.23,
+  "type": "click",
+  "g": 0.35,
+  "note": "grab XP Academy card"
+ },
+ {
+  "t": 8.52,
+  "type": "w57",
+  "g": 0.4,
+  "note": "card thrown"
+ },
+ {
+  "t": 8.73,
+  "type": "click",
+  "g": 0.35,
+  "note": "grab Nirvaha card"
+ },
+ {
+  "t": 9.02,
+  "type": "card",
+  "g": 0.35,
+  "note": "card thrown"
+ },
+ {
+  "t": 9.23,
+  "type": "click",
+  "g": 0.35,
+  "note": "grab LN Sports Arena card"
+ },
+ {
+  "t": 9.52,
+  "type": "card",
+  "g": 0.35,
+  "note": "card thrown"
+ },
+ {
+  "t": 9.88,
+  "type": "w52",
+  "g": 0.4,
+  "note": "Node stretches into the client tab"
+ },
+ {
+  "t": 10.05,
+  "type": "pop",
+  "g": 0.4,
+  "note": "client tabs grow"
+ },
+ {
+  "t": 10.22,
+  "type": "card",
+  "g": 0.4,
+  "note": "tiles unfold"
+ },
+ {
+  "t": 10.6,
+  "type": "w51",
+  "g": 0.4,
+  "note": "zoom into 6.1x"
+ },
+ {
+  "t": 11.75,
+  "type": "click",
+  "g": 0.5,
+  "note": "click Bamboo Spa"
+ },
+ {
+  "t": 13.25,
+  "type": "click",
+  "g": 0.5,
+  "note": "click Bikers Gear UK"
+ },
+ {
+  "t": 14.75,
+  "type": "click",
+  "g": 0.5,
+  "note": "click Bikers Wear Australia"
+ },
+ {
+  "t": 15.75,
+  "type": "click",
+  "g": 0.55,
+  "note": "click the ~9x tile"
+ },
+ {
+  "t": 16.02,
+  "type": "card",
+  "g": 0.55,
+  "note": "the ~9x tile floods the frame"
+ },
+ {
+  "t": 17.12,
+  "type": "w53",
+  "g": 0.4,
+  "note": "~9 slides out"
+ },
+ {
+  "t": 17.72,
+  "type": "w52",
+  "g": 0.4,
+  "note": "the X flies to the logo"
+ },
+ {
+  "t": 19.02,
+  "type": "pop",
+  "g": 0.5,
+  "note": "logo locks"
+ },
+ {
+  "t": 19.45,
+  "type": "pop",
+  "g": 0.3,
+  "note": "ONELOOP wordmark rises"
+ },
+ {
+  "t": 20.02,
+  "type": "pop",
+  "g": 0.28,
+  "note": "tagline word AUDIT"
+ },
+ {
+  "t": 20.27,
+  "type": "pop",
+  "g": 0.28,
+  "note": "tagline word BUILD"
+ },
+ {
+  "t": 20.52,
+  "type": "pop",
+  "g": 0.28,
+  "note": "tagline word MARKET"
+ },
+ {
+  "t": 20.77,
+  "type": "pop",
+  "g": 0.28,
+  "note": "tagline word AUTOMATE"
+ },
+ {
+  "t": 21.02,
+  "type": "card",
+  "g": 0.45,
+  "note": "CTA pill unfolds out of the Node"
+ },
+ {
+  "t": 22.5,
+  "type": "click",
+  "g": 0.55,
+  "note": "click the end-card CTA"
+ },
+ {
+  "t": 23.0,
+  "type": "type",
+  "g": 0.35,
+  "note": "oneloop.in types on"
+ },
+ {
+  "t": 23.09,
+  "type": "type",
+  "g": 0.35,
+  "note": "oneloop.in types on"
+ },
+ {
+  "t": 23.18,
+  "type": "type",
+  "g": 0.35,
+  "note": "oneloop.in types on"
+ },
+ {
+  "t": 23.27,
+  "type": "type",
+  "g": 0.35,
+  "note": "oneloop.in types on"
+ },
+ {
+  "t": 23.36,
+  "type": "type",
+  "g": 0.35,
+  "note": "oneloop.in types on"
+ },
+ {
+  "t": 23.52,
+  "type": "click",
+  "g": 0.25,
+  "note": "underline steps to the next word"
+ },
+ {
+  "t": 24.02,
+  "type": "click",
+  "g": 0.25,
+  "note": "underline steps to the next word"
+ },
+ {
+  "t": 24.52,
+  "type": "click",
+  "g": 0.25,
+  "note": "underline steps to the next word"
+ }
+]

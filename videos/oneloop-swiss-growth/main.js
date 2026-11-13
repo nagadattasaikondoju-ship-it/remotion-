@@ -1,0 +1,10 @@
+import { renderFilm, buildEvents, measure, DUR } from './film.js';
+const cv = document.getElementById('c'), g = cv.getContext('2d');
+await Promise.all(['500', '700', '800'].map(w => document.fonts.load(`${w} 40px Archivo`)));
+measure(g);
+let last = [];
+window.DUR = DUR;
+window.EV = buildEvents();
+window.render = t => { last = renderFilm(g, t); };
+window.TEXTS = t => { renderFilm(g, t); return renderFilm(g, t); };
+window.READY = true;

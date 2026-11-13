@@ -1,0 +1,197 @@
+[
+ {
+  "t": 4.35,
+  "type": "swipe",
+  "g": 0.35,
+  "note": "ad card and panel launch; camera pans to the platform"
+ },
+ {
+  "t": 4.5,
+  "type": "wood",
+  "g": 0.3,
+  "note": "the platform's eye opens"
+ },
+ {
+  "t": 6.35,
+  "type": "scan",
+  "g": 0.55,
+  "note": "ad-targeting scan: the green beam reads the creative",
+  "len": 0.9
+ },
+ {
+  "t": 7.25,
+  "type": "blip",
+  "g": 0.35,
+  "note": "scan complete, card outline turns green"
+ },
+ {
+  "t": 7.6,
+  "type": "slap",
+  "g": 0.45,
+  "note": "coral X lands on the targeting panel"
+ },
+ {
+  "t": 8.1,
+  "type": "env",
+  "g": 0.3,
+  "note": "the panel tumbles away"
+ },
+ {
+  "t": 10.5,
+  "type": "pencil",
+  "g": 0.4,
+  "note": "the triangle is drawn in the air",
+  "len": 0.8
+ },
+ {
+  "t": 11.9,
+  "type": "swipe2",
+  "g": 0.3,
+  "note": "triangle corners spread into the card slots; pan"
+ },
+ {
+  "t": 12.26,
+  "type": "pop1",
+  "g": 0.6,
+  "note": "pop 1: the problem ad"
+ },
+ {
+  "t": 13.9,
+  "type": "zap",
+  "g": 0.3,
+  "note": "the pain bolt strikes"
+ },
+ {
+  "t": 16.26,
+  "type": "pop2",
+  "g": 0.6,
+  "note": "pop 2: the proof ad"
+ },
+ {
+  "t": 19.28,
+  "type": "pop3",
+  "g": 0.6,
+  "note": "pop 3: the offer ad"
+ },
+ {
+  "t": 20.75,
+  "type": "can",
+  "g": 0.3,
+  "note": "the gift lid pops, the tag swings out"
+ },
+ {
+  "t": 21.95,
+  "type": "env",
+  "g": 0.3,
+  "note": "one product stamps onto all three ads"
+ },
+ {
+  "t": 25.0,
+  "type": "blip",
+  "g": 0.3,
+  "note": "the eye returns and finds the audiences"
+ },
+ {
+  "t": 29.55,
+  "type": "snip",
+  "g": 0.5,
+  "note": "scissors cut the weakest ad"
+ },
+ {
+  "t": 29.9,
+  "type": "slide2",
+  "g": 0.35,
+  "note": "the cut halves fall"
+ },
+ {
+  "t": 30.3,
+  "type": "rise",
+  "g": 1.0,
+  "note": "rising whoosh: the money moves to the winner",
+  "len": 0.9
+ },
+ {
+  "t": 31.15,
+  "type": "ding",
+  "g": 0.75,
+  "note": "crown lands on the winner"
+ },
+ {
+  "t": 32.6,
+  "type": "pa",
+  "g": 0.25,
+  "note": "shopfront 1 gets the winner"
+ },
+ {
+  "t": 32.85,
+  "type": "pb",
+  "g": 0.25,
+  "note": "shopfront 2 gets the winner"
+ },
+ {
+  "t": 33.1,
+  "type": "pc",
+  "g": 0.25,
+  "note": "shopfront 3 gets the winner"
+ },
+ {
+  "t": 34.0,
+  "type": "swipe3",
+  "g": 0.3,
+  "note": "pan to the strategies deck"
+ },
+ {
+  "t": 35.7,
+  "type": "wood",
+  "g": 0.25,
+  "note": "platform 1"
+ },
+ {
+  "t": 36.3,
+  "type": "wood2",
+  "g": 0.25,
+  "note": "platform 2"
+ },
+ {
+  "t": 39.13,
+  "type": "slide2",
+  "g": 0.3,
+  "note": "everything folds into the phone"
+ },
+ {
+  "t": 40.86,
+  "type": "key",
+  "g": 0.35,
+  "note": "typing META letter 1"
+ },
+ {
+  "t": 40.97,
+  "type": "key",
+  "g": 0.35,
+  "note": "typing META letter 2"
+ },
+ {
+  "t": 41.08,
+  "type": "key",
+  "g": 0.35,
+  "note": "typing META letter 3"
+ },
+ {
+  "t": 41.19,
+  "type": "key",
+  "g": 0.35,
+  "note": "typing META letter 4"
+ },
+ {
+  "t": 41.55,
+  "type": "click",
+  "g": 0.65,
+  "note": "confident click: send"
+ },
+ {
+  "t": 41.85,
+  "type": "chime",
+  "g": 0.6,
+  "note": "notification chime: message delivered"
+ }
+]

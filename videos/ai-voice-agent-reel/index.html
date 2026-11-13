@@ -78,12 +78,21 @@
       .live { display: inline-flex; align-items: center; gap: 10px; font-weight: 900; font-size: 28px; color: var(--green); margin-top: 10px; }
       .live b { width: 18px; height: 18px; border-radius: 50%; background: var(--green); display: block; }
 
-      /* chat */
-      #cChat { flex-direction: column; align-items: stretch; justify-content: center; gap: 14px; }
-      .bub { font-weight: 800; font-size: 40px; padding: 16px 28px; border-radius: 30px; max-width: 640px; }
-      .bub.c { background: #3a3f4d; align-self: flex-start; border-bottom-left-radius: 8px; }
-      .bub.a { background: var(--blue); align-self: flex-end; border-bottom-right-radius: 8px; }
-      #bolt { position: absolute; right: 34px; top: 24px; background: var(--yellow); color: #000; font-weight: 900; font-size: 30px; padding: 10px 20px; border-radius: 26px; display: flex; gap: 8px; align-items: center; }
+      /* live call: customer speaks, AI answers */
+      #cCall { flex-direction: column; align-items: stretch; justify-content: center; gap: 10px; padding: 20px 34px; }
+      #callTop { display: flex; align-items: center; gap: 20px; }
+      #callIcon { width: 74px; height: 74px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; flex: none; }
+      #callStatus { font-weight: 900; font-size: 44px; line-height: 1; }
+      #callStatus small { display: block; font-size: 26px; color: #b9bfcc; margin-top: 6px; letter-spacing: 1px; }
+      #timer { margin-left: auto; position: relative; width: 150px; height: 52px; flex: none; }
+      #timer b { position: absolute; right: 0; top: 0; font-weight: 900; font-size: 50px; font-variant-numeric: tabular-nums; color: var(--green); }
+      .who { display: flex; align-items: center; gap: 18px; height: 56px; }
+      .who span { width: 190px; flex: none; font-weight: 900; font-size: 28px; letter-spacing: 2px; color: #b9bfcc; }
+      .who.ai span { color: var(--blue); }
+      .bars { display: flex; align-items: center; gap: 7px; height: 56px; flex: 1; }
+      .bars i { display: block; width: 11px; height: 8px; border-radius: 6px; background: #8d94a6; }
+      .who.ai .bars i { background: linear-gradient(var(--violet), var(--blue)); }
+      #bolt { position: absolute; right: 34px; top: 30px; background: var(--yellow); color: #000; font-weight: 900; font-size: 28px; padding: 10px 20px; border-radius: 26px; display: flex; gap: 8px; align-items: center; }
 
       /* checklist */
       #cList { flex-direction: column; align-items: stretch; justify-content: center; gap: 10px; padding: 18px 34px; height: 262px; background: rgba(14, 16, 22, 0.85); }
@@ -145,10 +154,15 @@
           <div><div class="h1">AI VOICE AGENT</div><div class="sub">Answers every single call</div><div class="live"><b id="liveDot"></b>LIVE 24/7</div></div>
         </div>
 
-        <div class="card" id="cChat">
-          <div class="bub c" id="b1">Can I book for tomorrow?</div>
-          <div class="bub a" id="b2">Yes! 4 PM works for you.</div>
-          <div id="bolt"><svg width="26" height="26" viewBox="0 0 24 24" fill="#000"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>INSTANT</div>
+        <div class="card" id="cCall">
+          <div id="callTop">
+            <div id="callIcon"><svg width="42" height="42" viewBox="0 0 24 24" fill="#000"><path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1z"/></svg></div>
+            <div id="callStatus">Call connected<small>YOUR BUSINESS LINE</small></div>
+            <div id="timer"><b id="tm1">00:01</b><b id="tm2">00:02</b><b id="tm3">00:03</b></div>
+          </div>
+          <div class="who"><span>CUSTOMER</span><div class="bars" id="barsC"></div></div>
+          <div class="who ai"><span>AI AGENT</span><div class="bars" id="barsA"></div></div>
+          <div id="bolt"><svg width="26" height="26" viewBox="0 0 24 24" fill="#000"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg>INSTANT ANSWER</div>
         </div>
 
         <div class="card" id="cList">
@@ -195,21 +209,23 @@
       <audio id="sfx-12" src="assets/audio/pop.wav" data-start="6.43" data-duration="0.14" data-track-index="11" data-volume="0.5"></audio>
       <audio id="sfx-13" src="assets/audio/pop.wav" data-start="7.01" data-duration="0.14" data-track-index="11" data-volume="0.5"></audio>
       <audio id="sfx-14" src="assets/audio/whoosh.wav" data-start="8.7" data-duration="0.4" data-track-index="11" data-volume="0.28"></audio>
-      <audio id="sfx-15" src="assets/audio/pop.wav" data-start="9.0" data-duration="0.14" data-track-index="12" data-volume="0.5"></audio>
-      <audio id="sfx-16" src="assets/audio/pop.wav" data-start="9.95" data-duration="0.14" data-track-index="11" data-volume="0.5"></audio>
-      <audio id="sfx-17" src="assets/audio/impact.wav" data-start="11.05" data-duration="0.9" data-track-index="11" data-volume="0.4"></audio>
-      <audio id="sfx-18" src="assets/audio/whoosh.wav" data-start="11.62" data-duration="0.4" data-track-index="12" data-volume="0.28"></audio>
-      <audio id="sfx-19" src="assets/audio/ding.wav" data-start="12.453" data-duration="0.5" data-track-index="11" data-volume="0.45"></audio>
-      <audio id="sfx-20" src="assets/audio/ding.wav" data-start="13.097" data-duration="0.5" data-track-index="11" data-volume="0.45"></audio>
-      <audio id="sfx-21" src="assets/audio/ding.wav" data-start="14.657" data-duration="0.5" data-track-index="11" data-volume="0.45"></audio>
-      <audio id="sfx-22" src="assets/audio/whoosh.wav" data-start="15.02" data-duration="0.4" data-track-index="12" data-volume="0.28"></audio>
-      <audio id="sfx-23" src="assets/audio/tock.wav" data-start="15.3" data-duration="0.09" data-track-index="11" data-volume="0.4"></audio>
-      <audio id="sfx-24" src="assets/audio/tock.wav" data-start="15.6" data-duration="0.09" data-track-index="11" data-volume="0.4"></audio>
-      <audio id="sfx-25" src="assets/audio/tock.wav" data-start="15.9" data-duration="0.09" data-track-index="11" data-volume="0.4"></audio>
-      <audio id="sfx-26" src="assets/audio/whoosh-down.wav" data-start="17.2" data-duration="0.35" data-track-index="11" data-volume="0.25"></audio>
-      <audio id="sfx-27" src="assets/audio/impact.wav" data-start="18.77" data-duration="0.9" data-track-index="11" data-volume="0.5"></audio>
-      <audio id="sfx-28" src="assets/audio/chime.wav" data-start="18.857" data-duration="1.1" data-track-index="12" data-volume="0.55"></audio>
-      <audio id="sfx-29" src="assets/audio/impact.wav" data-start="20.347" data-duration="0.9" data-track-index="11" data-volume="0.45"></audio>
+      <audio id="sfx-15" src="assets/audio/ding.wav" data-start="8.86" data-duration="0.5" data-track-index="12" data-volume="0.4"></audio>
+      <audio id="sfx-16" src="assets/audio/tick.wav" data-start="9.76" data-duration="0.05" data-track-index="11" data-volume="0.3"></audio>
+      <audio id="sfx-17" src="assets/audio/tick.wav" data-start="10.76" data-duration="0.05" data-track-index="11" data-volume="0.3"></audio>
+      <audio id="sfx-18" src="assets/audio/pop.wav" data-start="10.5" data-duration="0.14" data-track-index="12" data-volume="0.45"></audio>
+      <audio id="sfx-19" src="assets/audio/impact.wav" data-start="11.05" data-duration="0.9" data-track-index="11" data-volume="0.4"></audio>
+      <audio id="sfx-20" src="assets/audio/whoosh.wav" data-start="11.62" data-duration="0.4" data-track-index="12" data-volume="0.28"></audio>
+      <audio id="sfx-21" src="assets/audio/ding.wav" data-start="12.453" data-duration="0.5" data-track-index="11" data-volume="0.45"></audio>
+      <audio id="sfx-22" src="assets/audio/ding.wav" data-start="13.097" data-duration="0.5" data-track-index="11" data-volume="0.45"></audio>
+      <audio id="sfx-23" src="assets/audio/ding.wav" data-start="14.657" data-duration="0.5" data-track-index="11" data-volume="0.45"></audio>
+      <audio id="sfx-24" src="assets/audio/whoosh.wav" data-start="15.02" data-duration="0.4" data-track-index="12" data-volume="0.28"></audio>
+      <audio id="sfx-25" src="assets/audio/tock.wav" data-start="15.3" data-duration="0.09" data-track-index="11" data-volume="0.4"></audio>
+      <audio id="sfx-26" src="assets/audio/tock.wav" data-start="15.6" data-duration="0.09" data-track-index="11" data-volume="0.4"></audio>
+      <audio id="sfx-27" src="assets/audio/tock.wav" data-start="15.9" data-duration="0.09" data-track-index="11" data-volume="0.4"></audio>
+      <audio id="sfx-28" src="assets/audio/whoosh-down.wav" data-start="17.2" data-duration="0.35" data-track-index="11" data-volume="0.25"></audio>
+      <audio id="sfx-29" src="assets/audio/impact.wav" data-start="18.77" data-duration="0.9" data-track-index="11" data-volume="0.5"></audio>
+      <audio id="sfx-30" src="assets/audio/chime.wav" data-start="18.857" data-duration="1.1" data-track-index="12" data-volume="0.55"></audio>
+      <audio id="sfx-31" src="assets/audio/impact.wav" data-start="20.347" data-duration="0.9" data-track-index="11" data-volume="0.45"></audio>
     </div>
 
     <script>
@@ -313,13 +329,29 @@
       tl.fromTo("#liveDot", { opacity: 1 }, { opacity: 0.25, duration: 0.3, repeat: 7, yoyo: true, ease: "sine.inOut", immediateRender: false }, 6.2);
       cardOut("#cAI", 8.66);
 
-      /* understands + responds instantly (8.75 - 11.6) */
-      gsap.set("#b1, #b2", { autoAlpha: 0 }); gsap.set("#bolt", { autoAlpha: 0, scale: 0.4 });
-      cardIn("#cChat", 8.75);
-      tl.fromTo("#b1", { autoAlpha: 0, x: -40 }, { autoAlpha: 1, x: 0, duration: 0.22, ease: POP, immediateRender: false }, 9.0);
-      tl.fromTo("#b2", { autoAlpha: 0, x: 40 }, { autoAlpha: 1, x: 0, duration: 0.22, ease: POP, immediateRender: false }, 9.95);
+      /* understands + responds instantly (8.75 - 11.6): a live call, not a chat */
+      const mkBars = (id, n) => { const w = document.getElementById(id); const arr = []; for (let i = 0; i < n; i++) { const b = document.createElement("i"); w.appendChild(b); arr.push(b); } return arr; };
+      const barsC = mkBars("barsC", 26), barsA = mkBars("barsA", 26);
+      gsap.set([...barsC, ...barsA], { height: 8 });
+      gsap.set("#tm2, #tm3, #bolt", { autoAlpha: 0 }); gsap.set("#bolt", { scale: 0.4 });
+      cardIn("#cCall", 8.75);
+      tl.fromTo("#callIcon", { scale: 0.5 }, { scale: 1, duration: 0.25, ease: POP, immediateRender: false }, 8.85);
+      tl.fromTo("#callIcon", { scale: 1 }, { scale: 1.12, duration: 0.3, yoyo: true, repeat: 7, ease: "sine.inOut", immediateRender: false }, 9.15);
+      /* call timer ticks 00:01 -> 00:03 */
+      tl.set("#tm1", { autoAlpha: 0 }, 9.75); tl.set("#tm2", { autoAlpha: 1 }, 9.75);
+      tl.set("#tm2", { autoAlpha: 0 }, 10.75); tl.set("#tm3", { autoAlpha: 1 }, 10.75);
+      /* customer speaks (8.9 - 10.4), AI picks up straight after (10.5 - 11.5) */
+      const talk = (arr, t0, dur, salt) => arr.forEach((b, i) => {
+        const dd = 0.15 + ((i * 29 + salt) % 9) * 0.02;
+        const reps = Math.max(1, Math.floor(dur / dd) - 1);
+        tl.fromTo(b, { height: 8 }, { height: 14 + ((i * 47 + salt) % 8) * 6, duration: dd, repeat: reps % 2 ? reps : reps - 1, yoyo: true, ease: "sine.inOut", immediateRender: false }, t0 + i * 0.01);
+        tl.to(b, { height: 8, duration: 0.1, ease: "power2.out" }, t0 + dur);
+      });
+      talk(barsC, 8.95, 1.45, 3);
+      talk(barsA, 10.5, 1.0, 11);
+      tl.set("#tm3", { autoAlpha: 0 }, T.instantly - 0.03);
       tl.fromTo("#bolt", { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.2, ease: POP, immediateRender: false }, T.instantly - 0.02);
-      cardOut("#cChat", 11.56);
+      cardOut("#cCall", 11.56);
 
       /* the list: qualify leads / book appointments / questions (11.65 - 15.05) */
       gsap.set("#r1, #r2, #r3", { autoAlpha: 0, x: -50 });
