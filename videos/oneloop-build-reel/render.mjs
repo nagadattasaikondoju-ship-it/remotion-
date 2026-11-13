@@ -34,7 +34,7 @@ if (mode === "stills") {
 } else {
   const ff = spawn("ffmpeg", ["-v", "error", "-y", "-i", BASE, "-f", "image2pipe", "-framerate", String(FPS), "-i", "-",
     "-filter_complex", "[0:v][1:v]overlay=0:0:format=auto,format=yuv420p[v]", "-map", "[v]", "-frames:v", String(N),
-    "-c:v", "libx264", "-preset", "medium", "-crf", "11", "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709",
+    "-c:v", "libx264", "-preset", "medium", "-crf", "16", "-profile:v", "high", "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709",
     path.join(dir, "out/video.mp4")], { stdio: ["pipe", "inherit", "inherit"] });
   for (let f = 0; f < N; f++) {
     const buf = Buffer.from(await frame(f / FPS), "base64");

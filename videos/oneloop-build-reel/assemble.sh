@@ -30,16 +30,20 @@ SFX=$REPO/.claude/skills/real-sfx; W=$HERE/out/sfxwork; mkdir -p "$W/work" "$W/r
  && python3 -I scripts/mix.py "$W/work/cues.json" --out "$W/result/mix.mp4" --base-audio "$HERE/out/bed.wav" --sfx-trim-db ${SFX_TRIM:-0}) 2>&1 | grep -v -E "distutils|_distutils_hack|frozen site|addpackage|Remainder|^\s*$" | tail -4
 (cd "$SFX" && python3 -I scripts/critique.py "$W/result/mix_resolved_cues.json" "$W/result/mix_sfx_track.wav" > "$W/result/critique.txt") 2>/dev/null || true
 grep -E "^\| (sync|balance|headroom|loudness|hook|pacing)" "$W/result/critique.txt" || true
+rm -f out/video_v.mov "$W/result/mix.mp4"   # 4K picture copies: free the disk before the deliverables
 cp "$W/result/mix_sfx_track.wav" out/stems/sfx.wav; cp out/dialogue.wav out/stems/dialogue.wav; cp out/music.wav out/stems/music_raw.wav
 ffmpeg -nostdin -v error -y -i out/bed.wav -i out/stems/sfx.wav -filter_complex "[1:a]apad=whole_dur=$DUR[s];[0:a][s]amix=inputs=2:normalize=0:duration=first,atrim=0:$DUR" -c:a pcm_f32le out/_pre.wav
 J=$(ffmpeg -nostdin -hide_banner -i out/_pre.wav -af loudnorm=I=-14:TP=-1.5:LRA=11:print_format=json -f null - 2>&1 | sed -n '/^{/,/^}/p')
 m() { echo "$J" | python3 -I -c "import json,sys; print(json.load(sys.stdin)['$1'])" 2>/dev/null; }
 ffmpeg -nostdin -v error -y -i out/_pre.wav -af "loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(m input_i):measured_TP=$(m input_tp):measured_LRA=$(m input_lra):measured_thresh=$(m input_thresh):offset=$(m target_offset):linear=true,aresample=48000,atrim=0:$DUR" -c:a pcm_s24le out/mix_master.wav
 # ---- deliverables ----
-for q in "2160x3840_30fps_4K_MASTER 13 320k 2160 medium" "1080x1920_30fps_HD_MASTER 12 320k 1080 slow" "1080x1920_30fps_share 17 256k 1080 slow"; do set -- $q
-ffmpeg -nostdin -v error -y -i out/video.mp4 -i out/mix_master.wav -map 0:v -map 1:a -vf "scale=$4:-2:flags=lanczos" -c:v libx264 -preset $5 -crf $2 -pix_fmt yuv420p \
+for q in "1080x1920_30fps_HD_MASTER 12 320k" "1080x1920_30fps_share 17 256k"; do set -- $q   # HD copies: downscaled from the 4K render
+ffmpeg -nostdin -v error -y -i out/video.mp4 -i out/mix_master.wav -map 0:v -map 1:a -vf "scale=1080:1920:flags=lanczos" -c:v libx264 -preset slow -crf $2 -pix_fmt yuv420p \
   -colorspace bt709 -color_primaries bt709 -color_trc bt709 -profile:v high -c:a aac -b:a $3 -af apad -t $DUR -movflags +faststart out/${N}_$1.mp4
 done
+# 4K master: the 4K render as is (no second encode) + the mix
+ffmpeg -nostdin -v error -y -i out/video.mp4 -i out/mix_master.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 320k -af apad -t $DUR -movflags +faststart \
+  out/${N}_2160x3840_30fps_4K_MASTER.mp4
 rm -f out/video_v.mov out/_pre.wav out/sfxwork/result/mix.mp4
 for f in out/${N}_*.mp4; do echo "$f $(ffprobe -v error -show_entries format=duration,size:stream=nb_frames -of csv=p=0 "$f" | tr '\n' ' ')"; done
 ffmpeg -nostdin -hide_banner -i out/${N}_1080x1920_30fps_share.mp4 -af ebur128=peak=true -f null - 2>&1 | grep -E "^\s+I:|Peak:"

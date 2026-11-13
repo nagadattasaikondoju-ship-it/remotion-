@@ -10,11 +10,11 @@ Three shots (cuts measured at 8.79 s and 15.00 s):
    - Client, 9.0–10.9 s: a complaint that is unintelligible ("hundreds of …"). 11.1 s: "Please do something!"
    - Developer, 13.2 s: "I'll do something." The client turns back to the laptop.
 3. **The call** (15.0–26.3 s). The client walks off, dials, and phones the manager:
-   "Hey, hi. Listen, the demo is actually good. But you know what's the problem? But it failed in deployment. Can you…"
+   "Hey, hi. Listen, the demo is actually good. But I don't know what's the problem, but it failed in deployment. Can you…"
    (1.4 s pause: he turns and looks back at the developer) "…just change the developer, please?" That pause is the joke, so it stays.
 
 **Transcription check:** Whisper medium and turbo, on the raw and the cleaned audio, with and without a context prompt, plus focused decodes
-of the three doubtful spans. Every line above is what the models agree on. The two unintelligible lines got a different text from every
+of the three doubtful spans. Every line above is what the models agree on, except one word: medium hears "But **I** don't know", turbo "But **you** (don't) know"; the caption follows medium, which heard it the same way on the raw take and on the final mix. The two unintelligible lines got a different text from every
 decode (e.g. "It won't be a body of work" / "In this moment we have bought it" / "and it's moving to your body"), so they're cut rather
 than captioned with a guess. Word onsets around the long pause were read off the speech envelope, where Whisper's timings drift.
 

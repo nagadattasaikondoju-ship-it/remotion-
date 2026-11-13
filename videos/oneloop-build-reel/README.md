@@ -31,7 +31,7 @@ throughout) and the three style references (see `ANALYSIS.md`).
 | 4.2 | the client (closer) | "The demo looks fine. So you can deploy it." DEMO APPROVED, then "Deploying to production…" fills |
 | 7.05 | black card | "3 weeks later…" / "the app goes live" |
 | 8.2 | the crash | "Deployment failed" toast, red pulse. Client: "Please do something!" (quick zoom on the developer). Developer: "I'll do something." |
-| 11.55 | the call | The client walks off and phones the manager ("Calling Manager…", then a call timer): "Hey, hi. Listen, the demo is actually good. But you know what's the problem? But it failed in deployment. Can you… [looks back at the developer] just change the developer, please?" (punch-in on the punchline) |
+| 11.55 | the call | The client walks off and phones the manager ("Calling Manager…", then a call timer): "Hey, hi. Listen, the demo is actually good. But I don't know what's the problem, but it failed in deployment. Can you… [looks back at the developer] just change the developer, please?" (punch-in on the punchline) |
 | 22.1 | freeze | Record scratch + tape-stop, "The demo worked. / Deployment didn't.", Tarun's "You see," over the frozen frame (J-cut) |
 | 23.5 | Tarun | "…software that dies": a YOUR APP monitor beeps three times and flatlines (LIVE → DOWN) on "dies" |
 | 26.3 | split screen | Top: the DEMO panel (clean data ✓, one user ✓, Wi-Fi perfect ✓). Bottom: Tarun. The panel glitches apart. |

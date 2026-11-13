@@ -66,10 +66,10 @@ C = [
  ("skit", 5.30, 6.70, "The demo looks fine.", ["fine."], None), ("skit", 6.76, 8.00, "So you can deploy it.", ["deploy"], None),
  *B1_EXTRA,
  ("skit", 11.08, 12.10, "Please do something!", ["something!"], "b"),
- ("skit", 13.12, 14.10, "I'll do something.", [], "b"),
+ ("skit", 12.80, 14.10, "I'll do something.", [], "b", [12.90, 13.52, 13.66]),   # onsets off the speech envelope
  ("skit", 16.50, 17.60, "Hey, hi. Listen,", [], None), ("skit", 18.02, 19.66, "the demo is actually good.", ["good."], None),
- ("skit", 19.98, 21.20, "But you know what's the problem?", ["problem?"], None),
- ("skit", 21.28, 22.45, "But it failed in deployment.", ["failed"], None),
+ ("skit", 19.98, 21.20, "But I don't know what's the problem,", ["problem,"], None),   # medium (raw + final mix) hears "I don't"; turbo "you (don't)"
+ ("skit", 21.28, 22.45, "but it failed in deployment.", ["failed"], None),
  ("skit", 22.80, 23.60, "Can you…", [], None, [23.08, 23.24]),   # word onsets read off the speech envelope (Whisper drifts here)
  ("skit", 24.80, 25.95, "just change the developer, please?", ["developer,"], None, [24.90, 25.04, 25.20, 25.30, 25.72]),
  ("t1", 1.85, 2.55, "You see,", [], None), ("t1", 2.65, 3.56, "nobody plans to build", ["nobody"], None),
