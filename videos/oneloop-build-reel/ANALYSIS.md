@@ -1,4 +1,28 @@
-# Reference analysis: what the three style references do, and what this reel takes from each
+# Analysis: the skit's story, and what the three style references do
+
+## The skit (WhatsApp video, 26.3 s, 478×850, 24 fps): read frame by frame
+Three shots (cuts measured at 8.79 s and 15.00 s):
+1. **The demo** (0–8.8 s, wide two-shot at a cafe table). The developer (yellow check shirt, glasses) presents the software on the
+   laptop; the client (light-blue check shirt, beard) watches, hand on chin.
+   - Developer, 1.3 s: "That's about the entire software." Then a second line at 3.1–4.4 s that is unintelligible.
+   - Client, 5.3 s: "The demo looks fine." 6.8 s: **"So you can deploy it."** (the go-ahead; v1's "But you can't deploy it" was a mis-hearing)
+2. **The crash** (8.8–15.0 s, new angle: time has passed). The client turns on the developer, gesturing.
+   - Client, 9.0–10.9 s: a complaint that is unintelligible ("hundreds of …"). 11.1 s: "Please do something!"
+   - Developer, 13.2 s: "I'll do something." The client turns back to the laptop.
+3. **The call** (15.0–26.3 s). The client walks off, dials, and phones the manager:
+   "Hey, hi. Listen, the demo is actually good. But you know what's the problem? But it failed in deployment. Can you…"
+   (1.4 s pause: he turns and looks back at the developer) "…just change the developer, please?" That pause is the joke, so it stays.
+
+**Transcription check:** Whisper medium and turbo, on the raw and the cleaned audio, with and without a context prompt, plus focused decodes
+of the three doubtful spans. Every line above is what the models agree on. The two unintelligible lines got a different text from every
+decode (e.g. "It won't be a body of work" / "In this moment we have bought it" / "and it's moving to your body"), so they're cut rather
+than captioned with a guess. Word onsets around the long pause were read off the speech envelope, where Whisper's timings drift.
+
+**Edit rule (Tarun's note: "keep it natural, no heavy cuts"):** the shots play in order. The only cuts remove dead air and the two
+unintelligible lines; each one lands on a change of framing (wide → closer on the speaker), or on the "3 weeks later" card, so none reads
+as a jump.
+
+# What the three style references do, and what this reel takes from each
 
 All three references are screen recordings of Instagram Reels (measured from frames at 2 fps, Whisper word timings and audio).
 

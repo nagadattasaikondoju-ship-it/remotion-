@@ -1,24 +1,26 @@
 #!/bin/bash
-# OneLoop "We don't build demos" reel: skit + Tarun's explanation, 1080x1920 30 fps.
+# OneLoop "We don't build demos" reel: skit + Tarun's explanation. Rendered in 4K (2160x3840, 30 fps); the HD copies are downscaled from it.
 #   bash assemble.sh            full build (timeline -> picture -> overlay -> sound -> deliverables)
 #   SKIP_PICTURE=1 bash assemble.sh   re-do only the sound + deliverables (out/video.mp4 must exist)
-# Sources (SRC_DIR): skit.mp4, clips/t1..t9.mp4, broll_0640.mp4 (One Loop Drive B-roll), clean/*.wav (cleaned dialogue).
+# Sources (SRC_DIR): skit.mp4, clips/t1..t9.mp4, broll_0640.mp4 (One Loop Drive B-roll), clean/*.wav (cleaned dialogue),
+#   up/*.mp4 + up/offsets.json (the takes upscaled x4 with tools/upscale_realesr.py; base_render.py falls back to the originals).
 set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd); REPO=$(cd "$HERE/../.." && pwd); cd "$HERE"
-PY=/usr/bin/python3; N=OneLoop_WeDontBuildDemos_1080x1920_30fps
+PY=/usr/bin/python3; N=OneLoop_WeDontBuildDemos
 python3 -I timeline.py >/dev/null
 DUR=$(python3 -I -c "import json;print(json.load(open('out/timeline.json'))['duration'])" 2>/dev/null)
 if [ -z "${SKIP_PICTURE:-}" ]; then
-  $PY -P base_render.py | tail -1        # picture: zooms, split, PiP, freezes (out/base.mp4)
-  node render.mjs video                  # captions + motion graphics over it (out/video.mp4)
+  $PY -P base_render.py | tail -1        # picture: zooms, split, PiP, freezes (out/base.mp4, 4K)
+  SC=2 node render.mjs video             # captions + motion graphics over it, drawn at 2x (out/video.mp4, 4K)
 fi
 # ---- sound ----
 $PY -P audio_build.py                    # out/dialogue.wav + out/music.wav (composed in code)
 python3 -I sfx_cues.py
 # music: playful under the sketch, documentary under Tarun (~19 dB under his voice), pulse under the proofs, out for the slam,
 # up for the logo / CTA hold; then ducked by the voice so every word sits on top
+VOL=$(python3 -I -c "import json;m=json.load(open('out/timeline.json'))['marks'];print(f\"if(lt(t,{m['frz']}),0.42,if(lt(t,{m['t4b']}),0.52,if(lt(t,{m['t7a']}),0.55,if(lt(t,{m['t9']}),0.0,0.60))))\")" 2>/dev/null)
 ffmpeg -nostdin -v error -y -i out/music.wav -i out/dialogue.wav -filter_complex \
- "[0:a]volume='if(lt(t,16.2),0.42,if(lt(t,36.9),0.52,if(lt(t,43.7),0.55,if(lt(t,47.5),0.0,0.60))))':eval=frame[m];\
+ "[0:a]volume='$VOL':eval=frame[m];\
   [1:a]asplit=2[d1][d2];[m][d1]sidechaincompress=threshold=0.03:ratio=4:attack=15:release=350:makeup=1[md];\
   [d2][md]amix=inputs=2:normalize=0:duration=first" -c:a pcm_s24le out/bed.wav
 ffmpeg -nostdin -v error -y -i out/video.mp4 -i out/bed.wav -map 0:v -map 1:a -c:v copy -c:a pcm_s16le -shortest out/video_v.mov
@@ -34,10 +36,10 @@ J=$(ffmpeg -nostdin -hide_banner -i out/_pre.wav -af loudnorm=I=-14:TP=-1.5:LRA=
 m() { echo "$J" | python3 -I -c "import json,sys; print(json.load(sys.stdin)['$1'])" 2>/dev/null; }
 ffmpeg -nostdin -v error -y -i out/_pre.wav -af "loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(m input_i):measured_TP=$(m input_tp):measured_LRA=$(m input_lra):measured_thresh=$(m input_thresh):offset=$(m target_offset):linear=true,aresample=48000,atrim=0:$DUR" -c:a pcm_s24le out/mix_master.wav
 # ---- deliverables ----
-for q in "MASTER 12 320k" "share 17 256k"; do set -- $q
-ffmpeg -nostdin -v error -y -i out/video.mp4 -i out/mix_master.wav -map 0:v -map 1:a -c:v libx264 -preset slow -crf $2 -pix_fmt yuv420p \
+for q in "2160x3840_30fps_4K_MASTER 13 320k 2160 medium" "1080x1920_30fps_HD_MASTER 12 320k 1080 slow" "1080x1920_30fps_share 17 256k 1080 slow"; do set -- $q
+ffmpeg -nostdin -v error -y -i out/video.mp4 -i out/mix_master.wav -map 0:v -map 1:a -vf "scale=$4:-2:flags=lanczos" -c:v libx264 -preset $5 -crf $2 -pix_fmt yuv420p \
   -colorspace bt709 -color_primaries bt709 -color_trc bt709 -profile:v high -c:a aac -b:a $3 -af apad -t $DUR -movflags +faststart out/${N}_$1.mp4
 done
 rm -f out/video_v.mov out/_pre.wav out/sfxwork/result/mix.mp4
 for f in out/${N}_*.mp4; do echo "$f $(ffprobe -v error -show_entries format=duration,size:stream=nb_frames -of csv=p=0 "$f" | tr '\n' ' ')"; done
-ffmpeg -nostdin -hide_banner -i out/${N}_share.mp4 -af ebur128=peak=true -f null - 2>&1 | grep -E "^\s+I:|Peak:"
+ffmpeg -nostdin -hide_banner -i out/${N}_1080x1920_30fps_share.mp4 -af ebur128=peak=true -f null - 2>&1 | grep -E "^\s+I:|Peak:"

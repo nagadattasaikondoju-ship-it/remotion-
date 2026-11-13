@@ -12,12 +12,19 @@ MAP = {"glitch": {"ids": [62], "role": "glitch"}, "lowhit": {"ids": [29], "role"
        "punch": {"ids": [55], "role": "hit"}, "pops": {"ids": [10], "role": "ui"}, "impact": {"ids": [28], "role": "hit"},
        "bigimpact": {"ids": [32], "role": "hit"}, "chime": {"ids": [61], "role": "ui"},
        "key1": {"ids": [33], "role": "ui"}, "key2": {"ids": [34], "role": "ui"}, "key3": {"ids": [37], "role": "ui"}}
-td = T1(4.40); spd = (790 - 60) / (td - (S("t1b") + 0.05))
-beats = [S("t1b") + 0.05 + (x - 60) / spd for x in (193, 423, 653)]
+APPROVE = next(w["t"] for c in TL["captions"] if c["text"].startswith("So you can deploy") for w in c["words"] if w["w"] == "deploy")
+td = T1(4.40); spd = (790 - 80) / (td - (S("t1b") + 0.05))   # overlay.html sECG: trace from x0 = 80, flatlines at x = 790
+beats = [S("t1b") + 0.05 + (x - 80) / spd for x in (213, 443, 673)]
 C = [
- (S("co1") + 0.30, "glitch", 0.50, "cold open: the deployment crashes, punch-in on the dev"),
+ (S("co1") + 0.30, "glitch", 0.50, "cold open: the deployment crashes, punch-in on the developer"),
  (S("co2"), "lowhit", 0.55, "cut to black: He had no idea what was coming."),
- (S("k2") + 0.30, "glitch", 0.45, "the crash, quick zoom on the dev + red toast"),
+ (S("a1") + 0.10, "pops", 0.30, "label: THE DEVELOPER"), (S("a1") + 0.28, "pops", 0.28, "label: THE CLIENT"),
+ (APPROVE, "chime", 0.36, "DEMO APPROVED (on 'deploy')"),
+ (S("lat") - 0.06, "softwhoosh", 0.34, "cut to the card: 3 weeks later"),
+ *[(S("lat") + 0.04 + 0.45 * k / 13, f"key{k % 3 + 1}", 0.30, "typing: 3 weeks later") for k in (0, 2, 9)],
+ (S("b"), "lowhit", 0.55, "back from the card: Deployment failed"), (S("b") + 0.04, "glitch", 0.40, "the red toast + glitch"),
+ (S("b") + 0.42, "glitch", 0.42, "the crash: quick zoom on the developer"),
+ (S("c1") + 0.20, "pops", 0.26, "Calling Manager chip"),
  (S("frz"), "scratch", 0.80, "freeze-frame: record scratch (the handoff)"),
  *[(b, "beep", 0.32, "heart-monitor beep on the ECG blip") for b in beats],
  (td, "lowhit", 0.38, "'dies': the trace flatlines, the beeping stops"),

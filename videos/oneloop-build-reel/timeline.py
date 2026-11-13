@@ -5,24 +5,30 @@ import json, os
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.environ.get("SRC_DIR", "/tmp/claude-0/-home-user-remotion-/b8e0fea9-ddb3-5f50-9983-de131f1aa53e/scratchpad/build")
 FILES = {"skit": f"{SRC}/skit.mp4", "broll": f"{SRC}/broll_0640.mp4", **{f"t{i}": f"{SRC}/clips/t{i}.mp4" for i in range(1, 10)}}
-WORDS = {k: f"{SRC}/tr/med/{k}.json" for k in ["skit"] + [f"t{i}" for i in range(1, 10)]}
+WORDS = {"skit": f"{SRC}/tr/turbo/skit_np.json", **{f"t{i}": f"{SRC}/tr/med/t{i}.json" for i in range(1, 10)}}
+# Two short sketch lines are unintelligible (Whisper medium + turbo, raw and cleaned audio, with and without context, all disagree):
+# the developer's second line (raw 3.1-4.4 s) and the client's complaint (raw 9.0-10.9 s). They are cut, not guessed.
+A1_DUR = 1.70          # 1.15 -> 2.85: "That's about the entire software."
+A1_EXTRA, B1_EXTRA = [], []
 
-# face anchors in source pixels (skit 478x850, Tarun 480x854)
-DEV_B, CLI_C, PAIR_A, PAIR_B, TARUN = (338, 250), (132, 152), (215, 300), (250, 255), (187, 228)
+# face anchors in ORIGINAL source pixels (skit 478x850, Tarun 480x854; base_render scales them for the upscaled files)
+DEV_A, CLI_A, PAIR_A = (318, 335), (120, 330), (215, 330)   # shot A: the demo (developer = yellow check, client = blue check)
+DEV_B, PAIR_B = (338, 250), (232, 268)                      # shot B: three weeks later, the crash
+CLI_C = (132, 152)                                          # shot C: the client calls the manager
+TARUN = (187, 228)
 
 # ---- picture: (id, kind, src, in, dur, layout, anchor, zoom keys [(t_local, z)], grade, note) ----
+# Part 1 is the sketch IN STORY ORDER, as Tarun asked ("keep it natural, no heavy cuts"): the demo -> 3 weeks later the
+# crash -> the client calls the manager. Only dead air is removed; every line is kept in its place.
 V = [
- ("co1",  "clip",   "skit", 11.05, 1.20, "full",  DEV_B,  [(0, 1.30), (0.12, 1.30), (0.30, 1.75), (1.2, 1.82)], "warm", "cold open: the crash, punch in on the dev"),
+ ("co1",  "clip",   "skit", 11.05, 1.20, "full",  DEV_B,  [(0, 1.30), (0.12, 1.30), (0.30, 1.75), (1.2, 1.82)], "warm", "cold open: flash-forward to the crash, punch in on the developer"),
  ("co2",  "black",  None,   0,     1.30, None,    None,   None, None, "black: He had no idea what was coming."),
- ("k0",   "clip",   "skit", 1.25,  1.70, "full",  PAIR_A, [(0, 1.00), (1.7, 1.04)], "warm", "That's about the entire software."),
- ("k1",   "clip",   "skit", 5.55,  2.65, "full",  PAIR_A, [(0, 1.06), (2.65, 1.12)], "warm", "The demo looks fine. But you can't deploy it."),
- ("k2",   "clip",   "skit", 11.05, 1.25, "full",  DEV_B,  [(0, 1.00), (0.10, 1.00), (0.32, 1.65), (1.25, 1.70)], "warm", "Please do something! (crash: quick zoom on the dev)"),
- ("k3",   "clip",   "skit", 13.10, 1.25, "full",  DEV_B,  [(0, 1.45), (1.25, 1.50)], "warm", "I'll do something."),
- ("k4a",  "clip",   "skit", 16.85, 0.70, "full",  CLI_C,  [(0, 1.00), (0.7, 1.02)], "warm", "Listen,"),
- ("k4b",  "clip",   "skit", 18.45, 4.17, "full",  CLI_C,  [(0, 1.12), (4.17, 1.20)], "warm", "the demo is actually good ... it failed in deployment."),
- ("k5a",  "clip",   "skit", 22.85, 0.65, "full",  CLI_C,  [(0, 1.00), (0.65, 1.02)], "warm", "Can you"),
- ("k5b",  "clip",   "skit", 24.60, 1.35, "full",  CLI_C,  [(0, 1.18), (1.35, 1.32)], "warm", "just change the developer, please?"),
- ("frz",  "freeze", "skit", 25.90, 1.37, "full",  CLI_C,  [(0, 1.32), (1.37, 1.36)], "freeze", "freeze + record scratch; Tarun's VO starts over it"),
+ ("a1",   "clip",   "skit", 1.15,  A1_DUR, "full", PAIR_A, [(0, 1.00), (A1_DUR, 1.04)], "warm", "THE DEMO: the developer shows the software (wide two-shot, roles labelled)"),
+ ("a3",   "clip",   "skit", 5.20,  2.85, "full",  CLI_A,  [(0, 1.30), (2.85, 1.36)], "warm", "cut to the client: The demo looks fine. So you can deploy it. (APPROVED)"),
+ ("lat",  "black",  None,   0,     1.15, None,    None,   None, None, "card: 3 weeks later… (Tarun's script: the client said go ahead, three weeks later... this)"),
+ ("b",    "clip",   "skit", 10.95, 3.35, "full",  DEV_B,  [(0, 1.05), (0.20, 1.05), (0.42, 1.65), (3.35, 1.72)], "warm", "Deployment failed. Please do something! (quick zoom on the developer) / I'll do something."),
+ ("c1",   "clip",   "skit", 15.40, 10.55, "full", CLI_C,  [(0, 1.00), (1.3, 1.00), (3.2, 1.10), (9.45, 1.15), (9.62, 1.32), (10.55, 1.36)], "warm", "the client walks off and calls the manager; punch-in on the punchline"),
+ ("frz",  "freeze", "skit", 25.90, 1.37, "full",  CLI_C,  [(0, 1.36), (1.37, 1.40)], "freeze", "freeze + record scratch; Tarun's VO starts over it"),
  ("t1b",  "clip",   "t1",   2.62,  2.83, "full",  TARUN,  [(0, 1.00), (2.83, 1.07)], "cool", "nobody plans to build a software that dies. It happens quietly."),
  ("t1c",  "clip",   "t1",   5.45,  3.65, "split", TARUN,  [(0, 1.00), (3.65, 1.05)], "cool", "split: DEMO panel on top"),
  ("t2a",  "clip",   "broll", 1.50, 1.80, "cover", None,   [(0, 1.00), (1.8, 1.08)], "cool", "b-roll MVI_0640 night traffic: the real world walks in"),
@@ -40,28 +46,32 @@ V = [
  ("t8",   "clip",   "t8",   0.75,  2.25, "full",  TARUN,  [(0, 1.10), (2.25, 1.14)], "cool", "Comment BUILD"),
  ("hold", "freeze", "t8",   2.99,  2.00, "full",  TARUN,  [(0, 1.14), (2.0, 1.16)], "hold", "CTA hold 2 s"),
 ]
-CENTRE = {"co1", "k2", "k3"}  # punch-ins that bring the dev's face to the middle of the frame
+CENTRE = {"co1": 1.0, "b": 1.0, "a3": 0.7, "c1": 0.5}  # punch-ins that pull the speaker's face toward the middle of the frame
 # ---- dialogue: (src, in, out, at = id of the picture segment it starts in, offset into that segment) ----
 A = [
- ("skit", 11.05, 12.25, "co1", 0), ("skit", 1.25, 2.95, "k0", 0), ("skit", 5.55, 8.20, "k1", 0),
- ("skit", 11.05, 12.30, "k2", 0), ("skit", 13.10, 14.35, "k3", 0), ("skit", 16.85, 17.55, "k4a", 0),
- ("skit", 18.45, 22.62, "k4b", 0), ("skit", 22.85, 23.50, "k5a", 0), ("skit", 24.60, 25.95, "k5b", 0),
+ ("skit", 11.05, 12.25, "co1", 0), ("skit", 1.15, 1.15 + A1_DUR, "a1", 0), ("skit", 5.20, 8.05, "a3", 0),
+ ("skit", 10.95, 14.30, "b", 0),                 # one continuous take: "Please do something!", the quick zoom, "I'll do something."
+ ("skit", 15.40, 25.95, "c1", 0),                # the whole phone call, pauses and all (the look back at the developer is the joke)
  ("t1", 1.85, 9.10, "frz", 0.60),               # J-cut: "You see," over the freeze, picture cuts to Tarun on "nobody"
  ("t2", 0.60, 7.15, "t2a", 0), ("t3", 0.55, 5.25, "t3", 0), ("t4", 0.70, 4.10, "t4a", 0),
  ("t5", 0.65, 2.95, "t5", 0), ("t6", 0.80, 3.50, "t6", 0), ("t7", 0.45, 4.25, "t7a", 0),
  ("t9", 0.70, 4.00, "t9", 0), ("t8", 0.75, 3.00, "t8", 0),
 ]
-# ---- captions: (src, from, to, text, emphasised words); word times come from Whisper inside [from, to] ----
+# ---- captions: (src, from, to, text, emphasised words, hint); word times come from Whisper inside [from, to] ----
+# The sketch is transcribed with Whisper turbo (tr/turbo/skit_np.json); lines checked against medium and a clean-audio pass.
 C = [
- ("skit", 11.10, 12.25, "Please do something!", ["something!"], "co1"),
- ("skit", 1.30, 2.90, "That's about the entire software.", ["software."], None),
- ("skit", 5.60, 6.80, "The demo looks fine.", ["fine."], None), ("skit", 7.10, 8.15, "But you can't deploy it.", ["deploy"], None),
- ("skit", 11.10, 12.25, "Please do something!", ["something!"], "k2"),
- ("skit", 13.10, 14.30, "I'll do something.", [], None),
- ("skit", 16.88, 17.50, "Listen,", [], None), ("skit", 18.50, 19.80, "the demo is actually good.", ["good."], None),
- ("skit", 20.00, 21.28, "But I don't know what's the problem,", ["problem,"], None),
- ("skit", 21.28, 22.60, "but it failed in deployment.", ["failed"], None),
- ("skit", 22.88, 23.48, "Can you", [], None), ("skit", 24.62, 25.95, "just change the developer, please?", ["developer,"], None),
+ ("skit", 11.08, 12.10, "Please do something!", ["something!"], "co1"),
+ ("skit", 1.26, 2.80, "That's about the entire software.", ["software."], None),
+ *A1_EXTRA,
+ ("skit", 5.30, 6.70, "The demo looks fine.", ["fine."], None), ("skit", 6.76, 8.00, "So you can deploy it.", ["deploy"], None),
+ *B1_EXTRA,
+ ("skit", 11.08, 12.10, "Please do something!", ["something!"], "b"),
+ ("skit", 13.12, 14.10, "I'll do something.", [], "b"),
+ ("skit", 16.50, 17.60, "Hey, hi. Listen,", [], None), ("skit", 18.02, 19.66, "the demo is actually good.", ["good."], None),
+ ("skit", 19.98, 21.20, "But you know what's the problem?", ["problem?"], None),
+ ("skit", 21.28, 22.45, "But it failed in deployment.", ["failed"], None),
+ ("skit", 22.80, 23.60, "Can you…", [], None, [23.08, 23.24]),   # word onsets read off the speech envelope (Whisper drifts here)
+ ("skit", 24.80, 25.95, "just change the developer, please?", ["developer,"], None, [24.90, 25.04, 25.20, 25.30, 25.72]),
  ("t1", 1.85, 2.55, "You see,", [], None), ("t1", 2.65, 3.56, "nobody plans to build", ["nobody"], None),
  ("t1", 3.56, 4.66, "a software that dies.", ["dies."], None), ("t1", 4.66, 5.45, "It happens quietly.", ["quietly."], None),
  ("t1", 5.55, 6.20, "In the demo,", ["demo,"], None), ("t1", 6.30, 7.20, "the data is clean.", ["clean."], None),
@@ -92,7 +102,7 @@ def main():
     for sid, kind, src, i, dur, layout, anchor, zk, grade, note in V:
         seg[sid] = t
         out["segments"].append({"id": sid, "kind": kind, "src": src, "in": i, "dur": dur, "start": round(t, 4), "layout": layout,
-                                "anchor": anchor, "zoom": zk, "grade": grade, "note": note, "centre": 1.0 if sid in CENTRE else 0.0})
+                                "anchor": anchor, "zoom": zk, "grade": grade, "note": note, "centre": CENTRE.get(sid, 0.0)})
         t += dur
     out["duration"] = round(t, 4)
     amap = []  # (src, in, out, out_start)
@@ -103,8 +113,9 @@ def main():
             if s == src and i - 0.02 <= x <= o + 0.02 and (hint is None or abs(st - seg[hint]) < 1e-6): return st + (x - i)
         return None
     words = {k: load_words(k) for k in WORDS}
-    for src, a, b, text, emph, hint in C:
+    for src, a, b, text, emph, hint, *fixed in C:
         toks = text.split(); ws = [w for w in words[src] if a - 0.05 <= w[0] < b]
+        if fixed: ws = [(x, x, tk) for x, tk in zip(fixed[0], toks)]
         if src in ("t5", "t6"): ws = [w for w in ws if w[0] > 0.3]  # Whisper pins the first word at 0.00; the onset is later
         if len(ws) == len(toks): times = [max(a, w[0]) for w in ws]
         else:  # Whisper split/merged words differently: spread the corrected words over the spoken span

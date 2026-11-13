@@ -62,6 +62,11 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
   `davidcervinka/vibe-editing` has no SKILL.md: reference clone in `tools/skill-repos/`. House rules still win (sound pipeline, captions, no fabricated clients).
 - Freesound CDN and Wikimedia downloads return 403 from cloud sessions: SFX the library lacks are made with `earshot forge` into `assets/sfx/earshot/` and
   APPENDED to `tools/real-sfx.index.json` (never rebuild the index: `build_index.py` renumbers every id and breaks older reels' `sfx_map.json`). Music is composed in code.
+- Low-res footage (WhatsApp 480p): AI-upscale ×4 with `tools/upscale_realesr.py` (Real-ESRGAN general-x4v3, BSD-3; safetensors weights
+  from Hugging Face into gitignored `tools/models/`, URL at the top of the script; CPU bf16, ~2 s/frame). The user wants HD or 4K:
+  render at 4K and downscale the HD copies (pattern: `videos/oneloop-build-reel`). Disk is tight (a few GB free): delete intermediates.
+- Skits / acted scenes: keep them in story order and caption exactly what is said (Whisper turbo, cross-checked); never reorder lines or
+  guess unclear words. Add story labels (roles, time jumps) so it reads on mute. The user rejected a chopped, reordered skit (Nov 13).
 - **Sound pipeline for EVERY video (user's standing rule):**
   1. Openverse API (`tools/openverse_sfx.py`): search and fetch real recorded SFX (CC0).
   2. Real SFX skill (`real-sfx`): analyse the video and place the sounds on the timeline.

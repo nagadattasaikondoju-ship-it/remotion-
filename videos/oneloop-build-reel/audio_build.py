@@ -60,7 +60,7 @@ def add(buf, x, at, gain=1.0, pan=0.0):
 def music():
     m = np.zeros((N, 2))
     # --- playful sketch bed: 116 BPM, C major, bouncy pizzicato bass + staccato motif, from the sketch's first line to the freeze
-    t0, t1, bpm = S("k0"), S("frz"), 116; beat = 60 / bpm
+    t0, t1, bpm = S("a1"), S("frz"), 116; beat = 60 / bpm
     bass = [36, 43, 41, 43, 36, 43, 38, 43]; motif = [72, None, 76, 79, 77, None, 74, 76, 72, None, 79, 77, 76, 74, 72, None]
     k = 0; t = t0
     while t < t1 - 0.05:

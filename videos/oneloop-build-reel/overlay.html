@@ -2,20 +2,24 @@
 <html><head><meta charset="utf-8">
 <style>html,body{margin:0;background:transparent}canvas{display:block}</style>
 </head><body>
-<canvas id="c" width="1080" height="1920"></canvas>
+<canvas id="c"></canvas>
 <script src="img/logo.js"></script>
 <script>
 // Captions + motion graphics for the BUILD reel. Every frame is a pure function of t (window.seek), no timers, no state.
 // Timing comes from out/timeline.json (window.TIMELINE), so a re-cut moves everything with it.
-const TLD = window.TIMELINE, W = 1080, H = 1920;
-const cv = document.getElementById("c"), ctx = cv.getContext("2d");
+const TLD = window.TIMELINE, W = 1080, H = 1920, SC = window.SC || 1;
+const cv = document.getElementById("c"); cv.width = W * SC; cv.height = H * SC; const ctx = cv.getContext("2d");
+// shadows are in device pixels (the transform doesn't scale them): scale them with SC so 4K looks like 1080
+function scaleShadows(g) { for (const k of ["shadowBlur", "shadowOffsetX", "shadowOffsetY"]) { const d = Object.getOwnPropertyDescriptor(CanvasRenderingContext2D.prototype, k);
+  Object.defineProperty(g, k, { get() { return d.get.call(this) / SC; }, set(v) { d.set.call(this, v * SC); } }); } }
+scaleShadows(ctx);
 const COP = "#E59C69", CREAM = "#F7E8DA", RED = "#FF4D4F", GREEN = "#3DDC97", INK = "#0E0F12";
 const SEG = {}; TLD.segments.forEach(s => SEG[s.id] = s);
 const S = id => SEG[id].start, E = id => SEG[id].start + SEG[id].dur;
 // source-time → output-time for the takes that carry motion graphics
 const T1 = x => S("frz") + 0.60 + (x - 1.85), T2 = x => S("t2a") + (x - 0.60), T3 = x => S("t3") + (x - 0.55);
 const T7 = x => S("t7a") + (x - 0.45), T8 = x => S("t8") + (x - 0.75), T9 = x => S("t9") + (x - 0.70);
-const PIP = { x: 250, y: 1590, r: 196 };
+const PIP = { x: 310, y: 1470, r: 260 };   // medium circle: Tarun's whole head, hair to chin (base_render.py frames it)
 
 const cl = (u, a = 0, b = 1) => Math.min(b, Math.max(a, u));
 const P = (t, a, b) => cl((t - a) / (b - a));
@@ -83,9 +87,10 @@ function toast(label, u, y = 330) { // red error toast that pops in
 }
 
 // ---------- captions (rail): white Poppins 800, word by word, the punch word in copper ----------
-const CAP = { co1: { y: 1500 }, k0: { y: 1520 }, k1: { y: 1520 }, k2: { y: 1520 }, k3: { y: 1520 }, k4a: { y: 1540 }, k4b: { y: 1540 }, k5a: { y: 1540 }, k5b: { y: 1540 },
-  frz: { y: 1540 }, t1b: { y: 1470 }, t1c: { y: 1770, size: 74 }, t2b: { y: 1600 }, t2c: { y: 1610 }, t2d: { x: 700, y: 1600, maxW: 640, size: 68 },
-  t3: { y: 1470 }, t4a: { y: 1470 }, t4b: { x: 700, y: 1600, maxW: 640, size: 68 }, t5: { x: 700, y: 1600, maxW: 640, size: 68 }, t6: { x: 700, y: 1600, maxW: 640, size: 68 },
+const PCAP = { x: 818, y: 1470, maxW: 450, size: 62 };   // captions beside the circle
+const CAP = { co1: { y: 1500 }, a1: { y: 1560 }, a3: { y: 1560 }, b: { y: 1560 }, c1: { y: 1540 },
+  frz: { y: 1540 }, t1b: { y: 1470 }, t1c: { y: 1770, size: 74 }, t2b: { y: 1640 }, t2c: { y: 1640 }, t2d: PCAP,
+  t3: { y: 1470 }, t4a: { y: 1470 }, t4b: PCAP, t5: PCAP, t6: PCAP,
   t7a: { y: 1470 }, t9: { y: 1470 } };
 function segAt(t) { let s = TLD.segments[0]; for (const x of TLD.segments) if (t >= x.start - 1e-6) s = x; return s; }
 function captions(t) {
@@ -112,6 +117,53 @@ function sCrash(id, t) { // the deployment crashes: red toast + red edge pulse o
   const u = t - S(id), hit = 0.30; if (u < hit) return;
   vignette("rgba(229,72,77,A)", 0.55 * Math.exp(-(u - hit) * 3.2) + 0.12); toast("Deployment failed", u - hit, 300);
 }
+// The sketch, told so anyone can follow it: who is who, the client says go ahead, 3 weeks later it breaks, the client calls the manager.
+function pointer(label, x, y, a, col) { // a role label with a small arrow down to the person
+  if (a <= 0) return; ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - a) * -18);
+  ctx.shadowColor = "rgba(0,0,0,.35)"; ctx.shadowBlur = 18; ctx.shadowOffsetY = 4;
+  ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(x - 15, y + 26); ctx.lineTo(x + 15, y + 26); ctx.lineTo(x, y + 46); ctx.closePath(); ctx.fill();
+  chip(label, x, y, { bg: col, fg: INK, size: 34, pad: 28 }); ctx.restore();
+}
+function sRoles(t) { // THE DEMO: name the two roles (story roles, not real names)
+  const u = t - S("a1"), d = SEG.a1.dur, out = 1 - P(u, d - 0.2, d);
+  chip("DEMO DAY", W / 2, 200, { bg: "rgba(14,15,18,.78)", fg: "#fff", dot: GREEN, size: 30, alpha: eOut(P(u, 0, 0.3)) * out });
+  pointer("THE DEVELOPER", 722, 566, eOut(P(u, 0.10, 0.42)) * out, CREAM);
+  pointer("THE CLIENT", 262, 566, eOut(P(u, 0.28, 0.60)) * out, COP);
+}
+function sApproved(t) { // "So you can deploy it.": the go-ahead, then the deploy starts
+  const c = TLD.captions.find(c => c.text.startsWith("So you can deploy")), td = c.words[3].t, k = P(t, td - 0.06, td + 0.28); if (k <= 0) return;
+  const a = cl(k * 2), sc = lerp(0.8, 1, back(k)); ctx.save(); ctx.translate(W / 2, 230); ctx.scale(sc, sc); ctx.globalAlpha = a;
+  font(800, 38); const label = "DEMO APPROVED", w = ctx.measureText(label).width + 120; rr(-w / 2, -40, w, 80, 40);
+  ctx.shadowColor = "rgba(0,0,0,.4)"; ctx.shadowBlur = 24; ctx.shadowOffsetY = 6; ctx.fillStyle = "#19A86A"; ctx.fill(); ctx.shadowColor = "transparent";
+  check(-w / 2 + 44, 0, 23, cl(k * 1.4), "#0B6B42");
+  ctx.fillStyle = "#fff"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(label, -w / 2 + 80, 2); ctx.restore();
+  const pb = eIO(P(t, td + 0.30, E("a3") - 0.05)), b = eOut(P(t, td + 0.25, td + 0.5)); if (b <= 0) return;
+  ctx.save(); ctx.globalAlpha = b; rr(W / 2 - 230, 312, 460, 14, 7); ctx.fillStyle = "rgba(255,255,255,.28)"; ctx.fill();
+  rr(W / 2 - 230, 312, 460 * Math.max(0.03, pb), 14, 7); ctx.fillStyle = GREEN; ctx.fill(); ctx.restore();
+  txt(pb < 1 ? "Deploying to production…" : "Deployed ✓", W / 2, 360, { size: 30, weight: 700, alpha: b, shadow: 0.9, stroke: 6 });
+}
+const FAIL_AT = () => S("b") + 0.04;   // the "Deployment failed" toast, the moment we're back from the card
+function sLater(t) { // 3 weeks later… on black (Tarun's script: "The client said go ahead. Three weeks later… this.")
+  const u = t - S("lat"), d = SEG.lat.dur, a = eOut(P(u, 0, 0.18)) * (1 - P(u, d - 0.12, d));
+  const str = "3 weeks later…", n = Math.ceil(cl((u - 0.04) / 0.45) * str.length); font(400, 132, "ISI"); const x0 = W / 2 - ctx.measureText(str).width / 2;
+  txt(str.slice(0, n), x0, 900, { size: 132, weight: 400, fam: "ISI", align: "left", alpha: a });
+  const ln = eOut(P(u, 0.35, 0.75)); ctx.save(); ctx.globalAlpha = a; ctx.fillStyle = COP; ctx.fillRect(W / 2 - 180 * ln, 995, 360 * ln, 5); ctx.restore();
+  txt("the app goes live", W / 2, 1080, { size: 46, weight: 600, color: "#D5D9E0", alpha: a * eOut(P(u, 0.5, 0.8)) });
+}
+function crashToast(t) { const u = t - FAIL_AT(); if (u <= 0) return; toast("Deployment failed", u, 300); }
+function sCall(t) { // the client walks off and phones the manager: a call chip with a ringing pulse, then a call timer
+  const u = t - S("c1"), tOn = S("c1") + (16.50 - 15.40), a = eOut(P(u, 0.2, 0.5)) * (1 - P(t, E("c1") - 0.15, E("c1"))); if (a <= 0) return;
+  const on = t >= tOn, label = on ? `On call · Manager   0:${String(Math.floor(t - tOn)).padStart(2, "0")}` : "Calling Manager…";
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - a) * -20); font(700, 34); const w = ctx.measureText(label).width + 124, cx0 = 700, y = 150;
+  ctx.shadowColor = "rgba(0,0,0,.35)"; ctx.shadowBlur = 20; ctx.shadowOffsetY = 5; rr(cx0 - w / 2, y - 40, w, 80, 40); ctx.fillStyle = "rgba(14,15,18,.84)"; ctx.fill(); ctx.shadowColor = "transparent";
+  const cx = cx0 - w / 2 + 46;
+  if (!on) for (const ph of [0, 0.5]) { const pr = (u * 1.4 + ph) % 1; ctx.beginPath(); ctx.arc(cx, y, 24 + pr * 30, 0, 7); ctx.strokeStyle = `rgba(61,220,151,${0.8 * (1 - pr)})`; ctx.lineWidth = 3; ctx.stroke(); }
+  ctx.beginPath(); ctx.arc(cx, y, 24, 0, 7); ctx.fillStyle = on ? GREEN : "#2BB673"; ctx.fill();
+  ctx.save(); ctx.translate(cx, y); ctx.rotate(-0.75); ctx.fillStyle = "#fff"; rr(-6, -14, 12, 28, 5); ctx.fill(); rr(-10, -15, 20, 7, 3); ctx.fill(); rr(-10, 8, 20, 7, 3); ctx.fill(); ctx.restore();
+  ctx.fillStyle = "#fff"; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(label, cx + 38, y + 2); ctx.restore();
+}
+function glitchBars(u) { if (u > 0.22) return; for (let k = 0; k < 7; k++) { const y = hash(k * 9 + Math.floor(u * 60)) * H, h = 8 + hash(k + 3) * 26;
+  ctx.fillStyle = k % 2 ? "rgba(255,77,79,.35)" : "rgba(94,177,255,.25)"; ctx.fillRect(0, y, W, h); } }
 function sBlack(t) { // He had no idea what was coming.
   const u = t - S("co2"); ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H);
   const l1 = ["He", "had", "no", "idea"], l2 = ["what", "was", "coming."];
@@ -131,9 +183,14 @@ function sFreeze(t) { // the record-scratch freeze
 }
 function sECG(t) { // "nobody plans to build software that dies": a heartbeat that flatlines on "dies"
   const t0 = S("t1b") + 0.05, td = T1(4.40), t1 = E("t1b"); if (t < t0 || t > t1) return;
-  const x0 = 60, x1 = 1020, xd = 790, speed = (xd - x0) / (td - t0), head = Math.min(x1, x0 + (t - t0) * speed), y = 1200;
+  const x0 = 80, x1 = 1000, xd = 790, speed = (xd - x0) / (td - t0), head = Math.min(x1, x0 + (t - t0) * speed), y = 1262;
   const a = P(t, t0, t0 + 0.25) * (1 - P(t, t1 - 0.3, t1));
   const sig = x => { if (x > xd) return 0; const p = ((x - x0) % 230) / 230; return p > 0.55 && p < 0.62 ? -150 * Math.sin((p - 0.55) / 0.07 * Math.PI) : p > 0.62 && p < 0.67 ? 60 * Math.sin((p - 0.62) / 0.05 * Math.PI) : p > 0.4 && p < 0.48 ? -14 * Math.sin((p - 0.4) / 0.08 * Math.PI) : 0; };
+  ctx.save(); ctx.globalAlpha = a; rr(40, 1030, 1000, 360, 36); ctx.fillStyle = "rgba(8,10,14,.66)"; ctx.fill();
+  txt("YOUR APP", 90, 1080, { size: 30, weight: 700, color: "#AEB5C2", align: "left" }); const dead = t >= td;
+  chip(dead ? "DOWN" : "LIVE", 948, 1080, { bg: dead ? "rgba(255,77,79,.95)" : "rgba(25,168,106,.95)", fg: "#fff", dot: "#fff", size: 26 });
+  if (dead) txt("no alarms, no errors. It just stops.", 560, 1356, { size: 28, weight: 600, color: "#AEB5C2", alpha: eOut(P(t, td + 0.1, td + 0.4)) });
+  ctx.restore();
   ctx.save(); ctx.globalAlpha = a; ctx.lineWidth = 7; ctx.lineJoin = ctx.lineCap = "round"; ctx.shadowBlur = 18;
   for (const [from, to, col] of [[x0, Math.min(head, xd), GREEN], [xd, head, RED]]) { if (to <= from) continue;
     ctx.strokeStyle = col; ctx.shadowColor = col; ctx.beginPath(); for (let x = from; x <= to; x += 3) { const yy = y + sig(x); x === from ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy); } ctx.stroke(); }
@@ -162,12 +219,12 @@ function demoPanel(t, g) { // top half of the split: the demo, where everything 
   });
   g.restore();
 }
-const off = document.createElement("canvas"); off.width = W; off.height = 960; const og = off.getContext("2d");
+const off = document.createElement("canvas"); off.width = W * SC; off.height = 960 * SC; const og = off.getContext("2d"); scaleShadows(og);
 function sSplit(t) {
-  const u = t - S("t1c"), dur = SEG.t1c.dur; og.clearRect(0, 0, W, 960); demoPanel(t, og);
+  const u = t - S("t1c"), dur = SEG.t1c.dur; og.setTransform(SC, 0, 0, SC, 0, 0); og.clearRect(0, 0, W, 960); demoPanel(t, og);
   const gl = P(u, dur - 0.30, dur); // the demo breaks right before the real world walks in
-  if (gl <= 0) ctx.drawImage(off, 0, 0);
-  else for (let k = 0; k < 24; k++) { const y = k * 40, dx = (hash(k + Math.floor(u * 30)) - 0.5) * 160 * gl; ctx.drawImage(off, 0, y, W, 40, dx, y, W, 40);
+  if (gl <= 0) ctx.drawImage(off, 0, 0, W, 960);
+  else for (let k = 0; k < 24; k++) { const y = k * 40, dx = (hash(k + Math.floor(u * 30)) - 0.5) * 160 * gl; ctx.drawImage(off, 0, y * SC, W * SC, 40 * SC, dx, y, W, 40);
     if (hash(k * 3 + Math.floor(u * 30)) > 0.75) { ctx.fillStyle = `rgba(255,77,79,${0.35 * gl})`; ctx.fillRect(0, y, W, 40); } }
   ctx.fillStyle = COP; ctx.fillRect(0, 957, W, 6);
 }
@@ -182,13 +239,16 @@ function sRealWorld(t) { // b-roll + REAL WORLD title
 }
 function sPeople(t) { // hundreds of people
   const u = t - S("t2b"); ctx.fillStyle = "#0B0D12"; ctx.fillRect(0, 0, W, H);
-  const n = Math.round(1 + 499 * eIn(P(u, 0.02, 0.9))), cols = 20, rows = 25, sx = 50, x0 = W / 2 - (cols - 1) * sx / 2, y0 = 470;
+  const n = Math.round(1 + 499 * eIn(P(u, 0.02, 0.9))), cols = 20, rows = 17, sx = 50, x0 = W / 2 - (cols - 1) * sx / 2, y0 = 500;
   const cells = []; for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) { const x = x0 + c * sx, y = y0 + r * sx; cells.push([Math.hypot(x - W / 2, (y - 1070) * 0.8) + hash(r * 31 + c) * 60, x, y, r, c]); }
   cells.sort((a, b) => a[0] - b[0]);
-  cells.slice(0, n).forEach(([d, x, y, r, c], i) => { const col = [COP, CREAM, "#8C94A3", "#5E6675"][Math.floor(hash(r * 7 + c * 13) * 4)];
+  cells.slice(0, Math.round(n * cols * rows / 500)).forEach(([d, x, y, r, c], i) => { const col = [COP, CREAM, "#8C94A3", "#5E6675"][Math.floor(hash(r * 7 + c * 13) * 4)];
     ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x, y - 6, 8, 0, 7); ctx.fill(); ctx.beginPath(); ctx.ellipse(x, y + 12, 13, 9, 0, Math.PI, 0); ctx.fill(); });
-  txt("USERS ONLINE", W / 2, 230, { size: 36, weight: 700, color: "#8C94A3" });
-  txt(String(n), W / 2, 360, { size: 170, color: n > 1 ? COP : "#fff" });
+  txt("USERS ONLINE", W / 2, 200, { size: 36, weight: 700, color: "#8C94A3" });
+  txt(String(n), W / 2, 320, { size: 170, color: n > 1 ? COP : "#fff" }); txt("at the same time", W / 2, 420, { size: 34, weight: 600, color: "#C9CED8" });
+  const load = Math.min(99, Math.round(6 + 93 * (n - 1) / 499)), lc = load < 55 ? GREEN : load < 85 ? COP : RED;
+  txt("SERVER LOAD", 90, 1380, { size: 30, weight: 700, color: "#8C94A3", align: "left" }); txt(`${load}%`, 990, 1380, { size: 40, weight: 800, color: lc, align: "right" });
+  rr(90, 1418, 900, 28, 14); ctx.fillStyle = "#1E222B"; ctx.fill(); rr(90, 1418, 900 * load / 100, 28, 14); ctx.fillStyle = lc; ctx.fill();
 }
 const ROWS = [["Ravi Kumar", "98480 12345", "Hyderabad", "₹1,200", ""], ["ravi kumar.", "+91 9848012345", "HYD", "1200", "dup"],
   ["NULL", "—", "undefined", "NaN", "bad"], ["Priya S", "99999 99999", "Secundrabad", "₹ -0", "bad"], ["Arjun", "#ERROR", "Vizag", "₹1,2,00", "bad"],
@@ -197,22 +257,25 @@ const ROWS = [["Ravi Kumar", "98480 12345", "Hyderabad", "₹1,200", ""], ["ravi
 function sData(t) { // messy data
   const u = t - S("t2c"); ctx.fillStyle = "#0B0D12"; ctx.fillRect(0, 0, W, H);
   chip("MESSY DATA", W / 2, 250, { bg: "rgba(255,77,79,.18)", fg: RED, dot: RED, size: 34 });
-  ctx.save(); rr(60, 340, 960, 1100, 36); ctx.fillStyle = "#14171E"; ctx.fill(); ctx.clip();
+  ctx.save(); rr(60, 340, 960, 1060, 36); ctx.fillStyle = "#14171E"; ctx.fill(); ctx.clip();
   const cols = [[100, "NAME"], [370, "PHONE"], [640, "CITY"], [860, "AMOUNT"]]; font(700, 26); ctx.textBaseline = "middle";
   ctx.fillStyle = "#1B1F28"; ctx.fillRect(60, 340, 960, 90); cols.forEach(([x, h]) => { ctx.fillStyle = "#8C94A3"; ctx.textAlign = "left"; ctx.fillText(h, x, 386); });
   const scroll = u * 380, rh = 96;
-  for (let k = 0; k < 24; k++) { const y = 470 + k * rh - (scroll % (rh * ROWS.length)), r = ROWS[k % ROWS.length]; if (y < 400 || y > 1460) continue;
+  for (let k = 0; k < 24; k++) { const y = 470 + k * rh - (scroll % (rh * ROWS.length)), r = ROWS[k % ROWS.length]; if (y < 400 || y > 1440) continue;
     const bad = r[4] === "bad", dup = r[4] === "dup";
     if (bad || dup) { ctx.fillStyle = bad ? "rgba(255,77,79,.14)" : "rgba(229,156,105,.13)"; ctx.fillRect(60, y - rh / 2 + 4, 960, rh - 8); }
     r.slice(0, 4).forEach((v, i) => { const weird = bad && (v === "" || /NULL|null|undefined|NaN|#ERROR|N\/A|\?|—|xx|000|-/.test(v)); font(weird ? 700 : 600, 32);
       ctx.fillStyle = weird ? RED : dup ? COP : "#E9ECF2"; ctx.textAlign = "left"; ctx.fillText(v === "" ? "(empty)" : v, cols[i][0], y); });
     ctx.fillStyle = "#222733"; ctx.fillRect(60, y + rh / 2 - 1, 960, 2); }
   ctx.restore();
+  [["Duplicates", COP, 225], ["Empty / NULL", RED, 540], ["Wrong format", RED, 860]].forEach(([l, c, x], i) =>
+    chip(l, x, 1475, { bg: c === COP ? "rgba(229,156,105,.16)" : "rgba(255,77,79,.16)", fg: c, dot: c, size: 27, alpha: eOut(P(u, 0.15 + i * 0.12, 0.4 + i * 0.12)) }));
 }
 function sNetwork(t) { // phones on bad networks in the middle of nowhere (+ Tarun in the circle)
   const u = t - S("t2d"), g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, "#10141B"); g.addColorStop(1, "#1A1F28"); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   ctx.strokeStyle = "rgba(255,255,255,.05)"; ctx.lineWidth = 2; for (let k = 0; k < 9; k++) { ctx.beginPath(); for (let x = 0; x <= W; x += 30) { const y = 140 + k * 150 + Math.sin(x / 140 + k) * 26; x ? ctx.lineTo(x, y) : ctx.moveTo(x, y); } ctx.stroke(); }
-  const px = 520, py = 210, pw = 470, ph = 960, e = eOut(P(u, 0, 0.3)); ctx.save(); ctx.translate((1 - e) * 200, 0); ctx.globalAlpha = e;
+  chip("BAD NETWORK", W / 2, 130, { bg: "rgba(255,77,79,.16)", fg: RED, dot: RED, size: 30, alpha: eOut(P(u, 0, 0.25)) });
+  const px = 520, py = 210, pw = 470, ph = 900, e = eOut(P(u, 0, 0.3)); ctx.save(); ctx.translate((1 - e) * 200, 0); ctx.globalAlpha = e;
   rr(px, py, pw, ph, 64); ctx.fillStyle = "#050608"; ctx.fill(); rr(px + 16, py + 16, pw - 32, ph - 32, 50); ctx.fillStyle = "#F3F4F6"; ctx.fill();
   const bars = u < T2(5.22) - S("t2d") ? 4 : u < T2(5.50) - S("t2d") ? 2 : u < T2(5.88) - S("t2d") ? 1 : 0;
   for (let b = 0; b < 4; b++) { ctx.fillStyle = b < bars ? INK : "#C9CDD4"; ctx.fillRect(px + 60 + b * 16, py + 64 - (b + 1) * 9, 11, (b + 1) * 9); }
@@ -240,22 +303,23 @@ function sNirvaha(t) {
   txt("Nirvaha", W / 2 - 200, 285, { size: 120, weight: 400, fam: "IS", align: "left" });
   txt("AI emotional-wellbeing app", W / 2, 390, { size: 38, weight: 600, color: "#CFE8D6" });
   chip("LIVE ON GOOGLE PLAY", W / 2, 470, { bg: "#fff", fg: "#0B2A17", dot: "#34A853", size: 32 });
-  [[IMG.nirvaha_s1, 290, -5, 0.05], [IMG.nirvaha_s2, 790, 5, 0.18]].forEach(([im, cx, rot, d]) => { const k = eOut(P(u, d, d + 0.35)); if (!im.complete) return;
-    ctx.save(); ctx.translate(cx + (1 - k) * 260, 905); ctx.rotate(rot * Math.PI / 180); ctx.globalAlpha = e * k; ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 50; ctx.shadowOffsetY = 20;
-    rr(-205, -365, 410, 730, 30); ctx.fillStyle = "#000"; ctx.fill(); ctx.shadowColor = "transparent"; ctx.clip(); ctx.drawImage(im, -205, -365, 410, 730); ctx.restore(); });
+  [[IMG.nirvaha_s1, 345, -5, 0.05], [IMG.nirvaha_s2, 760, 5, 0.18]].forEach(([im, cx, rot, d]) => { const k = eOut(P(u, d, d + 0.35)); if (!im.complete) return;
+    ctx.save(); ctx.translate(cx + (1 - k) * 260, 862); ctx.rotate(rot * Math.PI / 180); ctx.globalAlpha = e * k; ctx.shadowColor = "rgba(0,0,0,.6)"; ctx.shadowBlur = 50; ctx.shadowOffsetY = 20;
+    rr(-168, -298, 336, 596, 28); ctx.fillStyle = "#000"; ctx.fill(); ctx.shadowColor = "transparent"; ctx.clip(); ctx.drawImage(im, -168, -298, 336, 596); ctx.restore(); });
   ctx.restore(); pipHole(e);
 }
-const ROUTES = [[[120, 560], [380, 560], [380, 820], [700, 820], [700, 1080], [960, 1080]], [[960, 520], [760, 520], [760, 760], [520, 760], [520, 1180], [240, 1180]], [[200, 980], [440, 980], [440, 660], [880, 660], [880, 1240]]];
+const ROUTES = [[[120, 560], [380, 560], [380, 820], [700, 820], [700, 1080], [960, 1080]], [[960, 520], [760, 520], [760, 760], [520, 760], [520, 1180], [240, 1180]], [[200, 980], [440, 980], [440, 660], [880, 660], [880, 1240]]]
+  .map(r => r.map(([x, y]) => [x, 430 + (y - 430) * 0.8]));   // squeezed to sit above the circle
 function along(pts, f) { const L = []; let tot = 0; for (let i = 1; i < pts.length; i++) { const d = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); L.push(d); tot += d; }
   let s = f * tot; for (let i = 1; i < pts.length; i++) { if (s <= L[i - 1]) { const v = s / L[i - 1]; return [lerp(pts[i - 1][0], pts[i][0], v), lerp(pts[i - 1][1], pts[i][1], v)]; } s -= L[i - 1]; } return pts[pts.length - 1]; }
 function sLogistics(t) {
   const u = t - S("t5"), e = eOut(P(u, 0, 0.3)); ctx.fillStyle = "#0B1220"; ctx.fillRect(0, 0, W, H); proofHead("02", u);
   ctx.save(); ctx.translate((1 - e) * 220, 0); ctx.globalAlpha = e;
   txt("Logistics system", W / 2, 280, { size: 84, weight: 800 }); txt("Real vehicles, tracked live", W / 2, 365, { size: 40, weight: 600, color: "#9FB3C8" });
-  rr(60, 430, 960, 900, 40); ctx.save(); ctx.clip(); ctx.fillStyle = "#101B2E"; ctx.fillRect(60, 430, 960, 900);
-  ctx.strokeStyle = "#1C2A44"; ctx.lineWidth = 18; for (let x = 120; x < 1020; x += 120) { ctx.beginPath(); ctx.moveTo(x + 40, 430); ctx.lineTo(x - 40, 1330); ctx.stroke(); }
-  for (let y = 520; y < 1330; y += 130) { ctx.beginPath(); ctx.moveTo(60, y); ctx.lineTo(1020, y + 30); ctx.stroke(); }
-  ctx.fillStyle = "#14352A"; rr(560, 880, 180, 140, 20); ctx.fill(); rr(150, 640, 150, 110, 20); ctx.fill();
+  rr(60, 430, 960, 740, 40); ctx.save(); ctx.clip(); ctx.fillStyle = "#101B2E"; ctx.fillRect(60, 430, 960, 740);
+  ctx.strokeStyle = "#1C2A44"; ctx.lineWidth = 18; for (let x = 120; x < 1020; x += 120) { ctx.beginPath(); ctx.moveTo(x + 40, 430); ctx.lineTo(x - 40, 1170); ctx.stroke(); }
+  for (let y = 515; y < 1170; y += 105) { ctx.beginPath(); ctx.moveTo(60, y); ctx.lineTo(1020, y + 26); ctx.stroke(); }
+  ctx.fillStyle = "#14352A"; rr(560, 790, 180, 115, 20); ctx.fill(); rr(150, 600, 150, 95, 20); ctx.fill();
   ROUTES.forEach((r, i) => { const f = cl([0.02, 0.38, 0.62][i] + u * 0.17), steps = 40; ctx.strokeStyle = [COP, "#5EB1FF", GREEN][i]; ctx.lineWidth = 8; ctx.lineCap = ctx.lineJoin = "round"; ctx.globalAlpha = e * 0.85;
     ctx.beginPath(); for (let k = 0; k <= steps; k++) { const p = along(r, f * k / steps); k ? ctx.lineTo(p[0], p[1]) : ctx.moveTo(p[0], p[1]); } ctx.stroke(); ctx.globalAlpha = e;
     const p = along(r, f); ctx.beginPath(); ctx.arc(p[0], p[1], 26, 0, 7); ctx.fillStyle = "#fff"; ctx.fill(); ctx.beginPath(); ctx.arc(p[0], p[1], 17, 0, 7); ctx.fillStyle = [COP, "#5EB1FF", GREEN][i]; ctx.fill();
@@ -270,8 +334,8 @@ function sLN(t) {
   ctx.save(); ctx.translate((1 - e) * 220, 0); ctx.globalAlpha = e;
   if (IMG.lnsports_t.complete) ctx.drawImage(IMG.lnsports_t, W / 2 - 110, 205, 220, 212);
   txt("LN Sports Arena", W / 2, 470, { size: 76, weight: 800 }); txt("Booking app · real players, every day", W / 2, 540, { size: 34, weight: 600, color: "#FFB36B" });
-  rr(50, 600, 980, 700, 36); ctx.fillStyle = "rgba(255,255,255,.06)"; ctx.fill();
-  const cx0 = 280, cw = 122, ry0 = 690, rh = 116; SLOTS.forEach((s, i) => txt(s, cx0 + i * cw + cw / 2, 650, { size: 24, weight: 700, color: "#9FB0D6" }));
+  rr(50, 596, 980, 584, 36); ctx.fillStyle = "rgba(255,255,255,.06)"; ctx.fill();
+  const cx0 = 280, cw = 122, ry0 = 676, rh = 96; SLOTS.forEach((s, i) => txt(s, cx0 + i * cw + cw / 2, 640, { size: 24, weight: 700, color: "#9FB0D6" }));
   COURTS.forEach((c, r) => { txt(c, 80, ry0 + r * rh + rh / 2, { size: 28, weight: 700, color: "#E8ECF7", align: "left" });
     SLOTS.forEach((s, i) => { const k = r * 6 + i, open = hash(k * 5.3) > 0.78, at = 0.15 + hash(k * 1.7) * 1.9, f = P(u, at, at + 0.18);
       const x = cx0 + i * cw + 8, y = ry0 + r * rh + 10, w = cw - 16, h = rh - 20; rr(x, y, w, h, 16);
@@ -316,8 +380,14 @@ function sCTA(t) { // Comment BUILD (+ the 2 s hold)
 }
 
 window.seek = function (t) {
-  ctx.clearRect(0, 0, W, H); const id = segAt(t).id;
-  if (id === "co1" || id === "k2") sCrash(id, t);
+  ctx.setTransform(SC, 0, 0, SC, 0, 0); ctx.clearRect(0, 0, W, H); const id = segAt(t).id;
+  if (id === "co1") sCrash(id, t);
+  if (id === "a1") sRoles(t);
+  if (id === "a3") sApproved(t);
+  if (id === "lat") sLater(t);
+  if (id === "b") { const u = t - S("b"); vignette("rgba(229,72,77,A)", 0.4 * Math.exp(-u * 3.5) + (u > 0.42 ? 0.5 * Math.exp(-(u - 0.42) * 3.2) : 0) + 0.12);
+    glitchBars(u); if (u > 0.42) glitchBars(u - 0.42); crashToast(t); }
+  if (id === "c1") sCall(t);
   if (id === "co2") sBlack(t);
   if (id === "frz") sFreeze(t);
   if (id === "t1b") sECG(t);
