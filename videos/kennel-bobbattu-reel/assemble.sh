@@ -17,7 +17,7 @@ export REAL_SFX_CONFIG=$REPO/tools/real-sfx.config.json REAL_SFX_INDEX=$REPO/too
 SFX=$REPO/.claude/skills/real-sfx; W=$HERE/out/sfxwork; mkdir -p "$W/work" "$W/result"
 ffmpeg -nostdin -v error -y -i out/video.mp4 -i assets/ref_audio.wav -map 0:v -map 1:a -c:v copy -c:a pcm_s16le -shortest out/video_a.mov
 (cd "$SFX" && python3 -I scripts/from_cues.py "$HERE/sfx_cues.json" --video "$HERE/out/video_a.mov" --out "$W/work/cues.json" --ui library --map "$HERE/sfx_map.json" \
- && python3 -I scripts/mix.py "$W/work/cues.json" --out "$W/result/mix.mp4" --base-audio "$HERE/assets/ref_audio.wav" --sfx-trim-db ${SFX_TRIM:-0}) 2>&1 | grep -v -E "distutils|_distutils_hack|frozen site|addpackage|Remainder|^\s*$" | tail -3
+ && python3 -I scripts/mix.py "$W/work/cues.json" --out "$W/result/mix.mp4" --base-audio "$HERE/assets/ref_audio.wav" --sfx-trim-db ${SFX_TRIM:-22}) 2>&1 | grep -v -E "distutils|_distutils_hack|frozen site|addpackage|Remainder|^\s*$" | tail -3
 (cd "$SFX" && python3 -I scripts/critique.py "$W/result/mix_resolved_cues.json" "$W/result/mix_sfx_track.wav" > "$W/result/critique.txt") 2>/dev/null || true
 grep -E "^\| (sync|balance|headroom|loudness)" "$W/result/critique.txt" || true
 rm -f out/video_a.mov "$W/result/mix.mp4"
