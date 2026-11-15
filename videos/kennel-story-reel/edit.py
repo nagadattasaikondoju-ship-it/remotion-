@@ -12,7 +12,7 @@ BOX = (35, 546, 1010, 876)        # x, y, w, h in the 1080x1920 frame (reference
 # (start, source, in-point, crop top y0 in the upright 1080x1920 frame, grade, what it shows)
 #  sources: "k:" kennel shoot original (Sony, rotated upright), "o:" One Loop B-roll original, "r:" reference element (box-sized)
 SHOTS = [
- (0.00,  "k:MVI_0812", 1.60, 780, "warm", "Mastiff puppy in its crate turns and looks at us through the bars (box fades in at 0.25)"),
+ (0.00,  "k:MVI_0812", 1.60, 600, "warm", "Mastiff puppy in its crate turns and looks at us through the bars (box fades in at 0.25)"),
  (5.67,  "k:MVI_0794", 7.30, 600, "warm_in", "Maltese trots up and looks up at you"),
  (6.87,  "k:MVI_0799", 18.45, 350, "warm_in", "cheek to cheek: a hug with the Maltese"),
  (8.70,  "k:MVI_0808", 1.35, 500, "warm", "Shih Tzu lying still, looking at you, then away"),
