@@ -1,0 +1,44 @@
+[
+ {
+  "t": 4.314,
+  "type": "pop",
+  "g": 0.2,
+  "note": "label lands: the boss"
+ },
+ {
+  "t": 6.401,
+  "type": "pop",
+  "g": 0.2,
+  "note": "label lands: head of security"
+ },
+ {
+  "t": 8.488,
+  "type": "pop",
+  "g": 0.2,
+  "note": "label lands: the interns"
+ },
+ {
+  "t": 10.575,
+  "type": "pop",
+  "g": 0.2,
+  "note": "label lands: lunch break"
+ },
+ {
+  "t": 12.662,
+  "type": "pop",
+  "g": 0.2,
+  "note": "label lands: performance bonus"
+ },
+ {
+  "t": 14.749,
+  "type": "pop",
+  "g": 0.2,
+  "note": "label lands: brand ambassador"
+ },
+ {
+  "t": 23.006,
+  "type": "chime",
+  "g": 0.5,
+  "note": "One Loop logo"
+ }
+]
