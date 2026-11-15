@@ -1,5 +1,19 @@
 # One Loop × pet client: "meet the team"
 
+**v2 (current) is edited in invideo**: https://invideo.io/@oneloops-workspace/original-footage/tree/main/seq-5.1
+(the kennel clips come straight from the user's uploads in that project; MVI_0729, the privacy-blurred MVI_0727, the
+score+SFX mix, the logo and two scrims were uploaded to it). `picture.py` / `assemble.sh` are the v1 local build.
+
+v2 changes (user's notes, 15 Nov):
+- **Captions bolder and higher contrast:** Playfair Display ExtraBold Italic (OFL, a static instance of the variable font)
+  in pure white with a heavy dark shadow, over soft dark scrims; the overlines are copper pills with charcoal caps.
+  The last line "you're next." is copper.
+- **Job titles that are real jobs:** "lunch break" → **food critic** (the puppy at the bowl), "performance bonus" →
+  **welcome committee** (Shih Tzus standing up at the railing).
+- **Sharper shots:** "head of security" is now the cream Cane Corso sitting to attention (MVI_0809 7.20; the black
+  Cane Corso close-up MVI_0811 had motion blur on the face); the welcome committee window moved to 18.30, where the dogs
+  stand up and are sharpest; the cream fluffy dog in the burst (soft through the mesh) became the blue Bully (MVI_0780 27.95).
+
 25.0 s · 1080×1920 · 60 fps · 115 BPM, 12 bars. A One Loop brand reel: we signed a pet client, here's the team.
 The hook and the turn are One Loop B-roll; everything between is the kennel shoot (`docs/playbook/kennel-shoot-catalogue.md`).
 The kennel is never named.
@@ -15,12 +29,12 @@ SKIP_PICTURE=1 bash assemble.sh  # sound and deliverables only
 | 1 | 0.00 | POV / we just signed a new client | One Loop MVI_0729 2.00: the handshake on the cafe sofa |
 | 2 | 2.09 | OUR NEW CLIENT / meet the team | MVI_0814 0.85: Mastiff puppy grins into the lens |
 | 3 | 4.17 | MEET THE TEAM / the boss | MVI_0771 0.85: Tibetan Mastiff stands at the mesh, waves a paw |
-| 4 | 6.26 | head of security | MVI_0811 6.95: black Cane Corso comes up to the lens, tongue out |
+| 4 | 6.26 | head of security | MVI_0809 7.20: cream Cane Corso sitting to attention on its chain |
 | 5 | 8.35 | the interns | MVI_0777 4.60: one Saint Bernard hops onto the other |
-| 6 | 10.43 | lunch break | MVI_0815 3.85: Mastiff puppy eating from a big steel bowl |
-| 7 | 12.52 | performance bonus | MVI_0826 12.95: Shih Tzus crowd the railing for treats |
+| 6 | 10.43 | food critic | MVI_0815 3.60: Mastiff puppy tasting from a big steel bowl |
+| 7 | 12.52 | welcome committee | MVI_0826 18.30: Shih Tzus stand up at the railing for treats |
 | 8 | 14.61 | brand ambassador | MVI_0808 0.50: Shih Tzu lying like royalty |
-| 9–10 | 16.70 | honestly? → best client ever. | one beat each: 0770 Saint Bernards standing, 0775 Shepherds standing up, 0779 Saint Bernard up at the mesh, 0800 Maltese in a hand, 0778 fluffy dog up on the mesh, 0805 Shih Tzu at the stairs, 0832 puppy being petted, 0794 Maltese looking up |
+| 9–10 | 16.70 | honestly? → best client ever. | one beat each: 0770 Saint Bernards standing, 0775 Shepherds standing up, 0779 Saint Bernard up at the mesh, 0800 Maltese in a hand, 0780 blue Bully on its platform, 0805 Shih Tzu at the stairs, 0832 puppy being petted, 0794 Maltese looking up |
 | 11 | 20.87 | ONE LOOP / now let's make them famous | One Loop MVI_0727: the One Loop site on the laptop |
 | 12 | 22.96 | pet brands, you're next. | One Loop logo on black |
 
