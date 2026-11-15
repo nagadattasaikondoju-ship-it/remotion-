@@ -9,13 +9,22 @@ is the kennel shoot from Drive (`docs/playbook/kennel-shoot-catalogue.md`), down
 | Time | Line (reference audio) | Caption | Shot |
 |---|---|---|---|
 | 0.00 | "My name is Maximus Decimus Meridius" | MY NAME IS MAXIMUS DECIMUS MERIDIUS (gold condensed caps) | the reference's Doberman, AI-upscaled from 512×916 |
-| 1.90 | "My name is bobbattu" | My name is bobbattu 💗 | MVI_0814: Mastiff puppy comes up to the camera and smiles |
-| 3.73 | "ali billi bobbattu" | ✨ ali billi bobbattu | MVI_0800: Maltese, chin cradled in a hand, tips its head up |
-| 5.33 | "andhala bobbattu" | andhala bobbattu 🥰 | MVI_0805: Shih Tzu at the stairs looks away, then back (crop 1.6×, AI-upscaled) |
-| 7.13 | "maa nethi bobbattu" | 💗 maa nethi bobbattu | MVI_0794: Maltese trots up and looks straight up at the camera |
-| 8.97 | "Lakshmi Ganapathi bobbattu" | Lakshmi Ganapathi bobbattu ✨✨ | MVI_0808: Shih Tzu lying like royalty, looking at the camera |
+| 1.90 | "My name is bobbattu" | My name is bobbattu 💗 | MVI_0814 from 0.85 s: Mastiff puppy comes up to the camera and smiles |
+| 3.73 | "ali billi bobbattu" | ✨ ali billi bobbattu | MVI_0800 from 2.05 s: Maltese, chin cradled in a hand, looks at you, then tips its head up |
+| 5.33 | "andhala bobbattu" | andhala bobbattu 🥰 (above the dog) | MVI_0805 from 0.20 s: Shih Tzu at the foot of the stairs looks away, then back |
+| 7.13 | "maa nethi bobbattu" | 💗 maa nethi bobbattu | MVI_0794 from 7.00 s: Maltese trots up and looks straight up at the camera |
+| 8.97 | "Lakshmi Ganapathi bobbattu" | Lakshmi Ganapathi bobbattu ✨✨ | MVI_0808 from 0.50 s: Shih Tzu lying like royalty, looking at the camera |
 
 Shots were picked frame by frame (6 fps sheets of 20 candidate clips) for calm, close, looking-at-camera moments; no barking.
+In-points were then moved to each clip's sharpest stretch (Laplacian variance of the full frame, scored every 0.05 s).
+
+## Quality (v2, 15 Nov 2026)
+v1 looked softer than the Drive files. It zoomed every shot (up to 1.22×), blew up a 1.6× crop of MVI_0805 with AI upscaling,
+sharpened, and encoded the footage three times. v2 fixes all of that:
+- every kennel shot is the Sony original's full frame, turned upright, at its native 1080×1920: no zoom, no crop, no upscaling, no sharpening;
+- the captions are drawn as transparent frames (`node render.mjs overlay`) and composited in `base.py`, so the footage is encoded once (CRF 8);
+- the MASTER is that encode untouched (stream copy). Only the share copies get one more encode (CRF 14).
+The hook is the one exception: the reference's Doberman exists only at 512×916, so it stays AI-upscaled.
 
 ## Look
 - **Captions** match the reference:
@@ -24,7 +33,7 @@ Shots were picked frame by frame (6 fps sheets of 20 candidate clips) for calm, 
   - emoji stickers drawn with Noto Color Emoji, sparkles twinkling.
 - The reference spells one caption "andhala bobbatu"; here it is "bobbattu" like the rest.
 - **The hook:** the reference is a screen recording, so a dark band covers its burned-in caption and the Instagram UI (profile bubble, sound icon), and the caption is redrawn on top in the same place.
-- **Grade:** the dog shots are bright and warm; the hook keeps its own look. Slow push-ins on every shot.
+- **Grade:** the dog shots are bright and warm; the hook keeps its own look. No push-ins (they soften the picture).
 
 ## Sound
 - **Audio:** the reference reel's audio, cut to the loop (`assets/ref_audio.wav`, gitignored).

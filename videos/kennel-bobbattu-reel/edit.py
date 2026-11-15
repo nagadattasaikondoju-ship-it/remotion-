@@ -11,22 +11,23 @@ CUTS = [0.0, 1.900, 3.733, 5.333, 7.133, 8.967, DUR]
 # (id, source, in-point s, rotate?, zoom keys [(t, z)], anchor (x, y) in the upright frame, grade, caption, emoji, note)
 #   "up/…" sources are AI-upscaled crops (tools/upscale_realesr.py), already upright and 1080x1920.
 SHOTS = [
- ("s1", "up/s1_ref.mp4", 0.0, False, [(0, 1.00), (1.9, 1.03)], (540, 700), "ref",
-  "MY NAME IS MAXIMUS DECIMUS MERIDIUS", None, "the hook: the reference reel's own Doberman shot (0.233-2.133 s), AI-upscaled to 1080x1920; its caption and the Instagram UI are covered and the caption redrawn"),
- ("s2", "orig/MVI_0814.mp4", 0.75, True, [(0, 1.02), (1.833, 1.08)], (440, 950), "cute",
+ ("s1", "up/s1_ref.mp4", 0.0, False, [(0, 1.0)], (540, 700), "ref",
+  "MY NAME IS MAXIMUS DECIMUS MERIDIUS", None, "the hook: the reference reel's own Doberman shot (0.233-2.133 s), AI-upscaled to 1080x1920 (its source is only 512x916); its caption and the Instagram UI are covered and the caption redrawn"),
+ ("s2", "orig/MVI_0814.mp4", 0.85, True, [(0, 1.0)], (440, 950), "cute",
   "My name is bobbattu", "💗", "MVI_0814: Mastiff puppy comes up to the camera and smiles"),
- ("s3", "orig/MVI_0800.mp4", 3.20, True, [(0, 1.00), (1.6, 1.05)], (560, 700), "cute",
-  "ali billi bobbattu", "✨", "MVI_0800: Maltese, chin cradled in a hand, tips its head up"),
- ("s4", "up/s4_0805.mp4", 0.00, False, [(0, 1.00), (1.8, 1.05)], (520, 1216), "cute",
-  "andhala bobbattu", "🥰", "MVI_0805: Shih Tzu at the stairs looks away, then back at the camera; crop 1.6x"),
- ("s5", "orig/MVI_0794.mp4", 6.95, True, [(0, 1.14), (1.833, 1.22)], (530, 1000), "cute",
+ ("s3", "orig/MVI_0800.mp4", 2.05, True, [(0, 1.0)], (560, 700), "cute",
+  "ali billi bobbattu", "✨", "MVI_0800: Maltese, chin cradled in a hand, looks at you, then tips its head up"),
+ ("s4", "orig/MVI_0805.mp4", 0.20, True, [(0, 1.0)], (520, 1216), "cute",
+  "andhala bobbattu", "🥰", "MVI_0805: Shih Tzu sitting at the foot of the stairs, looks away, then back at the camera (full frame)"),
+ ("s5", "orig/MVI_0794.mp4", 7.00, True, [(0, 1.0)], (530, 1000), "cute",
   "maa nethi bobbattu", "💗", "MVI_0794: Maltese trots up and looks straight up at the camera"),
- ("s6", "orig/MVI_0808.mp4", 0.00, True, [(0, 1.04), (2.05, 1.10)], (490, 870), "cute",
+ ("s6", "orig/MVI_0808.mp4", 0.50, True, [(0, 1.0)], (490, 870), "cute",
   "Lakshmi Ganapathi\nbobbattu", "✨", "MVI_0808: Shih Tzu lying like royalty, looking at the camera"),
 ]
-
-# fallback for the two zoomed shots: the same crop from the original, Lanczos-scaled (PREVIEW=1, or until the AI upscale exists)
-FALLBACK = {"s4": ("orig/MVI_0805.mp4", 0.00, "crop=676:1202:100:640")}
+# Quality (v2, after the user's "quality is good in Drive"): every kennel shot is the Sony original's full frame, upright, at its
+# native 1080x1920: no zoom, no crop, no AI upscale, no sharpening. Captions are composited in the same pass (base.py), so the
+# footage is compressed once; the MASTER is that encode untouched.
+FALLBACK = {}
 
 SPEED = {}   # per-shot speed, e.g. {"s2": 0.8} for slow motion (the originals are 59.94 fps)
 

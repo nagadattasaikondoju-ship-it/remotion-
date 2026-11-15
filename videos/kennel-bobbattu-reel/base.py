@@ -1,7 +1,9 @@
-# Picture: every shot of out/edit.json -> out/base.mp4 (1080x1920, 60 fps, no audio).
+# Picture: every shot of out/edit.json + the caption frames (out/ov, from `node render.mjs overlay`) -> out/video.mp4
+# (1080x1920, 60 fps, no audio). This is the only encode of the footage: the MASTER is this file untouched.
 #   /usr/bin/python3 -P base.py
-# Sony originals are stored landscape (1920x1080, 59.94 fps): transpose=2 makes them upright. Each frame is placed with a
-# sub-pixel affine transform for the slow push-ins. Grades are ffmpeg filters applied while decoding.
+# Sony originals are stored landscape (1920x1080, 59.94 fps): transpose=2 makes them upright at exactly 1080x1920, so every
+# kennel shot is shown pixel for pixel (no zoom, no crop, no sharpening). Grades are ffmpeg filters applied while decoding.
+# Zoom keys other than 1.0 still work (affine transform), but v2 uses none: a push-in enlarges the picture and softens it.
 import json, os, subprocess, numpy as np
 from PIL import Image
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -45,10 +47,10 @@ def spotlight(img, ax, ay):  # "maximus": the face stays lit, the rest of the fr
 
 def main():
     enc = subprocess.Popen(["ffmpeg", "-nostdin", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(FPS),
-                            "-i", "-", "-vf", "unsharp=5:5:0.4:5:5:0,format=yuv420p", "-c:v", "libx264", "-preset", "medium", "-crf", "11",
-                            "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", os.path.join(HERE, "out", "base.mp4")],
+                            "-i", "-", "-vf", "format=yuv420p", "-c:v", "libx264", "-preset", "slow", "-crf", "8", "-tune", "film",
+                            "-colorspace", "bt709", "-color_primaries", "bt709", "-color_trc", "bt709", os.path.join(HERE, "out", "video.mp4")],
                            stdin=subprocess.PIPE)
-    total = 0
+    total = 0; OV = os.path.join(HERE, "out", "ov"); f0 = 0
     for sh in E["shots"]:
         n = round((sh["start"] + sh["dur"]) * FPS) - round(sh["start"] * FPS); ax, ay = sh["anchor"]
         for k, img in enumerate(frames(sh, n)):
@@ -56,8 +58,10 @@ def main():
             ox = min(0, max(W - W * z, ax - ax * z)); oy = min(0, max(H - H * z, ay - ay * z))   # zoom about the anchor, never past an edge
             fr = img.transform((W, H), Image.AFFINE, (1 / z, 0, -ox / z, 0, 1 / z, -oy / z), resample=Image.BICUBIC) if abs(z - 1) > 1e-4 else img
             if sh["grade"] == "maximus": fr = spotlight(fr, ax, ay)
+            ov = Image.open(os.path.join(OV, f"{f0 + k:05d}.png"))   # captions + emoji for this frame
+            if ov.getbbox(): fr = Image.alpha_composite(fr.convert("RGBA"), ov.convert("RGBA")).convert("RGB")
             enc.stdin.write(fr.tobytes())
-        total += n; print(f"{sh['id']} {n} frames", flush=True)
-    enc.stdin.close(); enc.wait(); print(f"out/base.mp4: {total} frames ({total / FPS:.3f} s)")
+        f0 += n; total += n; print(f"{sh['id']} {n} frames", flush=True)
+    enc.stdin.close(); enc.wait(); print(f"out/video.mp4: {total} frames ({total / FPS:.3f} s)")
 
 if __name__ == "__main__": main()
