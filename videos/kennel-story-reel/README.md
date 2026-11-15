@@ -1,7 +1,8 @@
 # "To them, you're their whole book": kennel dogs story reel
 
 43.6 s · 1080×1920 · 60 fps. A remake of the user's reference reel (a voiceover about how much a dog's life is about us),
-in its exact layout: one 1.15:1 picture box on black, one small lowercase italic caption under it, hard cuts on each phrase,
+in its exact layout: one 1.15:1 picture box on black with the reference's rounded corners (radius 39 px, measured on its
+flash frame), one small lowercase italic caption under it, hard cuts on each phrase,
 a warm light-leak flash, and an orange ":)" at the end. The voiceover and music are the reference's.
 
 ## Picture quality (the user's note: "Drive quality is good, keep it")

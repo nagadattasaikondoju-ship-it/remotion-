@@ -13,7 +13,10 @@ GRADE = {  # a soft, warm, natural look like the reference; "warm_in" lifts the 
     "warm_in": "eq=brightness=0.03:contrast=1.02:saturation=1.04:gamma=1.05,colorbalance=rm=0.025:bm=-0.02:rh=0.015",
     "none": "null",
 }
-mask = Image.new("L", (BW * 4, BH * 4), 0); ImageDraw.Draw(mask).rounded_rectangle((0, 0, BW * 4 - 1, BH * 4 - 1), radius=12 * 4, fill=255)
+# corner radius measured on the reference (its bright flash frame, all four corners, sub-pixel edge): a circular arc of r = 18.3 px
+# on its 510 px-wide recording = 39 px here
+RADIUS = 39
+mask = Image.new("L", (BW * 4, BH * 4), 0); ImageDraw.Draw(mask).rounded_rectangle((0, 0, BW * 4 - 1, BH * 4 - 1), radius=RADIUS * 4, fill=255)
 mask = mask.resize((BW, BH), Image.LANCZOS)
 
 # ---- captions (the reference's style): small white lowercase italic line under the box; an orange ":)" at the end ----
