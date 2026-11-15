@@ -8,6 +8,7 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
 - Short-form editing brief (captions, hooks, animations): @docs/playbook/short-form-editing.md
 - One Loop brand, palette, logo and client-portfolio data: @docs/playbook/oneloop-brand.md
 - One Loop B-roll (Drive): every clip described, renamed in Drive, best picks by job: `docs/playbook/oneloop-broll-catalogue.md`
+- Kennel shoot (Tarun's Drive folder, MVI_0768–0838, dogs): every clip described, cute picks starred: `docs/playbook/kennel-shoot-catalogue.md`
 - One Loop Instagram: what gets views and leads (measured Nov 2026), episode slate: `docs/playbook/oneloop-instagram.md`
 - Skills knowledge base (all project skills by job, with sources and routing): `docs/skills-knowledge-base.md`. Regenerate with `python3 tools/build_skills_kb.py` after installs.
 - Motion-graphics reference library: `docs/library/prompt-motion/README.md`.

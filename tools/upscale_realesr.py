@@ -43,6 +43,8 @@ def main():
     ap.add_argument("--ss", type=float); ap.add_argument("--to", type=float)
     ap.add_argument("--scale", type=int, default=4); ap.add_argument("--crf", type=int, default=12)
     ap.add_argument("--threads", type=int, default=os.cpu_count())
+    ap.add_argument("--size", default="", help="final WxH after the x4 (Lanczos), e.g. 1080x1920 for a zoomed crop")
+    ap.add_argument("--vf", default="", help="ffmpeg filters applied before upscaling, e.g. 'transpose=2,crop=720:1280:60:500'")
     ap.add_argument("--fp32", action="store_true", help="skip bfloat16 (bf16 is ~3x faster on CPUs with AMX/AVX512-BF16)")
     a = ap.parse_args()
     torch.set_num_threads(a.threads)
@@ -50,11 +52,16 @@ def main():
     net = net.to(memory_format=torch.channels_last)
     amp = torch.autocast("cpu", dtype=torch.bfloat16, enabled=not a.fp32)
     w, h, rate, fps = probe(a.src)
+    if a.vf:  # the size after the pre-filters (crop/rotate): read one filtered frame
+        import io; from PIL import Image
+        png = subprocess.check_output(["ffmpeg", "-v", "error", "-nostdin", "-i", a.src, "-vf", a.vf, "-frames:v", "1", "-f", "image2pipe", "-vcodec", "png", "-"])
+        w, h = Image.open(io.BytesIO(png)).size
     cut = (["-ss", str(a.ss)] if a.ss is not None else []) + (["-to", str(a.to)] if a.to is not None else [])
-    dec = subprocess.Popen(["ffmpeg", "-v", "error", "-nostdin", *cut, "-i", a.src, "-vf", f"fps={rate}", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+    dec = subprocess.Popen(["ffmpeg", "-v", "error", "-nostdin", *cut, "-i", a.src, "-vf", ",".join(x for x in [a.vf, f"fps={rate}"] if x), "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
                            stdout=subprocess.PIPE)
     ow, oh = (w * 4, h * 4) if a.scale == 4 else (w * a.scale // 2 * 2, h * a.scale // 2 * 2)
-    vf = [] if a.scale == 4 else ["-vf", f"scale={ow}:{oh}:flags=lanczos"]
+    if a.size: ow, oh = map(int, a.size.split("x"))
+    vf = [] if (ow, oh) == (w * 4, h * 4) else ["-vf", f"scale={ow}:{oh}:flags=lanczos"]
     enc = subprocess.Popen(["ffmpeg", "-v", "error", "-y", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{w*4}x{h*4}", "-r", rate,
                             "-i", "-", *vf, "-c:v", "libx264", "-preset", "medium", "-crf", str(a.crf), "-pix_fmt", "yuv420p",
                             "-color_primaries", "bt709", "-color_trc", "bt709", "-colorspace", "bt709", a.dst], stdin=subprocess.PIPE)
