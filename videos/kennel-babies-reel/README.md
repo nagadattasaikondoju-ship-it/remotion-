@@ -24,6 +24,8 @@ Alternatives kept for later: "THEY ONLY KNOW HOW TO LOVE" (same 5 + 1 shape), "B
 - Each strip is the upright Sony frame at native size (rotation −90°, zoom 1.7778 = 1:1 pixels), cut to a 336 px band with
   invideo's crop effect and moved into place. Nothing is enlarged.
 - Words: Gilda Display (OFL), white, 117 px (82 px caps, the reference's size), centred in each strip, soft dark shadow.
+- BABIES sits higher than the reference's centred EXPLORE (canvas y ≈ 385): at the centre it covered the dogs' faces
+  (the waving Mastiff, the Shepherd); up there it clears every face in all five shots.
   Italiana was tried first (closest shape) but too thin to read over the mesh and the white dog.
 - Grade: one adjustment layer, vibrance +0.18, temperature +0.05.
 
