@@ -1561,7 +1561,7 @@ AI image editing prompting patterns for Qwen-Image (Qwen-Image-Edit-2511 by defa
 - **Job:** Sound, music and audio QA
 - **Source:** installed before the manifest (see CLAUDE.md)
 - **Licence:** see the skill folder
-- **Folder:** `.claude/skills/real-sfx/` (1944 files, SKILL.md 498 lines, with scripts/tools)
+- **Folder:** `.claude/skills/real-sfx/` (1945 files, SKILL.md 498 lines, with scripts/tools)
 
 Sound design for motion videos with REAL recorded sounds from the user's own libraries (a sorted main pack of whooshes, hits, risers, pops, chimes, keystrokes, foley, ambiences plus fallback libraries) and UI cues from uisfx, never synthesized. Finds the moments from the project's own cue list or from the synthesizer script that makes its sound, from a HyperFrames composition, from a screen recording (regions: typing, toasts, scrolls, clicks) or from the picture itself, picks and processes the sounds, places them on the exact frame at the level the author's own sounds had, keeps the music and voice, takes a synthesized layer baked into the render OUT instead of doubling it, and returns a new MP4, a separate SFX WAV track, a cue report and a self-critique scoreboard. Use whenever the user asks to add sound effects or SFX, sound-design, "озвучь", "добавь звуки", "сфх", whoosh/hit/riser/click/typing sounds, UI sounds, to replace synthesized or generated sounds with real ones, or to make a motion graphic, promo, explainer, UI animation, screencast, HyperFrames render, After Effects or Premiere project sound better, or complains the sound is synthetic, generic or out of sync, even if they do not say "skill" or name a library.
 
@@ -2057,6 +2057,10 @@ How published videos are doing on YouTube, and what to learn from it. Views, lik
 | `moviepy`, `ffmpeg-python`, `librosa` | Python video assembly, ffmpeg bindings, beat/tempo analysis (`beat-sync-edit`) | same (pip) |
 | `automontage` | AutoMontage-Agent engine: auto-montage of talking heads, motion reels, review UI (Remotion 4.0.536 + faster-whisper) | `bash tools/setup_skill_clis.sh`; engine in `tools/skill-repos/mcdenil-skills_AutoMontage-Agent`; `automontage doctor`, `node scripts/cli.js demo` |
 | `ffmpeg-skill` scripts | 87 ffmpeg capabilities; `scripts/_contract.py doctor` checks the machine | in the skill folder, stdlib only |
+| `synfig` 1.5 | Synfig Studio's CLI renderer: vector 2D cut-out/bone animation from `.sif`/`.sifz` files to PNG sequences or video (`synfig f.sif -t png -o f.png`) | apt, via `bash tools/setup_skill_clis.sh` |
+| `pencil2d` 0.6 | Hand-drawn 2D (bitmap + vector) frame animation; renders `.pclx` from the command line (`QT_QPA_PLATFORM=offscreen pencil2d in.pclx -o out.mp4`) | same (apt) |
+| `pyopenvdb` 10 | DreamWorks' OpenVDB sparse volumes (smoke, clouds, fire) from Python: build grids, write `.vdb` for Blender to render | same (apt `python3-openvdb`); `python3.12 -c "import pyopenvdb"` |
+| Theatre.js 0.7, SVG.js 3.2 | Keyframed motion with a timeline editor (`@theatre/studio`) and a seekable sequence (`sheet.sequence.position = t`, so frame-exact renders); SVG drawing and animation | `tools/web-anim` (`npm ci`); bundle into a page with the film's own build step |
 
 ## Considered and not installed (Nov 16 2026 list)
 
@@ -2075,6 +2079,15 @@ How published videos are doing on YouTube, and what to learn from it. Views, lik
 | heygen-com/hyperframes, charlie947, howseen-ai, Mort1d, iart-ai/motion-skills | Already installed earlier |
 | zhuyansen, inginjadipro, sasateguh, devanasolver, Thedurancode, 26medias, BehiSecc, wilwaldon (indexes) | Link lists, nothing to install |
 | soyenriquerocha/ai-video-editor | Does not exist on GitHub |
+
+## Open-source animation tools (Nov 16 2026 list)
+
+| Repo | Status |
+|---|---|
+| synfig/synfig, pencil2d/pencil, AcademySoftwareFoundation/openvdb, theatre-js/theatre, svgdotjs/svg.js | Installed (tools table above), tested here |
+| opentoonz/opentoonz | Not installed: a desktop GUI app (Studio Ghibli's base) with no Linux package or headless renderer; building it from source needs ~2 GB and still only gives the GUI |
+| NatronGitHub/Natron | Not installed: node compositor, no apt package; the portable Linux build (~600 MB unpacked) includes `NatronRenderer` for headless renders. Ask first; disk is tight. ffmpeg + code compositing cover the same jobs here |
+| freemocap/freemocap | Not installed: markerless motion capture needs 2+ camera recordings of a person and ~1.5 GB of PySide6/MediaPipe/OpenCV; useful only with that footage |
 
 ## Skills built into Claude (not in this repo)
 

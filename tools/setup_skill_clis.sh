@@ -33,4 +33,8 @@ B=$AM/node_modules/.remotion/chrome-headless-shell; mkdir -p $B/linux64/chrome-h
 ln -sfn /opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell $B/linux64/chrome-headless-shell-linux64/chrome-headless-shell
 node -e "const f=require(process.argv[1]);require('fs').writeFileSync(process.argv[2],f.getExpectedVersion({version:null,chromeMode:'headless-shell',platform:'linux64'}))" \
   "$PWD/$AM/node_modules/@remotion/renderer/dist/browser/BrowserFetcher.js" "$B/VERSION"
-command -v om explainroo argo auto-editor scenedetect automontage
+# Nov 16 2026 open-source animation tools (user's list): Synfig (vector 2D, CLI renderer), Pencil2D (hand-drawn 2D; `--export`
+# with QT_QPA_PLATFORM=offscreen), OpenVDB's Python module (`pyopenvdb`, python3.12 only). Theatre.js + SVG.js from npm into tools/web-anim.
+command -v synfig pencil2d >/dev/null || { apt-get update -q && apt-get install -y -q --no-install-recommends synfig pencil2d python3-openvdb; }
+(cd ../web-anim && npm ci --no-audit --no-fund)
+command -v om explainroo argo auto-editor scenedetect automontage synfig pencil2d

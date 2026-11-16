@@ -68,6 +68,8 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
   - CLIs: `bash tools/setup_skill_clis.sh` also pip-installs auto-editor, scenedetect, moviepy, ffmpeg-python, librosa (`~/.local/bin`; tested on the kennel footage).
   - Ask first: ElevenLabs / Gemini / OpenAI / fal.ai / Fish Audio routes in these skills. Never publish or host without an explicit ask (`video-shotcraft`'s Upload-Post publisher, `video-production`'s Tailscale hosting).
   - `video-motion-craft` says "load ALWAYS before video code": it doesn't override this file's routing. House rules still win (sound pipeline, captions, no fabricated clients); their sound goes through the pipeline below.
+- Open-source animation tools (Nov 16 2026, user's list): `synfig` (vector 2D CLI renderer), `pencil2d` (hand-drawn 2D, `QT_QPA_PLATFORM=offscreen`), `pyopenvdb` (OpenVDB volumes, python3.12) via apt;
+  Theatre.js + SVG.js in `tools/web-anim` (`npm ci`). All in `bash tools/setup_skill_clis.sh`. OpenToonz (GUI only), Natron (~600 MB portable, ask first) and FreeMoCap (needs multi-camera footage) are not installed; reasons in the KB.
 - Freesound CDN and Wikimedia downloads return 403 from cloud sessions: SFX the library lacks are made with `earshot forge` into `assets/sfx/earshot/` and
   APPENDED to `tools/real-sfx.index.json` (never rebuild the index: `build_index.py` renumbers every id and breaks older reels' `sfx_map.json`). Music is composed in code.
 - Low-res footage (WhatsApp 480p): AI-upscale ×4 with `tools/upscale_realesr.py` (Real-ESRGAN general-x4v3, BSD-3; safetensors weights
