@@ -252,90 +252,6 @@
   "licensed": false
  },
  {
-  "skill": "video_toolkit",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "video_toolkit",
-  "licensed": true
- },
- {
-  "skill": "remotion-best-practices",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "remotion-best-practices",
-  "licensed": true
- },
- {
-  "skill": "synthetic-ui-demo",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "synthetic-ui-demo",
-  "licensed": true
- },
- {
-  "skill": "ltx2",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "ltx2",
-  "licensed": true
- },
- {
-  "skill": "qwen-edit",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "qwen-edit",
-  "licensed": true
- },
- {
-  "skill": "playwright-recording",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "playwright-recording",
-  "licensed": true
- },
- {
-  "skill": "ideogram4",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "ideogram4",
-  "licensed": true
- },
- {
-  "skill": "dsk-ffmpeg",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "ffmpeg",
-  "licensed": true
- },
- {
-  "skill": "dsk-frontend-design",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "frontend-design",
-  "licensed": true
- },
- {
-  "skill": "dsk-remotion",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "remotion",
-  "licensed": true
- },
- {
-  "skill": "moviepy",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "moviepy",
-  "licensed": true
- },
- {
-  "skill": "dsk-elevenlabs",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "elevenlabs",
-  "licensed": true
- },
- {
-  "skill": "acestep",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "acestep",
-  "licensed": true
- },
- {
-  "skill": "runpod",
-  "from": "digitalsamba/claude-code-video-toolkit",
-  "original_name": "runpod",
-  "licensed": true
- },
- {
   "skill": "makemyclip-editor",
   "from": "MakeMyClip/editor",
   "original_name": "editor",
@@ -837,6 +753,270 @@
   "skill": "style-sampling",
   "from": "heygen-com/hyperframes",
   "original_name": "style-sampling",
+  "licensed": true
+ },
+ {
+  "skill": "acestep",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "acestep",
+  "licensed": true
+ },
+ {
+  "skill": "blender",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "blender",
+  "licensed": true
+ },
+ {
+  "skill": "dsk-elevenlabs",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "elevenlabs",
+  "licensed": true
+ },
+ {
+  "skill": "dsk-ffmpeg",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "ffmpeg",
+  "licensed": true
+ },
+ {
+  "skill": "ideogram4",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "ideogram4",
+  "licensed": true
+ },
+ {
+  "skill": "ltx2",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "ltx2",
+  "licensed": true
+ },
+ {
+  "skill": "moviepy",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "moviepy",
+  "licensed": true
+ },
+ {
+  "skill": "parody-short",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "parody-short",
+  "licensed": true
+ },
+ {
+  "skill": "playwright-recording",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "playwright-recording",
+  "licensed": true
+ },
+ {
+  "skill": "qwen-edit",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "qwen-edit",
+  "licensed": true
+ },
+ {
+  "skill": "dsk-remotion",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "remotion",
+  "licensed": true
+ },
+ {
+  "skill": "remotion-best-practices",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "remotion-best-practices",
+  "licensed": true
+ },
+ {
+  "skill": "runpod",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "runpod",
+  "licensed": true
+ },
+ {
+  "skill": "synthetic-ui-demo",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "synthetic-ui-demo",
+  "licensed": true
+ },
+ {
+  "skill": "video-design",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "video-design",
+  "licensed": true
+ },
+ {
+  "skill": "youtube-stats",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "youtube-stats",
+  "licensed": true
+ },
+ {
+  "skill": "video_toolkit",
+  "from": "digitalsamba/claude-code-video-toolkit",
+  "original_name": "video_toolkit",
+  "licensed": true
+ },
+ {
+  "skill": "ffmpeg-skill",
+  "from": "kajisho5/ffmpeg-skill",
+  "original_name": "ffmpeg-skill",
+  "licensed": true
+ },
+ {
+  "skill": "remotion-ffmpeg-skill",
+  "from": "kajisho5/remotion-ffmpeg-skill",
+  "original_name": "remotion-ffmpeg-skill",
+  "licensed": true
+ },
+ {
+  "skill": "video-shotcraft",
+  "from": "Vincentwei1021/video-shotcraft",
+  "original_name": "video-shotcraft",
+  "licensed": true
+ },
+ {
+  "skill": "motion-video-director",
+  "from": "mattypark/Motion-graphics-skill",
+  "original_name": "motion-video-director",
+  "licensed": false
+ },
+ {
+  "skill": "video-motion-craft",
+  "from": "vibegameengine/video-motion-craft",
+  "original_name": "video-motion-craft",
+  "licensed": true
+ },
+ {
+  "skill": "reel-editor",
+  "from": "sunithvs/video-agent-skill",
+  "original_name": "reel-editor",
+  "licensed": true
+ },
+ {
+  "skill": "youtube-editor",
+  "from": "sunithvs/video-agent-skill",
+  "original_name": "youtube-editor",
+  "licensed": true
+ },
+ {
+  "skill": "jhonty-video-editing",
+  "from": "JhontyBarreto/video-editing-skill",
+  "original_name": "video-editing",
+  "licensed": false
+ },
+ {
+  "skill": "editing-videos",
+  "from": "kmilo93sd/agent-video-editor",
+  "original_name": "editing-videos",
+  "licensed": true
+ },
+ {
+  "skill": "boring-tools",
+  "from": "brookejlacey/boring-tools",
+  "original_name": "boring-tools",
+  "licensed": true
+ },
+ {
+  "skill": "ecc-video-editing",
+  "from": "KirttiVushan/claude-code",
+  "original_name": "video-editing",
+  "licensed": true
+ },
+ {
+  "skill": "hyperframes-motion-reel",
+  "from": "Sunwood-ai-labs/hyperframes-motion-reel-skill",
+  "original_name": "hyperframes-motion-reel",
+  "licensed": true
+ },
+ {
+  "skill": "motion-video",
+  "from": "bestagentkits/motion-video-skill",
+  "original_name": "motion-video",
+  "licensed": true
+ },
+ {
+  "skill": "motion-video-production",
+  "from": "unclejobs-ai/motion-video-skill",
+  "original_name": "motion-video-production",
+  "licensed": true
+ },
+ {
+  "skill": "motion-reel",
+  "from": "10291124jcjc-dotcom/motion-reel",
+  "original_name": "motion-reel",
+  "licensed": true
+ },
+ {
+  "skill": "extreme-motion-design",
+  "from": "dev-isaacmello/extreme-motion-design",
+  "original_name": "extreme-motion-design",
+  "licensed": true
+ },
+ {
+  "skill": "adu-motion-video",
+  "from": "adunext/adu-motion-video",
+  "original_name": "adu-motion-video",
+  "licensed": true
+ },
+ {
+  "skill": "remotion-bits",
+  "from": "av/remotion-bits",
+  "original_name": "remotion-bits",
+  "licensed": true
+ },
+ {
+  "skill": "remotion-video-director",
+  "from": "BayramAnnakov/remotion-video-director",
+  "original_name": "remotion-video-director",
+  "licensed": true
+ },
+ {
+  "skill": "video-production",
+  "from": "Aaryan-Kapoor/video-production-skill",
+  "original_name": "video-production",
+  "licensed": true
+ },
+ {
+  "skill": "arthur-explainer-video",
+  "from": "arthurkatcher/explainer-video",
+  "original_name": "explainer-video",
+  "licensed": false
+ },
+ {
+  "skill": "auto-editor",
+  "from": "WyattBlue/auto-editor",
+  "original_name": "auto-editor",
+  "licensed": true
+ },
+ {
+  "skill": "auto-editor-effects",
+  "from": "WyattBlue/auto-editor",
+  "original_name": "auto-editor-effects",
+  "licensed": true
+ },
+ {
+  "skill": "auto-editor-export",
+  "from": "WyattBlue/auto-editor",
+  "original_name": "auto-editor-export",
+  "licensed": true
+ },
+ {
+  "skill": "auto-editor-transcribe",
+  "from": "WyattBlue/auto-editor",
+  "original_name": "auto-editor-transcribe",
+  "licensed": true
+ },
+ {
+  "skill": "auto-editor-transitions",
+  "from": "WyattBlue/auto-editor",
+  "original_name": "auto-editor-transitions",
+  "licensed": true
+ },
+ {
+  "skill": "beat-sync-edit",
+  "from": "ZiadAbdelkarim/beat-synced-edit",
+  "original_name": "beat-sync-edit",
   "licensed": true
  }
 ]

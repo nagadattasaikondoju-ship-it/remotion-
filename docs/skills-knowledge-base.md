@@ -1,6 +1,6 @@
 # Skills knowledge base
 
-Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/skills/*/SKILL.md` in this repo. **161 project skills.** Re-run the script after installing or removing skills.
+Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/skills/*/SKILL.md` in this repo. **204 project skills.** Re-run the script after installing or removing skills.
 
 ## How the skills fit together (house rules win)
 
@@ -12,6 +12,8 @@ Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/s
   - Never hand-synthesise SFX outside this pipeline.
   - Never run `earshot llm` (it uploads audio to Gemini) unless asked.
 - **Paid APIs, ask first:** ElevenLabs, Arcads, RunPod, Ideogram, OpenArt, LTX, Higgsfield/Seedance/Kling/Suno (take-one), and the cloud TTS options in argo. Local voices by default (explainroo Kokoro, argo `kokoro-js`).
+  - Nov 16 batch: ElevenLabs in `jhonty-video-editing`, `extreme-motion-design` (optional; it also offers local TTS) and `motion-video-production` (via composio, or Fish Audio); `motion-video` uses the `multix` CLI (Gemini TTS + ElevenLabs); fal.ai in `ecc-video-editing`; OpenAI/ElevenLabs TTS in `video-production`; YouTube OAuth in `youtube-stats`; Modal/Hugging Face GPUs in `parody-short`.
+  - **Never post anywhere** without the user's explicit go: `video-shotcraft` can publish to social platforms (Upload-Post API) and `video-production` can host files over Tailscale.
 - **Never add** huashu-motion's "Made with huashu-motion" signature. Use `om` from PATH, never `npx huashu-motion`.
 - **Browsers:** use the preinstalled Chromium (`/opt/pw-browsers/chromium-1194/chrome-linux/chrome`):
   - `OM_CHROME` / `EXPLAINROO_CHROME` / `PLAYWRIGHT_CHROME` point at it;
@@ -43,20 +45,70 @@ Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | Brand system | `brand-intake`, `brand-motion-guidelines` | `color-motion` |
 | Direction and QA of any coded video | `video-director` (`scripts/qa_video.py`, `check_timeline.py`) | `motion-design-critique`, `video-qa` |
 | Sound | the pipeline above (`real-sfx`, `earshot`, `real-sound`) | (not `km-sound-design` / `dsk-elevenlabs`) |
+| Trim real footage: silence, dead air, motionless stretches | `auto-editor` (CLI) | `auto-editor-effects`, `auto-editor-transitions`, `auto-editor-export` (Premiere/Resolve/FCP XML) |
+| Probe, reframe, loudness, platform checks with ffmpeg | `ffmpeg-skill` (`scripts/*.py`, `check.py --platform reels`) | `dsk-ffmpeg`, `boring-tools` (edit-as-text renders) |
+| Find the shots inside long clips | `scenedetect` CLI (PySceneDetect) | `beat-sync-edit`'s `clip_tag.py` (motion/energy tags) |
+| Montage cut to a song's beats | `beat-sync-edit` (beat map → EDL → render, flashes, speed ramps) | `beat-sync-editing` (principles), `music-to-video` |
+| Motion graphics over real footage in Remotion (SRT captions, jump cuts, audio-peak hits) | `remotion-ffmpeg-skill` (needs `ffmpeg-skill`) | `remotion-bits` (ready-made Remotion components) |
+| Cinematic product promo from a web page (shot cards, 2.5D camera) | `video-shotcraft` | `huashu-motion`, `cinetic` |
+| Editor judgment: pacing, hooks, LUFS, J/L cuts, CC0 SFX and music | `editing-videos` (ships a 128-file CC0 sound library) | `short-form-video` |
+| Talking-head reel with face layouts, PiP, kinetic text | `reel-editor` | `boring-tools`, `branded-ad-edit` |
+| Long horizontal YouTube edit (chapters, jump cuts, subtitles) | `youtube-editor` | `auto-editor` |
+| Match a reference video with measured targets | `motion-video-production` | `reel-style-clone`, `reanimate` |
+| Showreel-grade motion in HyperFrames | `hyperframes-motion-reel` | `motion-video`, `hyperframes-animation` |
+| How a video looks: palette by act, type scale, contact-sheet critique | `video-design` | `motion-design-critique` |
 
 ## Index by job
 
-### After Effects, Blender and desktop apps (5)
+### After Effects, Blender and desktop apps (6)
 
 | Skill | What it does | Source |
 |---|---|---|
 | [`after-effects`](#after-effects) | This skill should be used when the user asks anything about Adobe After Effects — to "write an After Effects expression", "make a wiggle / loopOut / inertial bounce", "r… | iart-ai/motion-design-skills |
 | [`aftereffects-motion`](#aftereffects-motion) | Use this skill whenever Adobe After Effects is the working tool. | LobzyJay/motion-design-with-claude |
+| [`blender`](#blender) | 3D scenes, character acting and product shots from a shot spec, rendered in Blender, as a finished film, as clips for any other build (moviepy, a video job, an editor), … | digitalsamba/claude-code-video-toolkit |
 | [`blender-motion`](#blender-motion) | Use this skill whenever Blender is the working tool. | LobzyJay/motion-design-with-claude |
 | [`capcut-export`](#capcut-export) | Export a finished layered edit (footage + graphic cards + alpha fx overlay + captions + SFX/music/VO) into a CapCut desktop draft where EVERY element stays editable — fo… | krusemediallc/video-editor-agent |
 | [`figma`](#figma) | Import Figma content into a HyperFrames composition — rendered assets, brand tokens, components, storyboard sections → reconstructed motion (frames read as states, not s… | earlier install |
 
-### Delivery, export and QA (4)
+### Footage editing: cuts, ffmpeg, scenes, beat sync (14)
+
+| Skill | What it does | Source |
+|---|---|---|
+| [`auto-editor`](#auto-editor) | Record a microphone or edit video/audio with the auto-editor CLI — cut out dead space (silence, motionlessness, black frames), set the pace, make manual cuts, and render… | WyattBlue/auto-editor |
+| [`auto-editor-effects`](#auto-editor-effects) | Apply actions and animations to sections of a video/audio with auto-editor — change speed, duck or fade volume, de-ess, zoom/Ken Burns, rotate/spin, draw boxes, overlay … | WyattBlue/auto-editor |
+| [`auto-editor-export`](#auto-editor-export) | Export auto-editor's edit or microphone recording to a video editor (Premiere, DaVinci Resolve, Final Cut Pro, ShotCut, Kdenlive), to individual clips, or to auto-editor… | WyattBlue/auto-editor |
+| [`auto-editor-transcribe`](#auto-editor-transcribe) | Transcribe a media file or live microphone to text or subtitles with auto-editor's whisper subcommand, then edit by spoken content — cut to keep (or drop) sections whose… | WyattBlue/auto-editor |
+| [`auto-editor-transitions`](#auto-editor-transitions) | Add transitions at auto-editor's cuts — cross-dissolves, Premiere Pro's transitions (push, clock-wipe, glitch, page-peel, iris-round, and the rest, including its Legacy … | WyattBlue/auto-editor |
+| [`beat-sync-edit`](#beat-sync-edit) | Turn a song + raw footage into a beat-synced edit. | ZiadAbdelkarim/beat-synced-edit |
+| [`boring-tools`](#boring-tools) | Edit video as text. | brookejlacey/boring-tools |
+| [`dsk-ffmpeg`](#dsk-ffmpeg) | Video and audio processing with FFmpeg. | digitalsamba/claude-code-video-toolkit |
+| [`ecc-video-editing`](#ecc-video-editing) | AI-assisted video editing workflows for cutting, structuring, and augmenting real footage. | KirttiVushan/claude-code |
+| [`editing-videos`](#editing-videos) | Gives an editor's judgment, with sourced numbers, for cutting and pacing, J and L cuts, jump cuts, b-roll, hooks and retention, captions, on-screen text and graphics, zo… | kmilo93sd/agent-video-editor |
+| [`edl-tighten`](#edl-tighten) | - Surgically remove awkward pauses, dead air, and long silences from a FINISHED voiceover-driven cut while keeping video, VO audio, word-synced captions, SFX hits, and t… | krusemediallc/video-editor-agent |
+| [`ffmpeg-skill`](#ffmpeg-skill) | Edit video and audio with local FFmpeg: cut, join, reframe, speed, captions, overlays, silence removal, sync, loudness, HDR to SDR, platform exports and checks. | kajisho5/ffmpeg-skill |
+| [`jhonty-video-editing`](#jhonty-video-editing) | Make and edit short-form videos (Reels, TikToks, Shorts, video ads, explainers, VSLs) with Remotion, ElevenLabs and 21st.dev. | JhontyBarreto/video-editing-skill |
+| [`remotion-ffmpeg-skill`](#remotion-ffmpeg-skill) | Make motion graphics on real footage with Remotion, driven by measurements from ffmpeg-skill: animated captions timed from an SRT/VTT file, automatic jump cuts that drop… | kajisho5/remotion-ffmpeg-skill |
+
+### End-to-end motion-graphics video pipelines (13)
+
+| Skill | What it does | Source |
+|---|---|---|
+| [`adu-motion-video`](#adu-motion-video) | 使用完整动画工程包，把新口播、文案与自有素材制作成可编辑动效视频和 60fps MP4；也支持轻量 TPL、手绘续接、字幕与改旧片。支持 Windows、macOS、Linux，以及 Codex、Claude Code、豆包、DeepSeek、WorkBuddy 等可读写文件并运行命令的助手。 | adunext/adu-motion-video |
+| [`extreme-motion-design`](#extreme-motion-design) | Cria vídeos de motion design de nível de estúdio por código (Remotion/React), com trilha licenciada, SFX sincronizados, voz opcional (ElevenLabs ou modelo TTS local esco… | dev-isaacmello/extreme-motion-design |
+| [`hyperframes-motion-reel`](#hyperframes-motion-reel) | ショーリール品質（Behance / OFFF / Awwwards級）のモーショングラフィックス動画を HyperFrames（HTML + GSAP + SVG + Canvas、Apache-2.0）で制作する。remotion-motion-reel の HyperFrames 版で、Remotion の Company Lic… | Sunwood-ai-labs/hyperframes-motion-reel-skill |
+| [`motion-reel`](#motion-reel) | Make motion-graphics videos rendered entirely from code — product ads, brand promos, launch videos, showreels, animated explainers, 抖音/视频号/小红书 竖屏广告, 宣传片, 片头, 动态海报视频 — wi… | 10291124jcjc-dotcom/motion-reel |
+| [`motion-video`](#motion-video) | Produce beat-synced 1080p motion-graphic videos in HyperFrames (HTML + GSAP) with an AI voice-over, Vietnamese karaoke captions, SFX and generated music, in one of two p… | bestagentkits/motion-video-skill |
+| [`motion-video-director`](#motion-video-director) | Plan, direct, and produce code-drawn 2D/3D motion graphics and edited videos (reels, hooks, SaaS/product explainers, talking-head edits) on the user's local machine thro… | mattypark/Motion-graphics-skill |
+| [`motion-video-production`](#motion-video-production) | Plan, build and verify 15–90 second motion graphics, promo and character videos. | unclejobs-ai/motion-video-skill |
+| [`parody-short`](#parody-short) | Comedy shorts about a group's own life - a team's launch, quarter end, office move or leaving do; a club's season; a class's year; a family's Christmas - or about a shar… | digitalsamba/claude-code-video-toolkit |
+| [`remotion-video`](#remotion-video) | This skill should be used when the user asks to "make a video with Remotion", "create a programmatic/data-driven video in React", "render an MP4/GIF from code", "animate… | iart-ai/motion-design-skills |
+| [`remotion-video-director`](#remotion-video-director) | Interactive guide for creating Remotion videos - from strategic concept to rendered MP4. | BayramAnnakov/remotion-video-director |
+| [`video-motion-craft`](#video-motion-craft) | Create and edit video with cinematic motion — Remotion (React video) for motion graphics, reels, intros, promos, titles and game trailers, plus FFmpeg/Whisper for editin… | vibegameengine/video-motion-craft |
+| [`video-production`](#video-production) | End-to-end narrated video production with research, source extraction, storyboard/script, Manim/ffmpeg visuals, TTS voiceover, QC, archival backups, and optional local/T… | Aaryan-Kapoor/video-production-skill |
+| [`video-shotcraft`](#video-shotcraft) | Create cinematic product videos from frontend projects or webpages with Remotion, real page captures, shot cards, the Ink Press template, beat sync and sound design. | Vincentwei1021/video-shotcraft |
+
+### Delivery, export and QA (5)
 
 | Skill | What it does | Source |
 |---|---|---|
@@ -64,6 +116,7 @@ Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`video-delivery-specs`](#video-delivery-specs) | This skill should be used when the user asks "what are the specs for Instagram Reels / TikTok / YouTube / broadcast", "export settings for social", "what aspect ratio an… | iart-ai/freelance-motion-skills |
 | [`video-qa`](#video-qa) | - Four-layer QA for a rendered video edit — run it on any .mp4/.mov you or a pipeline just produced. | krusemediallc/video-editor-agent |
 | [`video-review-canvas`](#video-review-canvas) | Publish a finished (or draft) video cut to a frame.io-style review canvas on here.now — a player with a frame-accurate scrubber, persistent timeline notes, version compa… | krusemediallc/video-editor-agent |
+| [`youtube-stats`](#youtube-stats) | How published videos are doing on YouTube, and what to learn from it. | digitalsamba/claude-code-video-toolkit |
 
 ### Sound, music and audio QA (11)
 
@@ -81,19 +134,19 @@ Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`real-sound`](#real-sound) | Build premium, realistic soundtracks for code-made videos and animations from real licensed recordings - launch films, product and feature videos, UI walkthroughs, logo … | earlier install |
 | [`soundtrack`](#soundtrack) | This skill should be used when the user asks to "add music to the animation", "make the music in code", "synthesize a soundtrack", "compose background music that fits th… | iart-ai/javascript-animation-skills |
 
-### Talking-head and short-form reel editing (19)
+### Talking-head and short-form reel editing (20)
 
 | Skill | What it does | Source |
 |---|---|---|
 | [`arcads-video-edit`](#arcads-video-edit) | Turn a creator's multi-take product-demo recordings (each take = screen recording + camera video + mic WAV, usually the creator walking through Arcads) into a finished 9… | krusemediallc/video-editor-agent |
 | [`branded-ad-edit`](#branded-ad-edit) | Turn a RAW talking-head video into a FINISHED, branded, motion-graphics ad for any brand or industry — a designed motion graphic on every spoken line, the brand's real c… | krusemediallc/video-editor-agent |
 | [`edits-hook-overlay`](#edits-hook-overlay) | Put Instagram's NATIVE text hook (the Edits app's own font, boxes and styling) on many videos without opening each one in Edits. | krusemediallc/video-editor-agent |
-| [`edl-tighten`](#edl-tighten) | - Surgically remove awkward pauses, dead air, and long silences from a FINISHED voiceover-driven cut while keeping video, VO audio, word-synced captions, SFX hits, and t… | krusemediallc/video-editor-agent |
 | [`general-video`](#general-video) | Author or edit a custom HyperFrames composition when no specialized workflow fits, or when BRIEF.md sets flow: companion. | earlier install |
 | [`hook-splitter`](#hook-splitter) | - Split ONE long recording that contains many separate hooks/takes into a set of standalone videos — one per hook — and tighten each so there is no dead air, no stumble,… | krusemediallc/video-editor-agent |
 | [`hook-variations`](#hook-variations) | - Combine ONE finished body cut with MANY hook clips to produce one standalone video per hook — the hook A/B batch you upload as separate ad creatives. | krusemediallc/video-editor-agent |
 | [`makemyclip-editor`](#makemyclip-editor) | AI-native video editor for any agent. | MakeMyClip/editor |
 | [`media-use`](#media-use) | Agent Media OS, the single skill for every media need in a HyperFrames project. | earlier install |
+| [`reel-editor`](#reel-editor) | Edit talking-head / selfie videos into finished Instagram Reels, TikToks and YouTube Shorts with code-rendered motion graphics - face layouts that morph (split screen, p… | sunithvs/video-agent-skill |
 | [`reel-recut`](#reel-recut) | - Recut a raw vertical talking-head reel into a finished short-form edit: a persistent title banner, word-synced karaoke captions, callout boxes for asides and comment-k… | krusemediallc/video-editor-agent |
 | [`reel-style-clone`](#reel-style-clone) | - Reverse-engineer a reference reel's editing style frame-by-frame into a replicable STYLE GUIDE plus per-line BUILD DIRECTIVES, then apply that style to the user's own … | krusemediallc/video-editor-agent |
 | [`short-form-video`](#short-form-video) | This skill should be used when the user asks to "make a Reels/TikTok/YouTube Shorts video", "build a short-form video template", "write a hook for a short", "edit for re… | iart-ai/tiktok-video-skills |
@@ -103,15 +156,17 @@ Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`talking-head-recut`](#talking-head-recut) | Package an existing talking-head / interview / podcast video with timed, designed GRAPHIC OVERLAY cards — kinetic titles, lower-thirds, data callouts, quotes, side panel… | earlier install |
 | [`tenfold-video-edit`](#tenfold-video-edit) | Turns raw 9:16 talking-head clips into a finished, premium Instagram reel end to end: picks the cleanest take of every line across your clips, cuts dead air, punches in … | tenfoldmarc/video-edit-skill |
 | [`video-edit-pipeline`](#video-edit-pipeline) | MASTER orchestration skill for producing a finished short-form video from raw talking-head footage. | krusemediallc/video-editor-agent |
-| [`video_toolkit`](#video_toolkit) | Create professional videos autonomously using claude-code-video-toolkit — AI voiceovers, image generation, music, talking heads, and Remotion rendering. | digitalsamba/claude-code-video-toolkit |
+| [`video_toolkit`](#video_toolkit) | Make short explainer videos from a brief with claude-code-video-toolkit — submit a scene spec, poll a job, get a QC-checked MP4. | digitalsamba/claude-code-video-toolkit |
+| [`youtube-editor`](#youtube-editor) | Edit full-length horizontal YouTube videos (5-60 min talking heads, explainers, tutorials, screen recordings) into finished 1920x1080 uploads - automatic jump cuts that … | sunithvs/video-agent-skill |
 
-### Captions, kinetic type and titles (12)
+### Captions, kinetic type and titles (13)
 
 | Skill | What it does | Source |
 |---|---|---|
 | [`article-highlights`](#article-highlights) | Editorial Remotion article inserts with mandatory format/background intake, layered highlights, zero neon/glow, and mobile QA. | Liamrjohnston/remotion-motion-graphics-skill |
 | [`canopy-part-title`](#canopy-part-title) | Leaves sweep through the frame and part to reveal the headline. | earlier install |
 | [`caption-animation`](#caption-animation) | This skill should be used when the user asks to "add animated captions", "make TikTok captions", "karaoke captions", "word-by-word subtitles", "auto subtitles", "highlig… | iart-ai/tiktok-video-skills |
+| [`captions-overlay`](#captions-overlay) | Overlay doctrine for captions in HyperFrames videos — the caption MODEL (drop / rail / embed) and the rule that captions are an OVERLAY composited on top of the film, ne… | heygen-com/hyperframes |
 | [`embedded-captions`](#embedded-captions) | Add captions or subtitles to an existing single-subject talking-head video without editing the footage. | earlier install |
 | [`glass-shard-title`](#glass-shard-title) | Glass shards fly in through fog and tile themselves into the headline. | earlier install |
 | [`kinetic-typography`](#kinetic-typography) | This skill should be used when the user asks to "animate a headline", "make a kinetic typography video", "do a split-text reveal", "stagger text by character/word/line",… | iart-ai/kinetic-typography-skills |
@@ -151,12 +206,13 @@ Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`wrapped-video`](#wrapped-video) | This skill should be used when the user asks to "make a Spotify Wrapped style video", "build a year in review / year-in-review video", "create a personalized data video"… | iart-ai/explainer-video-skills |
 | [`youtube-intro-outro`](#youtube-intro-outro) | This skill should be used when the user asks to "make a YouTube intro", "create a channel intro", "build a logo sting/bumper", "design an outro / end screen / end card",… | iart-ai/youtube-video-skills |
 
-### Explainers, data, charts and maps (12)
+### Explainers, data, charts and maps (13)
 
 | Skill | What it does | Source |
 |---|---|---|
 | [`animated-chart`](#animated-chart) | Make a looping animated chart for LinkedIn or a newsletter in code with Claude Code. | charlie947/motion-graphics-skills |
 | [`animated-infographic`](#animated-infographic) | This skill should be used when the user asks to "make an animated infographic", "create an infographic video", "build an infographic animation", "animate an explainer in… | iart-ai/data-animation-skills |
+| [`arthur-explainer-video`](#arthur-explainer-video) | Make a 30-60s motion-graphics explainer or product demo video entirely in code (Remotion + React for picture, numpy synth for music and sound design), rendered to mp4 on… | arthurkatcher/explainer-video |
 | [`chart-animation`](#chart-animation) | This skill should be used when the user asks to "make a bar chart race", "turn a CSV into a video", "build an animated data visualization", "create an animated statistic… | iart-ai/data-animation-skills |
 | [`diagram-animation`](#diagram-animation) | This skill should be used when the user asks to "animate this diagram", "build a flowchart that reveals step by step", "animate an architecture/sequence diagram", "make … | iart-ai/explainer-video-skills |
 | [`explainer-video`](#explainer-video) | This skill should be used when the user asks to "make an explainer video", "turn this into a short explainer", "write a script and storyboard for a product video", "prod… | iart-ai/explainer-video-skills |
@@ -218,12 +274,10 @@ Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`shader-glsl`](#shader-glsl) | This skill should be used when the user asks to "write a fragment shader", "make a GLSL gradient/noise/plasma background", "create an image transition (dissolve, displac… | iart-ai/webgl-animation-skills |
 | [`threejs-animation`](#threejs-animation) | This skill should be used when the user asks to "build a 3D hero section or WebGL background", "animate a Three.js scene", "play or crossfade GLTF animation clips", "mov… | iart-ai/webgl-animation-skills |
 
-### Frameworks: HyperFrames and Remotion (15)
+### Frameworks: HyperFrames and Remotion (13)
 
 | Skill | What it does | Source |
 |---|---|---|
-| [`dsk-ffmpeg`](#dsk-ffmpeg) | Video and audio processing with FFmpeg. | digitalsamba/claude-code-video-toolkit |
-| [`dsk-frontend-design`](#dsk-frontend-design) | Create distinctive, production-grade frontend interfaces with high design quality. | digitalsamba/claude-code-video-toolkit |
 | [`dsk-remotion`](#dsk-remotion) | Toolkit-specific Remotion patterns — custom transitions, shared components, and project conventions. | digitalsamba/claude-code-video-toolkit |
 | [`hyperframes`](#hyperframes) | Mandatory entry point: read this first for any request to make, create, edit, animate, or render a video, animation, or motion graphic, including a promo, explainer, cap… | earlier install |
 | [`hyperframes-animation`](#hyperframes-animation) | All animation knowledge for HyperFrames — atomic motion rules, multi-phase scene blueprints, scene transitions, broader motion-design techniques, AND the seven runtime a… | earlier install |
@@ -235,8 +289,8 @@ Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`hyperframes-studio`](#hyperframes-studio) | Use when building or editing a HyperFrames project that people open in Studio: how the timeline should be laid out so it reads well (one caption track, one element kind … | earlier install |
 | [`moviepy`](#moviepy) | Python video composition with moviepy 2.x — overlaying deterministic text on AI-generated video (LTX-2, SadTalker), compositing clips, single-file build.py video project… | digitalsamba/claude-code-video-toolkit |
 | [`remotion-best-practices`](#remotion-best-practices) | Router for all Remotion skills | digitalsamba/claude-code-video-toolkit |
+| [`remotion-bits`](#remotion-bits) | Animation components and utilities for Remotion video projects. | av/remotion-bits |
 | [`remotion-to-hyperframes`](#remotion-to-hyperframes) | Port an existing Remotion (React) composition''s source to HyperFrames HTML. | earlier install |
-| [`remotion-video`](#remotion-video) | This skill should be used when the user asks to "make a video with Remotion", "create a programmatic/data-driven video in React", "render an MP4/GIF from code", "animate… | iart-ai/motion-design-skills |
 
 ### AI generation and B-roll (paid APIs: ask first) (6)
 
@@ -249,7 +303,7 @@ Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`openart-broll`](#openart-broll) | GENERATE B-roll, talking-head clips, and screen-blend motion-graphic overlays for an edit through the OpenArt MCP (Seedance, Kling, Wan, Gemini Omni, Grok Imagine, Nano … | krusemediallc/video-editor-agent |
 | [`runpod`](#runpod) | Cloud GPU processing via RunPod serverless. | digitalsamba/claude-code-video-toolkit |
 
-### Motion principles, art direction and critique (17)
+### Motion principles, art direction and critique (18)
 
 | Skill | What it does | Source |
 |---|---|---|
@@ -269,6 +323,7 @@ Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`motion-graphics`](#motion-graphics) | A short, design-led motion graphic where motion is the message — kinetic typography, stat count-up, chart/data-viz hit, logo sting / brand lockup, lower-third / callout … | earlier install |
 | [`naming-convention`](#naming-convention) | - Name a batch of video deliverables so each filename says what the file actually is — subject, variant axis, and treatment — instead of `render-final-v3.mp4`. | krusemediallc/video-editor-agent |
 | [`shot-composition`](#shot-composition) | This skill should be used when the user asks to "compose a frame", "set up a grid", "plan shot composition", "place the focal point", "decide where elements enter and ex… | iart-ai/motion-design-skills |
+| [`video-design`](#video-design) | Visual design for videos - colour by act, type scale, chart and layout rules for 16:9 and 9:16 scenes, a design.md handoff that any design skill can fill, and a contact-… | digitalsamba/claude-code-video-toolkit |
 | [`video-director`](#video-director) | Direct, build and verify short videos that are written as code and rendered frame by frame (HTML/Canvas/SVG/Three.js, GSAP or Remotion → MP4 or a live page). | win4r/video-director |
 
 ### Briefs, pricing and client work (5)
@@ -281,11 +336,23 @@ Generated 2026-11-08 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`motion-pricing`](#motion-pricing) | This skill should be used when the user asks to "quote a motion project", "estimate this animation job", "how much should I charge for this video", "what's my day rate",… | iart-ai/freelance-motion-skills |
 | [`motion-prompt-writer`](#motion-prompt-writer) | Write a complete 8-part Claude Motion prompt (The bar, Format, The one rule, Look, Motion, Never, Before you finish, The scene) for one short looping motion graphic, in … | charlie947/motion-graphics-skills |
 
-### Other (1)
+### Other (13)
 
 | Skill | What it does | Source |
 |---|---|---|
+| [`animate`](#animate) | Make a short procedural animation in any style — an explainer, a history, a little story — as a single-file canvas video with a synthesized score, rendered to MP4. | cth9191/animate |
+| [`changelog-video`](#changelog-video) | Turn a weekly changelog .md into a finished branded changelog video (square 1080, ~45-60s, Annie VO, animated brand background, mock-UI visualizations, lowkey captions). | heygen-com/hyperframes |
+| [`chorono`](#chorono) | Create, edit and preview editable 2D animations in a connected Chorono editor through its MCP tools. | codie1982/chorono-editor |
+| [`chorono-setup`](#chorono-setup) | Install, start and troubleshoot the local Chorono editor, MCP connection and agent skills for Claude Code, Claude Desktop and Codex. | codie1982/chorono-editor |
+| [`cut-the-curve`](#cut-the-curve) | The technique catalog: five velocity-matched SEAMS (zoom-through, INVERSE zoom-through, cut-the-curve, waterfall cut, rack-focus blur-cut) plus the two in-scene techniqu… | heygen-com/hyperframes |
 | [`directing-stickman-videos`](#directing-stickman-videos) | Turn topics, requirements, articles or scripts into stickman videos. | kaomei/stickman-video-director |
+| [`free247editor`](#free247editor) | The user's personal video editor in this free247editor folder. | riecodes/free247editor |
+| [`motion-doctrine`](#motion-doctrine) | GATEWAY — load FIRST before composing any HyperFrames animation or video. | heygen-com/hyperframes |
+| [`oversized-cursor`](#oversized-cursor) | House-style oversized macOS cursor technique for HyperFrames launch videos. | heygen-com/hyperframes |
+| [`reverse-any-video`](#reverse-any-video) | Rebuild any video file as an editable HyperFrames project - motion graphics, talking heads, live action or AI-generated footage - checked against the original frame by f… | heygen-com/hyperframes |
+| [`seam-craft`](#seam-craft) | Render-correctness doctrine for scene-to-scene seams in HyperFrames launch videos — the prerequisites that make transitions composite correctly on the master timeline. | heygen-com/hyperframes |
+| [`style-sampling`](#style-sampling) | Make a new episode in a proven video style - Collage Explainer, Finance Explainer, Animated Science Explainer, 3D Brand Explainer, 3D True Crime - on the person's topic. | heygen-com/hyperframes |
+| [`ultimate-video-editor`](#ultimate-video-editor) | Transforms any AI code editor into a god-level video editor with 50+ years of craft. | Rajbharti06/Ultimate-Video-Editing-Skills |
 
 ## Full catalogue (A–Z)
 
@@ -311,7 +378,7 @@ This skill should be used when the user asks to "respect prefers-reduced-motion"
 - **Job:** Sound, music and audio QA
 - **Source:** digitalsamba/claude-code-video-toolkit
 - **Licence:** licensed
-- **Folder:** `.claude/skills/acestep/` (1 files, SKILL.md 350 lines)
+- **Folder:** `.claude/skills/acestep/` (1 files, SKILL.md 351 lines)
 
 AI music generation with ACE-Step 1.5 — background music, vocal tracks, covers, stem extraction, audio repainting, and continuation for video production. Use when generating music, soundtracks, jingles, or working with audio stems. Triggers include background music, soundtrack, jingle, music generation, stem extraction, cover, style transfer, repaint, continuation, or musical composition tasks.
 
@@ -330,6 +397,14 @@ This skill should be used when the user asks to "make a video ad", "create an an
 - **Folder:** `.claude/skills/ad-launch-video/` (3 files, SKILL.md 137 lines)
 
 This skill should be used when the user asks to "make a launch video", "create a product hype/sizzle film", "build a teaser/trailer for a drop", "do a reveal montage with an end-card CTA", "cut a hero video to the beat", or "export a launch film in 16:9/9:16/1:1". Covers the hook→tease→reveal→feature-montage→end-card arc and multi-aspect export.
+
+### adu-motion-video
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** adunext/adu-motion-video
+- **Licence:** licensed
+- **Folder:** `.claude/skills/adu-motion-video/` (1000 files, SKILL.md 96 lines, with scripts/tools)
+
+使用完整动画工程包，把新口播、文案与自有素材制作成可编辑动效视频和 60fps MP4；也支持轻量 TPL、手绘续接、字幕与改旧片。支持 Windows、macOS、Linux，以及 Codex、Claude Code、豆包、DeepSeek、WorkBuddy 等可读写文件并运行命令的助手。
 
 ### after-effects
 - **Job:** After Effects, Blender and desktop apps
@@ -354,6 +429,14 @@ Use this skill whenever Adobe After Effects is the working tool. Triggers on "Af
 - **Folder:** `.claude/skills/ai-audio-sound-design/` (3 files, SKILL.md 154 lines, with scripts/tools)
 
 Rebuild the audio of an AI-generated video (Arcads / AI actors / UGC-gen / any clip whose voices sound like sterile studio AI) so every scene sounds like it was really filmed in the location shown — location-matched ambience beds, room-matched convolution reverb, outdoor distance treatment, censor bleeps over swears, removal of the AI high-frequency watermark whine, and a social loudness master, all with the video stream untouched. Use whenever someone says clips "sound AI / fake / sterile / like a voiceover", asks to "add ambient sounds / background noise", "make it sound like the location they're in", "add reverb to match the room", "bleep the swears / curse words", or hands over AI-actor footage for an audio pass — even if they never say "sound design". Also for revision rounds on an existing pass ("make the lawnmower louder", "add a car driving by", "make it sound like it's outside"). NOT for captions (embedded-captions), cutting footage (reel-recut), or full branded motion-graphic edits (branded-ad-edit).
+
+### animate
+- **Job:** Other
+- **Source:** cth9191/animate
+- **Licence:** licensed
+- **Folder:** `.claude/skills/animate/` (107 files, SKILL.md 134 lines, with scripts/tools)
+
+Make a short procedural animation in any style — an explainer, a history, a little story — as a single-file canvas video with a synthesized score, rendered to MP4. Ships with styles (cut paper, crosshatch ink, riso print, sketchbook, manim-style math, pixel art, isometric line art) and makes new ones from the user's references. Walks the user through intake, then three check-ins (story, look, storyboard) before animating, and proves the result with measured review checks. Use when the user asks for an animated video, short, explainer or reel made in code, or wants a look matched from references.
 
 ### animated-chart
 - **Job:** Explainers, data, charts and maps
@@ -411,6 +494,14 @@ Turn a creator's multi-take product-demo recordings (each take = screen recordin
 
 Guide for using Argo to create polished product demo videos from Playwright scripts with AI voiceover and animated overlays. Use this skill whenever the user mentions Argo, demo videos, product demos, screen recordings with narration, Playwright video demos, voiceover generation, or wants to automate creating marketing/sales/onboarding videos from a web app. Also use when you see imports from '@argo-video/cli', files named '*.demo.ts' or '*.scenes.json', or an 'argo.config.js' in the project. Even if the user just says "record a demo" or "make a video of my app", this skill applies.
 
+### arthur-explainer-video
+- **Job:** Explainers, data, charts and maps
+- **Source:** arthurkatcher/explainer-video
+- **Licence:** no licence: local use only, git-ignored
+- **Folder:** `.claude/skills/arthur-explainer-video/` (10 files, SKILL.md 29 lines, with scripts/tools)
+
+Make a 30-60s motion-graphics explainer or product demo video entirely in code (Remotion + React for picture, numpy synth for music and sound design), rendered to mp4 on a laptop. Use when asked for an explainer, demo video, launch video, animated "how X works", or motion graphics.
+
 ### article-highlights
 - **Job:** Captions, kinetic type and titles
 - **Source:** Liamrjohnston/remotion-motion-graphics-skill
@@ -435,6 +526,54 @@ This skill should be used when the user asks to "make an ASCII animation", "buil
 
 This skill should be used when the user asks to "make an audiogram", "turn a podcast into a video", "create a waveform video", "make a podcast clip video", "convert audio to video", "animate a waveform/audio bars", "add a moving waveform to my voiceover", or "make a square/vertical clip for a podcast quote". Covers amplitude-driven waveforms, frequency bars, synced captions, cover-art layout, a progress bar, and 1:1 / 9:16 social framing.
 
+### auto-editor
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
+- **Source:** WyattBlue/auto-editor
+- **Licence:** licensed
+- **Folder:** `.claude/skills/auto-editor/` (1 files, SKILL.md 145 lines)
+
+Record a microphone or edit video/audio with the auto-editor CLI — cut out dead space (silence, motionlessness, black frames), set the pace, make manual cuts, and render the result. Use when someone wants to capture and trim a microphone, remove silence, shorten a recording, speed through quiet parts, or otherwise edit media with auto-editor.
+
+### auto-editor-effects
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
+- **Source:** WyattBlue/auto-editor
+- **Licence:** licensed
+- **Folder:** `.claude/skills/auto-editor-effects/` (1 files, SKILL.md 144 lines)
+
+Apply actions and animations to sections of a video/audio with auto-editor — change speed, duck or fade volume, de-ess, zoom/Ken Burns, rotate/spin, draw boxes, overlay logos or picture-in-picture, and animate any of these with ramps and easing. Use when someone wants creative effects or per-section behavior rather than plain silence-cutting.
+
+### auto-editor-export
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
+- **Source:** WyattBlue/auto-editor
+- **Licence:** licensed
+- **Folder:** `.claude/skills/auto-editor-export/` (1 files, SKILL.md 123 lines)
+
+Export auto-editor's edit or microphone recording to a video editor (Premiere, DaVinci Resolve, Final Cut Pro, ShotCut, Kdenlive), to individual clips, or to auto-editor timeline files (.v1/.v2/.v3); and import timeline/XML files to render them. Use when someone wants an editor-ready project, a preserved microphone source, split clips, or timeline files instead of a finished video.
+
+### auto-editor-transcribe
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
+- **Source:** WyattBlue/auto-editor
+- **Licence:** licensed
+- **Folder:** `.claude/skills/auto-editor-transcribe/` (1 files, SKILL.md 120 lines)
+
+Transcribe a media file or live microphone to text or subtitles with auto-editor's whisper subcommand, then edit by spoken content — cut to keep (or drop) sections whose subtitles match a word or regex. Use when someone wants a transcript, captions, live speech transcription, or to cut a video based on what is said rather than on loudness.
+
+### auto-editor-transitions
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
+- **Source:** WyattBlue/auto-editor
+- **Licence:** licensed
+- **Folder:** `.claude/skills/auto-editor-transitions/` (1 files, SKILL.md 123 lines)
+
+Add transitions at auto-editor's cuts — cross-dissolves, Premiere Pro's transitions (push, clock-wipe, glitch, page-peel, iris-round, and the rest, including its Legacy folder), and audio crossfades — and carry them into Premiere, DaVinci Resolve, Final Cut Pro, Shotcut or Kdenlive. Use when someone wants smoother cuts, fades at the start and end, a particular transition, or transitions that survive an editor export or import.
+
+### beat-sync-edit
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
+- **Source:** ZiadAbdelkarim/beat-synced-edit
+- **Licence:** licensed
+- **Folder:** `.claude/skills/beat-sync-edit/` (10 files, SKILL.md 109 lines)
+
+Turn a song + raw footage into a beat-synced edit. Runs the four-stage pipeline (beat analysis, scene tagging, EDL planning, render) and applies user-described ffmpeg effects — white flashes, stretch punches, hue shifts, speed ramps — at beat-accurate timestamps.
+
 ### beat-sync-editing
 - **Job:** Motion principles, art direction and critique
 - **Source:** iart-ai/motion-design-skills
@@ -443,6 +582,14 @@ This skill should be used when the user asks to "make an audiogram", "turn a pod
 
 This skill should be used when the user asks to "cut to the beat", "fix the pacing", "edit this sequence", "sync cuts to music/BPM", "add a match cut / J-cut / L-cut", "build a speed ramp", or "plan a shot sequence / edit timeline". Covers editing rhythm, transitions, retiming, and translating an edit plan to an NLE or a code timeline (Remotion/AE frames).
 
+### blender
+- **Job:** After Effects, Blender and desktop apps
+- **Source:** digitalsamba/claude-code-video-toolkit
+- **Licence:** licensed
+- **Folder:** `.claude/skills/blender/` (1 files, SKILL.md 578 lines)
+
+3D scenes, character acting and product shots from a shot spec, rendered in Blender, as a finished film, as clips for any other build (moviepy, a video job, an editor), or as elements of a Remotion video (transparent characters over a scene, a Remotion render on a 3D laptop, phone or floating card that the camera pulls back from, an imported 3D model on a studio stage). A rigged cartoon cast described in JSON (build, face, hair, clothes, a seed), sets, shots by type, acting beats in seconds or on narration words, every camera checked by geometry, sound placed on the motion. Use when a video needs a consistent directable character (parody, explainer gag, reaction shot), a 3D reveal or element in a Remotion video, a device or product shot of an app or a model, or exact acting timing that AI video clips can't hold. Triggers include Blender, 3D, character animation, rigged character, cast, shot spec, acting, camera angles, transparent clip, alpha, pull out from the screen, phone mockup, device mockup, product shot, turntable, orbit, glTF, GLB, BlenderClip.
+
 ### blender-motion
 - **Job:** After Effects, Blender and desktop apps
 - **Source:** LobzyJay/motion-design-with-claude
@@ -450,6 +597,14 @@ This skill should be used when the user asks to "cut to the beat", "fix the paci
 - **Folder:** `.claude/skills/blender-motion/` (12 files, SKILL.md 76 lines)
 
 Use this skill whenever Blender is the working tool. Triggers on "Blender", "bpy", "geometry nodes", "Cycles", "EEVEE", "Principled BSDF", "F-curve", "NLA", "keyframe in Blender", "3D motion graphics", "Blender render", "shape keys", "drivers", or any Blender-driven motion or rendering task. Also triggers on "Higgsfield", "Scene Builder", "blockout", "generate a mesh", "rigged character", "Seedance" in a Blender context. Pair with motion-design (foundation skill) for principles, timing, and taste. Blender MCP server: official Blender Lab MCP at projects.blender.org/lab/blender_mcp. Optional Higgsfield Bridge MCP: bridge.higgsfield.ai/mcp.
+
+### boring-tools
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
+- **Source:** brookejlacey/boring-tools
+- **Licence:** licensed
+- **Folder:** `.claude/skills/boring-tools/` (35 files, SKILL.md 101 lines, with scripts/tools)
+
+Edit video as text. Cut a long take into finished social or ad renders using ffmpeg, whisper, and python, where every cut, caption, and graphic placement is a number in a file you can read and re-render. Use when the user hands you raw footage, says "cut this", "make the cards bigger", "put the screen beside my head", "remove that thing on the wall", "give me a 15 and a 30", or asks for captions, vertical and landscape versions, or a rebuild after a note.
 
 ### brand-intake
 - **Job:** Motion principles, art direction and critique
@@ -507,6 +662,14 @@ Export a finished layered edit (footage + graphic cards + alpha fx overlay + cap
 
 This skill should be used when the user asks to "add animated captions", "make TikTok captions", "karaoke captions", "word-by-word subtitles", "auto subtitles", "highlight the active word", "burn in captions to a video", "sync captions to a voiceover/narration", or "turn an SRT/transcript into animated text". Covers word-level timing from Whisper, per-word pop/scale-in, active-word highlight, 9:16 safe-area placement, readable type, and burn-in vs sidecar SRT/VTT.
 
+### captions-overlay
+- **Job:** Captions, kinetic type and titles
+- **Source:** heygen-com/hyperframes
+- **Licence:** licensed
+- **Folder:** `.claude/skills/captions-overlay/` (1 files, SKILL.md 80 lines)
+
+Overlay doctrine for captions in HyperFrames videos — the caption MODEL (drop / rail / embed) and the rule that captions are an OVERLAY composited on top of the film, never a reserved bottom band you shift content up to avoid. Load when adding captions/subtitles to a talking-head or launch video, when deciding whether a phrase should be dropped, ride the verbatim rail, or be promoted to a scarce embedded climax, when laying out a composition that will carry captions (do NOT reserve a keep-out band), or when centering a composition on the true frame center under captions. Applies ON TOP of the `/hyperframes` skill's references/captions.md.
+
 ### cg-launch-video
 - **Job:** Launch, product, ad and promo films
 - **Source:** charlie947/motion-graphics-skills
@@ -515,6 +678,14 @@ This skill should be used when the user asks to "add animated captions", "make T
 
 Make a 30-45 second product launch video in code with Claude Code, the kind SaaS companies post on launch day. One sentence split across scenes, real product screens with slow camera moves, a typed prompt, a proof beat and a clear call to action. Use when someone says "launch video", "promo video for my product", "announce my course/cohort/offer", "make a launch reel" or "trailer for my product".
 
+### changelog-video
+- **Job:** Other
+- **Source:** heygen-com/hyperframes
+- **Licence:** licensed
+- **Folder:** `.claude/skills/changelog-video/` (15 files, SKILL.md 197 lines, with scripts/tools)
+
+Turn a weekly changelog .md into a finished branded changelog video (square 1080, ~45-60s, Annie VO, animated brand background, mock-UI visualizations, lowkey captions). Use when the user provides a changelog/digest markdown and wants the weekly video, or says "changelog video". Self-contained — fonts, background, lexicon, and scripts ship in this skill.
+
 ### chart-animation
 - **Job:** Explainers, data, charts and maps
 - **Source:** iart-ai/data-animation-skills
@@ -522,6 +693,22 @@ Make a 30-45 second product launch video in code with Claude Code, the kind SaaS
 - **Folder:** `.claude/skills/chart-animation/` (4 files, SKILL.md 173 lines)
 
 This skill should be used when the user asks to "make a bar chart race", "turn a CSV into a video", "build an animated data visualization", "create an animated statistics video", "animate a chart/graph", "make a number counter/ticker", "animate a ranking over time", or "batch-render one chart template across many datasets". Covers data-driven keyframing, value interpolation, rank transitions, counters, pacing, annotation, and template×data batch output.
+
+### chorono
+- **Job:** Other
+- **Source:** codie1982/chorono-editor
+- **Licence:** licensed
+- **Folder:** `.claude/skills/chorono/` (9 files, SKILL.md 45 lines)
+
+Create, edit and preview editable 2D animations in a connected Chorono editor through its MCP tools. Use for Chorono scenes, objects, timelines, particles and interactive animations.
+
+### chorono-setup
+- **Job:** Other
+- **Source:** codie1982/chorono-editor
+- **Licence:** licensed
+- **Folder:** `.claude/skills/chorono-setup/` (2 files, SKILL.md 38 lines)
+
+Install, start and troubleshoot the local Chorono editor, MCP connection and agent skills for Claude Code, Claude Desktop and Codex.
 
 ### cinematic-camera
 - **Job:** Motion principles, art direction and critique
@@ -587,6 +774,14 @@ This skill should be used when the user asks to "write a creative brief", "build
 
 A chain of bevelled cuboids rides a travelling wave as a content carousel. HyperFrames block, 1920×1080, 6.666666666666667s, 40 variables.
 
+### cut-the-curve
+- **Job:** Other
+- **Source:** heygen-com/hyperframes
+- **Licence:** licensed
+- **Folder:** `.claude/skills/cut-the-curve/` (2 files, SKILL.md 260 lines)
+
+The technique catalog: five velocity-matched SEAMS (zoom-through, INVERSE zoom-through, cut-the-curve, waterfall cut, rack-focus blur-cut) plus the two in-scene techniques — waterfall ENTRY (staggered arrival cascades for title cards / segment openers) and the nudge curve (slow-fast-slow three-phase group slides). Covers partial-travel (~12% of frame) velocity matching via mirrored power4 eases, the Z scale-sign rule, size-scaled blur (10px text / 18-20px full-frame), word-by-word staggered cuts, cascade pacing by element weight, and the 10/65/25 slide ratio. Read before authoring any transition, text-beat handoff, kinetic text entry, or group reposition. [depth, zoom, inverse-zoom, scale-sign, mirrored-zoom, rack-focus, pacing, velocity, cut-the-curve, waterfall, stagger, cascade, kinetic-text, title-card, segment-opener, nudge, slide, easing, group-motion, z-depth, motion-graphics, cinematic, transition, blur, directional-continuity]
+
 ### diagram-animation
 - **Job:** Explainers, data, charts and maps
 - **Source:** iart-ai/explainer-video-skills
@@ -607,25 +802,17 @@ Turn topics, requirements, articles or scripts into stickman videos. Director mo
 - **Job:** Sound, music and audio QA
 - **Source:** digitalsamba/claude-code-video-toolkit
 - **Licence:** licensed
-- **Folder:** `.claude/skills/dsk-elevenlabs/` (2 files, SKILL.md 415 lines)
+- **Folder:** `.claude/skills/dsk-elevenlabs/` (2 files, SKILL.md 446 lines)
 
 Generate AI voiceovers, sound effects, and music using ElevenLabs APIs. Use when creating audio content for videos, podcasts, or games. Triggers include generating voiceovers, narration, dialogue, sound effects from descriptions, background music, soundtrack generation, voice cloning, or any audio synthesis task.
 
 ### dsk-ffmpeg
-- **Job:** Frameworks: HyperFrames and Remotion
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
 - **Source:** digitalsamba/claude-code-video-toolkit
 - **Licence:** licensed
 - **Folder:** `.claude/skills/dsk-ffmpeg/` (2 files, SKILL.md 432 lines)
 
 Video and audio processing with FFmpeg. Use for format conversion, resizing, compression, audio extraction, and preparing assets for Remotion. Triggers include converting GIF to MP4, resizing video, extracting audio, compressing files, or any media transformation task.
-
-### dsk-frontend-design
-- **Job:** Frameworks: HyperFrames and Remotion
-- **Source:** digitalsamba/claude-code-video-toolkit
-- **Licence:** licensed
-- **Folder:** `.claude/skills/dsk-frontend-design/` (1 files, SKILL.md 42 lines)
-
-Create distinctive, production-grade frontend interfaces with high design quality. Use this skill when the user asks to build web components, pages, or applications. Generates creative, polished code that avoids generic AI aesthetics.
 
 ### dsk-remotion
 - **Job:** Frameworks: HyperFrames and Remotion
@@ -643,6 +830,22 @@ Toolkit-specific Remotion patterns — custom transitions, shared components, an
 
 Listen with earshot whenever you must judge, choose, trim, verify or compare sound you cannot hear - picking a sound effect, music or ambience from candidates, finding the cleanest moment in a recording, checking whether audio reads as a real recording or as code-synthesized, reviewing a soundtrack or a video's audio (what happens when, sync to picture, loudness, mix), A/B-ing a mix change, making a sound in code and improving it by listening (earshot forge), or giving a code-made film its sound effects from the shipped bank (earshot sfx / kit). Use it before telling anyone how audio sounds.
 
+### ecc-video-editing
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
+- **Source:** KirttiVushan/claude-code
+- **Licence:** licensed
+- **Folder:** `.claude/skills/ecc-video-editing/` (1 files, SKILL.md 310 lines)
+
+AI-assisted video editing workflows for cutting, structuring, and augmenting real footage. Covers the full pipeline from raw capture through FFmpeg, Remotion, ElevenLabs, fal.ai, and final polish in Descript or CapCut. Use when the user wants to edit video, cut footage, create vlogs, or build video content.
+
+### editing-videos
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
+- **Source:** kmilo93sd/agent-video-editor
+- **Licence:** licensed
+- **Folder:** `.claude/skills/editing-videos/` (204 files, SKILL.md 182 lines)
+
+Gives an editor's judgment, with sourced numbers, for cutting and pacing, J and L cuts, jump cuts, b-roll, hooks and retention, captions, on-screen text and graphics, zoom and punch-in, audio levels in LUFS, music ducking, sound effects, basic color, thumbnails, titles, chapters and licensing. Use it when planning, scripting, editing, reviewing or publishing any video for YouTube, Shorts, Reels or TikTok: a talking head, a vlog, a podcast or interview, a screen tutorial, an explainer or a vertical clip from a long video, or when looking for royalty-free sound effects, music, animated graphics or a meme to recreate. Works with any tool (Premiere Pro, DaVinci Resolve, Final Cut Pro, CapCut, ffmpeg, Remotion, HyperFrames). Ships recipes per video type, a review checklist, a CC0 sound library, a CC0 graphics kit for HyperFrames, a meme reference with Content ID risk, and tested templates for narrated screen tutorials.
+
 ### edits-hook-overlay
 - **Job:** Talking-head and short-form reel editing
 - **Source:** krusemediallc/video-editor-agent
@@ -652,7 +855,7 @@ Listen with earshot whenever you must judge, choose, trim, verify or compare sou
 Put Instagram's NATIVE text hook (the Edits app's own font, boxes and styling) on many videos without opening each one in Edits. Type each hook once in Edits on a USB-connected iPhone over a black/white plate, export it, lift the text out as an exact transparent PNG (difference matte), and burn it onto any number of videos, keeping HDR (HLG) phone footage untouched. Use for "put my IG text hook on these videos", "native Instagram title on all of these", "same hook overlay on 100 clips", "make the Edits text once and reuse it", "hook text in my feed style on this batch", or a batch of clips that each need a native-looking title. Not for animated text, auto-captions (use the platform's own captions), posting, or designed motion-graphic titles (branded-ad-edit / reel-recut).
 
 ### edl-tighten
-- **Job:** Talking-head and short-form reel editing
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
 - **Source:** krusemediallc/video-editor-agent
 - **Licence:** no licence: local use only, git-ignored
 - **Folder:** `.claude/skills/edl-tighten/` (2 files, SKILL.md 315 lines, with scripts/tools)
@@ -683,6 +886,14 @@ This skill should be used when the user asks to "make an explainer video", "turn
 
 Make an explainer video (MP4) with a voice-over using explainroo. The voice is made on this computer and no API key is needed. Use when the user asks for an explainer, how-to, walkthrough, launch or tutorial video, an animated diagram with a voice-over, or a short for YouTube, Reels or TikTok.
 
+### extreme-motion-design
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** dev-isaacmello/extreme-motion-design
+- **Licence:** licensed
+- **Folder:** `.claude/skills/extreme-motion-design/` (93 files, SKILL.md 113 lines, with scripts/tools)
+
+Cria vídeos de motion design de nível de estúdio por código (Remotion/React), com trilha licenciada, SFX sincronizados, voz opcional (ElevenLabs ou modelo TTS local escolhido pelo hardware) e gates automáticos de lint e QA antes da entrega. Use quando pedirem motion design, motion graphics, vídeo animado, explainer, vídeo de produto ou lançamento, reel ou TikTok animado, tipografia cinética, logo animado, animação de UI, loop, narração ou voiceover para vídeo, ou técnicas como keyframing, zoom in e zoom out, motion smooth, morphing, rigging, frame a frame, cel animation, stop motion, rotoscopia, motion tracking, match moving, compositing, motion 3D, speed ramp, match cut, overshoot, parallax e transições. Also for animated video, kinetic typography, product launch video, explainer with voiceover, text to speech narration.
+
 ### faceless-explainer
 - **Job:** Explainers, data, charts and maps
 - **Source:** installed before the manifest (see CLAUDE.md)
@@ -691,6 +902,14 @@ Make an explainer video (MP4) with a voice-over using explainroo. The voice is m
 
 Turn arbitrary text — an article, notes, a topic, a brief — into a faceless explainer video: there is no site or footage to capture, so the visuals are invented per scene (typography, abstract graphics, diagrams, data-viz). Use for topic explainers, concept breakdowns, how-tos, listicles. Not a video built from a website (/product-launch-video — promo or tour). Unclear → /hyperframes.
 
+### ffmpeg-skill
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
+- **Source:** kajisho5/ffmpeg-skill
+- **Licence:** licensed
+- **Folder:** `.claude/skills/ffmpeg-skill/` (85 files, SKILL.md 218 lines, with scripts/tools)
+
+Edit video and audio with local FFmpeg: cut, join, reframe, speed, captions, overlays, silence removal, sync, loudness, HDR to SDR, platform exports and checks. Use whenever the user mentions a video or audio file (mp4, mov, wav, m4a), footage, captions, a reel or short, YouTube/TikTok delivery, LUFS or ffmpeg, even without saying "edit". Needs FFmpeg 6.1+ and Python 3.10+; stdlib only, no cloud.
+
 ### figma
 - **Job:** After Effects, Blender and desktop apps
 - **Source:** installed before the manifest (see CLAUDE.md)
@@ -698,6 +917,14 @@ Turn arbitrary text — an article, notes, a topic, a brief — into a faceless 
 - **Folder:** `.claude/skills/figma/` (2 files, SKILL.md 132 lines, with scripts/tools)
 
 Import Figma content into a HyperFrames composition — rendered assets, brand tokens, components, storyboard sections → reconstructed motion (frames read as states, not slides) (REST/CLI), connector-assisted motion when available, and shaders from a connector or native export. Use when the user pastes a figma.com link or asks to bring a Figma design, frame, logo, brand, or animation into a video/composition.
+
+### free247editor
+- **Job:** Other
+- **Source:** riecodes/free247editor
+- **Licence:** licensed
+- **Folder:** `.claude/skills/free247editor/` (1 files, SKILL.md 129 lines)
+
+The user's personal video editor in this free247editor folder. Use for "start" or first-time setup; "edit this", "edit mo to", or a video dropped in or added to inbox/; notes on a draft ("faster", "bigger captions", "approved", "final"); a horizontal or YouTube version; or changing the user's style or rules. Runs setup.mjs, free transcription, and the Herk Edit Kit pipeline in kit/, renders drafts to outbox/, and saves lasting notes to my-rules.md.
 
 ### frost-sequence-camera-orbit
 - **Job:** Web, SVG, Lottie and code animation
@@ -835,6 +1062,14 @@ Non-animation creative direction for HyperFrames videos. Use for design spec (fr
 
 Use when a HyperFrames composition needs a punch-in, punch-out, zoom, reframe, Ken Burns treatment, camera move, visual match/whip handoff, or other seek-safe 2D/3D keyframes; also for GSAP, CSS keyframes, Anime.js, WAAPI, FLIP, paths, masks, SVG morph/draw, text trails, 3D depth, or `hyperframes keyframes` diagnostics. Don't use for broad scene strategy, brand design, media sourcing, captions, or general video planning.
 
+### hyperframes-motion-reel
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** Sunwood-ai-labs/hyperframes-motion-reel-skill
+- **Licence:** licensed
+- **Folder:** `.claude/skills/hyperframes-motion-reel/` (29 files, SKILL.md 412 lines)
+
+ショーリール品質（Behance / OFFF / Awwwards級）のモーショングラフィックス動画を HyperFrames（HTML + GSAP + SVG + Canvas、Apache-2.0）で制作する。remotion-motion-reel の HyperFrames 版で、Remotion の Company License が不要な構成。テーマ・素材（キャラクター画像、音声など）から世界観・コピー・デザインシステム・タイムライン・サウンドを補完し、120BPM/60fps で拍同期した映像を実装・レンダリングまで行う。「HyperFramesでかっこいい動画」「ライセンスフリーでモーショングラフィックス」「ショーリールをHTMLで」などの依頼時に使用。
+
 ### hyperframes-registry
 - **Job:** Frameworks: HyperFrames and Remotion
 - **Source:** installed before the manifest (see CLAUDE.md)
@@ -874,6 +1109,14 @@ This skill should be used when the user asks to "make an isometric animation", "
 - **Folder:** `.claude/skills/javascript-animation/` (10 files, SKILL.md 77 lines, with scripts/tools)
 
 This skill should be used when the user asks to "draw every frame in JavaScript", "make an animation with no image assets", "animate this in code / on a canvas", "make a hand-drawn style animated video", "turn this into a short animated film", "make an animated explainer drawn in code", "make an animated story / picture book of my photos", or "make a zero-asset animation like the Opus 5.5 ones". Produces a single self-contained HTML file whose frames are computed on an HTML canvas (seekable, deterministic), renders it to MP4, and self-checks the result. Pairs with the soundtrack skill for code-synthesized music. NOT for charts from data (use chart-animation) or 3D/WebGL (use threejs-animation / shader-glsl from webgl-animation-skills); pure text motion and depth drawn by projection on the 2D canvas are in scope.
+
+### jhonty-video-editing
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
+- **Source:** JhontyBarreto/video-editing-skill
+- **Licence:** no licence: local use only, git-ignored
+- **Folder:** `.claude/skills/jhonty-video-editing/` (26 files, SKILL.md 82 lines, with scripts/tools)
+
+Make and edit short-form videos (Reels, TikToks, Shorts, video ads, explainers, VSLs) with Remotion, ElevenLabs and 21st.dev. Covers the script, ElevenLabs voiceover with word timestamps, a speech-to-text check of every take, ElevenLabs music beds and sound effects, 21st.dev UI components and brand logos ported into Remotion scenes, captions synced to the voice, rendering, loudness normalising to -14 LUFS and a QA pass. Use when someone asks to make, edit, re-cut, resize or render a reel, short, video ad, VSL or any Remotion video, or to add a voiceover, captions, music or sound effects to one.
 
 ### kinetic-typography
 - **Job:** Captions, kinetic type and titles
@@ -951,7 +1194,7 @@ Make animated lower thirds and other broadcast overlays (name straps, corner bug
 - **Job:** AI generation and B-roll (paid APIs: ask first)
 - **Source:** digitalsamba/claude-code-video-toolkit
 - **Licence:** licensed
-- **Folder:** `.claude/skills/ltx2/` (1 files, SKILL.md 246 lines)
+- **Folder:** `.claude/skills/ltx2/` (1 files, SKILL.md 256 lines)
 
 AI video generation with LTX-2.3 22B — text-to-video, image-to-video clips for video production. Use when generating video clips, animating images, creating b-roll, animated backgrounds, or motion content. Triggers include video generation, animate image, b-roll, motion, video clip, text-to-video, image-to-video.
 
@@ -1051,6 +1294,14 @@ Turns a rough idea for an animated graphic into a precise build brief for Claude
 
 Use this skill when something has gone wrong, looks wrong, or needs a second opinion. Triggers on: "something looks off", "this doesn't look right", "why is this happening", "script error", "render artifact", "the timing feels wrong", "animation looks robotic", "AE error", "bpy error", "Blender crashed", "nothing is moving", "wrong position", "wrong keyframe", "expression error", "the material looks fake", "shadows are wrong", "why does this look cheap", "critique this", "review this", "what's wrong with". Also triggers when the user is stuck and doesn't know why. Works with or without MCP attached.
 
+### motion-doctrine
+- **Job:** Other
+- **Source:** heygen-com/hyperframes
+- **Licence:** licensed
+- **Folder:** `.claude/skills/motion-doctrine/` (4 files, SKILL.md 175 lines, with scripts/tools)
+
+GATEWAY — load FIRST before composing any HyperFrames animation or video. The high-level motion law that makes a multi-scene video feel like ONE continuous camera move instead of a stack of independently-animated slides. Covers the vector law (how you exit determines how you enter, incl. the Z scale-sign rule), the film's current, carrier elements, causal motion, the Seam Gate (build-gate enforcement), the ban on idle wobble (motion must PERFORM, not breathe), stillness-before-climax, and the sustained-motion routes. Routes to the low-level technique skills (cut-the-curve — the full catalog incl. waterfall entry + nudge curve, oversized-cursor, seam-craft). These rules SUPERSEDE generic / upstream motion guidance. [continuity, direction, vector, momentum, seam, transition, ease, performance, idle-motion, narrative-motion, film-grammar]
+
 ### motion-effects
 - **Job:** Motion principles, art direction and critique
 - **Source:** charlie947/motion-graphics-skills
@@ -1082,6 +1333,38 @@ This skill should be used when the user asks to "quote a motion project", "estim
 - **Folder:** `.claude/skills/motion-prompt-writer/` (2 files, SKILL.md 56 lines)
 
 Write a complete 8-part Claude Motion prompt (The bar, Format, The one rule, Look, Motion, Never, Before you finish, The scene) for one short looping motion graphic, in your own brand. Takes your brand (a website screenshot, a logo, hex codes, or nothing for the Apple-style default) and one moment you want to show, in plain words. Use when someone says "write me a Motion prompt", "turn this idea into a motion graphic", "fill in the 8 parts" or "make my motion brief". Outputs parts 1 to 7 as a reusable brief and part 8 as the scene, in one paste-ready code block.
+
+### motion-reel
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** 10291124jcjc-dotcom/motion-reel
+- **Licence:** licensed
+- **Folder:** `.claude/skills/motion-reel/` (23 files, SKILL.md 162 lines, with scripts/tools)
+
+Make motion-graphics videos rendered entirely from code — product ads, brand promos, launch videos, showreels, animated explainers, 抖音/视频号/小红书 竖屏广告, 宣传片, 片头, 动态海报视频 — with original beat-synced music, exported as MP4 in 9:16, 1:1 and 16:9 from one timeline. Use this whenever the user asks for a 动态视频, 广告视频, 宣传视频, 动效, motion graphics, showreel, promo/launch/ad video, or wants a company, product, PPT, PDF or website turned into a video, even if they don't say "motion" or name this skill. Also use it to revise such a video (change copy, cut a scene, retime, new format). Not for editing camera footage, and not for 硅基废话 whiteboard episodes (use guiji-feihua-video).
+
+### motion-video
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** bestagentkits/motion-video-skill
+- **Licence:** licensed
+- **Folder:** `.claude/skills/motion-video/` (22 files, SKILL.md 102 lines, with scripts/tools)
+
+Produce beat-synced 1080p motion-graphic videos in HyperFrames (HTML + GSAP) with an AI voice-over, Vietnamese karaoke captions, SFX and generated music, in one of two proven styles (glass keynote or Spider-Verse-style comic). Use when the user asks for a launch/release/feature video, motion graphic, animated explainer or promo clip, or a restyle of an existing one.
+
+### motion-video-director
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** mattypark/Motion-graphics-skill
+- **Licence:** no licence: local use only, git-ignored
+- **Folder:** `.claude/skills/motion-video-director/` (6 files, SKILL.md 440 lines, with scripts/tools)
+
+Plan, direct, and produce code-drawn 2D/3D motion graphics and edited videos (reels, hooks, SaaS/product explainers, talking-head edits) on the user's local machine through any coding agent that has terminal + file access (Claude Code, Codex, Cursor, Claude Desktop, VS Code agents, etc.). Workflow: explain the process → user gives references + story → write a paste-ready ElevenLabs voiceover script → user generates and returns the MP3 → build, preview, render. Uses Canvas/SVG/p5.brush/Three.js/GSAP rendered in headless Chrome, Motion Canvas/Revideo, ffmpeg, small local AI models (cutout, transcription), plus LottieFiles, Freesound, Pexels/Pixabay, Firecrawl and ElevenLabs MCPs, and the Playwright MCP to browse any website visually (Pinterest, Behance, Dribbble, brand sites) and grab image/video assets by itself. Use when the user asks to make, edit, animate, caption, voice, or sound-design a video.
+
+### motion-video-production
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** unclejobs-ai/motion-video-skill
+- **Licence:** licensed
+- **Folder:** `.claude/skills/motion-video-production/` (89 files, SKILL.md 191 lines, with scripts/tools)
+
+Plan, build and verify 15–90 second motion graphics, promo and character videos. Take a reference video apart with OpenCV into measured targets, then produce through gated stages (story, character, keyframes, clips, voice and music, assembly) on a bundled engine, Remotion (carry oracle, one-word cut template) or HyperFrames, and judge the rendered mp4 against the targets. Voice via ElevenLabs or Fish Audio through the composio CLI, a procedural score, mix and verify. Use for video production, reference matching, keyframes, character consistency and motion graphics assembly. 모션 그래픽·홍보 영상·캐릭터 영상 제작과 레퍼런스 영상 분석에 사용한다.
 
 ### moviepy
 - **Job:** Frameworks: HyperFrames and Remotion
@@ -1131,6 +1414,14 @@ GENERATE B-roll, talking-head clips, and screen-blend motion-graphic overlays fo
 
 A single feature card orbits a dot sphere on approved Blender camera motion. HyperFrames block, 1920×1080, 10s, 4 variables.
 
+### oversized-cursor
+- **Job:** Other
+- **Source:** heygen-com/hyperframes
+- **Licence:** licensed
+- **Folder:** `.claude/skills/oversized-cursor/` (1 files, SKILL.md 139 lines)
+
+House-style oversized macOS cursor technique for HyperFrames launch videos. Load whenever a scene involves cursors or a pointer-led action, when kicking off a UI scene, when igniting a morph/transition/typing run with a click, or when a scene reads as static, dead, or stale and needs a cheap high-yield source of motion to carry the viewer's eye and segment them out of the stale state. Covers cursor size/look (incl. brand-motif cursors), the off-screen entry law, tip-targeting and the click tap, click-ignites-the-next-beat, and exit / cross-scene handoff.
+
 ### page-transition-animation
 - **Job:** Web, SVG, Lottie and code animation
 - **Source:** iart-ai/web-animation-skills
@@ -1138,6 +1429,14 @@ A single feature card orbits a dot sphere on approved Blender camera motion. Hyp
 - **Folder:** `.claude/skills/page-transition-animation/` (3 files, SKILL.md 218 lines)
 
 This skill should be used when the user asks to "animate page or route transitions", "add a page transition or crossfade between views", "animate route changes in Next.js App Router", "use the View Transitions API", "AnimatePresence exit doesn't fire on navigation", or "Framer Motion exit animation not working / exit animation before unmount in Next.js". Covers enter/exit page-transition animation with the View Transitions API and Framer Motion, for Next.js App Router and general SPA routing.
+
+### parody-short
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** digitalsamba/claude-code-video-toolkit
+- **Licence:** licensed
+- **Folder:** `.claude/skills/parody-short/` (5 files, SKILL.md 130 lines)
+
+Comedy shorts about a group's own life - a team's launch, quarter end, office move or leaving do; a club's season; a class's year; a family's Christmas - or about a shared topic everyone recognises (video calls, the return to the office), told in a borrowed genre (80s action intro, creature feature, Dickens Christmas ad, heist, nature documentary) and starring the group's real, animated photos or an invented cast. Covers mining the group's own context for in-jokes (chat, email, calendars, shared docs, plus domain tools like a CRM, helpdesk or git), mapping a genre's beats onto the real event, costuming and animating photos (image_edit then LTX), and per-genre look and sound. Use when someone asks for a fun, parody, spoof, holiday or "for the giggles" video about their team, colleagues, club, class or family, a party or all-hands video, or wants people's photos animated into a story.
 
 ### particle-system
 - **Job:** Web, SVG, Lottie and code animation
@@ -1223,7 +1522,7 @@ This skill should be used when the user asks to "make a sale video", "create a p
 - **Job:** Copy and clone a reference
 - **Source:** digitalsamba/claude-code-video-toolkit
 - **Licence:** licensed
-- **Folder:** `.claude/skills/qwen-edit/` (4 files, SKILL.md 115 lines)
+- **Folder:** `.claude/skills/qwen-edit/` (4 files, SKILL.md 119 lines)
 
 AI image editing prompting patterns for Qwen-Image (Qwen-Image-Edit-2511 by default, Qwen-Image-2.1 as a non-commercial Modal opt-in). Use when editing photos while preserving identity, reframing cropped images, changing clothing or accessories, adjusting poses, applying style transfers, or character transformations. Provides prompt patterns, parameter tuning, and examples.
 
@@ -1258,6 +1557,14 @@ Clone a section, widget, page or animation from any reference (a live website UR
 - **Folder:** `.claude/skills/recap-video/` (8 files, SKILL.md 131 lines, with scripts/tools)
 
 - Edit an event, conference, summit, trip, or behind-the-scenes recap from spoken takes and supplied B-roll. Choose the strongest take for each line, remove pauses and restarts, match footage to the narration, mix full-screen and split layouts, add captions and selective graphics, then render, verify and revise. Use for "recap video", "event recap", or "edit this summit like this reference"; not for a text summary or a product screen-demo edit.
+
+### reel-editor
+- **Job:** Talking-head and short-form reel editing
+- **Source:** sunithvs/video-agent-skill
+- **Licence:** licensed
+- **Folder:** `.claude/skills/reel-editor/` (34 files, SKILL.md 179 lines, with scripts/tools)
+
+Edit talking-head / selfie videos into finished Instagram Reels, TikToks and YouTube Shorts with code-rendered motion graphics - face layouts that morph (split screen, picture-in-picture, punch-ins), kinetic text, captions (including English captions for Malayalam, Hindi or other non-English speech), b-roll from X/Twitter posts, websites and screen recordings, synced sound effects, and loudness mastering. Everything is drawn by one HTML file as a pure function of time and rendered frame by frame with Playwright + ffmpeg. Use this whenever the user drops a video into a folder and wants it edited, asks for a reel / short / TikTok, wants captions, subtitles, b-roll, motion graphics or sound design on a clip, or shares tweet / X links, product URLs or clips "to use when editing" - even if they only say "edit this video", "check the new video" or "make it like the last one".
 
 ### reel-export
 - **Job:** Delivery, export and QA
@@ -1295,9 +1602,25 @@ Turn references you admire into a scene-by-scene Claude Motion prompt for your o
 - **Job:** Frameworks: HyperFrames and Remotion
 - **Source:** digitalsamba/claude-code-video-toolkit
 - **Licence:** licensed
-- **Folder:** `.claude/skills/remotion-best-practices/` (144 files, SKILL.md 109 lines)
+- **Folder:** `.claude/skills/remotion-best-practices/` (148 files, SKILL.md 116 lines)
 
 Router for all Remotion skills
+
+### remotion-bits
+- **Job:** Frameworks: HyperFrames and Remotion
+- **Source:** av/remotion-bits
+- **Licence:** licensed
+- **Folder:** `.claude/skills/remotion-bits/` (4 files, SKILL.md 144 lines)
+
+Animation components and utilities for Remotion video projects. Use when building Remotion compositions with text animations, gradient transitions, particle effects, 3D scenes, or staggered motion effects. Provides example bits (complete compositions) and reusable components that can be installed via jsrepo.
+
+### remotion-ffmpeg-skill
+- **Job:** Footage editing: cuts, ffmpeg, scenes, beat sync
+- **Source:** kajisho5/remotion-ffmpeg-skill
+- **Licence:** licensed
+- **Folder:** `.claude/skills/remotion-ffmpeg-skill/` (76 files, SKILL.md 89 lines, with scripts/tools)
+
+Make motion graphics on real footage with Remotion, driven by measurements from ffmpeg-skill: animated captions timed from an SRT/VTT file, automatic jump cuts that drop the silences ffmpeg-skill measured (with punch-in zooms and captions re-timed), and motion that hits on measured audio peaks and scene cuts. Every composition takes its length, fps and frame size from the probed source; every render is verified (frame count, fps, size, audio) and inspected with a contact sheet, then delivered through ffmpeg-skill templates (YouTube, Reels, TikTok, Shorts, X) and its compliance check. Use this skill when the user wants Remotion, React video, motion graphics, animated captions or titles over a video, jump cuts / silence removal with motion, audio-reactive or beat-synced graphics, or a programmatic video built from a real recording -- even when they do not say "Remotion". Needs Node.js and ffmpeg-skill; local, no API keys.
 
 ### remotion-to-hyperframes
 - **Job:** Frameworks: HyperFrames and Remotion
@@ -1308,12 +1631,28 @@ Router for all Remotion skills
 Port an existing Remotion (React) composition''s source to HyperFrames HTML. Use ONLY on an explicit ask to port/convert/migrate/translate a Remotion source — one-way, Remotion-only. A passing Remotion mention, reference-only code, or "make something like my Remotion video" is a fresh build (/general-video). Unclear → /hyperframes.
 
 ### remotion-video
-- **Job:** Frameworks: HyperFrames and Remotion
+- **Job:** End-to-end motion-graphics video pipelines
 - **Source:** iart-ai/motion-design-skills
 - **Licence:** licensed
 - **Folder:** `.claude/skills/remotion-video/` (3 files, SKILL.md 194 lines)
 
 This skill should be used when the user asks to "make a video with Remotion", "create a programmatic/data-driven video in React", "render an MP4/GIF from code", "animate with useCurrentFrame/interpolate/spring", "sync video to audio/beats", or "render a templated video per record headlessly". Covers building React compositions and rendering them via CLI or @remotion/renderer.
+
+### remotion-video-director
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** BayramAnnakov/remotion-video-director
+- **Licence:** licensed
+- **Folder:** `.claude/skills/remotion-video-director/` (7 files, SKILL.md 391 lines)
+
+Interactive guide for creating Remotion videos - from strategic concept to rendered MP4. Use when the user wants to create a video, make a Remotion project, build a product demo video, generate a launch video, make a recurring content template, create a marketing video, or says "I need a video for...", "help me make a video", "video for my product", "remotion video". Covers the full creative process: expert deliberation, scenario design, build, and review. Works alongside the official remotion-dev/skills for API-level guidance.
+
+### reverse-any-video
+- **Job:** Other
+- **Source:** heygen-com/hyperframes
+- **Licence:** licensed
+- **Folder:** `.claude/skills/reverse-any-video/` (5 files, SKILL.md 39 lines)
+
+Rebuild any video file as an editable HyperFrames project - motion graphics, talking heads, live action or AI-generated footage - checked against the original frame by frame. Use to reverse, recreate, remake, replicate or copy a video, or 「复刻这个视频」「照着这个视频做一个」.
 
 ### rossark-motion-skill
 - **Job:** Web, SVG, Lottie and code animation
@@ -1330,6 +1669,14 @@ Bring anything drawn to life with calm, believable motion. It covers characters 
 - **Folder:** `.claude/skills/runpod/` (1 files, SKILL.md 232 lines)
 
 Cloud GPU processing via RunPod serverless. Use when setting up RunPod endpoints, deploying Docker images, managing GPU resources, troubleshooting endpoint issues, or understanding costs. Covers all 5 toolkit images (qwen-edit, realesrgan, propainter, sadtalker, qwen3-tts).
+
+### seam-craft
+- **Job:** Other
+- **Source:** heygen-com/hyperframes
+- **Licence:** licensed
+- **Folder:** `.claude/skills/seam-craft/` (1 files, SKILL.md 70 lines)
+
+Render-correctness doctrine for scene-to-scene seams in HyperFrames launch videos — the prerequisites that make transitions composite correctly on the master timeline. Load when assembling the master timeline / index.html, when a white flash appears at a cut or crossfade seam (especially on dark films), when reasoning about why a transition opacity dip shows through, or when verifying the render-side mechanics of how overlapping scene wrappers blend. Covers the opaque stage-ground (#root background) white-flash guard and how the injector overlaps wrappers, holds final frames, ping-pongs tracks, and stamps lint-clean template code onto the master timeline. Does NOT contain the per-transition catalog — see the transition registry for individual transition entries.
 
 ### shader-glsl
 - **Job:** 3D, WebGL and shaders
@@ -1371,6 +1718,14 @@ Author a HyperFrames slideshow — a presentation, pitch deck, or interactive de
 
 This skill should be used when the user asks to "add music to the animation", "make the music in code", "synthesize a soundtrack", "compose background music that fits the cuts", "sync the music to the video", "check if the audio lines up with the picture", or "the music is too sudden / startling". Covers a code-synthesized score that lives inside the animation page (Web Audio API, rendered offline to WAV), AI-generated or user-supplied music, and an automatic check that cuts land on the beat without a startling jump in loudness.
 
+### style-sampling
+- **Job:** Other
+- **Source:** heygen-com/hyperframes
+- **Licence:** licensed
+- **Folder:** `.claude/skills/style-sampling/` (2 files, SKILL.md 54 lines)
+
+Make a new episode in a proven video style - Collage Explainer, Finance Explainer, Animated Science Explainer, 3D Brand Explainer, 3D True Crime - on the person's topic. Use for "an episode of", "in the style of", "sample this style", 「用这个风格做一集」. One video to copy is reverse-any-video.
+
 ### svg-animation
 - **Job:** Web, SVG, Lottie and code animation
 - **Source:** iart-ai/web-animation-skills
@@ -1383,7 +1738,7 @@ This skill should be used when the user asks to "animate an SVG", "make a line d
 - **Job:** App demos, UI and screen capture
 - **Source:** digitalsamba/claude-code-video-toolkit
 - **Licence:** licensed
-- **Folder:** `.claude/skills/synthetic-ui-demo/` (1 files, SKILL.md 137 lines)
+- **Folder:** `.claude/skills/synthetic-ui-demo/` (1 files, SKILL.md 155 lines)
 
 Product demo and release-notes videos with no screen recording. Rebuild the app's screens as static React from its source code, then drive them in Remotion with a scripted cursor and camera (lib/components Stage + Cursor). Use when making a product walkthrough, feature demo, release-notes or changelog video for an app whose source you can read, or when a Playwright recording would be flaky, need test data, or go stale. Triggers include synthetic demo, rebuild the UI, release video, feature walkthrough, product demo from source, scripted cursor, camera zoom on UI, no screen recording.
 
@@ -1491,6 +1846,14 @@ This skill should be used when the user asks to "make an animated lower third", 
 
 Make a cinematic 3D title sequence (8-15 seconds) in code with Claude Code and Three.js. A camera moves through a lit scene, such as a rainy street at night with brand names as neon signs, then a big question or title lands. Use when someone wants a scroll-stopping opener, a film-style intro, "3D intro", "cinematic opening", "title sequence" or a hook for a video, reel or newsletter.
 
+### ultimate-video-editor
+- **Job:** Other
+- **Source:** Rajbharti06/Ultimate-Video-Editing-Skills
+- **Licence:** licensed
+- **Folder:** `.claude/skills/ultimate-video-editor/` (32 files, SKILL.md 600 lines)
+
+Transforms any AI code editor into a god-level video editor with 50+ years of craft. Covers ALL editing disciplines: narrative structure, every cut type, transitions, cinema-grade color grading (including movie-level grading, LUT equivalents, scene matching), sound design, motion graphics (Disney's 12 principles, GSAP, Lottie, Three.js), kinetic typography, compositing, speed ramping, subtitles (5 styles), AI-native workflows, and platform-optimized export. When this skill is active, the agent edits like a veteran — every cut intentional, every frame earning its place. Works with FFmpeg, Remotion, HyperFrames, MoviePy, Manim. READ THIS SKILL for ANY video editing, color grading, animation, or motion design task.
+
 ### video-delivery-specs
 - **Job:** Delivery, export and QA
 - **Source:** iart-ai/freelance-motion-skills
@@ -1498,6 +1861,14 @@ Make a cinematic 3D title sequence (8-15 seconds) in code with Claude Code and T
 - **Folder:** `.claude/skills/video-delivery-specs/` (6 files, SKILL.md 167 lines)
 
 This skill should be used when the user asks "what are the specs for Instagram Reels / TikTok / YouTube / broadcast", "export settings for social", "what aspect ratio and bitrate", "how do I repurpose 16:9 to 9:16", "safe area / title-safe for vertical", "pre-delivery checklist", or "collect files for handover". It outputs per-platform spec sheets, a cutdown matrix, captioning/accessibility notes, and a QC + collect-files checklist.
+
+### video-design
+- **Job:** Motion principles, art direction and critique
+- **Source:** digitalsamba/claude-code-video-toolkit
+- **Licence:** licensed
+- **Folder:** `.claude/skills/video-design/` (5 files, SKILL.md 126 lines)
+
+Visual design for videos - colour by act, type scale, chart and layout rules for 16:9 and 9:16 scenes, a design.md handoff that any design skill can fill, and a contact-sheet critique of the render. Use when designing or refining how a video looks (title cards, data scenes, slides, a whole video's palette), when a scene looks generic or busy, when choosing colours for a video, or when /design or /scene-review asks for visual work. Works on its own with a brand, or takes direction from a design source such as taste-skill, Anthropic's frontend-design, or the user's own design skill.
 
 ### video-director
 - **Job:** Motion principles, art direction and critique
@@ -1515,6 +1886,22 @@ Direct, build and verify short videos that are written as code and rendered fram
 
 MASTER orchestration skill for producing a finished short-form video from raw talking-head footage. Use for ANY request to edit, produce, recut, or "make an ad/reel out of" talking-head footage — with or without a style reference — including "edit this video", "edit this like the reference reel", "turn this clip into a finished reel", "do the full edit", "make this look like their winning ads", or a revision request on a previously delivered edit. It routes every stage to the right specialist skill (reel-style-clone, branded-ad-edit, reel-recut, arcads-video-edit, recap-video, talking-head-image-overlays, hook-splitter, edits-hook-overlay, sound-design, ai-audio-sound-design, video-qa, video-review-canvas, edl-tighten, hook-variations, naming-convention, capcut-export) and owns the intake → style → edit → QA → deliver → revise loop end to end. Do NOT use for plain captions on untouched footage or single generated clips.
 
+### video-motion-craft
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** vibegameengine/video-motion-craft
+- **Licence:** licensed
+- **Folder:** `.claude/skills/video-motion-craft/` (21 files, SKILL.md 172 lines, with scripts/tools)
+
+Create and edit video with cinematic motion — Remotion (React video) for motion graphics, reels, intros, promos, titles and game trailers, plus FFmpeg/Whisper for editing real footage (trim, jump-cut, captions, overlays, speed). Load ALWAYS before the first line of video code. Triggers — "make a video", "edit this video", "reel", "Shorts/TikTok", "intro", "logo animation", "titles", "captions", "promo video", "cinematic", "sync to music", "hit the beat", "the video looks cheap/generic/AI-made", "game trailer", "store/showcase video", "gameplay capture", Remotion, ffmpeg, motion graphics, video render.
+
+### video-production
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** Aaryan-Kapoor/video-production-skill
+- **Licence:** licensed
+- **Folder:** `.claude/skills/video-production/` (7 files, SKILL.md 148 lines, with scripts/tools)
+
+End-to-end narrated video production with research, source extraction, storyboard/script, Manim/ffmpeg visuals, TTS voiceover, QC, archival backups, and optional local/Tailscale hosting. Use when the user asks to make, create, generate, render, or produce a video, explainer, paper walkthrough, product demo, briefing, daily summary video, Manim animation, or narrated presentation.
+
 ### video-qa
 - **Job:** Delivery, export and QA
 - **Source:** krusemediallc/video-editor-agent
@@ -1531,13 +1918,21 @@ MASTER orchestration skill for producing a finished short-form video from raw ta
 
 Publish a finished (or draft) video cut to a frame.io-style review canvas on here.now — a player with a frame-accurate scrubber, persistent timeline notes, version comparison, replies, resolution and evidence, and a clickable beat map — then read those notes back before the next cut. Use this to DELIVER any video edit for review: reel recuts, brand-deal edits, motion-graphics ads, carousel videos, YouTube cuts, sizzle reels. Trigger whenever a cut is ready to show, or on "send me the video", "put this on a canvas", "let me leave notes on the timeline", "frame.io style", "get me a link to review this", "publish the new version", or "what notes did I leave?" — even if the canvas is never named. Delivering a cut as a bare file attachment or a local preview link instead of a canvas link is the failure this skill exists to prevent. NOT for image or slide galleries (plain here-now publish), and not for making the video itself (branded-ad-edit / hyperframes).
 
+### video-shotcraft
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** Vincentwei1021/video-shotcraft
+- **Licence:** licensed
+- **Folder:** `.claude/skills/video-shotcraft/` (1070 files, SKILL.md 286 lines)
+
+Create cinematic product videos from frontend projects or webpages with Remotion, real page captures, shot cards, the Ink Press template, beat sync and sound design. Use for full product promos, reproducing Ink Press, single shot-card effects, or finding, adding, replacing and aligning sound effects in an existing product video or shot, including candidate-only SFX searches. 用真实页面、镜头卡与 Ink Press 模板制作产品宣传片；用户要求用 video-shotcraft 做视频、复刻模板、制作单镜头，或给已完成的产品片/镜头找音效候选、加音效、换音效、对齐声音时使用。
+
 ### video_toolkit
 - **Job:** Talking-head and short-form reel editing
 - **Source:** digitalsamba/claude-code-video-toolkit
 - **Licence:** licensed
-- **Folder:** `.claude/skills/video_toolkit/` (1 files, SKILL.md 641 lines)
+- **Folder:** `.claude/skills/video_toolkit/` (1 files, SKILL.md 484 lines)
 
-Create professional videos autonomously using claude-code-video-toolkit — AI voiceovers, image generation, music, talking heads, and Remotion rendering.
+Make short explainer videos from a brief with claude-code-video-toolkit — submit a scene spec, poll a job, get a QC-checked MP4. Also covers the individual tools (AI voiceover, images, clips, music, talking heads) for custom work.
 
 ### vox-explainer
 - **Job:** Explainers, data, charts and maps
@@ -1571,6 +1966,14 @@ A wireframe portal bursts open, the title comes through, then its letters swap i
 
 This skill should be used when the user asks to "make a Spotify Wrapped style video", "build a year in review / year-in-review video", "create a personalized data video", "generate a recap video", "build a wrapped video generator", "turn a data table into shareable videos", or "make per-user stat videos". Covers the data row → one shareable video pattern, the Wrapped scene grammar (big-number reveals, top-X lists, superlatives), animated data counters, vertical 9:16 framing, and batch-rendering many personalized videos from one template.
 
+### youtube-editor
+- **Job:** Talking-head and short-form reel editing
+- **Source:** sunithvs/video-agent-skill
+- **Licence:** licensed
+- **Folder:** `.claude/skills/youtube-editor/` (34 files, SKILL.md 113 lines, with scripts/tools)
+
+Edit full-length horizontal YouTube videos (5-60 min talking heads, explainers, tutorials, screen recordings) into finished 1920x1080 uploads - automatic jump cuts that remove pauses, zoom changes on every cut, chapter cards and YouTube chapter timestamps, lower thirds, stock b-roll and royalty-free music from free APIs, occasional motion graphics, English subtitles (.srt, translated for Malayalam / Hindi / other speech), a description with credits, and a thumbnail. Rendered in resumable chunks with Playwright + ffmpeg. Use this whenever the user wants a YouTube video (not a Short or Reel) edited, drops a long recording or several takes in a folder, asks for jump cuts, chapters, subtitles, b-roll or a thumbnail for YouTube, or says "full length", "long video", "podcast", "tutorial" or "YouTube video". For vertical Shorts / Reels / TikToks use the reel-editor skill instead.
+
 ### youtube-intro-outro
 - **Job:** Launch, product, ad and promo films
 - **Source:** iart-ai/youtube-video-skills
@@ -1578,6 +1981,14 @@ This skill should be used when the user asks to "make a Spotify Wrapped style vi
 - **Folder:** `.claude/skills/youtube-intro-outro/` (3 files, SKILL.md 173 lines)
 
 This skill should be used when the user asks to "make a YouTube intro", "create a channel intro", "build a logo sting/bumper", "design an outro / end screen / end card", "add subscribe and next-video cards", "make an intro animation", "build a reusable intro template", or "sync the logo reveal to an audio sting". Covers the 3-5s branded intro, the last-20s end-screen outro inside YouTube's element safe zones, timing conventions, audio-sting sync, and a swap-the-brand template.
+
+### youtube-stats
+- **Job:** Delivery, export and QA
+- **Source:** digitalsamba/claude-code-video-toolkit
+- **Licence:** licensed
+- **Folder:** `.claude/skills/youtube-stats/` (1 files, SKILL.md 70 lines)
+
+How published videos are doing on YouTube, and what to learn from it. Views, likes, comments and subscribers per video, plus watch time, retention and traffic sources (Shorts feed, search, external) with the Analytics scope, saved as snapshots so trends show; GitHub traffic beside it to see whether YouTube sends people to the repo. Use when asked how a video or the channel is doing, which title, cover or genre worked, whether to make more of something, or for a weekly stats check.
 
 ## Tools and command-line programs these skills use
 
@@ -1594,6 +2005,29 @@ This skill should be used when the user asks to "make a YouTube intro", "create 
 | Lemo-Opuscar library | 66 code-made film styles + render tools + real-instrument sampler | `tools/lemo-opuscar` (see CLAUDE.md) |
 | Whisper | Word-level transcription for captions (`small` cached; `medium` for hard names) | preinstalled `whisper` |
 | DeepFilterNet3 | Speech noise reduction used on talking heads (`videos/*/tools/denoise.py`) | scratch install + `~/.cache/DeepFilterNet/DeepFilterNet3` |
+| `auto-editor` | Cuts silence / motionless / black stretches, speed ramps, editor XML export (Unlicense) | `bash tools/setup_skill_clis.sh` (pip, `~/.local/bin`); add `--progress none` to keep logs short |
+| `scenedetect` | PySceneDetect: shot boundaries and scene lists from long clips | same (pip) |
+| `moviepy`, `ffmpeg-python`, `librosa` | Python video assembly, ffmpeg bindings, beat/tempo analysis (`beat-sync-edit`) | same (pip) |
+| `ffmpeg-skill` scripts | 87 ffmpeg capabilities; `scripts/_contract.py doctor` checks the machine | in the skill folder, stdlib only |
+
+## Considered and not installed (Nov 16 2026 list)
+
+| Repo | Why not |
+|---|---|
+| digitalpublisher/video-shotcraft, SunCl8/video-shotcraft-skill, JohnChow90/video-shotcraft, simpletibr/simplicio-remotion | Copies of `video-shotcraft` (Vincentwei1021's is installed) |
+| remotion-dev/remotion | Its skills are for Remotion's own maintainers (PRs, releases); `remotion-best-practices` covers using it |
+| mcdenil-skills/AutoMontage-Agent | Skills drive its own Remotion engine (a separate npm install of several hundred MB); install it if a talking-head auto-montage job needs it |
+| wendymardigian-prog/Editor-IA-Pro | No licence; its skills are copies of others, and two need the paid inference.sh cloud |
+| metiutek/editorvideo-ai (vedit), MartinDelophy/ai-video-editor (Timeline Studio), WeftCut, OpenChatCut, openfilm, OpenTake | Editor apps (desktop or browser UI, some with cloud accounts), not skills; vedit could be added as an MCP server if wanted |
+| palmier-io/palmier-pro | Proprietary since v0.7.6 |
+| storytold/effectcraft (ArtCraft) | No licence; an AI image/video app |
+| artbyjazi/autoclip, Magerko/ReelsMaker-Pro | Apps (long video → clips with an LLM; batch reel converter) |
+| mifi/lossless-cut, GraphiteEditor/Graphite | Desktop GUI apps |
+| motion-canvas/motion-canvas, midrender/revideo | Frameworks installed per project with npm when a film uses them |
+| Zulko/moviepy, kkroening/ffmpeg-python, Breakthrough/PySceneDetect, WyattBlue/auto-editor | Installed as Python tools (above), not cloned |
+| heygen-com/hyperframes, charlie947, howseen-ai, Mort1d, iart-ai/motion-skills | Already installed earlier |
+| zhuyansen, inginjadipro, sasateguh, devanasolver, Thedurancode, 26medias, BehiSecc, wilwaldon (indexes) | Link lists, nothing to install |
+| soyenriquerocha/ai-video-editor | Does not exist on GitHub |
 
 ## Skills built into Claude (not in this repo)
 

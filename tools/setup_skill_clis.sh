@@ -20,4 +20,7 @@ ln -sfn /opt/pw-browsers/chromium-1194/chrome-linux/chrome $C/chromium-1248/chro
 for b in chromium_headless_shell-1248 chromium-1248; do touch $C/$b/INSTALLATION_COMPLETE $C/$b/DEPENDENCIES_VALIDATED; done
 # this container's system Pillow is broken for python3.11 (video-director's qa_video.py, tools/grade.py need it)
 python3 -c "import PIL.Image" 2>/dev/null || python3 -m pip install -q --user --break-system-packages --ignore-installed pillow
-command -v om explainroo argo
+# Nov 16 2026: Python editing tools for auto-editor-*, beat-sync-edit, PySceneDetect and moviepy skills (land in ~/.local/bin)
+python3 -m pip install -q --user --break-system-packages auto-editor scenedetect ffmpeg-python moviepy librosa
+export PATH="$HOME/.local/bin:$PATH"
+command -v om explainroo argo auto-editor scenedetect

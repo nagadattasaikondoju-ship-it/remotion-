@@ -20,9 +20,11 @@ def front(path):
 # job categories (first match wins); names are this repo's installed folder names
 CATS = [
     ("After Effects, Blender and desktop apps", r"after-?effects|blender|figma|capcut"),
-    ("Delivery, export and QA", r"qa|delivery|export|review"),
+    ("Footage editing: cuts, ffmpeg, scenes, beat sync", r"auto-editor|ffmpeg|boring-tools|beat-sync-edit$|editing-videos|video-editing|edl-tighten"),
+    ("End-to-end motion-graphics video pipelines", r"motion-video|motion-reel|adu-motion|extreme-motion|video-motion-craft|video-production|shotcraft|remotion-video-director|parody-short"),
+    ("Delivery, export and QA", r"qa|delivery|export|review|stats"),
     ("Sound, music and audio QA", r"sfx|sound|earshot|audio|soundtrack|music|acestep|elevenlabs|audiogram"),
-    ("Talking-head and short-form reel editing", r"talking-head|reel|tenfold|branded-ad|edl|hook|short-form|makemyclip|capcut|edit-pipeline|arcads-video|media-use|video_toolkit|general-video|edits-hook"),
+    ("Talking-head and short-form reel editing", r"talking-head|reel|youtube-editor|tenfold|branded-ad|edl|hook|short-form|makemyclip|capcut|edit-pipeline|arcads-video|media-use|video_toolkit|general-video|edits-hook"),
     ("Captions, kinetic type and titles", r"caption|kinetic|typograph|lower-third|title|text-message|article-highlights|terminal-inserts|glass-shard|wireframe-portal|canopy"),
     ("Launch, product, ad and promo films", r"launch|product|promo|ad-creative|apple|cinetic|take-one|huashu|lemo|newsletter|pr-to-video|testimonial|recap|wrapped|youtube-intro|model-showdown|milestone|countdown|slideshow|photo|presentation|music-to-video"),
     ("Explainers, data, charts and maps", r"explain|chart|data|diagram|infographic|map|manim|whiteboard|vox|isometric"),
@@ -32,7 +34,7 @@ CATS = [
     ("3D, WebGL and shaders", r"three|webgl|shader|blender|3d|title-sequence"),
     ("Frameworks: HyperFrames and Remotion", r"hyperframes|remotion|dsk-|moviepy"),
     ("AI generation and B-roll (paid APIs: ask first)", r"arcads|openart|ltx2|runpod|ideogram|generative|b-roll"),
-    ("Motion principles, art direction and critique", r"principle|critique|art-direction|motion-design|motion-graphics|motion-effects|color|shot-composition|beat-sync|cinematic|camera|brand|naming|video-director|howseen|lobzy|liam|mort1d"),
+    ("Motion principles, art direction and critique", r"principle|critique|video-design|art-direction|motion-design|motion-graphics|motion-effects|color|shot-composition|beat-sync|cinematic|camera|brand|naming|video-director|howseen|lobzy|liam|mort1d"),
     ("Briefs, pricing and client work", r"brief|pricing|client|prompt-writer|creative"),
 ]
 def cat(n):
@@ -70,6 +72,8 @@ L.append("""## How the skills fit together (house rules win)
   - Never hand-synthesise SFX outside this pipeline.
   - Never run `earshot llm` (it uploads audio to Gemini) unless asked.
 - **Paid APIs, ask first:** ElevenLabs, Arcads, RunPod, Ideogram, OpenArt, LTX, Higgsfield/Seedance/Kling/Suno (take-one), and the cloud TTS options in argo. Local voices by default (explainroo Kokoro, argo `kokoro-js`).
+  - Nov 16 batch: ElevenLabs in `jhonty-video-editing`, `extreme-motion-design` (optional; it also offers local TTS) and `motion-video-production` (via composio, or Fish Audio); `motion-video` uses the `multix` CLI (Gemini TTS + ElevenLabs); fal.ai in `ecc-video-editing`; OpenAI/ElevenLabs TTS in `video-production`; YouTube OAuth in `youtube-stats`; Modal/Hugging Face GPUs in `parody-short`.
+  - **Never post anywhere** without the user's explicit go: `video-shotcraft` can publish to social platforms (Upload-Post API) and `video-production` can host files over Tailscale.
 - **Never add** huashu-motion's "Made with huashu-motion" signature. Use `om` from PATH, never `npx huashu-motion`.
 - **Browsers:** use the preinstalled Chromium (`/opt/pw-browsers/chromium-1194/chrome-linux/chrome`):
   - `OM_CHROME` / `EXPLAINROO_CHROME` / `PLAYWRIGHT_CHROME` point at it;
@@ -101,6 +105,18 @@ L.append("""## How the skills fit together (house rules win)
 | Brand system | `brand-intake`, `brand-motion-guidelines` | `color-motion` |
 | Direction and QA of any coded video | `video-director` (`scripts/qa_video.py`, `check_timeline.py`) | `motion-design-critique`, `video-qa` |
 | Sound | the pipeline above (`real-sfx`, `earshot`, `real-sound`) | (not `km-sound-design` / `dsk-elevenlabs`) |
+| Trim real footage: silence, dead air, motionless stretches | `auto-editor` (CLI) | `auto-editor-effects`, `auto-editor-transitions`, `auto-editor-export` (Premiere/Resolve/FCP XML) |
+| Probe, reframe, loudness, platform checks with ffmpeg | `ffmpeg-skill` (`scripts/*.py`, `check.py --platform reels`) | `dsk-ffmpeg`, `boring-tools` (edit-as-text renders) |
+| Find the shots inside long clips | `scenedetect` CLI (PySceneDetect) | `beat-sync-edit`'s `clip_tag.py` (motion/energy tags) |
+| Montage cut to a song's beats | `beat-sync-edit` (beat map → EDL → render, flashes, speed ramps) | `beat-sync-editing` (principles), `music-to-video` |
+| Motion graphics over real footage in Remotion (SRT captions, jump cuts, audio-peak hits) | `remotion-ffmpeg-skill` (needs `ffmpeg-skill`) | `remotion-bits` (ready-made Remotion components) |
+| Cinematic product promo from a web page (shot cards, 2.5D camera) | `video-shotcraft` | `huashu-motion`, `cinetic` |
+| Editor judgment: pacing, hooks, LUFS, J/L cuts, CC0 SFX and music | `editing-videos` (ships a 128-file CC0 sound library) | `short-form-video` |
+| Talking-head reel with face layouts, PiP, kinetic text | `reel-editor` | `boring-tools`, `branded-ad-edit` |
+| Long horizontal YouTube edit (chapters, jump cuts, subtitles) | `youtube-editor` | `auto-editor` |
+| Match a reference video with measured targets | `motion-video-production` | `reel-style-clone`, `reanimate` |
+| Showreel-grade motion in HyperFrames | `hyperframes-motion-reel` | `motion-video`, `hyperframes-animation` |
+| How a video looks: palette by act, type scale, contact-sheet critique | `video-design` | `motion-design-critique` |
 """)
 
 # category index
@@ -146,6 +162,29 @@ L.append("""## Tools and command-line programs these skills use
 | Lemo-Opuscar library | 66 code-made film styles + render tools + real-instrument sampler | `tools/lemo-opuscar` (see CLAUDE.md) |
 | Whisper | Word-level transcription for captions (`small` cached; `medium` for hard names) | preinstalled `whisper` |
 | DeepFilterNet3 | Speech noise reduction used on talking heads (`videos/*/tools/denoise.py`) | scratch install + `~/.cache/DeepFilterNet/DeepFilterNet3` |
+| `auto-editor` | Cuts silence / motionless / black stretches, speed ramps, editor XML export (Unlicense) | `bash tools/setup_skill_clis.sh` (pip, `~/.local/bin`); add `--progress none` to keep logs short |
+| `scenedetect` | PySceneDetect: shot boundaries and scene lists from long clips | same (pip) |
+| `moviepy`, `ffmpeg-python`, `librosa` | Python video assembly, ffmpeg bindings, beat/tempo analysis (`beat-sync-edit`) | same (pip) |
+| `ffmpeg-skill` scripts | 87 ffmpeg capabilities; `scripts/_contract.py doctor` checks the machine | in the skill folder, stdlib only |
+
+## Considered and not installed (Nov 16 2026 list)
+
+| Repo | Why not |
+|---|---|
+| digitalpublisher/video-shotcraft, SunCl8/video-shotcraft-skill, JohnChow90/video-shotcraft, simpletibr/simplicio-remotion | Copies of `video-shotcraft` (Vincentwei1021's is installed) |
+| remotion-dev/remotion | Its skills are for Remotion's own maintainers (PRs, releases); `remotion-best-practices` covers using it |
+| mcdenil-skills/AutoMontage-Agent | Skills drive its own Remotion engine (a separate npm install of several hundred MB); install it if a talking-head auto-montage job needs it |
+| wendymardigian-prog/Editor-IA-Pro | No licence; its skills are copies of others, and two need the paid inference.sh cloud |
+| metiutek/editorvideo-ai (vedit), MartinDelophy/ai-video-editor (Timeline Studio), WeftCut, OpenChatCut, openfilm, OpenTake | Editor apps (desktop or browser UI, some with cloud accounts), not skills; vedit could be added as an MCP server if wanted |
+| palmier-io/palmier-pro | Proprietary since v0.7.6 |
+| storytold/effectcraft (ArtCraft) | No licence; an AI image/video app |
+| artbyjazi/autoclip, Magerko/ReelsMaker-Pro | Apps (long video → clips with an LLM; batch reel converter) |
+| mifi/lossless-cut, GraphiteEditor/Graphite | Desktop GUI apps |
+| motion-canvas/motion-canvas, midrender/revideo | Frameworks installed per project with npm when a film uses them |
+| Zulko/moviepy, kkroening/ffmpeg-python, Breakthrough/PySceneDetect, WyattBlue/auto-editor | Installed as Python tools (above), not cloned |
+| heygen-com/hyperframes, charlie947, howseen-ai, Mort1d, iart-ai/motion-skills | Already installed earlier |
+| zhuyansen, inginjadipro, sasateguh, devanasolver, Thedurancode, 26medias, BehiSecc, wilwaldon (indexes) | Link lists, nothing to install |
+| soyenriquerocha/ai-video-editor | Does not exist on GitHub |
 
 ## Skills built into Claude (not in this repo)
 

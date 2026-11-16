@@ -25,10 +25,13 @@ tools/pw-compat/
 
 .claude/settings.local.json
 
+tools/models/
+
 # Skills from repos without a licence: used locally, not re-published (python3 tools/install_skill_repos.py)
 .claude/skills/ai-audio-sound-design/
 .claude/skills/arcads-broll/
 .claude/skills/arcads-video-edit/
+.claude/skills/arthur-explainer-video/
 .claude/skills/branded-ad-edit/
 .claude/skills/broll-capture/
 .claude/skills/capcut-export/
@@ -37,7 +40,9 @@ tools/pw-compat/
 .claude/skills/generative-illustration/
 .claude/skills/hook-splitter/
 .claude/skills/hook-variations/
+.claude/skills/jhonty-video-editing/
 .claude/skills/km-sound-design/
+.claude/skills/motion-video-director/
 .claude/skills/naming-convention/
 .claude/skills/openart-broll/
 .claude/skills/recap-video/
@@ -48,4 +53,3 @@ tools/pw-compat/
 .claude/skills/video-edit-pipeline/
 .claude/skills/video-qa/
 .claude/skills/video-review-canvas/
-tools/models/
