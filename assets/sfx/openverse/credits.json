@@ -578,5 +578,16 @@
   "source": "https://freesound.org/people/Raclure/sounds/405546",
   "provider": "freesound",
   "duration_ms": 150
+ },
+ {
+  "file": "soft-pop/single-pop_fa52a6.wav",
+  "title": "3 Popping Pops (first pop, 0.61-0.80 s)",
+  "creator": "wubitog",
+  "licence": "cc0 1.0",
+  "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "source": "https://freesound.org/people/wubitog/sounds/188381",
+  "provider": "freesound",
+  "duration_ms": 190,
+  "note": "trimmed from soft-pop/3-popping-pops_fa52a6.mp3 (earshot find: the best single pop)"
  }
 ]

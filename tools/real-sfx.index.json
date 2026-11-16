@@ -1,11 +1,11 @@
 {
- "count": 65,
+ "count": 66,
  "libraries": [
   {
    "name": "main",
    "path": "/home/user/remotion-/assets/sfx/openverse",
    "tier": "main",
-   "files": 58,
+   "files": 59,
    "catalog": false
   },
   {
@@ -2221,6 +2221,42 @@
     "short"
    ],
    "id": 64
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/soft-pop/single-pop_fa52a6.wav",
+   "folder": "soft-pop",
+   "name": "single-pop fa52a6",
+   "role": "ui",
+   "roles": [
+    "ui",
+    "pop"
+   ],
+   "duration": 0.19,
+   "peak_db": -10.3,
+   "mean_db": -28.3,
+   "peak_time": 0.01,
+   "lr_corr": 1.0,
+   "attack_ms": 0,
+   "decay_ms": 80,
+   "centroid": 988,
+   "rolloff": 1031,
+   "low": 0.0,
+   "high": 0.0,
+   "flat": 0.001,
+   "bumps": 0.0,
+   "active_dur": 0.18,
+   "onset_count": 1,
+   "words": [
+    "punchy",
+    "warm",
+    "thin",
+    "tonal",
+    "short",
+    "dry"
+   ],
+   "id": 65
   }
  ]
 }
