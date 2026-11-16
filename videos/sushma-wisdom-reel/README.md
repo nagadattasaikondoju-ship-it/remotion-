@@ -1,4 +1,4 @@
-# Dr. Sri Sushma: wisdom-teeth reel (remake of a reference ad), IN PROGRESS
+# Dr. Sri Sushma: wisdom-teeth reel (remake of a reference ad), v1 delivered 16 Nov
 
 User's brief (16 Nov): keep the reference video EXACTLY (same animations, 3D teeth, captions, timing) and change only:
 1. foreign people/photos -> Indian people; 2. the other clinic's brand -> Dr. Sri Sushma's details;
@@ -45,3 +45,17 @@ Kept (no identifiable face): open-mouth close-ups, gloved hands, 3D teeth. Optio
   stability 0.5, similarity 0.8, style 0.15; `/with-timestamps`, then cut into the 14 phrases and place each on its reference start.
 - Pexels: the site is 403 to scripts; the API needs a free key (api.pexels.com, header Authorization). Openverse finds only
   Flickr/Wikimedia photos without model releases: not for a clinic ad.
+
+## v1 build (16 Nov): how it was made
+- Picture: `tools/upscale_realesr.py` on the reference (crop 418x742 at x 6, x4 -> 1080x1920) -> `out/base_up.mp4`;
+  `python3 composite.py out/base_up.mp4 out/picture.mp4` swaps the people and the end card, frame for frame:
+  toothache 154-191 (Pexels 3808804), open mouth 240-325 (6502742, Mathura), bad taste 359-396 and odour 397-415 (4584059),
+  good news 781-799 (6977987, soft oval cut-out with the original's pop-in/slide-out), dentist 834-904 (8224633, Assam).
+  Photos: Pexels licence (free, commercial, no attribution), found by web search and downloaded from images.pexels.com.
+  Each photo is row-matched to the original frame's colour (the ad's blue grade and fades) and the original captions are kept on top.
+  End card 1031-1136: logo/name/CALL line/number rebuilt (white Dr. Sushma badge, Poppins + Montserrat), fading in like the original.
+- Voice: Kokoro `hf_beta` (Indian female) with English phonemes (`node tts_indian.mjs lines.tsv outdir`; the Hindi phonemizer
+  added "in/he" sounds at every line edge), "Sri Sushma" said "Shree Sush-maa"; `warp_voice.py` fits it to the original
+  speaker's word timing (difflib word match, 0.85-1.2x pieces) so the kinetic captions land on their words.
+- Music/SFX: the reference's own bed, separated from the American voice with Demucs htdemucs (vocals removed, ~13 dB under);
+  voice level matched to the original vocal stem; mix -14 LUFS, true peak -1.5.
