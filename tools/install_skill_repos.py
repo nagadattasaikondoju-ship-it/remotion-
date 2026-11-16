@@ -76,6 +76,11 @@ REPOS = [  # (owner/repo, commit, prefix, licensed)
                       "vertical_style.py", "requirements.txt", "LICENSE"],
         "note": "The pipeline scripts (beat_map.py, clip_tag.py, plan_edit.py, render_edit.py, flash_montage.py, overunder_stack.py, "
                 "vertical_style.py) sit in this skill's folder: run them as `python3 .claude/skills/{name}/<script>.py`."}),
+    # The user asked for AutoMontage too (Nov 16). Its skills drive the engine in its clone (global `automontage` CLI, set up by
+    # tools/setup_skill_clis.sh); only skills/ holds the full SKILL.md files (.claude/.agents/.codex hold pointers to them).
+    ("mcdenil-skills/AutoMontage-Agent", "ed099ca", "am", True, None, {"sparse": ["/*", "!/docs/images/"], "skills_under": "skills/",
+        "note": "this skill drives the AutoMontage-Agent engine in `tools/skill-repos/mcdenil-skills_AutoMontage-Agent` (global "
+                "`automontage` CLI). Relative links below resolve from that repo's `skills/{orig}/` folder; run engine scripts from its root."}),
 ]
 REFERENCE_ONLY = [("Dakkshin/after-effects-mcp", "88d5fbf"), ("Arman-Luthra/aftr", "628397d"), ("davidcervinka/vibe-editing", "8faca77"),
                   ("lanayepifanova/Claude-Editor", "b9a2e27"), ("iart-ai/motion-skills", "238dfc5")]
@@ -114,6 +119,7 @@ def main():
         if not src: ensure_clone(repo, commit, d, opts.get("sparse"))
         seen = set()  # a repo may ship the same skill twice (.claude/ and .agents/): keep the first
         for sd in sorted(skill_dirs(d)):
+            if opts.get("skills_under") and not os.path.relpath(sd, d).startswith(opts["skills_under"]): continue
             n = name_of(os.path.join(sd, "SKILL.md"))
             if n in seen or (pick and n not in pick): continue
             seen.add(n); found.append((repo, prefix, licensed, sd, n, opts, d))
@@ -139,7 +145,7 @@ def main():
         if final != name:  # keep frontmatter name and folder in step
             t = re.sub(r"^(name:\s*['\"]?)[^'\"\n]+", lambda m: m.group(1) + final, t, count=1, flags=re.M)
         if opts.get("note"):  # one line after the frontmatter, e.g. where the scripts now live
-            t = re.sub(r"\A(---\n.*?\n---\n)", lambda m: m.group(1) + "\n> Installed here: " + opts["note"].format(name=final) + "\n", t, count=1, flags=re.S)
+            t = re.sub(r"\A(---\n.*?\n---\n)", lambda m: m.group(1) + "\n> Installed here: " + opts["note"].format(name=final, orig=name) + "\n", t, count=1, flags=re.S)
         open(p, "w", encoding="utf-8").write(t)
         manifest.append({"skill": final, "from": repo, "original_name": name, "licensed": licensed})
         if not licensed: ignored.append(f".claude/skills/{final}/")

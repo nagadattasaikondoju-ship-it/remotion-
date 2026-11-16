@@ -35,7 +35,7 @@ CATS = [
     ("Frameworks: HyperFrames and Remotion", r"hyperframes|remotion|dsk-|moviepy"),
     ("AI generation and B-roll (paid APIs: ask first)", r"arcads|openart|ltx2|runpod|ideogram|generative|b-roll"),
     ("Motion principles, art direction and critique", r"principle|critique|video-design|art-direction|motion-design|motion-graphics|motion-effects|color|shot-composition|beat-sync|cinematic|camera|brand|naming|video-director|howseen|lobzy|liam|mort1d"),
-    ("Briefs, pricing and client work", r"brief|pricing|client|prompt-writer|creative"),
+    ("Briefs, pricing and client work", r"brief|pricing|client|prompt-writer|creative|lead-magnet"),
 ]
 def cat(n):
     for c, rx in CATS:
@@ -73,6 +73,7 @@ L.append("""## How the skills fit together (house rules win)
   - Never run `earshot llm` (it uploads audio to Gemini) unless asked.
 - **Paid APIs, ask first:** ElevenLabs, Arcads, RunPod, Ideogram, OpenArt, LTX, Higgsfield/Seedance/Kling/Suno (take-one), and the cloud TTS options in argo. Local voices by default (explainroo Kokoro, argo `kokoro-js`).
   - Nov 16 batch: ElevenLabs in `jhonty-video-editing`, `extreme-motion-design` (optional; it also offers local TTS) and `motion-video-production` (via composio, or Fish Audio); `motion-video` uses the `multix` CLI (Gemini TTS + ElevenLabs); fal.ai in `ecc-video-editing`; OpenAI/ElevenLabs TTS in `video-production`; YouTube OAuth in `youtube-stats`; Modal/Hugging Face GPUs in `parody-short`.
+  - AutoMontage: `ai-promo` spends Higgsfield credits (OAuth MCP); `am-motion-reel` uses ElevenLabs only with `--accept-provider-cost`. Its Anthropic/OpenAI scripts are legacy opt-ins: don't use them.
   - **Never post anywhere** without the user's explicit go: `video-shotcraft` can publish to social platforms (Upload-Post API) and `video-production` can host files over Tailscale.
 - **Never add** huashu-motion's "Made with huashu-motion" signature. Use `om` from PATH, never `npx huashu-motion`.
 - **Browsers:** use the preinstalled Chromium (`/opt/pw-browsers/chromium-1194/chrome-linux/chrome`):
@@ -117,6 +118,7 @@ L.append("""## How the skills fit together (house rules win)
 | Match a reference video with measured targets | `motion-video-production` | `reel-style-clone`, `reanimate` |
 | Showreel-grade motion in HyperFrames | `hyperframes-motion-reel` | `motion-video`, `hyperframes-animation` |
 | How a video looks: palette by act, type scale, contact-sheet critique | `video-design` | `motion-design-critique` |
+| Turnkey talking-head reel on an engine (transcript, rough cut for approval, scene brief, render, QA) | `reel-turnkey` (AutoMontage, `automontage` CLI) | `reel-from-donor` (rebuild a useful reel's mechanics as your own cards), `am-motion-reel` (no-camera reel from a script or voice-over) |
 """)
 
 # category index
@@ -165,6 +167,7 @@ L.append("""## Tools and command-line programs these skills use
 | `auto-editor` | Cuts silence / motionless / black stretches, speed ramps, editor XML export (Unlicense) | `bash tools/setup_skill_clis.sh` (pip, `~/.local/bin`); add `--progress none` to keep logs short |
 | `scenedetect` | PySceneDetect: shot boundaries and scene lists from long clips | same (pip) |
 | `moviepy`, `ffmpeg-python`, `librosa` | Python video assembly, ffmpeg bindings, beat/tempo analysis (`beat-sync-edit`) | same (pip) |
+| `automontage` | AutoMontage-Agent engine: auto-montage of talking heads, motion reels, review UI (Remotion 4.0.536 + faster-whisper) | `bash tools/setup_skill_clis.sh`; engine in `tools/skill-repos/mcdenil-skills_AutoMontage-Agent`; `automontage doctor`, `node scripts/cli.js demo` |
 | `ffmpeg-skill` scripts | 87 ffmpeg capabilities; `scripts/_contract.py doctor` checks the machine | in the skill folder, stdlib only |
 
 ## Considered and not installed (Nov 16 2026 list)
@@ -173,7 +176,6 @@ L.append("""## Tools and command-line programs these skills use
 |---|---|
 | digitalpublisher/video-shotcraft, SunCl8/video-shotcraft-skill, JohnChow90/video-shotcraft, simpletibr/simplicio-remotion | Copies of `video-shotcraft` (Vincentwei1021's is installed) |
 | remotion-dev/remotion | Its skills are for Remotion's own maintainers (PRs, releases); `remotion-best-practices` covers using it |
-| mcdenil-skills/AutoMontage-Agent | Skills drive its own Remotion engine (a separate npm install of several hundred MB); install it if a talking-head auto-montage job needs it |
 | wendymardigian-prog/Editor-IA-Pro | No licence; its skills are copies of others, and two need the paid inference.sh cloud |
 | metiutek/editorvideo-ai (vedit), MartinDelophy/ai-video-editor (Timeline Studio), WeftCut, OpenChatCut, openfilm, OpenTake | Editor apps (desktop or browser UI, some with cloud accounts), not skills; vedit could be added as an MCP server if wanted |
 | palmier-io/palmier-pro | Proprietary since v0.7.6 |

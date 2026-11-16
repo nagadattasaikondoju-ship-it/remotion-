@@ -1,6 +1,6 @@
 # Skills knowledge base
 
-Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/skills/*/SKILL.md` in this repo. **204 project skills.** Re-run the script after installing or removing skills.
+Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/skills/*/SKILL.md` in this repo. **209 project skills.** Re-run the script after installing or removing skills.
 
 ## How the skills fit together (house rules win)
 
@@ -13,6 +13,7 @@ Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/s
   - Never run `earshot llm` (it uploads audio to Gemini) unless asked.
 - **Paid APIs, ask first:** ElevenLabs, Arcads, RunPod, Ideogram, OpenArt, LTX, Higgsfield/Seedance/Kling/Suno (take-one), and the cloud TTS options in argo. Local voices by default (explainroo Kokoro, argo `kokoro-js`).
   - Nov 16 batch: ElevenLabs in `jhonty-video-editing`, `extreme-motion-design` (optional; it also offers local TTS) and `motion-video-production` (via composio, or Fish Audio); `motion-video` uses the `multix` CLI (Gemini TTS + ElevenLabs); fal.ai in `ecc-video-editing`; OpenAI/ElevenLabs TTS in `video-production`; YouTube OAuth in `youtube-stats`; Modal/Hugging Face GPUs in `parody-short`.
+  - AutoMontage: `ai-promo` spends Higgsfield credits (OAuth MCP); `am-motion-reel` uses ElevenLabs only with `--accept-provider-cost`. Its Anthropic/OpenAI scripts are legacy opt-ins: don't use them.
   - **Never post anywhere** without the user's explicit go: `video-shotcraft` can publish to social platforms (Upload-Post API) and `video-production` can host files over Tailscale.
 - **Never add** huashu-motion's "Made with huashu-motion" signature. Use `om` from PATH, never `npx huashu-motion`.
 - **Browsers:** use the preinstalled Chromium (`/opt/pw-browsers/chromium-1194/chrome-linux/chrome`):
@@ -57,6 +58,7 @@ Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | Match a reference video with measured targets | `motion-video-production` | `reel-style-clone`, `reanimate` |
 | Showreel-grade motion in HyperFrames | `hyperframes-motion-reel` | `motion-video`, `hyperframes-animation` |
 | How a video looks: palette by act, type scale, contact-sheet critique | `video-design` | `motion-design-critique` |
+| Turnkey talking-head reel on an engine (transcript, rough cut for approval, scene brief, render, QA) | `reel-turnkey` (AutoMontage, `automontage` CLI) | `reel-from-donor` (rebuild a useful reel's mechanics as your own cards), `am-motion-reel` (no-camera reel from a script or voice-over) |
 
 ## Index by job
 
@@ -90,11 +92,12 @@ Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`jhonty-video-editing`](#jhonty-video-editing) | Make and edit short-form videos (Reels, TikToks, Shorts, video ads, explainers, VSLs) with Remotion, ElevenLabs and 21st.dev. | JhontyBarreto/video-editing-skill |
 | [`remotion-ffmpeg-skill`](#remotion-ffmpeg-skill) | Make motion graphics on real footage with Remotion, driven by measurements from ffmpeg-skill: animated captions timed from an SRT/VTT file, automatic jump cuts that drop… | kajisho5/remotion-ffmpeg-skill |
 
-### End-to-end motion-graphics video pipelines (13)
+### End-to-end motion-graphics video pipelines (14)
 
 | Skill | What it does | Source |
 |---|---|---|
 | [`adu-motion-video`](#adu-motion-video) | 使用完整动画工程包，把新口播、文案与自有素材制作成可编辑动效视频和 60fps MP4；也支持轻量 TPL、手绘续接、字幕与改旧片。支持 Windows、macOS、Linux，以及 Codex、Claude Code、豆包、DeepSeek、WorkBuddy 等可读写文件并运行命令的助手。 | adunext/adu-motion-video |
+| [`am-motion-reel`](#am-motion-reel) | - Создаёт анимационный Reels/Shorts без камеры из темы, сценария или готовой озвучки в AutoMontage-Agent: script, выбор аудио, таймкоды, motion brief, настоящий preview,… | mcdenil-skills/AutoMontage-Agent |
 | [`extreme-motion-design`](#extreme-motion-design) | Cria vídeos de motion design de nível de estúdio por código (Remotion/React), com trilha licenciada, SFX sincronizados, voz opcional (ElevenLabs ou modelo TTS local esco… | dev-isaacmello/extreme-motion-design |
 | [`hyperframes-motion-reel`](#hyperframes-motion-reel) | ショーリール品質（Behance / OFFF / Awwwards級）のモーショングラフィックス動画を HyperFrames（HTML + GSAP + SVG + Canvas、Apache-2.0）で制作する。remotion-motion-reel の HyperFrames 版で、Remotion の Company Lic… | Sunwood-ai-labs/hyperframes-motion-reel-skill |
 | [`motion-reel`](#motion-reel) | Make motion-graphics videos rendered entirely from code — product ads, brand promos, launch videos, showreels, animated explainers, 抖音/视频号/小红书 竖屏广告, 宣传片, 片头, 动态海报视频 — wi… | 10291124jcjc-dotcom/motion-reel |
@@ -134,7 +137,7 @@ Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`real-sound`](#real-sound) | Build premium, realistic soundtracks for code-made videos and animations from real licensed recordings - launch films, product and feature videos, UI walkthroughs, logo … | earlier install |
 | [`soundtrack`](#soundtrack) | This skill should be used when the user asks to "add music to the animation", "make the music in code", "synthesize a soundtrack", "compose background music that fits th… | iart-ai/javascript-animation-skills |
 
-### Talking-head and short-form reel editing (20)
+### Talking-head and short-form reel editing (22)
 
 | Skill | What it does | Source |
 |---|---|---|
@@ -147,8 +150,10 @@ Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`makemyclip-editor`](#makemyclip-editor) | AI-native video editor for any agent. | MakeMyClip/editor |
 | [`media-use`](#media-use) | Agent Media OS, the single skill for every media need in a HyperFrames project. | earlier install |
 | [`reel-editor`](#reel-editor) | Edit talking-head / selfie videos into finished Instagram Reels, TikToks and YouTube Shorts with code-rendered motion graphics - face layouts that morph (split screen, p… | sunithvs/video-agent-skill |
+| [`reel-from-donor`](#reel-from-donor) | - Превращает полезный разговорный Reels, Short или TikTok в авторский Reels с живыми, конкретными карточками: сначала разбирает донорский материал и проверяет факты, сна… | mcdenil-skills/AutoMontage-Agent |
 | [`reel-recut`](#reel-recut) | - Recut a raw vertical talking-head reel into a finished short-form edit: a persistent title banner, word-synced karaoke captions, callout boxes for asides and comment-k… | krusemediallc/video-editor-agent |
 | [`reel-style-clone`](#reel-style-clone) | - Reverse-engineer a reference reel's editing style frame-by-frame into a replicable STYLE GUIDE plus per-line BUILD DIRECTIVES, then apply that style to the user's own … | krusemediallc/video-editor-agent |
+| [`reel-turnkey`](#reel-turnkey) | - Собирает ролик под ключ в AutoMontage-Agent: проверяет исходник, транскрибирует речь, показывает автору черновую нарезку своей съёмки без графики, готовит один полный … | mcdenil-skills/AutoMontage-Agent |
 | [`short-form-video`](#short-form-video) | This skill should be used when the user asks to "make a Reels/TikTok/YouTube Shorts video", "build a short-form video template", "write a hook for a short", "edit for re… | iart-ai/tiktok-video-skills |
 | [`talking-head`](#talking-head) | Create an AI talking head from the user's own photos plus a voice sample, or from a self-recorded video by extracting face frames and speech. | iart-ai/talking-head-skills |
 | [`talking-head-b-roll`](#talking-head-b-roll) | Add b-roll motion graphics to a talking-head video. | iart-ai/b-roll-skills |
@@ -177,12 +182,13 @@ Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`title-sequence-3d`](#title-sequence-3d) | Make a cinematic 3D title sequence (8-15 seconds) in code with Claude Code and Three.js. | charlie947/motion-graphics-skills |
 | [`wireframe-portal-title`](#wireframe-portal-title) | A wireframe portal bursts open, the title comes through, then its letters swap into a second phrase. | earlier install |
 
-### Launch, product, ad and promo films (24)
+### Launch, product, ad and promo films (25)
 
 | Skill | What it does | Source |
 |---|---|---|
 | [`ad-creative-video`](#ad-creative-video) | This skill should be used when the user asks to "make a video ad", "create an animated ad", "build a performance/UGC-style ad", "batch-produce ad creative variations", "… | iart-ai/ad-video-skills |
 | [`ad-launch-video`](#ad-launch-video) | This skill should be used when the user asks to "make a launch video", "create a product hype/sizzle film", "build a teaser/trailer for a drop", "do a reveal montage wit… | iart-ai/ad-video-skills |
+| [`ai-promo`](#ai-promo) | - Собирает безголосый промо-ролик, рекламу или трейлер на 20–30 секунд из AI-кинокадров (сейчас Higgsfield через OAuth MCP) и project-local Remotion-VFX под музыку в Aut… | mcdenil-skills/AutoMontage-Agent |
 | [`apple-launch-film`](#apple-launch-film) | Rebuild an Apple-style Mac launch film entirely in code with Claude Code. | charlie947/motion-graphics-skills |
 | [`cg-launch-video`](#cg-launch-video) | Make a 30-45 second product launch video in code with Claude Code, the kind SaaS companies post on launch day. | charlie947/motion-graphics-skills |
 | [`cinetic`](#cinetic) | Direct, build and render premium cinematic motion design from code — launch films, product and feature videos, looping feature animations for landing pages and social, l… | earlier install |
@@ -326,12 +332,13 @@ Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`video-design`](#video-design) | Visual design for videos - colour by act, type scale, chart and layout rules for 16:9 and 9:16 scenes, a design.md handoff that any design skill can fill, and a contact-… | digitalsamba/claude-code-video-toolkit |
 | [`video-director`](#video-director) | Direct, build and verify short videos that are written as code and rendered frame by frame (HTML/Canvas/SVG/Three.js, GSAP or Remotion → MP4 or a live page). | win4r/video-director |
 
-### Briefs, pricing and client work (5)
+### Briefs, pricing and client work (6)
 
 | Skill | What it does | Source |
 |---|---|---|
 | [`client-revisions`](#client-revisions) | This skill should be used when the user asks to "stop scope creep", "limit revision rounds", "write SOW revision language", "the client keeps asking for changes", "how d… | iart-ai/freelance-motion-skills |
 | [`creative-brief`](#creative-brief) | This skill should be used when the user asks to "write a creative brief", "build a motion brief", "the client doesn't know what they want", "turn this vague client reque… | iart-ai/freelance-motion-skills |
+| [`lead-magnet`](#lead-magnet) | - Собирает лид-магнит к ролику в AutoMontage-Agent по запросу из «Пульта роликов»: дословное обещание, страница из заготовки бренд-пака, проверка фактов, PDF, тексты для… | mcdenil-skills/AutoMontage-Agent |
 | [`motion-brief-writer`](#motion-brief-writer) | Turns a rough idea for an animated graphic into a precise build brief for Claude Code, in your own brand. | charlie947/motion-graphics-skills |
 | [`motion-pricing`](#motion-pricing) | This skill should be used when the user asks to "quote a motion project", "estimate this animation job", "how much should I charge for this video", "what's my day rate",… | iart-ai/freelance-motion-skills |
 | [`motion-prompt-writer`](#motion-prompt-writer) | Write a complete 8-part Claude Motion prompt (The bar, Format, The one rule, Look, Motion, Never, Before you finish, The scene) for one short looping motion graphic, in … | charlie947/motion-graphics-skills |
@@ -429,6 +436,22 @@ Use this skill whenever Adobe After Effects is the working tool. Triggers on "Af
 - **Folder:** `.claude/skills/ai-audio-sound-design/` (3 files, SKILL.md 154 lines, with scripts/tools)
 
 Rebuild the audio of an AI-generated video (Arcads / AI actors / UGC-gen / any clip whose voices sound like sterile studio AI) so every scene sounds like it was really filmed in the location shown — location-matched ambience beds, room-matched convolution reverb, outdoor distance treatment, censor bleeps over swears, removal of the AI high-frequency watermark whine, and a social loudness master, all with the video stream untouched. Use whenever someone says clips "sound AI / fake / sterile / like a voiceover", asks to "add ambient sounds / background noise", "make it sound like the location they're in", "add reverb to match the room", "bleep the swears / curse words", or hands over AI-actor footage for an audio pass — even if they never say "sound design". Also for revision rounds on an existing pass ("make the lawnmower louder", "add a car driving by", "make it sound like it's outside"). NOT for captions (embedded-captions), cutting footage (reel-recut), or full branded motion-graphic edits (branded-ad-edit).
+
+### ai-promo
+- **Job:** Launch, product, ad and promo films
+- **Source:** mcdenil-skills/AutoMontage-Agent
+- **Licence:** licensed
+- **Folder:** `.claude/skills/ai-promo/` (19 files, SKILL.md 176 lines)
+
+- Собирает безголосый промо-ролик, рекламу или трейлер на 20–30 секунд из AI-кинокадров (сейчас Higgsfield через OAuth MCP) и project-local Remotion-VFX под музыку в AutoMontage-Agent: согласованный текст, бюджет кредитов с явным согласием, ключевые кадры, оживление, VFX-пакет, саундтрек, `automontage motion --music-only`, настоящий preview, ручной QA, явное «утверждаю» и final. Используй для «промо-ролик», «рекламный ролик», «трейлер», «ролик из AI-кадров», «Higgsfield», «ролик под музыку без голоса», даже если навык не назван.
+
+### am-motion-reel
+- **Job:** End-to-end motion-graphics video pipelines
+- **Source:** mcdenil-skills/AutoMontage-Agent
+- **Licence:** licensed
+- **Folder:** `.claude/skills/am-motion-reel/` (2 files, SKILL.md 337 lines)
+
+- Создаёт анимационный Reels/Shorts без камеры из темы, сценария или готовой озвучки в AutoMontage-Agent: script, выбор аудио, таймкоды, motion brief, настоящий preview, явное утверждение, MotionReel final и QA. Используй для «ролик без камеры», «анимационный рилс», «кинетический текст», «motion-reel» и «видео из озвучки»; в новом чате предлагает готовый стиль, уникальный Creative Motion или работу по референсу.
 
 ### animate
 - **Job:** Other
@@ -1134,6 +1157,14 @@ This skill should be used when the user asks to "animate a headline", "make a ki
 
 Generate and mix the full audio pass for a video edit with ElevenLabs — an SFX kit (whooshes, pops, impacts, count-ups, sub-drops, risers) generated, audited for the ~1/3 near-silent duds, and peak-normalized to −3dB; a music bed prompted by style descriptors (optionally style-matched to a reference track via spectrogram + BPM estimation); and the proven mix levels + ffmpeg verification recipe to sit it all under a spoken voiceover. Use when the user asks for "sound design", "SFX", "sound effects on this edit", "a music bed", "background music under the VO", "add whooshes/impacts", "a sub drop opener", "make the music feel like this track", or "mix/verify the audio" — and as the sound pass inside larger edit skills (branded-ad-edit, cinematic edits). Produces audited audio files + mix numbers; voiceover generation and clip placement live in the edit skills.
 
+### lead-magnet
+- **Job:** Briefs, pricing and client work
+- **Source:** mcdenil-skills/AutoMontage-Agent
+- **Licence:** licensed
+- **Folder:** `.claude/skills/lead-magnet/` (4 files, SKILL.md 107 lines)
+
+- Собирает лид-магнит к ролику в AutoMontage-Agent по запросу из «Пульта роликов»: дословное обещание, страница из заготовки бренд-пака, проверка фактов, PDF, тексты для раздачи, автопроверка и показ в пульте. Используй, когда во входящих есть строка «Лид-магнит: …», когда пользователь просит «сделай лид-магнит», «материал по кодовому слову», «гайд к ролику».
+
 ### lemo-opuscar
 - **Job:** Launch, product, ad and promo films
 - **Source:** installed before the manifest (see CLAUDE.md)
@@ -1574,6 +1605,14 @@ Edit talking-head / selfie videos into finished Instagram Reels, TikToks and You
 
 Turn any horizontal or square motion video into a 1080 x 1920 Instagram Reel or TikTok that uploads cleanly. Headline and logos inside the safe zone, H.264, yuv420p, limited colour range, bt709, a silent audio track when there is no sound, and an ffprobe check before upload. Use when someone says "make this a reel", "vertical version", "export for Instagram", "TikTok version", "9:16 cut", "reel export" or has a 16:9 or 4:5 video that needs to go on a vertical feed.
 
+### reel-from-donor
+- **Job:** Talking-head and short-form reel editing
+- **Source:** mcdenil-skills/AutoMontage-Agent
+- **Licence:** licensed
+- **Folder:** `.claude/skills/reel-from-donor/` (5 files, SKILL.md 316 lines)
+
+- Превращает полезный разговорный Reels, Short или TikTok в авторский Reels с живыми, конкретными карточками: сначала разбирает донорский материал и проверяет факты, сначала предлагает готовый стиль, уникальный Creative Motion или монтаж по референсу, согласует CTA, дизайн и формат, затем показывает тексты карточек и лишь после утверждения создаёт анимацию и монтаж. Используй, когда пользователь даёт ссылку, видео или транскрипт чужого ролика и просит адаптировать, переделать, разобрать в карточки, сделать лайфхаки или ролик по донору.
+
 ### reel-recut
 - **Job:** Talking-head and short-form reel editing
 - **Source:** krusemediallc/video-editor-agent
@@ -1589,6 +1628,14 @@ Turn any horizontal or square motion video into a 1080 x 1920 Instagram Reel or 
 - **Folder:** `.claude/skills/reel-style-clone/` (2 files, SKILL.md 144 lines)
 
 - Reverse-engineer a reference reel's editing style frame-by-frame into a replicable STYLE GUIDE plus per-line BUILD DIRECTIVES, then apply that style to the user's own footage. Use whenever someone hands over (or points at) an existing short-form video and says "edit mine like this", "clone this editing style", "match this reel", "why does this edit feel so good — copy it", "break down how this video is edited", "steal this creator's style", or "make my video look like [reference]". The output is analysis + a build plan, not a rendered video — the actual edit is built by branded-ad-edit (or reel-recut for the simple banner/caption look) from the directives this skill produces. Not for cloning a STATIC image ad (image-ad-clone), plain subtitles (embedded-captions), or an edit with no reference to match.
+
+### reel-turnkey
+- **Job:** Talking-head and short-form reel editing
+- **Source:** mcdenil-skills/AutoMontage-Agent
+- **Licence:** licensed
+- **Folder:** `.claude/skills/reel-turnkey/` (10 files, SKILL.md 523 lines)
+
+- Собирает ролик под ключ в AutoMontage-Agent: проверяет исходник, транскрибирует речь, показывает автору черновую нарезку своей съёмки без графики, готовит один полный пакет ТЗ со сценами, текстами, кадрированием, анимацией и аудиопробой, ждёт явного утверждения, рендерит ReelScenes и сам проводит визуальный и звуковой QA. Обязательно используй, когда пользователь просит «смонтируй ролик», «ролик под ключ», «сделай Reels/Shorts», «собери lesson» или даёт видео для монтажа, даже если не называет навык. В новом чате сначала предлагает готовый стиль, уникальный Creative Motion или монтаж по референсу. Запросы анимации без камеры направляет в motion-reel.
 
 ### reference-to-motion
 - **Job:** Copy and clone a reference
@@ -2008,6 +2055,7 @@ How published videos are doing on YouTube, and what to learn from it. Views, lik
 | `auto-editor` | Cuts silence / motionless / black stretches, speed ramps, editor XML export (Unlicense) | `bash tools/setup_skill_clis.sh` (pip, `~/.local/bin`); add `--progress none` to keep logs short |
 | `scenedetect` | PySceneDetect: shot boundaries and scene lists from long clips | same (pip) |
 | `moviepy`, `ffmpeg-python`, `librosa` | Python video assembly, ffmpeg bindings, beat/tempo analysis (`beat-sync-edit`) | same (pip) |
+| `automontage` | AutoMontage-Agent engine: auto-montage of talking heads, motion reels, review UI (Remotion 4.0.536 + faster-whisper) | `bash tools/setup_skill_clis.sh`; engine in `tools/skill-repos/mcdenil-skills_AutoMontage-Agent`; `automontage doctor`, `node scripts/cli.js demo` |
 | `ffmpeg-skill` scripts | 87 ffmpeg capabilities; `scripts/_contract.py doctor` checks the machine | in the skill folder, stdlib only |
 
 ## Considered and not installed (Nov 16 2026 list)
@@ -2016,7 +2064,6 @@ How published videos are doing on YouTube, and what to learn from it. Views, lik
 |---|---|
 | digitalpublisher/video-shotcraft, SunCl8/video-shotcraft-skill, JohnChow90/video-shotcraft, simpletibr/simplicio-remotion | Copies of `video-shotcraft` (Vincentwei1021's is installed) |
 | remotion-dev/remotion | Its skills are for Remotion's own maintainers (PRs, releases); `remotion-best-practices` covers using it |
-| mcdenil-skills/AutoMontage-Agent | Skills drive its own Remotion engine (a separate npm install of several hundred MB); install it if a talking-head auto-montage job needs it |
 | wendymardigian-prog/Editor-IA-Pro | No licence; its skills are copies of others, and two need the paid inference.sh cloud |
 | metiutek/editorvideo-ai (vedit), MartinDelophy/ai-video-editor (Timeline Studio), WeftCut, OpenChatCut, openfilm, OpenTake | Editor apps (desktop or browser UI, some with cloud accounts), not skills; vedit could be added as an MCP server if wanted |
 | palmier-io/palmier-pro | Proprietary since v0.7.6 |

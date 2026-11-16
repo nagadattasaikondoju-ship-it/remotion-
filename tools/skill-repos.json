@@ -1018,5 +1018,35 @@
   "from": "ZiadAbdelkarim/beat-synced-edit",
   "original_name": "beat-sync-edit",
   "licensed": true
+ },
+ {
+  "skill": "ai-promo",
+  "from": "mcdenil-skills/AutoMontage-Agent",
+  "original_name": "ai-promo",
+  "licensed": true
+ },
+ {
+  "skill": "lead-magnet",
+  "from": "mcdenil-skills/AutoMontage-Agent",
+  "original_name": "lead-magnet",
+  "licensed": true
+ },
+ {
+  "skill": "am-motion-reel",
+  "from": "mcdenil-skills/AutoMontage-Agent",
+  "original_name": "motion-reel",
+  "licensed": true
+ },
+ {
+  "skill": "reel-from-donor",
+  "from": "mcdenil-skills/AutoMontage-Agent",
+  "original_name": "reel-from-donor",
+  "licensed": true
+ },
+ {
+  "skill": "reel-turnkey",
+  "from": "mcdenil-skills/AutoMontage-Agent",
+  "original_name": "reel-turnkey",
+  "licensed": true
  }
 ]
