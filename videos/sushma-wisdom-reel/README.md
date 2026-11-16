@@ -59,3 +59,12 @@ Kept (no identifiable face): open-mouth close-ups, gloved hands, 3D teeth. Optio
   speaker's word timing (difflib word match, 0.85-1.2x pieces) so the kinetic captions land on their words.
 - Music/SFX: the reference's own bed, separated from the American voice with Demucs htdemucs (vocals removed, ~13 dB under);
   voice level matched to the original vocal stem; mix -14 LUFS, true peak -1.5.
+
+## v2 (16 Nov, current): the reference unchanged, only the brand swapped
+User: keep the reference exactly (voice, visuals); only turn the other brand into Dr. Sushma's and end on her pop-up card.
+- Picture: the AI-upscaled reference frames 0-1030 untouched (no face swaps), then `endcard/` (the Jerry reel's card.html,
+  backdrop = frame 1030, the white flash the original's card came out of), 150 frames; 39.37 s in all.
+- Sound: original soundtrack to 35.25 s; then the Demucs music/SFX bed alone, so "Call Next Care Dental today" is gone; the bed's
+  last 2 s loop once under the longer card and fade; whoosh/pop/chime on the card via the sound pipeline (trim +2 dB = 4 dB under
+  the bed). -14 LUFS.
+- `REF=<reference.mp4> STEMS=<dir with music_sfx.wav> bash build_brand.sh` (needs out/base_up.mp4 and endcard/out/card.mp4).
