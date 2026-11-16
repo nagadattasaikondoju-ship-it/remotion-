@@ -9,7 +9,7 @@ set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd); REPO=$(cd "$HERE/../.." && pwd); cd "$HERE"
 REF=${REF:?reference video}; STEMS=${STEMS:?folder with music_sfx.wav}
 N=DrSriSushma_WisdomTeeth_v2_1080x1920_30fps; KEEP=1031; FPS=30
-DUR=$(python3 -c "print(round(($KEEP+150)/$FPS,4))" 2>/dev/null); CUT=35.25
+DUR=$(python3 -c "print(round(($KEEP+150)/$FPS,4))" 2>/dev/null); CUT=34.80
 ffmpeg -nostdin -v error -y -i out/base_up.mp4 -i endcard/out/card.mp4 -filter_complex \
   "[0:v]trim=end_frame=$KEEP,setpts=PTS-STARTPTS[a];[a][1:v]concat=n=2:v=1:a=0,format=yuv420p[v]" -map "[v]" \
   -c:v libx264 -preset slow -crf 12 -profile:v high -colorspace bt709 -color_primaries bt709 -color_trc bt709 -r $FPS out/picture_v2.mp4
