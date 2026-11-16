@@ -39,3 +39,9 @@ Kept (no identifiable face): open-mouth close-ups, gloved hands, 3D teeth. Optio
   api.elevenlabs.io) for the voice; for photos, a free Pexels key (api.pexels.com) or invideo licences/credits.
 - Fallback voice tested: Kokoro hf_beta (explainroo, espeak-ng installed) reads the English clearly but adds "he/and" sounds at
   pauses; usable only after cleanup.
+- ElevenLabs (user's key works, FREE tier, 10k chars): free accounts can't use library voices (402) or Voice Design (403) via the
+  API, and free output has no commercial licence. Chosen voice once on Starter+: **Monika Sogam - Deep and Natural**
+  (`2zRM7PkgwBPiau2jvVXc`, young Indian English female; already in the account's voices). Model eleven_multilingual_v2,
+  stability 0.5, similarity 0.8, style 0.15; `/with-timestamps`, then cut into the 14 phrases and place each on its reference start.
+- Pexels: the site is 403 to scripts; the API needs a free key (api.pexels.com, header Authorization). Openverse finds only
+  Flickr/Wikimedia photos without model releases: not for a clinic ad.
