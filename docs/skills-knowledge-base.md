@@ -1,6 +1,6 @@
 # Skills knowledge base
 
-Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/skills/*/SKILL.md` in this repo. **209 project skills.** Re-run the script after installing or removing skills.
+Generated 2026-11-20 by `python3 tools/build_skills_kb.py` from every `.claude/skills/*/SKILL.md` in this repo. **210 project skills.** Re-run the script after installing or removing skills.
 
 ## How the skills fit together (house rules win)
 
@@ -137,7 +137,7 @@ Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`real-sound`](#real-sound) | Build premium, realistic soundtracks for code-made videos and animations from real licensed recordings - launch films, product and feature videos, UI walkthroughs, logo … | earlier install |
 | [`soundtrack`](#soundtrack) | This skill should be used when the user asks to "add music to the animation", "make the music in code", "synthesize a soundtrack", "compose background music that fits th… | iart-ai/javascript-animation-skills |
 
-### Talking-head and short-form reel editing (22)
+### Talking-head and short-form reel editing (23)
 
 | Skill | What it does | Source |
 |---|---|---|
@@ -159,6 +159,7 @@ Generated 2026-11-16 by `python3 tools/build_skills_kb.py` from every `.claude/s
 | [`talking-head-b-roll`](#talking-head-b-roll) | Add b-roll motion graphics to a talking-head video. | iart-ai/b-roll-skills |
 | [`talking-head-image-overlays`](#talking-head-image-overlays) | - Edit a talking-head video in the "uncut take + stacked image overlays" style: ONE continuous take that is never cut, with the entire sense of pace carried by hard-cut … | krusemediallc/video-editor-agent |
 | [`talking-head-recut`](#talking-head-recut) | Package an existing talking-head / interview / podcast video with timed, designed GRAPHIC OVERLAY cards — kinetic titles, lower-thirds, data callouts, quotes, side panel… | earlier install |
+| [`ten-styles-reel`](#ten-styles-reel) | One 5-second shot drawn in ten art styles (Madhubani, Ink Wash, Shadow Puppet, Paper Cut-out, Stained Glass, Anime, Warli, Blueprint, Ukiyo-e, Pahari Miniature), each a … | earlier install |
 | [`tenfold-video-edit`](#tenfold-video-edit) | Turns raw 9:16 talking-head clips into a finished, premium Instagram reel end to end: picks the cleanest take of every line across your clips, cuts dead air, punches in … | tenfoldmarc/video-edit-skill |
 | [`video-edit-pipeline`](#video-edit-pipeline) | MASTER orchestration skill for producing a finished short-form video from raw talking-head footage. | krusemediallc/video-editor-agent |
 | [`video_toolkit`](#video_toolkit) | Make short explainer videos from a brief with claude-code-video-toolkit — submit a scene spec, poll a job, get a QC-checked MP4. | digitalsamba/claude-code-video-toolkit |
@@ -1828,6 +1829,14 @@ Add b-roll motion graphics to a talking-head video. Transcribes the recording wi
 - **Folder:** `.claude/skills/talking-head-recut/` (28 files, SKILL.md 1218 lines)
 
 Package an existing talking-head / interview / podcast video with timed, designed GRAPHIC OVERLAY cards — kinetic titles, lower-thirds, data callouts, quotes, side panels, picture-in-picture — synced to the transcript, on a 16:9 / 9:16 / 4:5 canvas of your choice; the clip plays untouched underneath. Trigger on "graphic overlays", "on-screen graphics", "package / dress up my video". Not plain subtitles (/embedded-captions). Unclear → /hyperframes.
+
+### ten-styles-reel
+- **Job:** Talking-head and short-form reel editing
+- **Source:** installed before the manifest (see CLAUDE.md)
+- **Licence:** see the skill folder
+- **Folder:** `.claude/skills/ten-styles-reel/` (1 files, SKILL.md 94 lines)
+
+One 5-second shot drawn in ten art styles (Madhubani, Ink Wash, Shadow Puppet, Paper Cut-out, Stained Glass, Anime, Warli, Blueprint, Ukiyo-e, Pahari Miniature), each a canvas animation that is a pure function of time, then cut into a ~26 s 9:16 listicle reel (title, numbered list, card wiping every 2 s, comment CTA, voiceover). Use when the user asks for "10 animation styles", "same shot in different art styles", "Jatayu / Pushpak Viman reel", "Indian folk art styles animation", a style-showcase or "comment X for the prompts" reel, or any one of these ten looks on its own.
 
 ### tenfold-video-edit
 - **Job:** Talking-head and short-form reel editing
