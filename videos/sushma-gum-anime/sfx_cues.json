@@ -1,0 +1,209 @@
+[
+ {
+  "t": 0.0,
+  "type": "drain",
+  "g": 0.5,
+  "note": "pink water swirling down the drain (diegetic bed under the hook)"
+ },
+ {
+  "t": 0.3,
+  "type": "pop",
+  "g": 0.5,
+  "note": "PINK IN THE SINK pops in"
+ },
+ {
+  "t": 0.8,
+  "type": "punch",
+  "g": 0.55,
+  "note": "impact frames on 'sink' (the one impact of the hook)"
+ },
+ {
+  "t": 1.1,
+  "type": "pop",
+  "g": 0.4,
+  "note": "EVERY TIME line pops in"
+ },
+ {
+  "t": 2.8,
+  "type": "swipe",
+  "g": 0.5,
+  "note": "whip into the story (white flash)"
+ },
+ {
+  "t": 6.45,
+  "type": "brush",
+  "g": 0.55,
+  "note": "giant toothbrush scrubs across Moti (real brushing)"
+ },
+ {
+  "t": 7.64,
+  "type": "softwhoosh",
+  "g": 0.4,
+  "note": "camera pushes in to the gum line"
+ },
+ {
+  "t": 7.94,
+  "type": "pop",
+  "g": 0.55,
+  "note": "'!' pops over Moti, first drop of blood"
+ },
+ {
+  "t": 9.5,
+  "type": "pop",
+  "g": 0.45,
+  "note": "IT'S NORMAL~ bubble"
+ },
+ {
+  "t": 9.75,
+  "type": "pop",
+  "g": 0.4,
+  "note": "CHILL~ bubble"
+ },
+ {
+  "t": 10.83,
+  "type": "riser",
+  "g": 0.5,
+  "note": "riser into the trouble (ends as the plaque hardens)",
+  "len": 2.0
+ },
+ {
+  "t": 12.83,
+  "type": "crack",
+  "g": 0.45,
+  "note": "plaque hardens into tartar"
+ },
+ {
+  "t": 12.83,
+  "type": "lowhit",
+  "g": 0.45,
+  "note": "hit under the first riser"
+ },
+ {
+  "t": 15.01,
+  "type": "punch",
+  "g": 0.5,
+  "note": "RED! stamp (the impact of this scene)"
+ },
+ {
+  "t": 15.31,
+  "type": "pop",
+  "g": 0.5,
+  "note": "SWOLLEN! stamp"
+ },
+ {
+  "t": 15.77,
+  "type": "pop",
+  "g": 0.5,
+  "note": "BLEEDING! stamp"
+ },
+ {
+  "t": 16.92,
+  "type": "softwhoosh",
+  "g": 0.4,
+  "note": "gums pull back, camera pushes in"
+ },
+ {
+  "t": 19.2,
+  "type": "boing",
+  "g": 0.6,
+  "note": "Moti wobbles (impact frames, WOBBLE?! stamp)"
+ },
+ {
+  "t": 18.6,
+  "type": "riser",
+  "g": 0.55,
+  "note": "build to the rescue (ends on the hero flash)",
+  "len": 1.6
+ },
+ {
+  "t": 20.2,
+  "type": "impact",
+  "g": 0.5,
+  "note": "hero entrance: impact frames, golden light"
+ },
+ {
+  "t": 20.25,
+  "type": "sparkle",
+  "g": 0.5,
+  "note": "golden sparkle as the clinic badge appears"
+ },
+ {
+  "t": 21.56,
+  "type": "pop",
+  "g": 0.5,
+  "note": "DR. SRI SUSHMA plate lands"
+ },
+ {
+  "t": 22.44,
+  "type": "pop",
+  "g": 0.4,
+  "note": "GUM SPECIALIST pill lands"
+ },
+ {
+  "t": 24.1,
+  "type": "scaler",
+  "g": 0.45,
+  "note": "ultrasonic scaler sweeps the gum line (diegetic hum)"
+ },
+ {
+  "t": 24.45,
+  "type": "softwhoosh",
+  "g": 0.35,
+  "note": "hero badge flies out"
+ },
+ {
+  "t": 24.85,
+  "type": "crack",
+  "g": 0.4,
+  "note": "first tartar rocks shatter"
+ },
+ {
+  "t": 26.05,
+  "type": "crack",
+  "g": 0.35,
+  "note": "last tartar rocks shatter"
+ },
+ {
+  "t": 27.99,
+  "type": "sparkle",
+  "g": 0.5,
+  "note": "Moti flexes, sparkles, sun comes out (conclusion)"
+ },
+ {
+  "t": 32.24,
+  "type": "pop",
+  "g": 0.5,
+  "note": "DON'T WAIT FOR stamp"
+ },
+ {
+  "t": 33.02,
+  "type": "boing",
+  "g": 0.45,
+  "note": "THE WOBBLE! stamp (callback to the wobble)"
+ },
+ {
+  "t": 32.4,
+  "type": "brightriser",
+  "g": 0.4,
+  "note": "lift into the end card",
+  "len": 1.5
+ },
+ {
+  "t": 33.96,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "the card pops up out of the white flash"
+ },
+ {
+  "t": 34.26,
+  "type": "pop",
+  "g": 0.55,
+  "note": "the logo lands"
+ },
+ {
+  "t": 35.07,
+  "type": "chime",
+  "g": 0.5,
+  "note": "BOOK AN APPOINTMENT button lands"
+ }
+]

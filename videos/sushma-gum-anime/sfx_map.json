@@ -1,0 +1,98 @@
+{
+ "drain": {
+  "ids": [
+   66
+  ],
+  "role": "water"
+ },
+ "crack": {
+  "ids": [
+   67
+  ],
+  "role": "hit"
+ },
+ "sparkle": {
+  "ids": [
+   68
+  ],
+  "role": "chime"
+ },
+ "scaler": {
+  "ids": [
+   69
+  ],
+  "role": "misc"
+ },
+ "boing": {
+  "ids": [
+   70
+  ],
+  "role": "misc"
+ },
+ "brush": {
+  "ids": [
+   13
+  ],
+  "role": "foley"
+ },
+ "whoosh": {
+  "ids": [
+   56
+  ],
+  "role": "whoosh"
+ },
+ "swipe": {
+  "ids": [
+   53
+  ],
+  "role": "whoosh"
+ },
+ "softwhoosh": {
+  "ids": [
+   57
+  ],
+  "role": "whoosh"
+ },
+ "pop": {
+  "ids": [
+   65
+  ],
+  "role": "ui"
+ },
+ "punch": {
+  "ids": [
+   55
+  ],
+  "role": "hit"
+ },
+ "impact": {
+  "ids": [
+   28
+  ],
+  "role": "hit"
+ },
+ "lowhit": {
+  "ids": [
+   29
+  ],
+  "role": "hit"
+ },
+ "riser": {
+  "ids": [
+   43
+  ],
+  "role": "riser"
+ },
+ "brightriser": {
+  "ids": [
+   44
+  ],
+  "role": "riser"
+ },
+ "chime": {
+  "ids": [
+   61
+  ],
+  "role": "ui"
+ }
+}

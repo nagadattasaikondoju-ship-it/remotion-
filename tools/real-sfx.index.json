@@ -1,5 +1,5 @@
 {
- "count": 66,
+ "count": 71,
  "libraries": [
   {
    "name": "main",
@@ -2257,6 +2257,170 @@
     "dry"
    ],
    "id": 65
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/sink-drain-water/drain_swirl.wav",
+   "folder": "sink-drain-water",
+   "name": "drain swirl",
+   "role": "water",
+   "roles": [
+    "water"
+   ],
+   "duration": 3.0,
+   "peak_db": -1.0,
+   "mean_db": -16.5,
+   "peak_time": 0.51,
+   "lr_corr": 1.0,
+   "attack_ms": 370,
+   "decay_ms": 2490,
+   "centroid": 1135,
+   "rolloff": 2031,
+   "low": 0.116,
+   "high": 0.087,
+   "flat": 0.306,
+   "bumps": 2.9,
+   "active_dur": 3.0,
+   "onset_count": 4,
+   "words": [
+    "swelling",
+    "warm",
+    "textured",
+    "long",
+    "long-tail"
+   ],
+   "id": 66
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/ice-crack/tartar_crack.wav",
+   "folder": "ice-crack",
+   "name": "tartar crack",
+   "role": "hit",
+   "roles": [
+    "hit"
+   ],
+   "duration": 1.03,
+   "peak_db": -1.0,
+   "mean_db": -39.8,
+   "peak_time": 0.79,
+   "lr_corr": 0.18,
+   "attack_ms": 140,
+   "decay_ms": 90,
+   "centroid": 3154,
+   "rolloff": 4187,
+   "low": 0.016,
+   "high": 0.184,
+   "flat": 0.334,
+   "bumps": 3.3,
+   "active_dur": 1.01,
+   "words": [
+    "swelling",
+    "bright",
+    "thin",
+    "textured",
+    "medium"
+   ],
+   "id": 67
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/magic-sparkle/gleam_sparkle.wav",
+   "folder": "magic-sparkle",
+   "name": "gleam sparkle",
+   "role": "chime",
+   "roles": [
+    "chime"
+   ],
+   "duration": 1.77,
+   "peak_db": -1.0,
+   "mean_db": -24.4,
+   "peak_time": 0.85,
+   "lr_corr": 0.46,
+   "attack_ms": 980,
+   "decay_ms": 730,
+   "centroid": 6808,
+   "rolloff": 7562,
+   "low": 0.0,
+   "high": 0.995,
+   "flat": 0.002,
+   "bumps": 2.4,
+   "active_dur": 1.77,
+   "words": [
+    "slow-build",
+    "airy",
+    "thin",
+    "tonal",
+    "long",
+    "long-tail"
+   ],
+   "id": 68
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/electric-toothbrush/scaler_buzz.wav",
+   "folder": "electric-toothbrush",
+   "name": "scaler buzz",
+   "role": "misc",
+   "roles": [],
+   "duration": 3.6,
+   "peak_db": -1.0,
+   "mean_db": -20.1,
+   "peak_time": 0.63,
+   "lr_corr": -0.4,
+   "mono_ref": 0,
+   "attack_ms": 620,
+   "decay_ms": 2970,
+   "centroid": 4391,
+   "rolloff": 6312,
+   "low": 0.006,
+   "high": 0.57,
+   "flat": 0.669,
+   "bumps": 1.7,
+   "active_dur": 3.6,
+   "words": [
+    "slow-build",
+    "bright",
+    "thin",
+    "noisy",
+    "long",
+    "long-tail"
+   ],
+   "id": 69
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/boing-spring/wobble_boing.wav",
+   "folder": "boing-spring",
+   "name": "wobble boing",
+   "role": "misc",
+   "roles": [],
+   "duration": 0.766,
+   "peak_db": -1.0,
+   "mean_db": -20.9,
+   "peak_time": 0.05,
+   "lr_corr": 1.0,
+   "attack_ms": 20,
+   "decay_ms": 420,
+   "centroid": 992,
+   "rolloff": 1203,
+   "low": 0.104,
+   "high": 0.0,
+   "flat": 0.011,
+   "bumps": 5.3,
+   "active_dur": 0.68,
+   "words": [
+    "punchy",
+    "warm",
+    "tonal",
+    "medium"
+   ],
+   "id": 70
   }
  ]
 }
