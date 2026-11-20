@@ -4,15 +4,19 @@
 #    white flash (endcard/: the Jerry reel's card, backdrop = frame 1030), held 5 s;
 #  - sound: the original soundtrack up to 35.25 s; from there the music/SFX bed alone (Demucs stem), so the line
 #    "Call Next Care Dental today" is gone; the bed is extended under the longer card; card SFX through the sound pipeline.
+# v3 (20 Nov, the clinic found v2 dim / not clear): the same edit with a clarity grade on the reel part: a curve that pulls the
+#  milky white haze out of the midtones and deepens blacks, +12% saturation, local-contrast "clarity" (wide unsharp) and a fine
+#  sharpen; the card's backdrop (endcard/out/last_frame.png) is graded the same way so the hand-off doesn't jump. Higher-bitrate encodes.
 #   REF=<reference.mp4> STEMS=<dir with music_sfx.wav> bash build_brand.sh
 set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd); REPO=$(cd "$HERE/../.." && pwd); cd "$HERE"
 REF=${REF:?reference video}; STEMS=${STEMS:?folder with music_sfx.wav}
-N=DrSriSushma_WisdomTeeth_v2_1080x1920_30fps; KEEP=1031; FPS=30
+N=DrSriSushma_WisdomTeeth_v3_HD_1080x1920_30fps; KEEP=1031; FPS=30
+GRADE="curves=master='0/0 0.10/0.06 0.35/0.30 0.65/0.61 0.90/0.90 1/1',eq=contrast=1.05:saturation=1.12,unsharp=lx=13:ly=13:la=0.35:cx=3:cy=3:ca=0,unsharp=5:5:0.55:3:3:0"
 DUR=$(python3 -c "print(round(($KEEP+150)/$FPS,4))" 2>/dev/null); CUT=34.80
 ffmpeg -nostdin -v error -y -i out/base_up.mp4 -i endcard/out/card.mp4 -filter_complex \
-  "[0:v]trim=end_frame=$KEEP,setpts=PTS-STARTPTS[a];[a][1:v]concat=n=2:v=1:a=0,format=yuv420p[v]" -map "[v]" \
-  -c:v libx264 -preset slow -crf 12 -profile:v high -colorspace bt709 -color_primaries bt709 -color_trc bt709 -r $FPS out/picture_v2.mp4
+  "[0:v]trim=end_frame=$KEEP,setpts=PTS-STARTPTS,$GRADE[a];[a][1:v]concat=n=2:v=1:a=0,format=yuv420p[v]" -map "[v]" \
+  -c:v libx264 -preset slow -crf 10 -tune film -profile:v high -colorspace bt709 -color_primaries bt709 -color_trc bt709 -r $FPS out/picture_v2.mp4
 # soundtrack: original until CUT, then the music bed; the bed's last 2 s looped once (0.5 s crossfade) and faded out under the card
 ffmpeg -nostdin -v error -y -i "$REF" -i "$STEMS/music_sfx.wav" -filter_complex "
   [0:a]aresample=48000,atrim=0:$CUT,asetpts=PTS-STARTPTS[o];
@@ -43,7 +47,7 @@ m() { echo "$J" | python3 -I -c "import json,sys; print(json.load(sys.stdin)['$1
 ffmpeg -nostdin -v error -y -i out/_pre.wav -af "loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(m input_i):measured_TP=$(m input_tp):measured_LRA=$(m input_lra):measured_thresh=$(m input_thresh):offset=$(m target_offset):linear=true,aresample=48000,apad,atrim=0:$DUR" -c:a pcm_s24le out/mix_v2.wav
 rm -f out/_pre.wav
 ffmpeg -nostdin -v error -y -i out/picture_v2.mp4 -i out/mix_v2.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 320k -t $DUR -movflags +faststart out/${N}_MASTER.mp4
-ffmpeg -nostdin -v error -y -i out/picture_v2.mp4 -i out/mix_v2.wav -map 0:v -map 1:a -c:v libx264 -preset slow -crf 17 -pix_fmt yuv420p -profile:v high \
-  -c:a aac -b:a 256k -t $DUR -movflags +faststart out/${N}_share.mp4
+ffmpeg -nostdin -v error -y -i out/picture_v2.mp4 -i out/mix_v2.wav -map 0:v -map 1:a -c:v libx264 -preset slow -crf 15 -tune film -pix_fmt yuv420p -profile:v high \
+  -colorspace bt709 -color_primaries bt709 -color_trc bt709 -c:a aac -b:a 256k -t $DUR -movflags +faststart out/${N}_share.mp4
 for f in out/${N}_*.mp4; do echo "$f $(ffprobe -v error -show_entries format=duration,size -of csv=p=0 "$f")"; done
 ffmpeg -nostdin -hide_banner -i out/${N}_share.mp4 -af ebur128=peak=true -f null - 2>&1 | grep -E "^\s+I:|Peak:"
