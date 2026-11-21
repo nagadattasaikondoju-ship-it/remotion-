@@ -22,9 +22,10 @@
 | 00:18.60 | riser | riser (43) | build to the rescue (ends on the hero flash) |
 | 00:19.20 | texture | boing (70) | Moti wobbles (impact frames, WOBBLE?! stamp) |
 | 00:20.20 | hit | impact (28) | hero entrance: impact frames, golden light |
-| 00:20.25 | texture | sparkle (68) | golden sparkle as the clinic badge appears |
-| 00:21.56 | texture | pop (65) | DR. SRI SUSHMA plate lands |
-| 00:22.44 | texture | pop (65) | GUM SPECIALIST pill lands |
+| 00:20.25 | texture | sparkle (68) | golden sparkle as the clinic pops up |
+| 00:20.50 | texture | pop (65) | clinic logo badge pops on the roof |
+| 00:21.50 | texture | pop (65) | DR. SRI SUSHMA plate lands (on screen only) |
+| 00:22.35 | texture | pop (65) | GUM SPECIALIST · PERIODONTIST pill lands |
 | 00:24.10 | texture | scaler (69) | ultrasonic scaler sweeps the gum line (diegetic hum) |
 | 00:24.45 | whoosh | softwhoosh (57) | hero badge flies out |
 | 00:24.85 | hit | crack (67) | first tartar rocks shatter |

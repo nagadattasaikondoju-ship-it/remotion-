@@ -338,8 +338,8 @@ window.TL = {
   {
    "i": 7,
    "start": 20.2,
-   "end": 23.501,
-   "text": "That's when Moti met Doctor Sri Sushma, a gum specialist.",
+   "end": 22.644,
+   "text": "That's when Moti found the right dental clinic.",
    "words": [
     {
      "w": "That's",
@@ -349,50 +349,40 @@ window.TL = {
     {
      "w": "when",
      "s": 20.48,
-     "e": 20.6
+     "e": 20.64
     },
     {
      "w": "Moti",
-     "s": 20.6,
-     "e": 20.86
+     "s": 20.64,
+     "e": 20.92
     },
     {
-     "w": "met",
-     "s": 20.86,
-     "e": 21.14
+     "w": "found",
+     "s": 20.92,
+     "e": 21.24
     },
     {
-     "w": "Doctor",
-     "s": 21.14,
-     "e": 21.52
+     "w": "the",
+     "s": 21.24,
+     "e": 21.44
     },
     {
-     "w": "Sri",
-     "s": 21.52,
-     "e": 21.76
+     "w": "right",
+     "s": 21.44,
+     "e": 21.7
     },
     {
-     "w": "Sushma,",
-     "s": 21.76,
-     "e": 22.24
+     "w": "dental",
+     "s": 21.7,
+     "e": 22.1
     },
     {
-     "w": "a",
-     "s": 22.44,
-     "e": 22.54
-    },
-    {
-     "w": "gum",
-     "s": 22.54,
-     "e": 22.7
-    },
-    {
-     "w": "specialist.",
-     "s": 22.7,
-     "e": 23.16
+     "w": "clinic.",
+     "s": 22.1,
+     "e": 22.46
     }
    ],
-   "heard": "That's when Moti met Doctor Sri Sushma, a gum specialist."
+   "heard": "That's when Moti found the right dental clinic."
   },
   {
    "i": 8,
@@ -570,56 +560,31 @@ window.TL = {
   {
    "i": 10,
    "start": 34.3,
-   "end": 37.046,
-   "text": "Book your gum check-up with Doctor Sri Sushma today.",
+   "end": 35.861,
+   "text": "Book your appointment today.",
    "words": [
     {
      "w": "Book",
      "s": 34.3,
-     "e": 34.52
+     "e": 34.5
     },
     {
      "w": "your",
-     "s": 34.52,
+     "s": 34.5,
      "e": 34.72
     },
     {
-     "w": "gum",
+     "w": "appointment",
      "s": 34.72,
-     "e": 34.98
-    },
-    {
-     "w": "check-up",
-     "s": 34.98,
-     "e": 35.22
-    },
-    {
-     "w": "with",
-     "s": 35.22,
-     "e": 35.44
-    },
-    {
-     "w": "Doctor",
-     "s": 35.44,
-     "e": 35.68
-    },
-    {
-     "w": "Sri",
-     "s": 35.68,
-     "e": 35.96
-    },
-    {
-     "w": "Sushma",
-     "s": 35.96,
-     "e": 36.22
+     "e": 35.14
     },
     {
      "w": "today.",
-     "s": 36.22,
-     "e": 36.62
+     "s": 35.14,
+     "e": 35.62
     }
    ],
-   "heard": "Book your gum check -up with Doctor Sri Sushma today."
+   "heard": "Book your appointment today."
   }
  ]
 };

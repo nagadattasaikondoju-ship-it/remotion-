@@ -125,19 +125,25 @@
   "t": 20.25,
   "type": "sparkle",
   "g": 0.5,
-  "note": "golden sparkle as the clinic badge appears"
+  "note": "golden sparkle as the clinic pops up"
  },
  {
-  "t": 21.56,
+  "t": 20.5,
   "type": "pop",
   "g": 0.5,
-  "note": "DR. SRI SUSHMA plate lands"
+  "note": "clinic logo badge pops on the roof"
  },
  {
-  "t": 22.44,
+  "t": 21.5,
+  "type": "pop",
+  "g": 0.5,
+  "note": "DR. SRI SUSHMA plate lands (on screen only)"
+ },
+ {
+  "t": 22.35,
   "type": "pop",
   "g": 0.4,
-  "note": "GUM SPECIALIST pill lands"
+  "note": "GUM SPECIALIST \u00b7 PERIODONTIST pill lands"
  },
  {
   "t": 24.1,

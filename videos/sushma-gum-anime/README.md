@@ -7,6 +7,8 @@
 - **Style:** anime cel shading (ten-styles-reel skill, style 06): two-tone hard shadows, bold ink lines, saturated sky with
   cumulus, speed lines, 3 black/white impact frames + a colour frame on the hook, the wobble and the hero entrance, lens flare.
 - **Story:** sink hook → Moti the molar → a little blood → "it's normal" → plaque hardens into tartar, gums angry → gums pull
+  back, Moti wobbles → "found the right dental clinic": an anime clinic building with the logo badge, DR. SRI SUSHMA + GUM SPECIALIST ·
+  PERIODONTIST pop on screen (the name is never spoken, user's call 21 Nov) → scaler deep cleaning → "Don't wait for the wobble" →
   back, Moti wobbles → Dr. Sri Sushma (clinic badge, gum specialist) → scaler deep cleaning, tartar shatters, gums calm → "Don't
   wait for the wobble" → the clinic's full details card (same card as the clinic's other reels).
 - **Voice:** local Kokoro, Indian female voice (hf_beta) with English phonemes; "Sushma" and "Moti" set by hand (`tts.mjs`).

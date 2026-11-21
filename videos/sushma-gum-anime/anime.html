@@ -32,7 +32,7 @@ const word = (li, re) => { const w = L[li - 1].words.find(w => re.test(w.w)); re
 const tSink = word(1, /^sink/i), tBlood = word(3, /blood/i), tNormal = word(4, /normal/i), tIgnored = word(4, /ignored/i);
 const tPlaque = word(5, /plaque/i), tTartar = word(5, /tartar/i), tAngry = word(5, /angry/i);
 const tRed = word(5, /^Red/), tSwollen = word(5, /Swollen/), tBleeding = word(5, /^Bleeding/);
-const tPulling = word(6, /pulling/i), tWobble = word(6, /wobble/i), tSushma = word(7, /Sushma/), tGum7 = word(7, /^gum/);
+const tPulling = word(6, /pulling/i), tWobble = word(6, /wobble/i), tPlate = word(7, /dental/i), tPill = word(7, /clinic/i) + .35;
 const tGone = word(8, /gone/i), tCalmed = word(8, /calmed/i), tStrong = word(8, /strong/i);
 const tEarly = word(9, /early/i), tDont = word(9, /Don't/), tWob9 = word(9, /wobble/i);
 
@@ -46,8 +46,8 @@ const GAPS = [-90, 296, 784, 1170];
 
 // ---------- camera keyframes [t, zoom, cx, cy] ----------
 const CAM = [[T2, 1.0, 540, 960], [T3 - .2, 1.04, 540, 960], [tBlood - .3, 1.2, 560, 1080], [T4 + .2, .96, 540, 960], [T5 + 1, 1.0, 540, 1000],
-  [tAngry + .5, 1.12, 540, 1060], [T6, 1.12, 540, 1060], [tWobble - .2, 1.28, 540, 1010], [T7 - .05, 1.3, 540, 1000], [T7 + .25, .92, 540, 760],
-  [T8 - .2, .94, 540, 780], [T8 + .5, 1.08, 540, 1040], [tStrong - .3, 1.08, 540, 1020], [T9 + .3, 1.0, 540, 960], [TEND, 1.03, 540, 950]];
+  [tAngry + .5, 1.12, 540, 1060], [T6, 1.12, 540, 1060], [tWobble - .2, 1.28, 540, 1010], [T7 - .05, 1.3, 540, 1000], [T7 + .25, .92, 540, 700],
+  [T8 - .2, .94, 540, 720], [T8 + .5, 1.08, 540, 1040], [tStrong - .3, 1.08, 540, 1020], [T9 + .3, 1.0, 540, 960], [TEND, 1.03, 540, 950]];
 function cam(t) {
   if (t <= CAM[0][0]) return CAM[0].slice(1);
   for (let i = 0; i < CAM.length - 1; i++) {
@@ -307,6 +307,37 @@ function shards(t, tipAt) {
 const TIP0 = 300, TIP1 = 800;
 function tipAtG(x) { const k = (x - TIP0) / (TIP1 - TIP0); if (k < 0 || k > 1) return null;
   let lo = 0, hi = 1; for (let i = 0; i < 20; i++) { const m = (lo + hi) / 2; if (eio(m) < k) lo = m; else hi = m; } return T8 + .3 + lo * 3.0; }
+
+// ---------- the clinic (anime building, local coords: body x -300..300, y -190..215) ----------
+function clinic(t) {
+  X.lineJoin = 'round'; X.strokeStyle = INK;
+  // body with a cel shadow side
+  X.fillStyle = '#F4F8FD'; X.lineWidth = 8; X.beginPath(); X.roundRect(-300, -190, 600, 405, 18); X.fill();
+  X.save(); X.beginPath(); X.roundRect(-300, -190, 600, 405, 18); X.clip(); X.fillStyle = '#CADDF2'; X.fillRect(205, -200, 120, 430); X.restore();
+  X.beginPath(); X.roundRect(-300, -190, 600, 405, 18); X.stroke();
+  // roof band + sign board
+  X.fillStyle = '#1F74C8'; X.beginPath(); X.roundRect(-322, -212, 644, 78, 16); X.fill(); X.stroke();
+  X.fillStyle = '#4CABFE'; X.fillRect(-310, -204, 620, 14);
+  X.fillStyle = '#FFFFFF'; X.lineWidth = 6; X.beginPath(); X.roundRect(-235, -118, 470, 74, 14); X.fill(); X.stroke();
+  X.fillStyle = '#0B3F7F'; X.font = '62px Bangers'; X.textAlign = 'center'; X.textBaseline = 'middle'; X.fillText('DENTAL CLINIC', 0, -80);
+  // windows: glass with a moving shine
+  const win = (x, y, w, h) => { const g = X.createLinearGradient(x, y, x, y + h); g.addColorStop(0, '#9FD8FF'); g.addColorStop(1, '#4C9BE8');
+    X.fillStyle = g; X.lineWidth = 6; X.beginPath(); X.roundRect(x, y, w, h, 8); X.fill(); X.stroke();
+    X.save(); X.beginPath(); X.roundRect(x, y, w, h, 8); X.clip(); const sx = x - 60 + ((t * 120 + x) % (w + 160));
+    X.fillStyle = 'rgba(255,255,255,.55)'; X.beginPath(); X.moveTo(sx, y + h); X.lineTo(sx + 26, y + h); X.lineTo(sx + 66, y); X.lineTo(sx + 40, y); X.fill(); X.restore();
+    X.strokeStyle = 'rgba(22,24,46,.6)'; X.lineWidth = 4; X.beginPath(); X.moveTo(x + w / 2, y); X.lineTo(x + w / 2, y + h); X.stroke(); X.strokeStyle = INK; };
+  for (const x of [-270, -150, 50, 170]) win(x, -20, 100, 84);
+  for (const x of [-270, 170]) win(x, 98, 100, 84);
+  // door with a tooth sign above
+  X.fillStyle = '#1F74C8'; X.lineWidth = 7; X.beginPath(); X.roundRect(-88, 72, 176, 145, 10); X.fill(); X.stroke();
+  win(-74, 86, 70, 128); win(4, 86, 70, 128);
+  X.save(); X.translate(0, 50); X.scale(.2, .2); toothPath(1); X.fillStyle = '#FFFFFF'; X.fill(); X.lineWidth = 22; X.stroke(); X.restore();
+  // steps, path and bushes
+  X.fillStyle = '#D9DEE8'; X.lineWidth = 6; X.beginPath(); X.roundRect(-120, 214, 240, 22, 6); X.fill(); X.stroke();
+  for (const [bx, r] of [[-300, 58], [-232, 44], [300, 58], [232, 44]]) {
+    X.fillStyle = '#3F9B4A'; X.beginPath(); X.arc(bx, 205, r, 0, 6.28); X.fill(); X.lineWidth = 6; X.stroke();
+    X.fillStyle = '#6CC26F'; X.beginPath(); X.arc(bx - r * .2, 205 - r * .25, r * .62, 0, 6.28); X.fill(); }
+}
 // ---------- props ----------
 function toothbrush(x, y, rot) {
   X.save(); X.translate(x, y); X.rotate(rot);
@@ -382,7 +413,7 @@ function sinkScene(t) {
 
 // ---------- captions ----------
 const STAMPED = new Set(['Red.', 'Swollen.', 'Bleeding.']);
-const KEY = /blood|normal|ignored|tartar|angry|wobble|Sushma|gum|strong|early|deep|cleaning|disease/i;
+const KEY = /blood|normal|ignored|tartar|angry|wobble|clinic|gum|strong|early|deep|cleaning|disease|appointment/i;
 const CHUNKS = (() => {
   const out = [];
   for (const ln of L) {
@@ -526,19 +557,25 @@ function draw(t) {
   stamp(t, tSwollen, 'SWOLLEN!', 610, 720, 150, '#FF5A3C', .08, T6 - tSwollen);
   stamp(t, tBleeding, 'BLEEDING!', 470, 880, 160, '#E5143A', -.06, T6 - tBleeding);
   stamp(t, tWobble - .05, 'WOBBLE?!', 510, 520, 190, '#FFD24A', -.08, T7 - tWobble);
-  // hero plate
+  // hero: the clinic pops up in the golden light, logo badge on the roof, name + speciality on screen (not spoken)
   if (t > T7 && t < T8 + 1.2) {
-    const k = back(seg(t, T7 + .1, T7 + .55)), out = seg(t, T8 + .6, T8 + 1.2), y0 = 480 - out * 700;
-    X.save(); X.translate(510, y0); X.scale(k, k);
-    const rg = X.createRadialGradient(0, 0, 60, 0, 0, 300); rg.addColorStop(0, 'rgba(255,240,170,.9)'); rg.addColorStop(1, 'rgba(255,240,170,0)'); X.fillStyle = rg; X.beginPath(); X.arc(0, 0, 300, 0, 6.28); X.fill();
-    X.beginPath(); X.arc(0, 0, 190, 0, 6.28); X.fillStyle = '#FFFFFF'; X.fill(); X.lineWidth = 16; X.strokeStyle = '#E6B23A'; X.stroke(); X.lineWidth = 6; X.strokeStyle = INK; X.stroke();
-    X.save(); X.beginPath(); X.arc(0, 0, 178, 0, 6.28); X.clip(); const lw = 330, lh = lw * LOGO.naturalHeight / LOGO.naturalWidth; X.drawImage(LOGO, -lw / 2, -lh / 2 + 6, lw, lh); X.restore();
+    const k = back(seg(t, T7 + .08, T7 + .5)), out = eio(seg(t, T8 + .6, T8 + 1.2)), y0 = 560 - out * 900;
+    X.save(); X.translate(510, y0);
+    const rg = X.createRadialGradient(0, -40, 80, 0, -40, 520); rg.addColorStop(0, 'rgba(255,244,190,.95)'); rg.addColorStop(1, 'rgba(255,244,190,0)');
+    X.fillStyle = rg; X.beginPath(); X.arc(0, -40, 520, 0, 6.28); X.fill();
+    X.save(); X.translate(0, 215); X.scale(k, k); X.translate(0, -215);
+    clinic(t);
     X.restore();
-    const k2 = back(seg(t, tSushma - .25, tSushma + .1)); if (k2 > 0) { X.save(); X.translate(510, y0 + 290); X.scale(k2, k2);
+    const kb = back(seg(t, T7 + .3, T7 + .7)); if (kb > 0) { X.save(); X.translate(0, -238); X.scale(kb, kb);
+      X.beginPath(); X.arc(0, 0, 118, 0, 6.28); X.fillStyle = '#FFFFFF'; X.fill(); X.lineWidth = 14; X.strokeStyle = '#E6B23A'; X.stroke(); X.lineWidth = 6; X.strokeStyle = INK; X.stroke();
+      X.save(); X.beginPath(); X.arc(0, 0, 108, 0, 6.28); X.clip(); const lw = 206, lh = lw * LOGO.naturalHeight / LOGO.naturalWidth; X.drawImage(LOGO, -lw / 2, -lh / 2 + 4, lw, lh); X.restore();
+      X.restore(); sparkles(t, 0, -238, 200, 120, 6, 21, '#FFFFFF', 26); }
+    X.restore();
+    const k2 = back(seg(t, tPlate - .2, tPlate + .12)); if (k2 > 0) { X.save(); X.translate(510, y0 + 305); X.scale(k2, k2);
       X.fillStyle = '#0B3F7F'; X.strokeStyle = INK; X.lineWidth = 7; X.beginPath(); X.roundRect(-400, -62, 800, 124, 30); X.fill(); X.stroke();
       X.lineWidth = 6; X.strokeStyle = '#E6B23A'; X.beginPath(); X.roundRect(-388, -50, 776, 100, 24); X.stroke();
       txt('DR. SRI SUSHMA', 0, 4, 92, '#FFFFFF', '#0B3F7F', 0, 'Bangers', 0, 'center', false); X.restore(); }
-    const k3 = back(seg(t, tGum7 - .15, tGum7 + .15)); if (k3 > 0) { X.save(); X.translate(510, y0 + 400); X.scale(k3, k3);
+    const k3 = back(seg(t, tPill - .15, tPill + .15)); if (k3 > 0) { X.save(); X.translate(510, y0 + 412); X.scale(k3, k3);
       X.fillStyle = '#E6B23A'; X.strokeStyle = INK; X.lineWidth = 6; X.beginPath(); X.roundRect(-390, -40, 780, 80, 40); X.fill(); X.stroke();
       X.fillStyle = INK; X.font = '900 38px MB'; X.textAlign = 'center'; X.textBaseline = 'middle'; X.fillText('GUM SPECIALIST · PERIODONTIST', 0, 3); X.restore(); }
   }
