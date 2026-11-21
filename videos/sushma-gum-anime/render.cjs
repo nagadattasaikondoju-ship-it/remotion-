@@ -1,6 +1,7 @@
 // Render anime.html frame by frame (Playwright + preinstalled Chromium) at 2x = 2160x3840 (4K master intermediate).
 //   node render.cjs                    -> out/anime_4k.mp4 (0 .. TEND)
 //   node render.cjs --stills 1.2 5 ... -> out/stills/s_<t>.jpg (540x960 QA)
+//   FROM=600 TO=760 OUT=part.mp4 node render.cjs -> re-render frames 600..759 only (splice into anime_4k.mp4)
 //   node render.cjs --last             -> out/last_frame.png (1080x1920, the card's backdrop)
 const { chromium } = require('playwright');
 const fs = require('fs'), path = require('path'), { spawn } = require('child_process');
@@ -29,9 +30,9 @@ const run = (args) => new Promise(r => spawn('ffmpeg', args, { stdio: 'inherit' 
   }
   const enc = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-',
     '-vf', 'format=yuv420p', '-c:v', 'libx264', '-preset', 'medium', '-crf', '10', '-tune', 'animation', '-r', String(FPS),
-    path.join(HERE, 'out', 'anime_4k.mp4')], { stdio: ['pipe', 'inherit', 'inherit'] });
-  const N = Math.round(TEND * FPS), t0 = Date.now();
-  for (let f = 0; f < N; f++) {
+    path.join(HERE, 'out', process.env.OUT || 'anime_4k.mp4')], { stdio: ['pipe', 'inherit', 'inherit'] });
+  const N = Math.round(TEND * FPS), t0 = Date.now(), F0 = Number(process.env.FROM || 0), F1 = Number(process.env.TO || N);
+  for (let f = F0; f < F1; f++) {
     const buf = await grab(f / FPS);
     if (!enc.stdin.write(buf)) await new Promise(r => enc.stdin.once('drain', r));
     if (f % 60 === 0) console.log(`frame ${f}/${N}  ${((Date.now() - t0) / 1000).toFixed(0)} s`);
