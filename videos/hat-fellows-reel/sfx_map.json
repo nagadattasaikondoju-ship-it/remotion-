@@ -1,0 +1,9 @@
+{
+ "cardwhoosh": {"ids": [52, 56, 50, 53, 52], "role": "whoosh"},
+ "riser": {"ids": [43], "role": "riser"},
+ "hit": {"ids": [28], "role": "hit"},
+ "strike": {"ids": [53], "role": "whoosh"},
+ "stamp": {"ids": [18, 17], "role": "hit"},
+ "live": {"ids": [61], "role": "ui"},
+ "sparkle": {"ids": [60], "role": "ui"}
+}

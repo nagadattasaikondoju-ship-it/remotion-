@@ -1,0 +1,87 @@
+{
+  "name": "@makemyclip/editor",
+  "version": "0.0.0-development",
+  "description": "AI-native video editor — talk to Claude to make video. Trim, zoom, caption, and assemble clips via the clip CLI and a Claude Code skill.",
+  "keywords": [
+    "video-editing",
+    "ffmpeg",
+    "claude",
+    "claude-code",
+    "agent-skill",
+    "ai-video",
+    "typescript"
+  ],
+  "homepage": "https://github.com/MakeMyClip/editor",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MakeMyClip/editor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/MakeMyClip/editor/issues"
+  },
+  "license": "MIT",
+  "author": "MakeMyClip",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "bin": {
+    "clip": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "SKILL.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=24"
+  },
+  "packageManager": "pnpm@12.16.1",
+  "scripts": {
+    "build": "tsup && pnpm build:ui",
+    "build:ui": "vite build --config src/ui/web/vite.config.ts",
+    "dev": "tsx src/cli.ts",
+    "dev:ui": "vite --config src/ui/web/vite.config.ts",
+    "start": "node dist/cli.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "type-check": "tsc --noEmit && tsc --noEmit -p src/ui/web/tsconfig.json",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "prepublishOnly": "pnpm build"
+  },
+  "dependencies": {
+    "@hono/node-server": "^2.1.5",
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "execa": "^10.2.1",
+    "ffmpeg-static": "^5.3.0",
+    "get-port": "^7.2.0",
+    "hono": "^4.13.14",
+    "open": "^11.0.4",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.4",
+    "@semantic-release/changelog": "^7.0.0",
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/exec": "^7.1.0",
+    "@semantic-release/github": "^12.0.10",
+    "@semantic-release/npm": "^13.2.0",
+    "@semantic-release/release-notes-generator": "^14.1.1",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "semantic-release": "^25.0.9",
+    "tsup": "^9.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  }
+}

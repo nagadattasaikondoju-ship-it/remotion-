@@ -1,0 +1,559 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Claude Website Listicle Part 2</title>
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      :root {
+        --yel: #ffd60a;
+        --ink: #1b1d22;
+        --mute: #6b7180;
+        --line: #e6e8ee;
+        --soft: #f4f5f8;
+        --green: #22a35a;
+        --del: #ff5b4d;
+        --ol4: 4px 0 #000, -4px 0 #000, 0 4px #000, 0 -4px #000, 2.8px 2.8px #000, -2.8px 2.8px #000, 2.8px -2.8px #000,
+          -2.8px -2.8px #000, 3.7px 1.5px #000, -3.7px 1.5px #000, 3.7px -1.5px #000, -3.7px -1.5px #000, 1.5px 3.7px #000,
+          -1.5px 3.7px #000, 1.5px -3.7px #000, -1.5px -3.7px #000, 0 7px 12px rgba(0, 0, 0, 0.45);
+        --ol3: 3px 0 #000, -3px 0 #000, 0 3px #000, 0 -3px #000, 2.1px 2.1px #000, -2.1px 2.1px #000, 2.1px -2.1px #000,
+          -2.1px -2.1px #000, 0 5px 10px rgba(0, 0, 0, 0.45);
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1080px; height: 1920px; overflow: hidden; background: #111; }
+      #root {
+        position: relative; width: 1080px; height: 1920px; overflow: hidden; color: #fff;
+        font-family: "Liberation Sans", Arial, Helvetica, sans-serif;
+      }
+      .abs { position: absolute; }
+
+      /* ---------- footage ---------- */
+      #cam { position: absolute; inset: 0; transform-origin: 50% 52%; }
+      #cam video { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; object-fit: cover; }
+      #shade { position: absolute; left: 0; right: 0; bottom: 0; height: 640px; background: linear-gradient(to top, rgba(0,0,0,0.42), rgba(0,0,0,0)); }
+
+      /* ---------- headline ---------- */
+      #title {
+        position: absolute; left: 0; right: 0; top: 92px; text-align: center; font-weight: 700; font-size: 64px;
+        line-height: 1.1; letter-spacing: -0.01em; text-shadow: var(--ol4);
+      }
+      #title span { display: inline-block; }
+      #title .hl { color: var(--yel); }
+
+      /* ---------- checklist ---------- */
+      .grp { position: absolute; left: 0; top: 0; width: 380px; height: 1000px; }
+      .row { position: absolute; left: 0; width: 380px; height: 96px; }
+      .num {
+        position: absolute; left: 10px; top: 50%; width: 84px; margin-top: -30px; text-align: right; font-weight: 700;
+        font-size: 54px; line-height: 60px; letter-spacing: -0.03em; text-shadow: var(--ol4); transform-origin: 80% 50%;
+      }
+      .lbl {
+        position: absolute; left: 106px; top: 50%; width: 250px; transform: translateY(-50%); font-weight: 700;
+        font-size: 33px; line-height: 1.05; letter-spacing: -0.01em; text-shadow: var(--ol4);
+      }
+      .lbl span { display: inline-block; transform-origin: 0% 60%; }
+
+      /* ---------- browser mockup ---------- */
+      #browser {
+        position: absolute; left: 588px; top: 300px; width: 470px; height: 462px; border-radius: 22px; background: #fff;
+        overflow: hidden; box-shadow: 0 22px 60px rgba(0,0,0,0.38), 0 0 0 2px rgba(255,255,255,0.6); color: var(--ink);
+      }
+      #bar { position: absolute; left: 0; top: 0; right: 0; height: 44px; background: #eceef2; }
+      .dot { position: absolute; top: 15px; width: 14px; height: 14px; border-radius: 50%; }
+      #url {
+        position: absolute; left: 92px; right: 18px; top: 9px; height: 26px; border-radius: 13px; background: #fff;
+        font-size: 15px; line-height: 26px; color: #5d6370; padding-left: 14px; font-weight: 700;
+      }
+      #nav { position: absolute; left: 0; right: 0; top: 44px; height: 52px; border-bottom: 2px solid var(--line); }
+      #logo { position: absolute; left: 20px; top: 13px; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+      #logo i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; background: var(--yel); margin-right: 7px; transform: rotate(45deg) translateY(-2px); box-shadow: 0 0 0 2px var(--ink); }
+      #navcta { position: absolute; right: 16px; top: 10px; height: 32px; line-height: 32px; padding: 0 14px; border-radius: 9px; background: var(--ink); color: #fff; font-size: 15px; font-weight: 700; }
+      #body { position: absolute; left: 0; right: 0; top: 96px; bottom: 0; overflow: hidden; }
+      .pn { position: absolute; inset: 0; padding: 22px 24px; }
+      .h { font-size: 27px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; }
+      .sm { font-size: 18px; color: var(--mute); font-weight: 700; }
+      .btn { position: absolute; border-radius: 12px; text-align: center; font-weight: 700; }
+      .by { background: var(--yel); color: var(--ink); }
+      .bk { background: var(--ink); color: #fff; }
+      .bo { background: #fff; color: var(--ink); box-shadow: inset 0 0 0 2.5px var(--ink); }
+      .ln { position: absolute; height: 12px; border-radius: 6px; background: var(--line); }
+      .ic { position: absolute; width: 30px; height: 30px; border-radius: 50%; }
+      .ic svg { position: absolute; left: 7px; top: 7px; }
+      .ix { background: #eceef2; }
+      .iv { background: #dcf3e6; }
+      .rw { position: absolute; left: 24px; right: 20px; height: 44px; font-size: 21px; font-weight: 700; line-height: 30px; }
+      .rw .t { position: absolute; left: 44px; top: 0; }
+      .field { position: absolute; left: 24px; right: 24px; height: 40px; border-radius: 10px; background: var(--soft); box-shadow: inset 0 0 0 2px var(--line); font-size: 18px; line-height: 40px; padding-left: 14px; color: var(--mute); font-weight: 700; }
+      .tag { position: absolute; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; padding: 4px 9px; border-radius: 6px; background: #eef0f4; color: #5d6370; }
+      #cursor { position: absolute; left: 0; top: 0; width: 34px; height: 40px; z-index: 5; }
+
+      /* ---------- supporting overlay ---------- */
+      #notes { position: absolute; left: 588px; top: 780px; width: 470px; height: 60px; }
+      .note {
+        position: absolute; right: 0; top: 0; height: 54px; line-height: 54px; padding: 0 20px; border-radius: 14px;
+        background: var(--ink); color: #fff; font-size: 27px; font-weight: 700; white-space: nowrap;
+        box-shadow: 0 10px 26px rgba(0,0,0,0.35);
+      }
+      .note b { color: var(--yel); }
+
+      /* ---------- captions ---------- */
+      #cap { position: absolute; left: 60px; right: 60px; top: 1440px; height: 190px; }
+      .cp {
+        position: absolute; left: 0; right: 0; top: 0; text-align: center; font-weight: 700; font-size: 60px;
+        line-height: 1.08; text-transform: uppercase; text-shadow: var(--ol4); letter-spacing: -0.005em;
+      }
+      .cp em { font-style: normal; color: var(--yel); }
+
+      /* ---------- CTA ---------- */
+      #cta { position: absolute; left: 0; right: 0; top: 0; height: 1400px; }
+      #bubble {
+        position: absolute; left: 190px; top: 300px; width: 700px; height: 300px; border-radius: 48px; background: #fff;
+        box-shadow: 0 26px 70px rgba(0,0,0,0.42); color: var(--ink);
+      }
+      #bubble:after { content: ""; position: absolute; left: 110px; bottom: -44px; border: 26px solid transparent; border-top: 30px solid #fff; border-left: 30px solid #fff; }
+      #bubAv { position: absolute; left: 34px; top: 34px; width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, #ffd60a, #ff9f1a); }
+      #bubName { position: absolute; left: 112px; top: 44px; font-size: 26px; font-weight: 700; color: var(--mute); }
+      #part3 { position: absolute; left: 0; right: 0; top: 96px; text-align: center; font-size: 168px; font-weight: 700; letter-spacing: -0.04em; line-height: 1; }
+      #ctaSub { position: absolute; left: 0; right: 0; top: 676px; text-align: center; font-weight: 700; font-size: 54px; line-height: 1.12; text-shadow: var(--ol4); }
+      #ctaSub .d { color: var(--del); }
+      #pointer { position: absolute; left: 860px; top: 870px; width: 90px; height: 120px; }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="%%TOTAL%%" data-width="1080" data-height="1920">
+      <div id="cam">
+        <video id="take" src="assets/cut.mp4" data-start="0" data-duration="%%TOTAL%%" data-media-start="0" data-track-index="0" muted playsinline></video>
+      </div>
+      <div id="shade"></div>
+
+      <!-- headline -->
+      <div id="title"><div><span id="t10">10 things</span> <span id="tRest1"><span class="hl">Claude</span> should add</span></div><div id="tRest2">to your website</div></div>
+
+      <!-- checklist: two pages of five -->
+      <div id="list">
+        <div class="grp" id="gA"></div>
+        <div class="grp" id="gB"></div>
+      </div>
+
+      <!-- browser mockup: one fictional service site for every example -->
+      <div id="browser">
+        <div id="bar"><span class="dot" style="left:18px;background:#ff5f57"></span><span class="dot" style="left:40px;background:#febc2e"></span><span class="dot" style="left:62px;background:#28c840"></span><div id="url">kitewise.studio</div></div>
+        <div id="nav"><div id="logo"><i></i>Kitewise</div><div id="navcta">Book a call</div></div>
+        <div id="body">
+          <!-- hero -->
+          <div class="pn" id="p0">
+            <div class="h" style="font-size:31px">Websites that turn<br />visitors into calls</div>
+            <div class="ln" style="left:24px;top:110px;width:330px"></div>
+            <div class="ln" style="left:24px;top:132px;width:260px"></div>
+            <div class="btn by" style="left:24px;top:170px;width:190px;height:52px;line-height:52px;font-size:21px">Book a call</div>
+            <div class="btn bo" style="left:228px;top:170px;width:150px;height:52px;line-height:52px;font-size:21px">Our work</div>
+            <div class="ln" style="left:24px;top:262px;width:120px;height:44px;border-radius:10px"></div>
+            <div class="ln" style="left:162px;top:262px;width:120px;height:44px;border-radius:10px"></div>
+            <div class="ln" style="left:300px;top:262px;width:120px;height:44px;border-radius:10px"></div>
+          </div>
+
+          <!-- 1 who this is NOT for -->
+          <div class="pn" id="p1">
+            <div id="p1head" class="abs" style="left:20px;right:20px;top:18px;height:60px;border-radius:14px;background:var(--soft);box-shadow:inset 0 0 0 2px var(--line)">
+              <div class="h" style="position:absolute;left:18px;top:14px;font-size:26px">Not the right fit if…</div>
+              <svg id="p1car" style="position:absolute;right:18px;top:20px" width="22" height="22" viewBox="0 0 24 24"><path d="M5 9l7 7 7-7" fill="none" stroke="#1b1d22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div class="rw p1r" style="top:104px"><span class="ic ix"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="#7a808c" stroke-width="3.4" stroke-linecap="round"/></svg></span><span class="t">You want instant results</span></div>
+            <div class="rw p1r" style="top:160px"><span class="ic ix"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="#7a808c" stroke-width="3.4" stroke-linecap="round"/></svg></span><span class="t">You can't commit time</span></div>
+            <div class="rw p1r" style="top:216px"><span class="ic ix"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="#7a808c" stroke-width="3.4" stroke-linecap="round"/></svg></span><span class="t">You only want the<br />cheapest option</span></div>
+          </div>
+
+          <!-- 2 what happens after you pay -->
+          <div class="pn" id="p2">
+            <div id="p2toast" class="abs" style="left:24px;top:16px;height:40px;line-height:40px;padding:0 14px;border-radius:10px;background:#dcf3e6;color:#167a42;font-size:18px;font-weight:700">✓&nbsp; Payment confirmed</div>
+            <div class="h abs" style="left:24px;top:68px;font-size:24px">What happens next</div>
+            <div class="abs" style="left:39px;top:128px;width:4px;height:180px;background:var(--line)"></div>
+            <div id="p2line" class="abs" style="left:39px;top:128px;width:4px;height:180px;background:var(--ink);transform-origin:50% 0%"></div>
+            <div class="abs p2s" style="left:24px;top:110px;width:420px;height:40px"><span class="abs" style="left:4px;top:5px;width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:15px;line-height:26px;text-align:center;font-weight:700">1</span><span class="abs" style="left:46px;top:4px;font-size:21px;font-weight:700">Payment confirmed</span></div>
+            <div class="abs p2s" style="left:24px;top:170px;width:420px;height:40px"><span class="abs" style="left:4px;top:5px;width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:15px;line-height:26px;text-align:center;font-weight:700">2</span><span class="abs" style="left:46px;top:4px;font-size:21px;font-weight:700">Complete onboarding</span></div>
+            <div class="abs p2s" style="left:24px;top:230px;width:420px;height:40px"><span class="abs" style="left:4px;top:5px;width:26px;height:26px;border-radius:50%;background:var(--ink);color:#fff;font-size:15px;line-height:26px;text-align:center;font-weight:700">3</span><span class="abs" style="left:46px;top:4px;font-size:21px;font-weight:700">Kickoff scheduled</span></div>
+            <div class="abs p2s" style="left:24px;top:290px;width:420px;height:40px"><span class="abs" style="left:4px;top:5px;width:26px;height:26px;border-radius:50%;background:var(--yel);color:var(--ink);font-size:15px;line-height:26px;text-align:center;font-weight:700">4</span><span class="abs" style="left:46px;top:4px;font-size:21px;font-weight:700">Work begins</span></div>
+          </div>
+
+          <!-- 3 objection killer -->
+          <div class="pn" id="p3">
+            <div class="sm abs" style="left:24px;top:18px">FAQ</div>
+            <div id="p3q" class="abs" style="left:20px;right:20px;top:48px;height:96px;border-radius:16px;background:#fff;box-shadow:0 0 0 2.5px var(--ink), 0 10px 24px rgba(0,0,0,0.08);transform-origin:50% 50%">
+              <div class="abs" style="left:20px;right:54px;top:16px;font-size:24px;font-weight:700;line-height:1.15">Will this work with my existing setup?</div>
+              <svg id="p3car" style="position:absolute;right:18px;top:36px" width="22" height="22" viewBox="0 0 24 24"><path d="M5 9l7 7 7-7" fill="none" stroke="#1b1d22" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div id="p3a" class="abs" style="left:24px;right:24px;top:164px;font-size:22px;font-weight:700;color:#3d424d;line-height:1.25">Check compatibility before you commit.</div>
+            <div id="p3b" class="btn bo" style="left:24px;top:238px;width:230px;height:48px;line-height:48px;font-size:20px">View requirements</div>
+          </div>
+
+          <!-- 4 price anchor -->
+          <div class="pn" id="p4">
+            <div class="h abs" style="left:24px;top:16px;font-size:24px">Compare your options</div>
+            <div id="p4a" class="abs" style="left:20px;top:62px;width:206px;height:250px;border-radius:16px;background:var(--soft);box-shadow:inset 0 0 0 2px var(--line)">
+              <div class="abs" style="left:16px;top:16px;font-size:21px;font-weight:700;color:#4a4f5a">Build internally</div>
+              <div class="abs" style="left:16px;top:58px;right:12px;font-size:19px;font-weight:700;color:var(--mute);line-height:1.5">Time<br />+ tools<br />+ ongoing<br />&nbsp;&nbsp;&nbsp;maintenance</div>
+            </div>
+            <div id="p4b" class="abs" style="left:242px;top:62px;width:206px;height:250px;border-radius:16px;background:#fff;box-shadow:inset 0 0 0 3px var(--ink)">
+              <div class="abs" style="left:16px;top:16px;font-size:21px;font-weight:700">Our service</div>
+              <div class="abs" style="left:16px;top:58px;right:12px;font-size:19px;font-weight:700;color:var(--ink);line-height:1.5">Defined scope<br />+ clear pricing</div>
+              <div class="btn by" style="left:16px;right:16px;bottom:16px;height:44px;line-height:44px;font-size:18px">See pricing</div>
+            </div>
+          </div>
+
+          <!-- 5 see it working -->
+          <div class="pn" id="p5">
+            <div id="p5btn" class="btn bk" style="left:24px;top:18px;width:230px;height:50px;line-height:50px;font-size:21px">▶&nbsp; See it working</div>
+            <div id="p5demo" class="abs" style="left:20px;right:20px;top:84px;height:248px;border-radius:16px;background:var(--soft);box-shadow:inset 0 0 0 2px var(--line)">
+              <div class="tag" style="left:14px;top:12px">LIVE DEMO</div>
+              <div id="p5in" class="abs" style="left:14px;top:46px;width:180px;height:84px;border-radius:12px;background:#fff;box-shadow:0 0 0 2px var(--line)">
+                <div class="abs" style="left:12px;top:10px;font-size:14px;font-weight:700;color:var(--mute)">NEW ENQUIRY</div>
+                <div class="abs" style="left:12px;top:34px;font-size:18px;font-weight:700;line-height:1.2">"Need a quote<br />for a website"</div>
+              </div>
+              <svg id="p5arr" style="position:absolute;left:200px;top:72px" width="34" height="30" viewBox="0 0 34 30"><path d="M2 15h26M20 6l9 9-9 9" fill="none" stroke="#1b1d22" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <div id="p5row" class="abs" style="left:240px;top:46px;width:172px;height:84px;border-radius:12px;background:#fff;box-shadow:0 0 0 2px var(--line)">
+                <div class="abs" style="left:12px;top:10px;font-size:14px;font-weight:700;color:var(--mute)">DASHBOARD</div>
+                <div class="abs" style="left:12px;top:36px;font-size:18px;font-weight:700">Enquiry received</div>
+              </div>
+              <div id="p5st" class="abs" style="left:110px;top:156px;width:210px;height:62px;border-radius:14px;background:#dcf3e6;color:#167a42;font-size:24px;font-weight:700;line-height:62px;text-align:center;transform-origin:50% 50%">✓&nbsp; Reply sent</div>
+            </div>
+          </div>
+
+          <!-- 6 micro-commitment CTA -->
+          <div class="pn" id="p6">
+            <div id="p6big" class="btn bk" style="left:24px;top:18px;width:422px;height:62px;line-height:62px;font-size:24px">Book a call</div>
+            <div id="p6small" class="btn bo" style="left:104px;top:96px;width:262px;height:46px;line-height:46px;font-size:19px">Check if we're a fit</div>
+            <div id="p6form" class="abs" style="left:0;right:0;top:160px;height:200px">
+              <div class="abs" style="left:24px;top:2px;font-size:18px;font-weight:700">What do you need help with?</div>
+              <div class="field" style="top:30px">e.g. more enquiries</div>
+              <div class="abs" style="left:24px;top:82px;font-size:18px;font-weight:700">When would you like to start?</div>
+              <div class="field" style="top:110px">This month</div>
+            </div>
+          </div>
+
+          <!-- 7 cost of waiting calculator -->
+          <div class="pn" id="p7">
+            <div class="h abs" style="left:24px;top:16px;font-size:25px">What could delaying cost?</div>
+            <div class="abs" style="left:24px;top:62px;font-size:17px;font-weight:700;color:var(--mute)">Missed enquiries per month</div>
+            <div id="p7f1" class="field" style="top:86px;color:var(--ink)"><span id="p7a">8</span><span id="p7a2" style="position:absolute;left:14px">12</span></div>
+            <div class="abs" style="left:24px;top:136px;font-size:17px;font-weight:700;color:var(--mute)">Estimated value per enquiry</div>
+            <div class="field" style="top:160px;color:var(--ink)">Rs 5,000</div>
+            <div class="abs" style="left:20px;right:20px;top:214px;height:76px;border-radius:14px;background:var(--ink);color:#fff">
+              <div class="abs" style="left:16px;top:10px;font-size:15px;font-weight:700;color:#b9bdc7">ESTIMATED COST / MONTH</div>
+              <div class="abs" style="left:16px;top:32px;font-size:32px;font-weight:700;color:var(--yel)">Rs <span id="p7v">40,000</span></div>
+            </div>
+            <div class="abs" style="left:24px;right:20px;top:298px;font-size:15px;font-weight:700;font-style:italic;color:var(--mute)">Illustrative estimate — not guaranteed revenue.</div>
+          </div>
+
+          <!-- 8 proof inside the CTA area -->
+          <div class="pn" id="p8">
+            <div id="p8area" class="abs" style="left:12px;right:12px;top:10px;height:330px;border-radius:18px;box-shadow:inset 0 0 0 3px var(--yel)"></div>
+            <div class="btn by" style="left:28px;top:26px;width:414px;height:58px;line-height:58px;font-size:23px">Book your consultation</div>
+            <div id="p8card" class="abs" style="left:28px;top:100px;width:414px;height:222px;border-radius:16px;background:var(--soft);box-shadow:inset 0 0 0 2px var(--line)">
+              <div class="tag" style="right:12px;top:12px">SAMPLE</div>
+              <div class="abs" style="left:18px;top:16px;font-size:44px;font-weight:700;color:#c3c7d0;line-height:1">“</div>
+              <div class="abs" style="left:18px;top:52px;right:16px;font-size:20px;font-weight:700;line-height:1.25">Customer quote goes here</div>
+              <div class="abs" style="left:18px;top:92px;width:150px;height:10px;border-radius:5px;background:#d9dce3"></div>
+              <div class="abs" style="left:18px;top:124px;font-size:17px;font-weight:700;color:var(--mute)">Result: [relevant result]</div>
+              <div class="abs" style="left:18px;top:170px;font-size:18px;font-weight:700;text-decoration:underline">Read the full case study →</div>
+            </div>
+          </div>
+
+          <!-- 9 common mistakes -->
+          <div class="pn" id="p9">
+            <div class="h abs" style="left:24px;top:14px;font-size:24px">Common mistakes to avoid</div>
+            <div class="abs p9c" style="left:20px;right:20px;top:58px;height:86px;border-radius:14px;background:var(--soft)">
+              <div class="abs" style="left:14px;top:12px;font-size:19px;font-weight:700;color:#7a808c;text-decoration:line-through">Unclear next step</div>
+              <div class="abs p9f" style="left:14px;top:46px;font-size:19px;font-weight:700;color:#167a42">✓ One clear action</div>
+            </div>
+            <div class="abs p9c" style="left:20px;right:20px;top:152px;height:86px;border-radius:14px;background:var(--soft)">
+              <div class="abs" style="left:14px;top:12px;font-size:19px;font-weight:700;color:#7a808c;text-decoration:line-through">Too many competing CTAs</div>
+              <div class="abs p9f" style="left:14px;top:46px;font-size:19px;font-weight:700;color:#167a42">✓ Defined priority</div>
+            </div>
+            <div class="abs p9c" style="left:20px;right:20px;top:246px;height:86px;border-radius:14px;background:var(--soft)">
+              <div class="abs" style="left:14px;top:12px;font-size:19px;font-weight:700;color:#7a808c;text-decoration:line-through">Important details hidden</div>
+              <div class="abs p9f" style="left:14px;top:46px;font-size:19px;font-weight:700;color:#167a42">✓ Visible answers</div>
+            </div>
+          </div>
+
+          <!-- 10 deliberate friction point -->
+          <div class="pn" id="p10">
+            <div id="p10start" class="btn by" style="left:110px;top:120px;width:250px;height:62px;line-height:62px;font-size:24px">Get started</div>
+            <div id="p10q" class="abs" style="left:0;right:0;top:0;bottom:0">
+              <div class="sm abs" style="left:24px;top:14px">STEP 1 OF 2</div>
+              <div class="h abs" style="left:24px;top:40px;font-size:24px">What are you trying to achieve?</div>
+              <div class="abs p10o" style="left:24px;right:24px;top:84px;height:46px;border-radius:12px;box-shadow:inset 0 0 0 2px var(--line);font-size:19px;font-weight:700;line-height:46px;padding-left:48px"><span class="abs rad" style="left:14px;top:13px;width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 2.5px #9aa0ab"></span>Get more enquiries</div>
+              <div id="p10sel" class="abs p10o" style="left:24px;right:24px;top:138px;height:46px;border-radius:12px;box-shadow:inset 0 0 0 2px var(--line);font-size:19px;font-weight:700;line-height:46px;padding-left:48px"><span id="p10rad" class="abs" style="left:14px;top:13px;width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 2.5px #9aa0ab"></span>Book more calls</div>
+              <div class="abs p10o" style="left:24px;right:24px;top:192px;height:46px;border-radius:12px;box-shadow:inset 0 0 0 2px var(--line);font-size:19px;font-weight:700;line-height:46px;padding-left:48px"><span class="abs" style="left:14px;top:13px;width:20px;height:20px;border-radius:50%;box-shadow:inset 0 0 0 2.5px #9aa0ab"></span>Launch a new website</div>
+              <div class="abs" style="left:24px;top:270px;font-size:19px;font-weight:700;color:var(--mute)">← Back</div>
+              <div id="p10cont" class="btn bk" style="right:24px;top:256px;width:170px;height:48px;line-height:48px;font-size:20px">Continue</div>
+              <div id="p10ok" class="abs" style="left:196px;top:250px;width:60px;height:60px;border-radius:50%;background:#22a35a;box-shadow:0 8px 20px rgba(34,163,90,0.45)"><svg style="position:absolute;left:13px;top:15px" width="34" height="31" viewBox="0 0 24 22"><path d="M3 11.5l6 6L21 4" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            </div>
+          </div>
+        </div>
+        <svg id="cursor" viewBox="0 0 34 40"><path d="M3 2l26 20-12 2 7 13-5 2-7-13-9 8z" fill="#1b1d22" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/></svg>
+      </div>
+
+      <!-- one short supporting label per item -->
+      <div id="notes"></div>
+
+      <!-- phrase captions -->
+      <div id="cap"></div>
+
+      <!-- ending CTA -->
+      <div id="cta">
+        <div id="bubble"><div id="bubAv"></div><div id="bubName">you · just now</div><div id="part3">PART 3</div></div>
+        <div id="ctaSub">5 things to <span class="d">DELETE</span><br />from your website</div>
+        <svg id="pointer" viewBox="0 0 90 120"><path d="M45 8v84M18 66l27 30 27-30" fill="none" stroke="#000" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" opacity="0.5"/><path d="M45 8v84M18 66l27 30 27-30" fill="none" stroke="#ffd60a" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+
+      <!-- AUDIO: cleaned voice, ducked bed, SFX -->
+      <audio id="voice" src="assets/audio/voice.wav" data-start="0" data-duration="%%TOTAL%%" data-media-start="0" data-track-index="10" data-volume="1"></audio>
+      <audio id="bed" src="assets/audio/bed.wav" data-start="0" data-duration="%%TOTAL%%" data-media-start="0" data-track-index="9" data-volume="1"></audio>
+%%AUDIO%%
+    </div>
+
+    <script>
+      const D = %%DATA%%;
+      const tl = gsap.timeline({ paused: true });
+      const I = D.items; /* item start times (s), index 0..9 */
+      const POP = "back.out(2.2)";
+      const END = D.total;
+
+      /* ---------------- camera: tight open, punch on "actually shock you", alternate framing per item ---------------- */
+      tl.fromTo("#cam", { scale: 1.06 }, { scale: 1.08, duration: D.shock, ease: "none" }, 0);
+      tl.fromTo("#cam", { scale: 1.08 }, { scale: 1.15, duration: 0.16, ease: "power3.out", immediateRender: false }, D.shock);
+      tl.to("#cam", { scale: 1.165, duration: I[0] - D.shock - 0.16, ease: "none" }, D.shock + 0.16);
+      const FR = [1.0, 1.05, 1.0, 1.05, 1.06, 1.0, 1.05, 1.0, 1.05, 1.0];
+      I.forEach((t, i) => {
+        const nx = i + 1 < I.length ? I[i + 1] : D.cta;
+        tl.fromTo("#cam", { scale: FR[i] }, { scale: FR[i] + 0.012, duration: nx - t, ease: "none", immediateRender: false }, t);
+      });
+      /* item 10: slow, subtle push as the title is spoken */
+      tl.to("#cam", { scale: 1.07, duration: 0.6, ease: "power2.out" }, I[9] + 0.05);
+      tl.fromTo("#cam", { scale: 1.0 }, { scale: 1.035, duration: END - D.cta, ease: "none", immediateRender: false }, D.cta);
+
+      /* ---------------- headline ---------------- */
+      gsap.set("#tRest1, #tRest2", { opacity: 0, y: 14 });
+      /* "10 things" opens centred, then slides left as the rest of the line arrives */
+      const t10 = document.getElementById("t10");
+      const t10dx = t10.parentElement.offsetWidth / 2 - (t10.offsetLeft + t10.offsetWidth / 2);
+      gsap.set("#t10", { x: t10dx });
+      tl.fromTo("#t10", { scale: 0.4, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.26, ease: "back.out(2.6)" }, 0.02);
+      tl.to("#t10", { x: 0, duration: 0.24, ease: "power3.out" }, D.claude - 0.1);
+      tl.to("#tRest1", { opacity: 1, y: 0, duration: 0.24, ease: "power3.out" }, D.claude - 0.06);
+      tl.to("#tRest2", { opacity: 1, y: 0, duration: 0.24, ease: "power3.out" }, D.website - 0.2);
+      tl.fromTo("#tRest1 .hl", { scale: 1 }, { scale: 1.14, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, D.claude + 0.05);
+
+      /* ---------------- checklist ---------------- */
+      const LBL = D.labels;
+      const rowY = (k) => 410 + k * 100;
+      ["gA", "gB"].forEach((g, gi) => {
+        const host = document.getElementById(g);
+        for (let k = 0; k < 5; k++) {
+          const n = gi * 5 + k;
+          const r = document.createElement("div");
+          r.className = "row";
+          r.id = "r" + n;
+          r.style.top = rowY(k) - 48 + "px";
+          r.innerHTML = `<div class="num" id="n${n}">${n + 1}.</div><div class="lbl" id="l${n}"><span>${LBL[n]}</span></div>`;
+          host.appendChild(r);
+        }
+      });
+      gsap.set(".num", { opacity: 0, scale: 0.4 });
+      gsap.set(".lbl span", { opacity: 0, x: -24 });
+      /* numbers 1-5 count in as the hook lands */
+      tl.to("#gA .num", { opacity: 1, scale: 1, duration: 0.2, ease: POP, stagger: 0.06 }, I[0] - 0.42);
+      const dimRow = (n, t) => {
+        tl.to(`#n${n}, #l${n}`, { color: "#ffffff", duration: 0.12, ease: "none" }, t);
+        tl.to(`#n${n}, #l${n}`, { opacity: 0.72, duration: 0.2, ease: "none" }, t);
+      };
+      I.forEach((t, n) => {
+        tl.fromTo(`#l${n} span`, { opacity: 0, x: -24, scale: 0.9 }, { opacity: 1, x: 0, scale: 1, duration: 0.22, ease: POP, immediateRender: false }, t - 0.04);
+        tl.to(`#n${n}, #l${n}`, { color: "#ffd60a", duration: 0.08, ease: "none" }, t - 0.04);
+        tl.fromTo(`#n${n}`, { scale: 1 }, { scale: 1.2, duration: 0.11, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, t - 0.04);
+        if (n > 0 && n !== 5) dimRow(n - 1, t - 0.04);
+      });
+      /* midpoint: slide 1-5 out, 6-10 in; headline and browser stay put */
+      tl.to("#gA", { x: -70, opacity: 0, duration: 0.24, ease: "power2.in" }, I[5] - 0.34);
+      tl.fromTo("#gB .num", { opacity: 0, scale: 0.4, x: -40 }, { opacity: 1, scale: 1, x: 0, duration: 0.2, ease: POP, stagger: 0.04, immediateRender: false }, I[5] - 0.16);
+      /* ending: clear the list for the CTA */
+      tl.to("#gB", { x: -70, opacity: 0, duration: 0.24, ease: "power2.in" }, D.cta - 0.06);
+
+      /* ---------------- browser ---------------- */
+      gsap.set("#browser", { opacity: 0, x: 80, scale: 0.92, transformOrigin: "100% 0%" });
+      gsap.set(".pn", { opacity: 0 });
+      gsap.set("#p0", { opacity: 1 });
+      gsap.set("#cursor", { opacity: 0, x: 380, y: 300 });
+      tl.to("#browser", { opacity: 1, x: 0, scale: 1, duration: 0.34, ease: "power3.out" }, D.website - 0.12);
+      tl.to("#browser", { opacity: 0, x: 60, scale: 0.94, duration: 0.24, ease: "power2.in" }, D.cta - 0.06);
+
+      const swap = (from, to, t) => {
+        tl.to(from, { opacity: 0, x: -30, duration: 0.14, ease: "power2.in" }, t);
+        tl.fromTo(to, { opacity: 0, x: 36 }, { opacity: 1, x: 0, duration: 0.2, ease: "power3.out", immediateRender: false }, t + 0.1);
+      };
+      /* cursor helper: glide to (x,y) in browser coords, then press */
+      const cur = (x, y, t, press = true) => {
+        tl.to("#cursor", { opacity: 1, x, y, duration: 0.24, ease: "power2.inOut" }, t - 0.26);
+        if (press) tl.to("#cursor", { scale: 0.82, duration: 0.06, yoyo: true, repeat: 1, ease: "power1.inOut", transformOrigin: "10% 10%" }, t);
+      };
+      const curOff = (t) => tl.to("#cursor", { opacity: 0, duration: 0.12 }, t);
+
+      /* hook teaser: three quick flashes (calculator, proof card, friction screen) */
+      const tz = [["#p7", D.shock + 0.08], ["#p8", D.shock + 0.42], ["#p10", D.shock + 0.76]];
+      tl.to("#p0", { opacity: 0, duration: 0.06 }, tz[0][1]);
+      tz.forEach(([p, t], k) => {
+        tl.fromTo(p, { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.08, ease: "power2.out", immediateRender: false }, t);
+        tl.to(p, { opacity: 0, duration: 0.06, ease: "none" }, t + 0.27);
+      });
+      tl.fromTo("#browser", { boxShadow: "0 22px 60px rgba(0,0,0,0.38), 0 0 0 2px rgba(255,255,255,0.6)" }, { boxShadow: "0 22px 60px rgba(0,0,0,0.38), 0 0 0 6px rgba(255,214,10,0.95)", duration: 0.08, yoyo: true, repeat: 5, ease: "none", immediateRender: false }, tz[0][1]);
+      /* teaser states: show the "finished" look of each panel */
+      gsap.set("#p10start", { opacity: 0 }); gsap.set("#p10ok", { opacity: 0, scale: 0.4 });
+
+      /* item 1: who this is NOT for */
+      gsap.set(".p1r", { opacity: 0, y: -10 });
+      tl.fromTo("#p1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.22, ease: "power3.out", immediateRender: false }, I[0] - 0.02);
+      cur(400, 150, I[0] + 0.34);
+      tl.to("#p1car", { rotation: 180, duration: 0.2, ease: "power2.out", transformOrigin: "50% 50%" }, I[0] + 0.36);
+      tl.to(".p1r", { opacity: 1, y: 0, duration: 0.2, ease: "power2.out", stagger: 0.14 }, I[0] + 0.42);
+      curOff(I[0] + 0.9);
+
+      /* item 2: after-payment timeline */
+      gsap.set("#p2line", { scaleY: 0 }); gsap.set(".p2s", { opacity: 0, x: -14 }); gsap.set("#p2toast", { opacity: 0, scale: 0.8 });
+      swap("#p1", "#p2", I[1] - 0.12);
+      tl.to("#p2toast", { opacity: 1, scale: 1, duration: 0.2, ease: POP }, I[1] + 0.05);
+      tl.to("#p2line", { scaleY: 1, duration: 1.2, ease: "none" }, I[1] + 0.35);
+      tl.to(".p2s", { opacity: 1, x: 0, duration: 0.18, ease: "power2.out", stagger: 0.36 }, I[1] + 0.3);
+
+      /* item 3: objection killer */
+      gsap.set("#p3a, #p3b", { opacity: 0, y: 10 });
+      swap("#p2", "#p3", I[2] - 0.12);
+      tl.fromTo("#p3q", { scale: 1 }, { scale: 1.07, duration: 0.2, ease: "power2.out", yoyo: true, repeat: 1, immediateRender: false }, I[2] + 0.12);
+      cur(420, 200, I[2] + 0.62);
+      tl.to("#p3car", { rotation: 180, duration: 0.2, transformOrigin: "50% 50%" }, I[2] + 0.64);
+      tl.to("#p3a", { opacity: 1, y: 0, duration: 0.2 }, I[2] + 0.7);
+      tl.to("#p3b", { opacity: 1, y: 0, duration: 0.2, ease: POP }, I[2] + 0.95);
+      curOff(I[2] + 1.3);
+
+      /* item 4: price anchor */
+      swap("#p3", "#p4", I[3] - 0.12);
+      tl.fromTo("#p4a", { x: -40, y: 26, opacity: 0 }, { x: 0, y: 0, opacity: 1, duration: 0.3, ease: "power3.out", immediateRender: false }, I[3]);
+      tl.fromTo("#p4b", { x: 40, y: -26, opacity: 0 }, { x: 0, y: 0, opacity: 1, duration: 0.3, ease: "power3.out", immediateRender: false }, I[3] + 0.12);
+      tl.fromTo("#p4b", { scale: 1 }, { scale: 1.04, duration: 0.12, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, I[3] + 0.5);
+
+      /* item 5: see it working */
+      gsap.set("#p5demo", { opacity: 0, y: 16 }); gsap.set("#p5in, #p5arr, #p5row", { opacity: 0, x: -10 }); gsap.set("#p5st", { opacity: 0, scale: 0.7 });
+      swap("#p4", "#p5", I[4] - 0.12);
+      cur(170, 140, I[4] + 0.3);
+      tl.to("#p5demo", { opacity: 1, y: 0, duration: 0.2, ease: "power3.out" }, I[4] + 0.38);
+      tl.to("#p5in", { opacity: 1, x: 0, duration: 0.16 }, I[4] + 0.48);
+      tl.to("#p5arr", { opacity: 1, x: 0, duration: 0.14 }, I[4] + 0.66);
+      tl.to("#p5row", { opacity: 1, x: 0, duration: 0.16 }, I[4] + 0.76);
+      tl.to("#p5st", { opacity: 1, scale: 1, duration: 0.2, ease: POP }, I[4] + 0.98);
+      tl.to("#p5st", { scale: 1.14, duration: 0.24, ease: "power2.out", yoyo: true, repeat: 1 }, I[4] + 1.16);
+      curOff(I[4] + 0.7);
+
+      /* item 6: micro-commitment CTA */
+      gsap.set("#p6small", { opacity: 0, y: 8 }); gsap.set("#p6form", { opacity: 0, y: 14 });
+      swap("#p5", "#p6", I[5] - 0.12);
+      tl.to("#p6small", { opacity: 1, y: 0, duration: 0.2 }, I[5] + 0.22);
+      tl.fromTo("#p6small", { boxShadow: "inset 0 0 0 2.5px #1b1d22, 0 0 0 0px rgba(255,214,10,0)" }, { boxShadow: "inset 0 0 0 2.5px #1b1d22, 0 0 0 7px rgba(255,214,10,1)", duration: 0.2, yoyo: true, repeat: 1, ease: "sine.inOut", immediateRender: false }, I[5] + 0.42);
+      cur(260, 230, I[5] + 0.8);
+      tl.to("#p6big", { opacity: 0.35, duration: 0.2 }, I[5] + 0.82);
+      tl.to("#p6form", { opacity: 1, y: 0, duration: 0.22, ease: "power3.out" }, I[5] + 0.88);
+      curOff(I[5] + 1.2);
+
+      /* item 7: cost of waiting calculator */
+      gsap.set("#p7a2", { opacity: 0 });
+      gsap.set("#p7f1", { boxShadow: "inset 0 0 0 2px #e6e8ee" });
+      swap("#p6", "#p7", I[6] - 0.12);
+      cur(200, 230, I[6] + 0.42);
+      tl.to("#p7f1", { boxShadow: "inset 0 0 0 3px #1b1d22", duration: 0.1 }, I[6] + 0.44);
+      tl.set("#p7a", { opacity: 0 }, I[6] + 0.56);
+      tl.set("#p7a2", { opacity: 1 }, I[6] + 0.56);
+      const calc = { v: 40000 };
+      tl.fromTo(calc, { v: 40000 }, {
+        v: 60000, duration: 0.55, ease: "power2.out", immediateRender: false,
+        onUpdate: () => { document.getElementById("p7v").textContent = Math.round(calc.v / 500) * 500 >= 0 ? (Math.round(calc.v / 500) * 500).toLocaleString("en-IN") : ""; },
+      }, I[6] + 0.62);
+      curOff(I[6] + 0.9);
+
+      /* item 8: proof inside the CTA area */
+      gsap.set("#p8card", { opacity: 0, x: 60 }); gsap.set("#p8area", { opacity: 0 });
+      swap("#p7", "#p8", I[7] - 0.12);
+      /* the hook teaser flashes the finished card */
+      tl.set("#p8card, #p8area", { opacity: 1, x: 0 }, tz[1][1]);
+      tl.set("#p8card", { opacity: 0, x: 60 }, tz[1][1] + 0.34);
+      tl.set("#p8area", { opacity: 0 }, tz[1][1] + 0.34);
+      tl.fromTo("#p8card", { opacity: 0, x: 60 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out", immediateRender: false }, I[7] + 0.32);
+      tl.fromTo("#p8area", { opacity: 0, scale: 1.04 }, { opacity: 1, scale: 1, duration: 0.24, ease: "power2.out", immediateRender: false }, I[7] + 0.82);
+
+      /* item 9: common mistakes */
+      gsap.set(".p9c", { opacity: 0, y: 12 }); gsap.set(".p9f", { opacity: 0, x: -10 });
+      swap("#p8", "#p9", I[8] - 0.12);
+      tl.to(".p9c", { opacity: 1, y: 0, duration: 0.18, ease: "power2.out", stagger: 0.22 }, I[8] + 0.06);
+      tl.to(".p9f", { opacity: 1, x: 0, duration: 0.16, ease: "power2.out", stagger: 0.2 }, I[8] + 0.78);
+
+      /* item 10: deliberate friction point */
+      swap("#p9", "#p10", I[9] - 0.12);
+      tl.set("#p10start", { opacity: 1 }, I[9] - 0.12);
+      tl.set("#p10q", { opacity: 0 }, I[9] - 0.12);
+      cur(240, 250, I[9] + 0.26);
+      tl.to("#p10start", { opacity: 0, scale: 0.94, duration: 0.14 }, I[9] + 0.3);
+      tl.fromTo("#p10q", { opacity: 0, x: 30 }, { opacity: 1, x: 0, duration: 0.2, ease: "power3.out", immediateRender: false }, I[9] + 0.36);
+      cur(240, 260, I[9] + 0.82);
+      tl.to("#p10sel", { boxShadow: "inset 0 0 0 3px #1b1d22", backgroundColor: "#fffbe0", duration: 0.12 }, I[9] + 0.84);
+      tl.to("#p10rad", { boxShadow: "inset 0 0 0 7px #1b1d22", duration: 0.12 }, I[9] + 0.84);
+      curOff(I[9] + 1.05);
+      tl.fromTo("#p10ok", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.24, ease: POP, immediateRender: false }, I[9] + 1.18);
+
+      /* ---------------- supporting labels ---------------- */
+      const notes = document.getElementById("notes");
+      D.notes.forEach((txt, n) => {
+        const el = document.createElement("div");
+        el.className = "note";
+        el.id = "nt" + n;
+        el.innerHTML = txt;
+        notes.appendChild(el);
+      });
+      gsap.set(".note", { opacity: 0, y: -10 });
+      D.notes.forEach((_, n) => {
+        const t = I[n] + 0.25;
+        const off = (n + 1 < I.length ? I[n + 1] : D.cta) - 0.14;
+        tl.to("#nt" + n, { opacity: 1, y: 0, duration: 0.2, ease: "power3.out" }, t);
+        tl.to("#nt" + n, { opacity: 0, y: 8, duration: 0.12, ease: "power2.in" }, off);
+      });
+
+      /* ---------------- phrase captions ---------------- */
+      const cap = document.getElementById("cap");
+      D.caps.forEach((c, k) => {
+        const el = document.createElement("div");
+        el.className = "cp";
+        el.id = "cp" + k;
+        el.innerHTML = c.h;
+        cap.appendChild(el);
+      });
+      gsap.set(".cp", { opacity: 0 });
+      D.caps.forEach((c, k) => {
+        tl.fromTo("#cp" + k, { opacity: 0, y: 18, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.14, ease: "power3.out", immediateRender: false }, c.t0);
+        if (c.t1 < END - 0.01) tl.to("#cp" + k, { opacity: 0, duration: 0.06, ease: "none" }, c.t1);
+      });
+      tl.fromTo("#cp2 em", { color: "#ffffff" }, { color: "#ffd60a", duration: 0.1, immediateRender: false }, D.actually);
+      tl.fromTo("#cp2 em", { scale: 1 }, { scale: 1.08, duration: 0.14, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, D.actually);
+
+      /* ---------------- ending CTA ---------------- */
+      gsap.set("#bubble", { opacity: 0, scale: 0.6, y: 30, transformOrigin: "30% 100%" });
+      gsap.set("#ctaSub", { opacity: 0, y: 20 });
+      gsap.set("#pointer", { opacity: 0, y: -20 });
+      tl.to("#bubble", { opacity: 1, scale: 1, y: 0, duration: 0.34, ease: "back.out(1.9)" }, D.cta + 0.04);
+      tl.fromTo("#part3", { scale: 0.7 }, { scale: 1, duration: 0.3, ease: "back.out(2.4)", immediateRender: false }, D.part3);
+      tl.to("#ctaSub", { opacity: 1, y: 0, duration: 0.26, ease: "power3.out" }, D.cta + 0.95);
+      tl.fromTo("#ctaSub .d", { scale: 1 }, { scale: 1.12, duration: 0.14, yoyo: true, repeat: 1, ease: "power2.out", immediateRender: false }, D.del);
+      tl.to("#pointer", { opacity: 1, y: 0, duration: 0.24, ease: "power2.out" }, D.cta + 1.3);
+      tl.to("#pointer", { y: 22, duration: 0.36, ease: "sine.inOut", yoyo: true, repeat: 7 }, D.cta + 1.6);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,302 @@
+[
+ {
+  "t": 0.3,
+  "type": "glitch",
+  "g": 0.5,
+  "note": "cold open: the deployment crashes, punch-in on the developer"
+ },
+ {
+  "t": 1.2,
+  "type": "lowhit",
+  "g": 0.55,
+  "note": "cut to black: He had no idea what was coming."
+ },
+ {
+  "t": 2.6,
+  "type": "pops",
+  "g": 0.3,
+  "note": "label: THE DEVELOPER"
+ },
+ {
+  "t": 2.78,
+  "type": "pops",
+  "g": 0.28,
+  "note": "label: THE CLIENT"
+ },
+ {
+  "t": 6.4,
+  "type": "chime",
+  "g": 0.36,
+  "note": "DEMO APPROVED (on 'deploy')"
+ },
+ {
+  "t": 6.99,
+  "type": "softwhoosh",
+  "g": 0.34,
+  "note": "cut to the card: 3 weeks later"
+ },
+ {
+  "t": 7.09,
+  "type": "key1",
+  "g": 0.3,
+  "note": "typing: 3 weeks later"
+ },
+ {
+  "t": 7.159,
+  "type": "key3",
+  "g": 0.3,
+  "note": "typing: 3 weeks later"
+ },
+ {
+  "t": 7.402,
+  "type": "key1",
+  "g": 0.3,
+  "note": "typing: 3 weeks later"
+ },
+ {
+  "t": 8.2,
+  "type": "lowhit",
+  "g": 0.55,
+  "note": "back from the card: Deployment failed"
+ },
+ {
+  "t": 8.24,
+  "type": "glitch",
+  "g": 0.4,
+  "note": "the red toast + glitch"
+ },
+ {
+  "t": 8.62,
+  "type": "glitch",
+  "g": 0.42,
+  "note": "the crash: quick zoom on the developer"
+ },
+ {
+  "t": 11.75,
+  "type": "pops",
+  "g": 0.26,
+  "note": "Calling Manager chip"
+ },
+ {
+  "t": 22.1,
+  "type": "scratch",
+  "g": 0.8,
+  "note": "freeze-frame: record scratch (the handoff)"
+ },
+ {
+  "t": 23.844,
+  "type": "beep",
+  "g": 0.32,
+  "note": "heart-monitor beep on the ECG blip"
+ },
+ {
+  "t": 24.404,
+  "type": "beep",
+  "g": 0.32,
+  "note": "heart-monitor beep on the ECG blip"
+ },
+ {
+  "t": 24.965,
+  "type": "beep",
+  "g": 0.32,
+  "note": "heart-monitor beep on the ECG blip"
+ },
+ {
+  "t": 25.25,
+  "type": "lowhit",
+  "g": 0.38,
+  "note": "'dies': the trace flatlines, the beeping stops"
+ },
+ {
+  "t": 26.35,
+  "type": "swoosh",
+  "g": 0.4,
+  "note": "split screen: the DEMO panel slides up"
+ },
+ {
+  "t": 27.75,
+  "type": "tick",
+  "g": 0.5,
+  "note": "tick: data clean"
+ },
+ {
+  "t": 28.57,
+  "type": "tick",
+  "g": 0.5,
+  "note": "tick: one user"
+ },
+ {
+  "t": 29.59,
+  "type": "tick",
+  "g": 0.5,
+  "note": "tick: Wi-Fi perfect"
+ },
+ {
+  "t": 29.68,
+  "type": "glitch",
+  "g": 0.42,
+  "note": "the demo panel glitches apart"
+ },
+ {
+  "t": 29.95,
+  "type": "punch",
+  "g": 0.48,
+  "note": "THE REAL WORLD title on the night-traffic b-roll"
+ },
+ {
+  "t": 31.75,
+  "type": "fastwhoosh",
+  "g": 0.4,
+  "note": "cut: hundreds of people"
+ },
+ {
+  "t": 31.9,
+  "type": "pops",
+  "g": 0.3,
+  "note": "avatars multiplying"
+ },
+ {
+  "t": 32.8,
+  "type": "swoosh2",
+  "g": 0.4,
+  "note": "cut: messy data"
+ },
+ {
+  "t": 32.9,
+  "type": "glitch",
+  "g": 0.28,
+  "note": "bad cells"
+ },
+ {
+  "t": 34.0,
+  "type": "swoosh",
+  "g": 0.4,
+  "note": "cut: phone on a bad network"
+ },
+ {
+  "t": 34.57,
+  "type": "beep",
+  "g": 0.22,
+  "note": "signal drops"
+ },
+ {
+  "t": 34.85,
+  "type": "beep",
+  "g": 0.22,
+  "note": "signal drops again"
+ },
+ {
+  "t": 35.61,
+  "type": "glitch",
+  "g": 0.32,
+  "note": "Request timed out"
+ },
+ {
+  "t": 36.5,
+  "type": "softwhoosh",
+  "g": 0.3,
+  "note": "back to Tarun, one steady shot"
+ },
+ {
+  "t": 39.15,
+  "type": "chime",
+  "g": 0.3,
+  "note": "the OneLoop badge appears"
+ },
+ {
+  "t": 42.8,
+  "type": "impact",
+  "g": 0.6,
+  "note": "PROOF 1: Nirvaha, live on Google Play"
+ },
+ {
+  "t": 42.82,
+  "type": "fastwhoosh",
+  "g": 0.35,
+  "note": "proof card slides in"
+ },
+ {
+  "t": 44.6,
+  "type": "impact",
+  "g": 0.55,
+  "note": "PROOF 2: logistics"
+ },
+ {
+  "t": 46.9,
+  "type": "impact",
+  "g": 0.55,
+  "note": "PROOF 3: LN Sports Arena"
+ },
+ {
+  "t": 50.7,
+  "type": "bigimpact",
+  "g": 0.7,
+  "note": "copper slam"
+ },
+ {
+  "t": 51.41,
+  "type": "swoosh2",
+  "g": 0.45,
+  "note": "DEMOS gets struck through"
+ },
+ {
+  "t": 51.55,
+  "type": "fastwhoosh",
+  "g": 0.4,
+  "note": "copper wipes away, black: we build software"
+ },
+ {
+  "t": 52.97,
+  "type": "punch",
+  "g": 0.55,
+  "note": "WORKS."
+ },
+ {
+  "t": 54.03,
+  "type": "lowhit",
+  "g": 0.75,
+  "note": "bass hit: the OneLoop logo lands"
+ },
+ {
+  "t": 56.81,
+  "type": "key1",
+  "g": 0.45,
+  "note": "typing 'B' into the comment box"
+ },
+ {
+  "t": 56.9,
+  "type": "key2",
+  "g": 0.45,
+  "note": "typing 'U' into the comment box"
+ },
+ {
+  "t": 56.99,
+  "type": "key3",
+  "g": 0.45,
+  "note": "typing 'I' into the comment box"
+ },
+ {
+  "t": 57.08,
+  "type": "key1",
+  "g": 0.45,
+  "note": "typing 'L' into the comment box"
+ },
+ {
+  "t": 57.17,
+  "type": "key2",
+  "g": 0.45,
+  "note": "typing 'D' into the comment box"
+ },
+ {
+  "t": 57.31,
+  "type": "impact",
+  "g": 0.55,
+  "note": "BUILD lands"
+ },
+ {
+  "t": 57.45,
+  "type": "chime",
+  "g": 0.32,
+  "note": "comment posted"
+ }
+]

@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>WHY Venture Studio reel overlay</title>
+<style>
+  @font-face { font-family: "SG"; src: url("fonts/SpaceGrotesk-VF.ttf"); font-weight: 300 700; }
+  @font-face { font-family: "MR"; src: url("fonts/Manrope-VF.ttf"); font-weight: 200 800; }
+  @font-face { font-family: "DM"; src: url("fonts/DMMono-Medium.ttf"); font-weight: 500; }
+  :root { --lime: #C9FF52; --ink: #111418; --red: #FF3B3B; --cream: #F4F1E8; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
+  * { box-sizing: border-box; }
+  .abs { position: absolute; }
+  /* reference DNA: small white lead · huge glowing lime keyword · small trailing line that fills in word by word */
+  #shade { left: 0; top: 0; width: 1080px; height: 1920px; background: linear-gradient(180deg, rgba(0,0,0,0) 48%, rgba(8,8,10,0.30) 66%, rgba(8,8,10,0.42) 100%); }
+  .cap { left: 50px; width: 980px; text-align: center; }
+  .lead { font-family: "MR"; font-weight: 700; font-size: 50px; line-height: 1.05; color: #fff; letter-spacing: -0.5px; white-space: nowrap;
+          text-shadow: 0 3px 10px rgba(0,0,0,0.45); -webkit-text-stroke: 9px rgba(17,20,24,0.92); paint-order: stroke fill; }
+  .key { display: inline-block; position: relative; font-family: "SG"; font-weight: 700; font-size: 128px; line-height: 0.95; color: var(--lime);
+         letter-spacing: -4px; white-space: nowrap; transform-origin: 50% 70%; margin-top: 2px;
+         text-shadow: 0 0 26px rgba(201,255,82,0.45), 0 6px 16px rgba(0,0,0,0.45); -webkit-text-stroke: 16px #111418; paint-order: stroke fill; }
+  .key.box { color: var(--ink); background: var(--lime); padding: 4px 26px 12px; border-radius: 12px; text-shadow: none; -webkit-text-stroke: 0; box-shadow: 0 0 30px rgba(201,255,82,0.45), 8px 9px 0 var(--ink); }
+  .trail { font-family: "MR"; font-weight: 800; font-size: 46px; color: #fff; white-space: nowrap; margin-top: 8px; text-shadow: 0 3px 10px rgba(0,0,0,0.45); -webkit-text-stroke: 9px rgba(17,20,24,0.92); paint-order: stroke fill; }
+  .trail span { transition: none; }
+  .strike { position: absolute; left: -8px; right: -8px; top: 52%; height: 11px; background: var(--red); border-radius: 6px; transform-origin: 0 50%;
+            box-shadow: 0 0 14px rgba(255,59,59,0.6); }
+  /* glass chips (reference: dark red notification cards) — positive here, so dark glass with a lime icon */
+  .chip { display: flex; align-items: center; gap: 22px; padding: 22px 34px 22px 26px; border-radius: 22px; background: rgba(16,17,20,0.80);
+          border: 2px solid rgba(255,255,255,0.14); box-shadow: 0 18px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+          font-family: "MR"; font-weight: 700; font-size: 42px; color: #fff; white-space: nowrap; }
+  .chip i { display: inline-flex; width: 56px; height: 56px; border-radius: 14px; background: var(--lime); align-items: center; justify-content: center; font-style: normal; }
+  /* camera viewfinder (reference: REC frame) */
+  .corner { width: 90px; height: 90px; border-color: rgba(255,255,255,0.92); border-style: solid; border-width: 0; filter: drop-shadow(0 0 2px rgba(0,0,0,0.95)) drop-shadow(0 2px 8px rgba(0,0,0,0.55)); }
+  #rec { font-family: "DM"; font-size: 34px; color: #fff; letter-spacing: 3px; display: flex; align-items: center; gap: 14px; background: rgba(12,12,14,0.62); padding: 10px 20px; border-radius: 10px; }
+  #rec b { width: 22px; height: 22px; border-radius: 50%; background: var(--red); display: inline-block; box-shadow: 0 0 12px rgba(255,59,59,0.8); }
+  #live { padding: 10px 22px; border-radius: 10px; background: var(--red); font-family: "SG"; font-weight: 700; font-size: 40px; color: #fff; letter-spacing: 1px; }
+  #ring { border-radius: 50%; border: 8px solid #C9FF52; box-shadow: 0 0 0 2px rgba(17,20,24,0.55), 0 0 34px rgba(201,255,82,0.8), inset 0 0 0 2px rgba(17,20,24,0.45), inset 0 0 30px rgba(201,255,82,0.5); }
+  #blinds { left: 0; top: 0; width: 1080px; height: 1920px; background: repeating-linear-gradient(90deg, rgba(0,0,0,0.55) 0 7px, rgba(255,255,255,0.18) 7px 9px, rgba(0,0,0,0) 9px 22px); mix-blend-mode: normal; }
+  /* end card */
+  #end { left: 0; top: 0; width: 1080px; height: 1920px; background: #0E0F12; display: none; overflow: hidden; }
+  #end .grid { left: 0; top: 0; width: 1080px; height: 1920px; background-image: linear-gradient(rgba(255,255,255,0.05) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(255,255,255,0.05) 1.5px, transparent 1.5px); background-size: 90px 90px; }
+  .btn { display: inline-block; padding: 30px 54px; background: var(--lime); border-radius: 18px; box-shadow: 0 0 36px rgba(201,255,82,0.45), 10px 11px 0 #000;
+         font-family: "MR"; font-weight: 800; font-size: 60px; color: var(--ink); white-space: nowrap; }
+  .c { left: 540px; transform: translateX(-50%); text-align: center; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div id="shade" class="abs"></div>
+<div id="cap" class="cap abs" style="top:1215px;"><div class="lead" id="lead"></div><div class="key" id="key"><span id="keyt"></span><div class="strike" id="strike"></div></div><div class="trail" id="trail"></div></div>
+<div id="chips" class="abs" style="left:0;top:0;">
+  <div id="chip1" class="chip abs" style="left:540px;top:1330px;"><i>🌍</i>international experience</div>
+  <div id="chip2" class="chip abs" style="left:540px;top:1460px;"><i>🔗</i>connections across the ecosystem</div>
+</div>
+<div id="vf" class="abs" style="left:0;top:0;">
+  <div class="corner abs" style="left:70px;top:190px;border-left-width:6px;border-top-width:6px;"></div>
+  <div class="corner abs" style="left:920px;top:190px;border-right-width:6px;border-top-width:6px;"></div>
+  <div class="corner abs" style="left:70px;top:1640px;border-left-width:6px;border-bottom-width:6px;"></div>
+  <div class="corner abs" style="left:920px;top:1640px;border-right-width:6px;border-bottom-width:6px;"></div>
+  <div id="rec" class="abs" style="left:110px;top:230px;"><b></b>REC <span id="tc" style="opacity:.85"></span></div>
+  <div id="live" class="abs" style="left:800px;top:225px;">LIVE</div>
+</div>
+<div id="ring" class="abs"></div>
+<div id="blinds" class="abs"></div>
+<div id="end" class="abs">
+  <div class="grid abs"></div>
+  <div id="e1" class="abs c" style="top:560px;font-family:DM;font-size:32px;letter-spacing:5px;color:#fff;opacity:.85;">NEXT COHORT · REGISTRATIONS LIVE</div>
+  <div id="e2" class="abs c" style="top:650px;font-family:SG;font-weight:700;font-size:250px;letter-spacing:-8px;color:#C9FF52;text-shadow:0 0 40px rgba(201,255,82,.5);line-height:1;">WHY</div>
+  <div id="e3" class="abs c" style="top:910px;font-family:SG;font-weight:700;font-size:96px;letter-spacing:-3px;color:#fff;">Venture Studio</div>
+  <div id="e4" class="abs c" style="top:1060px;font-family:MR;font-weight:700;font-size:46px;color:#fff;opacity:.85;">for founders under 25 · only 15 startups</div>
+  <div id="e5" class="abs c" style="top:1210px;"><span class="btn">Comment “LINK” ↓</span></div>
+  <div id="e6" class="abs c" style="top:1440px;font-family:SG;font-weight:700;font-size:56px;color:#fff;opacity:.9;">hatfellows.com</div>
+</div>
+<script>
+/* Pure function of time: seek(t) sets every element for cut time t (s). Word times: Whisper (medium) on the cut. */
+const G = [ // [lead in, key in, lead, key, trail (words with in-times), style, y]
+  [0.00, 0.42, "if you are", "25", [["and", 0.76], ["building", 0.90], ["something", 1.12], ["meaningful,", 1.46]], "", 1215],
+  [1.90, 2.06, "", "PAY ATTENTION.", [], "", 1215],
+  [2.44, 4.16, "because the way founders are", "building startups", [], "strike", 1215],
+  [5.04, 5.94, "is about to get", "a new ecosystem.", [], "", 1215],
+  [6.85, 7.58, "introducing the", "WHY Venture Studio", [], "top", 230],
+  [9.16, 10.18, "a first-of-its-kind", "venture studio", [], "", 1215],
+  [11.12, 12.64, "designed to support early-stage", "founders under 25.", [], "", 1215],
+  [15.16, 99, "built by people with", "", [], "chips", 1190],
+  [19.89, 21.20, "WHY brings together", "resources,", [], "", 1215],
+  [21.62, 23.20, "founders, to", "move forward.", [], "", 1215],
+  [24.06, 25.82, "our first cohort started and it's", "going amazing.", [], "", 1215],
+  [26.54, 27.26, "next cohort", "registrations are live.", [], "", 1215],
+  [28.58, 29.42, "if you want to really", "build a company,", [], "", 1215],
+  [30.62, 31.02, "then kindly", "apply.", [], "box", 1215],
+  [31.29, 31.78, "only", "15 startups", [["will", 32.94], ["be", 33.20], ["selected.", 33.52]], "top", 175],
+  [34.14, 34.64, "so be", "curious,", [], "", 1215],
+  [35.46, 35.58, "be", "serious.", [], "box", 1215],
+  [36.04, 37.54, "want the registration link?", "comment “LINK”", [], "box", 1215],
+  [38.16, 38.56, "I will directly", "share it with you.", [], "", 1215],
+];
+const CUT = 39.19, END = 41.0;
+const STRIKE_AT = 4.90, BLINDS = [6.85, 33.71], REC = [24.06, 28.58], LIVE_AT = 27.26, RING = [31.29, 33.71];
+const RINGC = [542, 870], RINGR = 385;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, d) => clamp((t - a) / d);
+const eOut = (x) => 1 - Math.pow(1 - x, 3);
+const back = (x) => { const c = 1.7; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+const $ = (id) => document.getElementById(id);
+function pop(el, t, t0, from = 0.8, d = 0.2, y = 0, base = "") {
+  const p = t < t0 ? 0 : P(t, t0, d); el.style.opacity = clamp(p * 3);
+  el.style.transform = `${base} translateY(${(1 - eOut(p)) * y}px) scale(${from + (1 - from) * back(p)})`;
+}
+function fit(el, max) { el.style.fontSize = ""; const w = el.scrollWidth; if (w > max) el.style.fontSize = (parseFloat(getComputedStyle(el).fontSize) * max / w) + "px"; }
+let last = -1;
+function seek(t) {
+  const end = t >= CUT; $("end").style.display = end ? "block" : "none";
+  for (const id of ["shade", "cap", "chips", "vf", "ring", "blinds"]) $(id).style.display = end ? "none" : "block";
+  if (end) {
+    const a = CUT; pop($("e1"), t, a + 0.05, 1, 0.3, 14, "translateX(-50%)"); pop($("e2"), t, a + 0.12, 0.75, 0.3, 30, "translateX(-50%)");
+    pop($("e3"), t, a + 0.3, 0.85, 0.26, 20, "translateX(-50%)"); pop($("e4"), t, a + 0.45, 1, 0.3, 14, "translateX(-50%)");
+    pop($("e5"), t, a + 0.62, 0.7, 0.28, 20, "translateX(-50%)"); pop($("e6"), t, a + 0.8, 1, 0.3, 14, "translateX(-50%)");
+    return;
+  }
+  let gi = -1; for (let i = 0; i < G.length; i++) if (t >= G[i][0]) gi = i;
+  const g = G[gi], [a, k, lead, key, trail, st, y] = g;
+  if (gi !== last) {
+    $("lead").textContent = lead; $("keyt").textContent = key; $("key").className = "key" + (st === "box" ? " box" : "");
+    $("key").style.fontSize = st === "top" ? "112px" : ""; fit($("key"), 980);
+    $("trail").innerHTML = trail.map(([w]) => `<span>${w} </span>`).join(""); $("cap").style.top = y + "px"; last = gi;
+  }
+  $("shade").style.display = st === "top" ? "none" : "block";
+  const pl = P(t, a, 0.15); $("lead").style.opacity = lead ? eOut(pl) : 0; $("lead").style.transform = `translateY(${(1 - eOut(pl)) * 14}px)`;
+  const pk = key && t >= k ? P(t, k, 0.2) : 0; $("key").style.opacity = clamp(pk * 3); $("key").style.transform = `scale(${0.78 + 0.22 * back(pk)})`;
+  [...$("trail").children].forEach((s, i) => { s.style.color = t >= trail[i][1] ? "#fff" : "#9a9a9a"; });
+  $("strike").style.display = st === "strike" ? "block" : "none"; $("strike").style.transform = `scaleX(${eOut(P(t, STRIKE_AT, 0.22))})`;
+  // chips
+  const chipsOn = st === "chips"; $("chips").style.display = chipsOn ? "block" : "none";
+  if (chipsOn) { pop($("chip1"), t, 16.38, 0.8, 0.22, 26, "translateX(-50%)"); pop($("chip2"), t, 17.78, 0.8, 0.22, 26, "translateX(-50%)"); }
+  // viewfinder + LIVE
+  const vfOn = t >= REC[0] && t < REC[1]; $("vf").style.display = vfOn ? "block" : "none";
+  if (vfOn) {
+    const p = eOut(P(t, REC[0], 0.25)); $("vf").style.opacity = p; $("vf").style.transform = `scale(${1.06 - 0.06 * p})`; $("vf").style.transformOrigin = "540px 960px";
+    $("rec").querySelector("b").style.opacity = Math.floor(t * 2) % 2 ? 0.25 : 1;
+    const s = Math.floor(t - REC[0]); $("tc").textContent = `00:00:${String(s).padStart(2, "0")}`;
+    pop($("live"), t, LIVE_AT, 0.6, 0.22, 0);
+  }
+  // ring punch-in
+  const rOn = t >= RING[0] && t < RING[1]; $("ring").style.display = rOn ? "block" : "none";
+  if (rOn) {
+    const p = P(t, RING[0], 0.3), r = RINGR * (1.25 - 0.25 * eOut(p));
+    Object.assign($("ring").style, { left: RINGC[0] - r + "px", top: RINGC[1] - r + "px", width: 2 * r + "px", height: 2 * r + "px", opacity: eOut(p) * (0.85 + 0.15 * Math.sin(t * 8)) });
+  }
+  // blinds glitch (6 frames around each segment change)
+  let b = 0; for (const t0 of BLINDS) if (t >= t0 - 0.067 && t < t0 + 0.133) b = 1 - Math.abs(t - t0 - 0.033) / 0.1;
+  $("blinds").style.opacity = clamp(b); $("blinds").style.backgroundPosition = `${Math.round(t * 30) * 9}px 0`;
+}
+window.seek = seek; window.TIMING = { END, CUT };
+window.ready = (async () => {
+  await document.fonts.load("700 80px SG"); await document.fonts.load("700 40px MR"); await document.fonts.load("800 40px MR"); await document.fonts.load("30px DM");
+  seek(0); return true;
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+{
+ "whoosh": {"ids": [52, 50, 52], "role": "whoosh"},
+ "glitch": {"ids": [56, 53], "role": "whoosh"},
+ "strike": {"ids": [53], "role": "whoosh"},
+ "rec": {"ids": [33], "role": "click"},
+ "live": {"ids": [61], "role": "ui"},
+ "hit": {"ids": [29], "role": "hit"}
+}

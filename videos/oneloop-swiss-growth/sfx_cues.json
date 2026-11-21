@@ -1,0 +1,143 @@
+[
+ {
+  "t": 0.5,
+  "type": "paper",
+  "g": 0.7,
+  "note": "column 1 lands"
+ },
+ {
+  "t": 1.0,
+  "type": "paper",
+  "g": 0.7,
+  "note": "column 2"
+ },
+ {
+  "t": 1.5,
+  "type": "paper",
+  "g": 0.7,
+  "note": "column 3"
+ },
+ {
+  "t": 2.0,
+  "type": "paper",
+  "g": 0.7,
+  "note": "column 4"
+ },
+ {
+  "t": 0.5,
+  "type": "key",
+  "g": 0.55,
+  "note": "'growth breaks' lands"
+ },
+ {
+  "t": 1.0,
+  "type": "key",
+  "g": 0.55,
+  "note": "'in the gaps.' lands"
+ },
+ {
+  "t": 3.5,
+  "type": "click",
+  "g": 0.6,
+  "note": "copper dot placed"
+ },
+ {
+  "t": 4.0,
+  "type": "thump",
+  "g": 0.9,
+  "note": "numeral 01"
+ },
+ {
+  "t": 4.4,
+  "type": "tick",
+  "g": 0.55,
+  "note": "thread cuts leak 1"
+ },
+ {
+  "t": 8.0,
+  "type": "thump",
+  "g": 0.9,
+  "note": "numeral 02"
+ },
+ {
+  "t": 8.4,
+  "type": "tick",
+  "g": 0.55,
+  "note": "thread cuts leak 2"
+ },
+ {
+  "t": 8.5,
+  "type": "land",
+  "g": 0.55,
+  "note": "website block built"
+ },
+ {
+  "t": 12.0,
+  "type": "thump",
+  "g": 0.9,
+  "note": "numeral 03"
+ },
+ {
+  "t": 12.4,
+  "type": "tick",
+  "g": 0.55,
+  "note": "thread cuts leak 3"
+ },
+ {
+  "t": 12.5,
+  "type": "land",
+  "g": 0.55,
+  "note": "marketing block built"
+ },
+ {
+  "t": 16.0,
+  "type": "thump",
+  "g": 0.9,
+  "note": "numeral 04"
+ },
+ {
+  "t": 16.5,
+  "type": "land",
+  "g": 0.55,
+  "note": "operations block built"
+ },
+ {
+  "t": 20.0,
+  "type": "thump",
+  "g": 0.9,
+  "note": "numeral 05"
+ },
+ {
+  "t": 20.0,
+  "type": "whoosh",
+  "len": 0.5,
+  "g": 0.6,
+  "note": "pull out to the wall of five"
+ },
+ {
+  "t": 24.25,
+  "type": "whoosh",
+  "len": 0.25,
+  "g": 0.5,
+  "note": "knife cut through the programme"
+ },
+ {
+  "t": 25.75,
+  "type": "whoosh",
+  "len": 0.25,
+  "g": 0.5,
+  "note": "knife cut through the wall"
+ },
+ {
+  "t": 26.0,
+  "type": "hit",
+  "g": 0.75,
+  "note": "the X snaps into the logo"
+ },
+ {
+  "t": 27.25,
+  "type": "key",
+  "g": 0.5,
+  "note": "'audit my business' lands"
+ }
+]

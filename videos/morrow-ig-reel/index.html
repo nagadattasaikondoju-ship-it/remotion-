@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Morrow — profile build</title>
+<style>
+  @font-face { font-family: "Inter"; src: url("fonts/inter-400.woff2"); font-weight: 400; }
+  @font-face { font-family: "Inter"; src: url("fonts/inter-500.woff2"); font-weight: 500; }
+  @font-face { font-family: "Inter"; src: url("fonts/inter-600.woff2"); font-weight: 600; }
+  @font-face { font-family: "Inter"; src: url("fonts/inter-700.woff2"); font-weight: 700; }
+  @font-face { font-family: "FR"; src: url("fonts/Fraunces-VF.ttf"); font-weight: 100 900; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
+  /* everything is laid out in the reference screenshot's own 941×1672 coordinates, then scaled to 1080×1920 */
+  #ui { position: absolute; left: 0; top: 0; width: 941px; height: 1672px; transform: scale(1.147715); transform-origin: 0 0;
+        background: #fff; font-family: "Inter", "Noto Color Emoji", sans-serif; color: #111; overflow: hidden; }
+  #ui * { position: absolute; box-sizing: border-box; }
+  .t { white-space: nowrap; }
+  .c { transform: translateX(-50%); text-align: center; }
+  .btn { height: 62px; border-radius: 13px; background: #EFEFF1; font-size: 25px; font-weight: 500; display: flex; align-items: center; justify-content: center; }
+  .tile { overflow: hidden; }
+  .tile img { left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; }
+  .ph { background: #D4D5D1; display: flex; align-items: center; justify-content: center; text-align: center;
+        font-size: 25px; letter-spacing: 0.01em; line-height: 1.2; color: #2E2E2E; font-weight: 400; }
+  svg { overflow: visible; }
+  #cap { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: none; }
+  /* reference style: chunky soft serif in lemon yellow, stacked lines, top and bottom lines bent on arcs */
+  #cap svg text { font-family: "FR"; font-weight: 900; font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 72; fill: #F7E81E;
+                  letter-spacing: -1px; filter: drop-shadow(0 3px 8px rgba(0,0,0,0.35)); }
+</style>
+</head>
+<body>
+<div id="ui"></div>
+<div id="cap">
+  <svg width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;left:0;top:0;">
+    <defs>
+      <path id="arcTop" d="M 250 1035 Q 540 925 830 1035" fill="none"/>
+      <path id="arcBot" d="M 95 1300 Q 540 1420 985 1300" fill="none"/>
+    </defs>
+    <text font-size="96" text-anchor="middle"><textPath href="#arcTop" startOffset="50%">if i handled</textPath></text>
+    <text x="540" y="1200" font-size="150" text-anchor="middle">your café's</text>
+    <text font-size="150" text-anchor="middle"><textPath href="#arcBot" startOffset="50%">instagram...</textPath></text>
+  </svg>
+</div>
+<script>
+/* Morrow Coffee House — "if I handled your café's Instagram" profile build.
+   Pure function of time: window.seek(t) sets every element's state for video time t (seconds from the start of the reel).
+   Timing is locked to the song (113 BPM, beat = 0.531 s): the beat drops on the cut to the wireframe and every step
+   lands two beats later, the same rhythm as the reference reel (whose cuts trail the beat by ~0.1 s; these sit on it). */
+const BEAT = 60 / 113, DROP = 2.38;
+const STEP = (n) => DROP + 2 * n * BEAT;            // n = 1 … 6
+const S1 = STEP(1), S2 = STEP(2), S3 = STEP(3), R = [STEP(4), STEP(5), STEP(6)], END = DROP + 14.5 * BEAT;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const eOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+// pop-in: lands on its beat (90 % there within 3 frames), tiny scale settle, no bounce
+const pop = (t, t0, len = 0.16) => eOut(P(t, t0, t0 + len));
+
+const ui = document.getElementById("ui");
+const el = (html) => { const d = document.createElement("div"); d.innerHTML = html.trim(); const n = d.firstChild; ui.appendChild(n); return n; };
+const at = (x, y, w, h) => `left:${x}px;top:${y}px;` + (w ? `width:${w}px;` : "") + (h ? `height:${h}px;` : "");
+const SV = (x, y, w, h, body, sw = 2.6, fill = "none") =>
+  `<svg style="${at(x, y, w, h)}" viewBox="0 0 ${w} ${h}" fill="${fill}" stroke="#111" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
+
+/* ---------- static chrome ---------- */
+el(SV(66, 28, 34, 38, `<path d="M26 4 L8 19 L26 34"/>`, 3.2));                                   // back
+el(SV(752, 22, 46, 50, `<path d="M9 36 L37 36 L33 30 L33 20 Q33 8 23 8 Q13 8 13 20 L13 30 Z"/><path d="M19 41 Q23 46 27 41"/>`, 2.8)); // bell
+el(`<svg style="${at(836, 40, 46, 14)}" viewBox="0 0 46 14"><circle cx="7" cy="7" r="4" fill="#111"/><circle cx="23" cy="7" r="4" fill="#111"/><circle cx="39" cy="7" r="4" fill="#111"/></svg>`);
+// avatar story ring
+el(`<svg style="${at(72, 72, 196, 196)}" viewBox="0 0 196 196"><defs><linearGradient id="rg" x1="0" y1="1" x2="1" y2="0">
+  <stop offset="0" stop-color="#FEC053"/><stop offset="0.35" stop-color="#F2203E"/><stop offset="0.7" stop-color="#B729A8"/><stop offset="1" stop-color="#5342D6"/></linearGradient></defs>
+  <circle cx="98" cy="98" r="95" fill="none" stroke="url(#rg)" stroke-width="5"/></svg>`);
+// stats
+const STAT_X = [407, 596, 790], STAT_L = ["posts", "followers", "following"];
+const statN = STAT_X.map((x) => el(`<div class="t c" style="${at(x, 126)}font-size:32px;font-weight:700;">0</div>`));
+STAT_X.forEach((x, i) => el(`<div class="t c" style="${at(x, 166)}font-size:27px;font-weight:400;">${STAT_L[i]}</div>`));
+// buttons
+el(`<div class="btn" style="${at(59, 451, 257, 62)}">Following&nbsp;<svg style="position:relative;" width="22" height="14" viewBox="0 0 22 14" fill="none" stroke="#111" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4 L11 10 L17 4"/></svg></div>`);
+el(`<div class="btn" style="${at(326, 451, 239, 62)}">Message</div>`);
+el(`<div class="btn" style="${at(575, 451, 232, 62)}">Email</div>`);
+el(`<div class="btn" style="${at(819, 451, 76, 62)}"></div>`);
+el(SV(834, 462, 46, 40, `<circle cx="27" cy="12" r="8"/><path d="M13 36 Q13 23 27 23 Q41 23 41 36"/><path d="M2 20 L14 20 M8 14 L8 26"/>`, 2.8));
+// link icon
+el(SV(57, 402, 34, 34, `<path d="M14 20 L20 14"/><path d="M12 15 L8 19 Q3 24 8 29 Q13 34 18 29 L22 25"/><path d="M22 19 L26 15 Q31 10 26 5 Q21 0 16 5 L12 9"/>`, 2.8));
+// tabs
+el(SV(146, 714, 44, 44, `<rect x="2" y="2" width="40" height="40" rx="2"/><path d="M15.3 2 V42 M28.7 2 V42 M2 15.3 H42 M2 28.7 H42"/>`, 2.6));
+el(SV(450, 714, 44, 44, `<rect x="2" y="2" width="40" height="40" rx="10"/><path d="M2 13 H42 M13 2 L19 13 M25 2 L31 13"/><path d="M18 20 L29 27 L18 34 Z"/>`, 2.6));
+el(SV(759, 714, 44, 44, `<rect x="2" y="6" width="40" height="36" rx="8"/><path d="M15 6 L22 0 L29 6"/><circle cx="22" cy="20" r="6"/><path d="M11 36 Q12 28 22 28 Q32 28 33 36"/>`, 2.6));
+// bottom nav
+el(`<div style="${at(0, 1572, 941, 100)}background:#fff;"></div>`);
+el(`<svg style="${at(84, 1593, 48, 48)}" viewBox="0 0 48 48"><path d="M5 22 L24 5 L43 22 V44 H31 V31 H17 V44 H5 Z" fill="#111" stroke="#111" stroke-width="2.8" stroke-linejoin="round"/></svg>`);
+el(SV(268, 1595, 48, 48, `<circle cx="20" cy="20" r="16"/><path d="M32 32 L45 45"/>`, 3.4));
+el(SV(448, 1595, 48, 48, `<rect x="3" y="3" width="42" height="42" rx="12"/><path d="M24 14 V34 M14 24 H34"/>`, 3.2));
+el(SV(633, 1595, 48, 48, `<rect x="3" y="3" width="42" height="42" rx="12"/><path d="M3 14 H45 M14 3 L20 14 M27 3 L33 14"/><path d="M20 22 L31 29 L20 36 Z"/>`, 3.0));
+
+/* ---------- placeholder (wireframe) layer ---------- */
+const wf = {
+  user: el(`<div class="t c" style="${at(472, 26)}font-size:31px;font-weight:700;">username</div>`),
+  avatar: el(`<svg style="${at(82, 82, 176, 176)}" viewBox="0 0 176 176"><circle cx="88" cy="88" r="86" fill="#D9D9DB"/>
+     <circle cx="88" cy="70" r="30" fill="#fff"/><path d="M30 150 Q38 108 88 108 Q138 108 146 150 Q120 174 88 174 Q56 174 30 150 Z" fill="#fff"/></svg>`),
+  bio: el(`<div class="t" style="${at(58, 268)}font-size:25px;line-height:31.5px;"><b style="position:static;font-weight:700;">Account Name</b><br/>IG profile copy<br/>goes here</div>`),
+  link: el(`<div class="t" style="${at(110, 403)}font-size:25px;font-weight:600;">www.link.com</div>`),
+  nav: el(`<svg style="${at(811, 1595, 48, 48)}" viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="3"><circle cx="24" cy="24" r="21"/><circle cx="24" cy="19" r="7"/><path d="M11 38 Q14 29 24 29 Q34 29 37 38"/></svg>`),
+};
+const HL_X = [128, 301, 472, 646, 816], HL_L = ["Menu", "Find Us", "The Space", "FAQs", "Our Story"];
+const HL_IMG = ["hl_0_menu", "hl_1_findus", "hl_2_space", "hl_3_faqs", "hl_4_story"];
+const hlPh = HL_X.map((x) => el(`<div style="${at(x - 58, 536, 116, 116)}border-radius:50%;background:#D9D9DB;box-shadow:0 0 0 3px #fff, 0 0 0 5px #E3E3E5;"></div>`));
+HL_X.forEach((x, i) => el(`<div class="t c" style="${at(x, 654)}font-size:21px;font-weight:400;">${HL_L[i]}</div>`));
+
+const GX = 27, GY = 771, TW = 892 / 3, TH = 802 / 3, GAP = 3;
+const LABELS = ["CAFÉ<br/>INTRODUCTION", "COFFEE<br/>EDUCATION", "DRINK<br/>SPOTLIGHT", "THE CAFÉ<br/>EXPERIENCE", "FOOD &amp;<br/>PAIRINGS",
+  "COFFEE<br/>HUMOR", "BEHIND THE<br/>BAR", "COMMUNITY<br/>CONTENT", "PLAN YOUR<br/>VISIT"];
+const TILE_IMG = ["tile_0_logo", "tile_1_flatwhite", "tile_2_iced", "tile_3_interior", "tile_4_croissant", "tile_5_goodcoffee", "tile_6_espresso", "tile_7_slow", "tile_8_exterior"];
+const tileBox = (i) => { const r = Math.floor(i / 3), c = i % 3; return [GX + c * TW + (c ? GAP / 2 : 0), GY + r * TH + (r ? GAP / 2 : 0), TW - (c === 1 ? GAP : GAP / 2), TH - (r === 1 ? GAP : GAP / 2)]; };
+LABELS.forEach((s, i) => { const [x, y, w, h] = tileBox(i); el(`<div class="ph" style="${at(x, y, w, h)}">${s}</div>`); });
+
+/* ---------- real (Morrow) layer ---------- */
+const real = {
+  user: el(`<div class="t c" style="${at(472, 26)}font-size:31px;font-weight:700;">morrow.coffeehouse</div>`),
+  avatar: el(`<img src="img/avatar.png" style="${at(87, 87, 166, 166)}border-radius:50%;"/>`),
+  bio: el(`<div class="t" style="${at(58, 268)}font-size:25px;line-height:31.5px;"><b style="position:static;font-weight:700;">Morrow Coffee House | Specialty Coffee</b><br/>Slow mornings. Thoughtful coffee.<br/>Hyderabad, India · Daily 8am–10pm<br/>Coffee, brunch &amp; little rituals ☕</div>`),
+  link: el(`<div class="t" style="${at(110, 403)}font-size:25px;font-weight:600;">morrowcoffee.example/menu</div>`),
+  nav: el(`<img src="img/navpp.png" style="${at(811, 1595, 48, 48)}border-radius:50%;"/>`),
+};
+const hlReal = HL_X.map((x, i) => el(`<img src="img/${HL_IMG[i]}.png" style="${at(x - 58, 536, 116, 116)}border-radius:50%;"/>`));
+const tiles = TILE_IMG.map((s, i) => { const [x, y, w, h] = tileBox(i); return el(`<div class="tile" style="${at(x, y, w, h)}"><img src="img/${s}.jpg"/></div>`); });
+
+/* ---------- state ---------- */
+// stats climb with each row (posts / followers / following), ending on the profile's real numbers
+const STATS = [[0, 0, 0], [83, 6200, 204], [166, 12400, 408], [248, 18600, 612]];
+const fmt = (v, i) => { v = Math.round(v); if (i === 1 && v >= 10000) return (Math.round(v / 100) / 10).toFixed(1).replace(/\.0$/, "") + "K"; return v.toLocaleString("en-US"); };
+function show(node, t, t0, scale = 0.92, len = 0.16) {
+  const p = t < t0 ? 0 : pop(t, t0, len);
+  node.style.opacity = p; node.style.transform = (node.classList.contains("c") ? "translateX(-50%) " : "") + `scale(${scale + (1 - scale) * p})`;
+  return p;
+}
+function seek(t) {
+  document.getElementById("cap").style.display = "none";
+  ui.style.display = "block";
+  // step 1: name, logo and link · step 2: bio · step 3: highlights · steps 4-6: the grid row by row
+  for (const k of ["user", "avatar", "link", "nav"]) { const p = show(real[k], t, S1); wf[k].style.opacity = 1 - p; }
+  { const p = show(real.bio, t, S2, 0.98); wf.bio.style.opacity = 1 - p; }
+  hlReal.forEach((n, i) => { const p = show(n, t, S3 + 0.045 * i, 0.7, 0.2); hlPh[i].style.opacity = 1 - p; });
+  tiles.forEach((n, i) => show(n, t, R[Math.floor(i / 3)] + 0.05 * (i % 3), 0.9, 0.18));
+  let row = 0; for (let k = 0; k < 3; k++) if (t >= R[k]) row = k + 1;
+  const prev = STATS[Math.max(0, row - 1)], cur = STATS[row], u = row ? eOut(P(t, R[row - 1], R[row - 1] + 0.4)) : 1;
+  statN.forEach((n, i) => (n.textContent = fmt(prev[i] + (cur[i] - prev[i]) * u, i)));
+}
+function caption() { ui.style.display = "none"; document.getElementById("cap").style.display = "block"; }
+window.seek = seek; window.caption = caption; window.TIMING = { DROP, S1, S2, S3, R, END, BEAT };
+window.ready = (async () => {
+  await document.fonts.load("700 30px Inter"); await document.fonts.load("400 30px Inter"); await document.fonts.load("600 30px Inter");
+  await document.fonts.load("500 30px Inter"); await document.fonts.load("900 80px FR"); await document.fonts.load("30px 'Noto Color Emoji'");
+  await Promise.all([...document.images].map((im) => (im.complete ? 0 : new Promise((r) => { im.onload = im.onerror = r; }))));
+  seek(DROP); return true;
+})();
+</script>
+</body>
+</html>

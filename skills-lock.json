@@ -7,6 +7,12 @@
       "skillPath": "registry/blocks/canopy-part-title/SKILL.md",
       "computedHash": "800aab87510aec660405170b394dbf662c3342488d310427ea44370eb4bf0505"
     },
+    "cinetic": {
+      "source": "Leonxlnx/cinetic",
+      "sourceType": "github",
+      "skillPath": "skills/cinetic/SKILL.md",
+      "computedHash": "963c985987ee175e2b8b24ba3f18e8953275928972fd2acc64ac8322f5a9ff6e"
+    },
     "code-slice-hero": {
       "source": "heygen-com/hyperframes",
       "sourceType": "github",
@@ -138,6 +144,12 @@
       "sourceType": "github",
       "skillPath": "skills/pr-to-video/SKILL.md",
       "computedHash": "fd899f1b6166746b6255d7129d48df296afcef0803fd063ae2fe8c0c26a91131"
+    },
+    "product-film": {
+      "source": "Rieranthony/product-film-skill",
+      "sourceType": "github",
+      "skillPath": "plugins/product-film/skills/product-film/SKILL.md",
+      "computedHash": "d459357d3986dfe674ff858638b1851f7ac24270fb329762e1a74effcd046c68"
     },
     "product-launch-video": {
       "source": "heygen-com/hyperframes",

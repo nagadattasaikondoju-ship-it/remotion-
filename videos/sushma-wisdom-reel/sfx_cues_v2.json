@@ -1,0 +1,20 @@
+[
+ {
+  "t": 34.427,
+  "type": "whoosh",
+  "g": 0.45,
+  "note": "the card pops up out of the white flash"
+ },
+ {
+  "t": 34.727,
+  "type": "pop",
+  "g": 0.5,
+  "note": "the logo lands"
+ },
+ {
+  "t": 35.537,
+  "type": "chime",
+  "g": 0.45,
+  "note": "the BOOK AN APPOINTMENT button lands"
+ }
+]

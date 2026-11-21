@@ -1,0 +1,53 @@
+{
+ "thump": {
+  "ids": [
+   15,
+   17,
+   18
+  ],
+  "role": "hit"
+ },
+ "land": {
+  "ids": [
+   2,
+   3
+  ],
+  "role": "hit"
+ },
+ "key": {
+  "ids": [
+   31,
+   28,
+   27
+  ],
+  "role": "click"
+ },
+ "tick": {
+  "ids": [
+   0,
+   28
+  ],
+  "role": "click"
+ },
+ "click": {
+  "ids": [
+   1
+  ],
+  "role": "click"
+ },
+ "paper": {
+  "ids": [
+   11,
+   9,
+   14
+  ],
+  "role": "paper",
+  "slice": "first"
+ },
+ "hit": {
+  "ids": [
+   3
+  ],
+  "role": "hit"
+ }
+}
