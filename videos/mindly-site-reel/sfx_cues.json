@@ -1,0 +1,20 @@
+[
+ {
+  "t": 4.0,
+  "type": "swipe",
+  "g": 0.45,
+  "note": "the agent cursors swarm in from the edges"
+ },
+ {
+  "t": 4.514,
+  "type": "glitch",
+  "g": 0.35,
+  "note": "the slop is deleted (with the song's own pop)"
+ },
+ {
+  "t": 10.826,
+  "type": "softwhoosh",
+  "g": 0.35,
+  "note": "the browser shrinks up for the end card"
+ }
+]

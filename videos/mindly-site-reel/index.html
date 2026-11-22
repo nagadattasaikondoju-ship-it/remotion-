@@ -1,0 +1,292 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- One Loop ep. 04: "if i rebuilt your brand's website..." AI-slop site vs the rebuilt site, same brand (Mindly).
+     Pure function of time: window.seek(t) sets every element for video time t (song time). 1080x1920, rendered at 60 fps.
+     Mindly layers are crops of the user's reference screenshot (img/mindly_ref.png); the slop site is rebuilt in HTML. -->
+<style>
+@font-face { font-family: "Inter"; src: url("fonts/inter-400.woff2"); font-weight: 400; }
+@font-face { font-family: "Inter"; src: url("fonts/inter-500.woff2"); font-weight: 500; }
+@font-face { font-family: "Inter"; src: url("fonts/inter-600.woff2"); font-weight: 600; }
+@font-face { font-family: "Inter"; src: url("fonts/inter-700.woff2"); font-weight: 700 900; }
+@font-face { font-family: "FR"; src: url("fonts/Fraunces-VF.ttf"); font-weight: 100 900; }
+@font-face { font-family: "JBM"; src: url("fonts/JetBrainsMono-Regular.ttf"); font-weight: 400; }
+@font-face { font-family: "JBM"; src: url("fonts/JetBrainsMono-Bold.ttf"); font-weight: 700; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #0C0C0F; }
+#bg { position: absolute; inset: 0; background: radial-gradient(ellipse 900px 1100px at 50% 48%, #1C1C24 0%, #0C0C0F 70%); }
+#browser { position: absolute; left: 30px; top: 600px; width: 1020px; height: 737px; transform-origin: 510px 0; border-radius: 22px; overflow: hidden;
+  box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.08); background: #fff; }
+#chrome { position: absolute; left: 0; top: 0; width: 1020px; height: 46px; background: #1E1E23; }
+#chrome .dot { position: absolute; top: 17px; width: 12px; height: 12px; border-radius: 6px; }
+#url { position: absolute; left: 330px; top: 9px; width: 360px; height: 28px; border-radius: 14px; background: #2B2B31; color: #C9CAD3;
+  font: 500 15px Inter; display: flex; align-items: center; justify-content: center; letter-spacing: .2px; }
+#url b { color: #fff; font-weight: 600; }
+#page { position: absolute; left: 0; top: 46px; width: 1126px; height: 763px; transform: scale(0.905861); transform-origin: 0 0; overflow: hidden; }
+#cream { position: absolute; inset: 0; background: #FBFAF8; }
+#grid { position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(30,30,40,.12) 1.2px, transparent 1.4px); background-size: 24px 24px; }
+/* ---- the AI-slop version (same brand) ---- */
+#slop { position: absolute; inset: 0; background:
+  radial-gradient(ellipse 520px 420px at 860px 110px, rgba(0,190,210,.42), rgba(0,190,210,0) 70%),
+  radial-gradient(ellipse 520px 380px at 150px 720px, rgba(150,40,180,.45), rgba(150,40,180,0) 70%),
+  linear-gradient(180deg, #0B0B18, #0D0C1C); }
+.s { position: absolute; }
+#s_nav { left: 40px; top: 36px; width: 1046px; height: 72px; border-radius: 16px; border: 1px solid rgba(255,255,255,.13); background: rgba(255,255,255,.035); }
+#s_nav .logo { position: absolute; left: 28px; top: 18px; font: 700 30px JBM; color: #22E5FF; text-shadow: 0 0 14px rgba(34,229,255,.8); }
+#s_nav .links { position: absolute; left: 600px; top: 25px; font: 400 16px JBM; color: #A9B0C2; letter-spacing: 2.5px; word-spacing: 18px; }
+#s_nav .launch { position: absolute; right: 20px; top: 14px; width: 118px; height: 44px; border-radius: 9px; background: #12E3FF; color: #04141A;
+  font: 700 15px JBM; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 22px rgba(18,227,255,.7); }
+#s_chip { left: 468px; top: 150px; width: 190px; height: 36px; border-radius: 18px; border: 1.5px solid rgba(34,229,255,.55); background: rgba(34,229,255,.06);
+  font: 700 14px JBM; color: #22E5FF; letter-spacing: 3px; display: flex; align-items: center; justify-content: center; }
+.s_h { width: 1126px; left: 0; text-align: center; font: 800 66px Inter; color: #fff; letter-spacing: -1px; white-space: nowrap; }
+#s_h1 { top: 205px; } #s_h2 { top: 280px; }
+#s_h2 span { color: #22E5FF; text-shadow: 0 0 26px rgba(34,229,255,.85); }
+#s_sub { left: 0; width: 1126px; top: 376px; text-align: center; font: 400 18px/31px JBM; color: #9AA3B6; }
+#s_b1 { left: 408px; top: 464px; width: 158px; height: 52px; border-radius: 10px; background: #12E3FF; color: #04141A; font: 700 16px JBM; letter-spacing: 2px;
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 0 34px rgba(18,227,255,.75); }
+#s_b2 { left: 578px; top: 464px; width: 142px; height: 52px; border-radius: 10px; border: 1.5px solid rgba(34,229,255,.55); color: #22E5FF; font: 700 16px JBM;
+  letter-spacing: 2px; display: flex; align-items: center; justify-content: center; background: rgba(10,30,40,.4); }
+.s_card { top: 560px; width: 340px; height: 176px; border-radius: 14px; border: 1px solid rgba(255,255,255,.09); background: rgba(255,255,255,.035); text-align: center; }
+#s_c1 { left: 40px; background: linear-gradient(160deg, rgba(150,40,180,.35), rgba(255,255,255,.03) 70%); } #s_c2 { left: 393px; } #s_c3 { left: 746px; }
+.s_card svg { position: absolute; left: 150px; top: 22px; }
+.s_card .ti { position: absolute; left: 0; width: 340px; top: 82px; font: 700 17px JBM; color: #22E5FF; letter-spacing: 3px; }
+.s_card .de { position: absolute; left: 30px; width: 280px; top: 114px; font: 400 15px/22px Inter; color: #9AA3B6; }
+/* ---- the rebuilt version: crops of the reference, one layer each ---- */
+.m { position: absolute; background-image: url(img/mindly_ref.png); background-size: 1200px 837px; opacity: 0; }
+/* ---- overlays ---- */
+#ov { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; pointer-events: none; }
+#ov text { font-family: "FR"; font-weight: 900; font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 72; fill: #FFE81A; letter-spacing: -1px;
+  paint-order: stroke fill; stroke: #1A0B08; stroke-width: 10px; stroke-linejoin: round; filter: drop-shadow(0 4px 10px rgba(0,0,0,.55)); }
+#ov g { transform-box: fill-box; transform-origin: center; }
+#cv { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+/* hook caption (rendered once to a transparent PNG, laid over the B-roll by ffmpeg) */
+#cap { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: none; }
+#cap text { font-family: "FR"; font-weight: 900; font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 72; fill: #FFE81A; letter-spacing: -1px;
+  paint-order: stroke fill; stroke: #1A0B08; stroke-width: 11px; stroke-linejoin: round; filter: drop-shadow(0 4px 10px rgba(0,0,0,.5)); }
+</style></head>
+<body>
+<div id="scene">
+<div id="bg"></div>
+<div id="cam" style="position:absolute;left:0;top:0;width:1080px;height:1920px;transform-origin:0 0">
+<div id="browser">
+  <div id="chrome"><div class="dot" style="left:20px;background:#FF5F57"></div><div class="dot" style="left:40px;background:#FEBC2E"></div><div class="dot" style="left:60px;background:#28C840"></div>
+    <div id="url"><b>mindly</b>.app</div></div>
+  <div id="page">
+    <div id="cream"></div><div id="grid"></div>
+    <div id="mind"></div>
+    <div id="slop">
+      <div class="s" id="s_nav"><div class="logo">&lt;MINDLY/&gt;</div><div class="links">FEATURES DOCS PRICING</div><div class="launch">LAUNCH</div></div>
+      <div class="s" id="s_chip">// NOW IN BETA</div>
+      <div class="s s_h" id="s_h1">Build the Future</div>
+      <div class="s s_h" id="s_h2">with <span>Mindly AI</span></div>
+      <div class="s" id="s_sub">const future = await buildWithAI(); // Neon glow<br>makes everything 10x more futuristic</div>
+      <div class="s" id="s_b1">INITIALIZE_</div>
+      <div class="s" id="s_b2">VIEW_CODE</div>
+      <div class="s s_card" id="s_c1"><svg width="40" height="48" viewBox="0 0 40 48"><path d="M24 2 L4 28 H18 L14 46 L36 18 H22 Z" fill="#FFC83D" stroke="#B57A00" stroke-width="2" stroke-linejoin="round"/></svg>
+        <div class="ti">LIGHTNING</div><div class="de">Blazing fast with quantum acceleration</div></div>
+      <div class="s s_card" id="s_c2"><svg width="40" height="48" viewBox="0 0 40 48"><defs><radialGradient id="orb" cx=".35" cy=".3"><stop offset="0" stop-color="#FFD6FF"/><stop offset=".45" stop-color="#C04BEA"/><stop offset="1" stop-color="#4B1170"/></radialGradient></defs>
+        <circle cx="20" cy="20" r="17" fill="url(#orb)"/><path d="M8 40 h24 l-4 -6 h-16 z" fill="#C9A25A" stroke="#7A5A20" stroke-width="1.5"/></svg>
+        <div class="ti">AI POWERED</div><div class="de">Neural networks do the heavy lifting</div></div>
+      <div class="s s_card" id="s_c3"><svg width="40" height="48" viewBox="0 0 40 48"><circle cx="20" cy="22" r="17" fill="#7EC8F2" stroke="#2A6E9E" stroke-width="2"/>
+        <ellipse cx="20" cy="22" rx="8" ry="17" fill="none" stroke="#2A6E9E" stroke-width="1.6"/><path d="M3 22 H37 M6 13 H34 M6 31 H34" stroke="#2A6E9E" stroke-width="1.6"/></svg>
+        <div class="ti">WEB3 READY</div><div class="de">Decentralized by default</div></div>
+    </div>
+  </div>
+</div>
+<canvas id="cv" width="1080" height="1920"></canvas>
+</div>
+<svg id="ov" viewBox="0 0 1080 1920">
+  <g id="o_s1"><text x="540" y="470" font-size="150" text-anchor="middle">AI slop.</text></g>
+  <g id="o_b1a"><text x="540" y="400" font-size="84" text-anchor="middle">now watch it get rebuilt.</text></g>
+  <g id="o_b1b"><text x="540" y="505" font-size="96" text-anchor="middle">layer by layer.</text></g>
+  <g id="o_e1a"><text x="540" y="380" font-size="86" text-anchor="middle">your brand deserves</text></g>
+  <g id="o_e1b"><text x="540" y="482" font-size="98" text-anchor="middle">the second one.</text></g>
+  <g id="o_e2a"><text x="540" y="1150" font-size="92" text-anchor="middle">comment "SITE"</text></g>
+  <g id="o_e2b"><text x="540" y="1236" font-size="62" text-anchor="middle">and we'll audit yours free</text></g>
+</svg>
+</div>
+<div id="cap">
+  <svg width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;left:0;top:0;overflow:visible">
+    <defs>
+      <path id="arcTop" d="M 250 1080 Q 540 970 830 1080" fill="none"/>
+      <path id="arcBot" d="M 120 1455 Q 540 1575 960 1455" fill="none"/>
+      <linearGradient id="dim" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="0.3" stop-color="#000" stop-opacity="0.34"/>
+        <stop offset="0.75" stop-color="#000" stop-opacity="0.34"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="910" width="1080" height="860" fill="url(#dim)"/>
+    <text font-size="98" text-anchor="middle"><textPath href="#arcTop" startOffset="50%">if i rebuilt</textPath></text>
+    <text x="540" y="1262" font-size="128" text-anchor="middle">your brand's</text>
+    <text font-size="150" text-anchor="middle"><textPath href="#arcBot" startOffset="50%">website...</textPath></text>
+    <text x="540" y="1668" font-size="76" text-anchor="middle">ep. 04</text>
+  </svg>
+</div>
+<script src="logo.js"></script>
+<script>
+// ---------- timing: the song's beat grid (113 BPM, every pop in the song sits on a 2-beat step) ----------
+const BEAT = 60 / 113, DROP = 2.383, P = k => 3.442 + (k - 1) * 2 * BEAT;   // P(1)=3.442 ... P(9)=11.938
+const P1 = P(1), P2 = P(2), P3 = P(3), P4 = P(4), P5 = P(5), P6 = P(6), P7 = P(7), P8 = P(8), P9 = P(9), END = 13.269;
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), lerp = (a, b, k) => a + (b - a) * k;
+const seg = (t, a, b) => clamp((t - a) / (b - a));
+const eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2, eo = k => 1 - Math.pow(1 - k, 3);
+const back = k => { const c = 1.7; return k <= 0 ? 0 : 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); };
+const hash = (i, k = 0) => { const s = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return s - Math.floor(s); };
+
+// ---------- geometry: page (content) coords 1126x763 -> screen ----------
+const PAGE_S = 1020 / 1126;
+let BR = { x: 30, y: 600, s: 1 };           // browser placement (changes at the end)
+const toScreen = (x, y) => [540 + (x * PAGE_S - 510) * BR.s, BR.y + (46 + y * PAGE_S) * BR.s];
+
+// ---------- the rebuilt site: layers cut from the reference (ref coords; page = ref - (36,34)) ----------
+const OX = 36, OY = 34;
+const ML = {
+  logo: [96, 48, 168, 80], nav: [438, 46, 760, 86], app: [990, 46, 1104, 86], badge: [1016, 146, 1110, 242],
+  h1: [376, 122, 822, 200], h2: [344, 198, 849, 278], sub: [426, 280, 774, 324], b1: [456, 333, 606, 380], b2: [608, 333, 744, 380],
+  lcard: [110, 222, 300, 412], rcard: [906, 300, 1096, 488],
+  hero1: [322, 393, 506, 595], hero2: [506, 393, 690, 595], hero3: [690, 393, 878, 595],
+  hero4: [322, 595, 506, 797], hero5: [506, 595, 690, 797], hero6: [690, 595, 878, 797],
+  lineL: [192, 396, 322, 530], lineR: [878, 466, 1004, 580], trust: [96, 606, 226, 652], avat: [96, 652, 212, 694], chaos: [986, 626, 1104, 700],
+};
+const WAVES = { 3: ['logo', 'nav', 'app', 'badge'], 4: ['h1', 'h2'], 5: ['sub', 'b1', 'b2', 'lcard', 'rcard'],
+  6: ['hero1', 'hero2', 'hero3', 'hero4', 'hero5', 'hero6', 'lineL', 'lineR', 'trust', 'avat', 'chaos'] };
+const mind = document.getElementById('mind'), MEL = {};
+for (const [k, [x0, y0, x1, y1]] of Object.entries(ML)) {
+  const d = document.createElement('div'); d.className = 'm';
+  Object.assign(d.style, { left: (x0 - OX) + 'px', top: (y0 - OY) + 'px', width: (x1 - x0) + 'px', height: (y1 - y0) + 'px', backgroundPosition: `${-x0}px ${-y0}px` });
+  mind.appendChild(d); MEL[k] = d;
+}
+const pageRect = k => { const [x0, y0, x1, y1] = ML[k]; return [x0 - OX, y0 - OY, x1 - OX, y1 - OY]; };
+// ---------- the slop site's elements (page coords) ----------
+const SL = { s_nav: [40, 36, 1086, 108], s_chip: [468, 150, 658, 186], s_h1: [300, 208, 826, 280], s_h2: [330, 283, 796, 355],
+  s_sub: [330, 372, 796, 438], s_b1: [408, 464, 566, 516], s_b2: [578, 464, 720, 516], s_c1: [40, 560, 380, 736], s_c2: [393, 560, 733, 736], s_c3: [746, 560, 1086, 736] };
+const SEL = Object.fromEntries(Object.keys(SL).map(k => [k, document.getElementById(k)]));
+
+// ---------- agents (cursors) ----------
+const COLS = ['#FF4D6D', '#FFB020', '#2FD27B', '#2F6BFF', '#B05CFF', '#00C2D1', '#FF7A3D', '#E83E8C', '#7BD62F', '#5B5BFF', '#FF5ACD', '#14B8A6'];
+const NA = 24;
+const spawn = i => { const a = hash(i, 3) * 6.283; return [563 + Math.cos(a) * 980, 380 + Math.sin(a) * 760]; };
+// a job = drag a box over a strip of an element, ending on beat `at`
+function jobsFor(k) {
+  const at = k === 2 ? P2 : P(k), names = k === 2 ? Object.keys(SL) : WAVES[k], n = names.length;
+  const active = k === 2 ? 12 : NA, per = Math.ceil(active / n), jobs = [];
+  for (let i = 0; i < active; i++) {
+    const nm = names[i % n], j = Math.floor(i / n), c = Math.min(per, Math.ceil((active - (i % n)) / n));
+    const r = k === 2 ? SL[nm] : pageRect(nm), w = r[2] - r[0];
+    const x0 = r[0] + w * j / c, x1 = r[0] + w * (j + 1) / c;
+    jobs[i] = { nm, box: [x0, r[1], x1, r[3]], at, del: k === 2, st: at - 1.0 + hash(i, k) * .12, ds: at - .56 + hash(i, k + 9) * .1 };
+  }
+  return jobs;
+}
+const JOBS = { 2: jobsFor(2), 3: jobsFor(3), 4: jobsFor(4), 5: jobsFor(5), 6: jobsFor(6) };
+JOBS[2].forEach(j => { j.st = 3.78 + hash(j.box[0], 2) * .2; });
+function agentAt(i, t) {   // -> {x, y, job, phase} in page coords, or null when off
+  let prev = spawn(i), prevEnd = 0;
+  for (const k of [2, 3, 4, 5, 6]) {
+    const j = JOBS[k][i]; if (!j) continue;
+    if (t < j.st) return { x: prev[0], y: prev[1], idle: true };
+    const [x0, y0, x1, y1] = j.box;
+    if (t < j.ds) { const e = eio(seg(t, j.st, j.ds)); return { x: lerp(prev[0], x0, e), y: lerp(prev[1], y0, e) + Math.sin(e * Math.PI) * -40 * hash(i, k) }; }
+    if (t < j.at) { const e = eio(seg(t, j.ds, j.at - .05)); return { x: lerp(x0, x1, e), y: lerp(y0, y1, e), job: j, drag: e }; }
+    prev = [x1, y1]; prevEnd = j.at;
+    if (t < j.at + .2) return { x: x1, y: y1, job: j, done: seg(t, j.at, j.at + .35) };
+  }
+  const out = spawn(i + 7), e = eio(seg(t, P6 + .15, P6 + .9));
+  if (e >= 1) return null;
+  return { x: lerp(prev[0], out[0], e), y: lerp(prev[1], out[1], e) };
+}
+const layerCount = t => { const pts = [[P2 + .4, 0], [P3, 64], [P4, 141], [P5, 233], [P6, 347]];
+  if (t < pts[0][0]) return 0; for (let i = 1; i < pts.length; i++) if (t <= pts[i][0]) return Math.round(lerp(pts[i - 1][1], pts[i][1], eio(seg(t, pts[i][0] - .62, pts[i][0])))); return 347; };
+const agentCount = t => t < 3.78 ? 0 : t < P2 + .3 ? Math.round(lerp(1, 12, seg(t, 3.78, 4.2))) : Math.round(lerp(12, 31, seg(t, P2 + .3, P3 - .2)));
+
+// ---------- canvas drawing ----------
+const cv = document.getElementById('cv'), X = cv.getContext('2d');
+function cursor(x, y, col) {
+  X.save(); X.translate(x, y); X.beginPath(); X.moveTo(0, 0); X.lineTo(0, 27); X.lineTo(7, 21); X.lineTo(12, 32); X.lineTo(17, 30); X.lineTo(12, 19); X.lineTo(21, 19); X.closePath();
+  X.shadowColor = 'rgba(0,0,0,.35)'; X.shadowBlur = 6; X.shadowOffsetY = 2; X.fillStyle = col; X.fill(); X.shadowColor = 'transparent';
+  X.lineWidth = 2.2; X.strokeStyle = '#fff'; X.lineJoin = 'round'; X.stroke(); X.restore();
+}
+function tag(x, y, s, col) {
+  X.font = '700 13px JBM'; const w = X.measureText(s).width + 14;
+  X.fillStyle = col; X.beginPath(); X.roundRect(x, y, w, 20, 4); X.fill(); X.fillStyle = '#fff'; X.textBaseline = 'middle'; X.fillText(s, x + 7, y + 10.5);
+}
+function hud(t, a) {
+  if (a <= 0) return;
+  const [cx, cy] = toScreen(563, 722); X.save(); X.globalAlpha = a;
+  const s1 = `${agentCount(t)} agents`, s2 = `${layerCount(t)} / 347 layers`;
+  X.font = '600 17px Inter'; const w = 120 + X.measureText(s1 + s2).width + 40;
+  X.fillStyle = 'rgba(17,17,20,.92)'; X.beginPath(); X.roundRect(cx - w / 2, cy - 22, w, 44, 22); X.fill();
+  for (let i = 0; i < 5; i++) { X.fillStyle = COLS[i]; X.beginPath(); X.arc(cx - w / 2 + 24 + i * 15, cy, 7, 0, 6.28); X.fill(); X.strokeStyle = '#111'; X.lineWidth = 2; X.stroke(); }
+  X.fillStyle = '#fff'; X.textBaseline = 'middle'; X.fillText(s1, cx - w / 2 + 110, cy + 1);
+  const w1 = X.measureText(s1).width; X.fillStyle = '#8A8A96'; X.fillText('·', cx - w / 2 + 120 + w1, cy + 1);
+  X.fillStyle = '#D8D8E0'; X.fillText(s2, cx - w / 2 + 136 + w1, cy + 1);
+  X.restore();
+}
+function logoLockup(t) {
+  const k = back(seg(t, P9 - .02, P9 + .3)); if (k <= 0) return;
+  const u = 140, cx = 540, cy = 1368;
+  X.save(); X.translate(cx, cy); X.scale(k * u, k * u);
+  const add = c => { if (!Array.isArray(c) || !c.length) return; if (typeof c[0] === 'number') return; if (typeof c[0][0] === 'number') { c.forEach(([x, y], i) => i ? X.lineTo(x, y) : X.moveTo(x, y)); X.closePath(); } else c.forEach(add); };
+  const poly = (list, col) => { X.beginPath(); add(list); X.fillStyle = col; X.fill('evenodd'); };
+  poly(LOGO.CL, '#E59C69'); poly(LOGO.CR, '#E59C69'); poly(LOGO.X, '#E59C69'); poly(LOGO.WORD.map(w => w.paths), '#F7E8DA'); poly(LOGO.TAGW, '#F7E8DA'); poly(LOGO.TAGC, '#E59C69');
+  X.restore();
+}
+
+// ---------- seek ----------
+const $ = id => document.getElementById(id), BROWSER = $('browser'), SLOP = $('slop');
+function ovShow(id, t0, t1, rot = 0) {
+  const g = $(id); const k = back(seg(t, t0, t0 + .22)), out = seg(t, t1, t1 + .14);
+  g.style.opacity = t < t0 ? 0 : 1 - out; g.style.transform = `rotate(${rot}deg) scale(${(t < t0 ? 0 : k) * (1 - out * .3)})`;
+}
+let t = 0;
+function seek(tt) {
+  t = tt;
+  // browser entrance on the drop, shrink for the end card
+  const ent = eo(seg(t, DROP, DROP + .18)), sh = eio(seg(t, P8 - .25, P8 + .2));
+  BR = { x: 30, y: lerp(600, 520, sh), s: lerp(1, .7, sh) };
+  BROWSER.style.transform = `translateY(${BR.y - 600}px) scale(${BR.s * lerp(1.06, 1, ent)})`; BROWSER.style.opacity = ent;
+  // slop: elements are deleted on P2, then its dark ground fades to the blank canvas
+  for (const [k, el] of Object.entries(SEL)) { const d = seg(t, P2 - .01, P2 + .1); el.style.opacity = 1 - d; el.style.transform = `scale(${1 - d * .12})`; }
+  SLOP.style.background = ''; SLOP.style.opacity = 1 - eio(seg(t, P2 + .08, P2 + .5));
+  $('grid').style.opacity = seg(t, P2 + .1, P2 + .5) * (1 - seg(t, P6, P6 + .4));
+  // the rebuilt layers pop in on their beat
+  for (const k of [3, 4, 5, 6]) WAVES[k].forEach((nm, i) => {
+    const t0 = P(k) + i * .012, e = seg(t, t0, t0 + .14);
+    MEL[nm].style.opacity = e; MEL[nm].style.transform = `scale(${t < t0 ? .96 : lerp(.96, 1, back(e))})`;
+  });
+  // overlays
+  ovShow('o_s1', P1 - .02, P2 - .14, -3);
+  ovShow('o_b1a', P2 + .06, P6 + .35); ovShow('o_b1b', P2 + .3, P6 + .35);
+  ovShow('o_e1a', P7 - .02, 99); ovShow('o_e1b', P7 + .2, 99);
+  ovShow('o_e2a', P8 - .02, 99); ovShow('o_e2b', P8 + .2, 99);
+  { const [z, fx, fy] = camAt(t); $('cam').style.transform = `translate(${fx * (1 - z)}px, ${fy * (1 - z)}px) scale(${z})`; }
+  // canvas: boxes, tags, cursors, HUD, logo
+  X.clearRect(0, 0, 1080, 1920);
+  X.save(); const [bx, by] = toScreen(0, 0); X.beginPath(); X.rect(bx, by, 1020 * BR.s, 691 * BR.s); X.clip();
+  for (let i = 0; i < NA; i++) {
+    const a = agentAt(i, t); if (!a || !a.job) continue;
+    const j = a.job, [x0, y0] = j.box, col = j.del ? '#FF3B4E' : '#2F6BFF';
+    const xe = a.drag != null ? a.x : j.box[2], ye = a.drag != null ? a.y : j.box[3];
+    const [sx0, sy0] = toScreen(x0, y0), [sx1, sy1] = toScreen(xe, ye), al = a.done != null ? 1 - a.done : 1;
+    X.globalAlpha = al; X.fillStyle = j.del ? 'rgba(255,59,78,.12)' : 'rgba(47,107,255,.10)'; X.fillRect(sx0, sy0, sx1 - sx0, sy1 - sy0);
+    X.lineWidth = 2; X.strokeStyle = col; X.strokeRect(sx0, sy0, sx1 - sx0, sy1 - sy0);
+    if (a.done != null && a.done < .5) { X.globalAlpha = (1 - a.done * 2) * .5; X.fillStyle = j.del ? '#FF3B4E' : '#FFFFFF'; X.fillRect(sx0, sy0, sx1 - sx0, sy1 - sy0); X.globalAlpha = al; }
+    const wpx = Math.round((xe - x0) * 1440 / 1126), hpx = Math.round((ye - y0) * 1440 / 1126);
+    if (wpx > 8 && hpx > 8) tag(sx1 - 2, sy1 + 4, j.del ? 'DEL' : `${wpx} × ${hpx}`, col);
+    X.globalAlpha = 1;
+  }
+  X.restore();
+  for (let i = 0; i < NA; i++) { const a = agentAt(i, t); if (!a || t < 3.7) continue; const [sx, sy] = toScreen(a.x, a.y); cursor(sx, sy, COLS[i % COLS.length]); }
+  hud(t, seg(t, 3.8, 4.0) * (1 - seg(t, P6 + .5, P6 + .8)));
+  logoLockup(t);
+}
+// camera keyframes [t, zoom, focusX, focusY] (screen coords of the point kept fixed)
+const CAMK = [[P2 + .5, 1, 540, 960], [P3 - .75, 1.14, 540, 640], [P3 + .25, 1.14, 540, 640], [P4 - .75, 1.32, 540, 735], [P4 + .3, 1.32, 540, 735],
+  [P5 - .75, 1.16, 540, 800], [P5 + .3, 1.16, 540, 800], [P6 - .7, 1.06, 540, 900], [P6 + .5, 1, 540, 960]];
+function camAt(t) { if (t <= CAMK[0][0]) return [1, 540, 960];
+  for (let i = 0; i < CAMK.length - 1; i++) { const a = CAMK[i], b = CAMK[i + 1]; if (t <= b[0]) { const k = eio(seg(t, a[0], b[0])); return [lerp(a[1], b[1], k), lerp(a[2], b[2], k), lerp(a[3], b[3], k)]; } }
+  return [1, 540, 960]; }
+function caption() { $('scene').style.display = 'none'; $('cap').style.display = 'block'; document.documentElement.style.background = 'transparent'; document.body.style.background = 'transparent'; }
+window.seek = seek; window.caption = caption; window.TIMING = { DROP, END, P1, P2, P3, P4, P5, P6, P7, P8, P9, BEAT };
+window.ready = (async () => { await Promise.all(['900 100px FR', '400 16px JBM', '700 16px JBM', '800 60px Inter', '600 17px Inter', '400 15px Inter'].map(f => document.fonts.load(f)));
+  await document.fonts.ready; const im = new Image(); im.src = 'img/mindly_ref.png'; await im.decode(); seek(DROP); return true; })();
+</script></body></html>
