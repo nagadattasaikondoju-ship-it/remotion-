@@ -1,11 +1,13 @@
-# One Loop ep. 04: "if i rebuilt your brand's website…" (22 Nov 2026)
+# One Loop website series ep. 01: "if i rebuilt your brand's website…" (22 Nov 2026)
 
-13.27 s · 1080×1920 · 60 fps, same series format as ep. 01–03 (`../veridale-ig-reel`). AI-slop site vs the rebuilt site,
+13.27 s · 1080×1920 · 60 fps, same format as the Instagram series (`../veridale-ig-reel`), first episode of the website series.
+Two versions: **TEXT** (every overlay) and **CLEAN** (`?v=clean`: no text while the site changes; the full site holds, then the comment "SITE" CTA + logo).
+Continuity: the hook's last 0.22 s push in toward the laptop as the caption fades; the screen part starts on that frame (`img/hook_last.jpg`) and the site grows out of the laptop. AI-slop site vs the rebuilt site,
 same brand on both (**Mindly**, the user's call). Overlays chosen by the user: H1 / S1 / B1 / E1 + E2.
 
 | Song time | On screen |
 |---|---|
-| 0–2.383 | Hook: MVI_0706 (One Loop B-roll Drive, floral shirt typing → hand to chin) + "if i rebuilt / your brand's / website… / ep. 04" |
+| 0–2.383 | Hook: MVI_0706 (One Loop B-roll Drive, floral shirt typing → hand to chin) + "if i rebuilt / your brand's / website… / ep. 01" (tight line spacing) |
 | 2.383 drop | the neon `<MINDLY/>` slop site (rebuilt in HTML from the user's reference) |
 | 3.442 | "AI slop." |
 | 4.504 | 12 agent cursors drag red DEL boxes, the slop is deleted; "now watch it get rebuilt. layer by layer." |
@@ -18,9 +20,9 @@ same brand on both (**Mindly**, the user's call). Overlays chosen by the user: H
 - Mindly layers are crops of the user's reference screenshot (`img/mindly_ref.png`); "347 layers" is the effect's counter, not a claim.
 - **Song:** "DANCE…" as used in ep. 03. The clean source recording wasn't on this machine, so it comes from the ep. 03 reel: its pops sit on every
   2-beat step, and the reel's events land on those same beats. Extended from 10.08 to 13.27 s by repeating 6 beats [5.538, 8.724).
-- **Sound:** house pipeline, three real recordings (swipe 53 as the swarm flies in, glitch 62 on the delete, whoosh 57 on the shrink), balance 10, −14 LUFS.
+- **Sound:** house pipeline, three real recordings (swipe 53 as the swarm flies in, glitch 62 on the delete, whoosh 57 on the shrink), clarity EQ on the song, balance 10, −14 LUFS.
 
 ```
-node render.cjs stills 4.5 7 | node render.cjs caption | node render.cjs ui      (NODE_PATH=$(npm root -g))
+node render.cjs stills 4.5 7 | node render.cjs caption | VARIANT=text|clean node render.cjs ui      (NODE_PATH=$(npm root -g))
 B=<MVI_0706.MP4> U=<ep03 reel.mp4> bash assemble.sh
 ```
