@@ -1,5 +1,5 @@
 {
- "count": 71,
+ "count": 72,
  "libraries": [
   {
    "name": "main",
@@ -2421,6 +2421,40 @@
     "medium"
    ],
    "id": 70
+  },
+  {
+   "library": "main",
+   "tier": "main",
+   "path": "/home/user/remotion-/assets/sfx/openverse/coins-drop/coin-dropped_ef74b7.mp3",
+   "folder": "coins-drop",
+   "name": "coin-dropped ef74b7",
+   "role": "coin",
+   "roles": [
+    "coin"
+   ],
+   "duration": 0.316,
+   "peak_db": 0.0,
+   "mean_db": -37.1,
+   "peak_time": 0.03,
+   "lr_corr": 0.05,
+   "attack_ms": 0,
+   "decay_ms": 210,
+   "centroid": 4229,
+   "rolloff": 7250,
+   "low": 0.012,
+   "high": 0.544,
+   "flat": 0.614,
+   "bumps": 3.3,
+   "active_dur": 0.31,
+   "onset_count": 2,
+   "words": [
+    "punchy",
+    "bright",
+    "thin",
+    "noisy",
+    "short"
+   ],
+   "id": 71
   }
  ]
 }

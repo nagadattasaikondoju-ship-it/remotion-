@@ -1,0 +1,128 @@
+[
+ {
+  "t": 2.28,
+  "type": "crack",
+  "g": 0.5,
+  "note": "the tooth cracks (impact frames)"
+ },
+ {
+  "t": 2.36,
+  "type": "whoosh",
+  "g": 0.45,
+  "note": "the tooth flies out"
+ },
+ {
+  "t": 4.25,
+  "type": "pop",
+  "g": 0.45,
+  "note": "MISSING TOOTH"
+ },
+ {
+  "t": 7.53,
+  "type": "swipe",
+  "g": 0.45,
+  "note": "cut to the face"
+ },
+ {
+  "t": 9.72,
+  "type": "tick",
+  "g": 0.5,
+  "note": "the clock appears"
+ },
+ {
+  "t": 11.95,
+  "type": "pop",
+  "g": 0.45,
+  "note": "FACE SHAPE CHANGES"
+ },
+ {
+  "t": 13.62,
+  "type": "swipe",
+  "g": 0.45,
+  "note": "cut to the jawbone"
+ },
+ {
+  "t": 14.35,
+  "type": "pop",
+  "g": 0.45,
+  "note": "BONE LOSS"
+ },
+ {
+  "t": 17.45,
+  "type": "whoosh",
+  "g": 0.4,
+  "note": "a late implant drops in"
+ },
+ {
+  "t": 19.8,
+  "type": "boing",
+  "g": 0.5,
+  "note": "it wobbles out: red X, HARDER TO FIX"
+ },
+ {
+  "t": 21.68,
+  "type": "rewind",
+  "g": 0.5,
+  "note": "rewind: do it on time"
+ },
+ {
+  "t": 22.45,
+  "type": "scaler",
+  "g": 0.35,
+  "note": "the implant spins into the bone"
+ },
+ {
+  "t": 25.4,
+  "type": "click",
+  "g": 0.5,
+  "note": "the abutment clicks on"
+ },
+ {
+  "t": 26.8,
+  "type": "sparkle",
+  "g": 0.5,
+  "note": "the new tooth lands"
+ },
+ {
+  "t": 27.25,
+  "type": "pop",
+  "g": 0.45,
+  "note": "ON TIME!"
+ },
+ {
+  "t": 29.28,
+  "type": "swipe",
+  "g": 0.45,
+  "note": "cut to the calendar"
+ },
+ {
+  "t": 29.35,
+  "type": "pop",
+  "g": 0.45,
+  "note": "DON'T DELAY!"
+ },
+ {
+  "t": 30.1,
+  "type": "coin",
+  "g": 0.55,
+  "note": "coins: delay costs more"
+ },
+ {
+  "t": 31.56,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "Dr. Sri Sushma's card pops up"
+ },
+ {
+  "t": 31.86,
+  "type": "pop",
+  "g": 0.55,
+  "note": "the logo lands"
+ },
+ {
+  "t": 32.67,
+  "type": "chime",
+  "g": 0.5,
+  "note": "BOOK AN APPOINTMENT lands"
+ }
+]

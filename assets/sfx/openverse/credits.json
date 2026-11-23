@@ -789,5 +789,35 @@
   "source": "https://freesound.org/people/petebuchwald/sounds/271355",
   "provider": "freesound",
   "duration_ms": 15737
+ },
+ {
+  "file": "coins-drop/coin-drop-on-concrete_93cb42.mp3",
+  "title": "coin drop on concrete",
+  "creator": "PetervH",
+  "licence": "cc0 1.0",
+  "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "source": "https://freesound.org/people/PetervH/sounds/324760",
+  "provider": "freesound",
+  "duration_ms": 1529
+ },
+ {
+  "file": "coins-drop/real-coin-drop_5ae65b.mp3",
+  "title": "Real Coin Drop",
+  "creator": "Rocotilos",
+  "licence": "cc0 1.0",
+  "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "source": "https://freesound.org/people/Rocotilos/sounds/343462",
+  "provider": "freesound",
+  "duration_ms": 164
+ },
+ {
+  "file": "coins-drop/coin-dropped_ef74b7.mp3",
+  "title": "Coin Dropped",
+  "creator": "kermite607",
+  "licence": "cc0 1.0",
+  "licence_url": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "source": "https://freesound.org/people/kermite607/sounds/368203",
+  "provider": "freesound",
+  "duration_ms": 316
  }
 ]
