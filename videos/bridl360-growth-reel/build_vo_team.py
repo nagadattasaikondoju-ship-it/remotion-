@@ -8,9 +8,10 @@ SR = 48000; DUR = 49.7667
 LINES = [(0, 15), (16, 25), (26, 36), (37, 46), (47, 53), (54, 62), (63, 67), (68, 70), (71, 72), (73, 79), (80, 89), (90, 96), (97, 110), (111, 117)]
 W = json.load(open("vo/team_words.json"))
 slots = [tuple(map(float, l.split("\t")[:2])) for l in open("vo/lines.tsv").read().strip().split("\n")]
-# 17-26 s: the reference VO was slow here and the picture's beats ("Growth" 22.96, "Value" 24.46) follow it, so lines 5 and 6 are split
-# into phrases anchored on the reference's own words, eased 10 % slower; otherwise the teammate's faster read left ~1.6 s holes
-SPLIT = {4: [((47, 50), 17.55, 1.0), ((51, 53), 19.66, 0.9)], 5: [((54, 57), 21.66, 0.9), ((58, 62), 23.90, 0.9)]}
+# 17-26 s: the reference VO was slow here and the picture's cards follow it (Jobs 17.9, Infrastructure 19.7, And land 21.0, Growth 22.5,
+# Value 24.3). The teammate's read is kept whole and at its own speed, cut only at her own sentence pauses: "Jobs are moving there." /
+# "Infrastructure is following and land around growth." (one take) / "That is where value begins.", each placed on its card.
+SPLIT = {4: [((47, 50), 17.92, 1.0), ((51, 57), 20.20, 1.0)], 5: [((58, 62), 23.75, 1.0)]}
 SHIFT = {2: 0.25}   # line 3 a touch later so it carries over the music's quiet bar at 11.5 s
 PH = []   # (first word, last word, start, slot end, forced tempo or None)
 for k, (ij, (st, en)) in enumerate(zip(LINES, slots)):

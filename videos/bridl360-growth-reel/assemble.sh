@@ -19,32 +19,9 @@ ffmpeg -nostdin -v error -y -i "$REF_UP" -i out/overlay.mov -filter_complex "[0:
 fi
 # voice: raised to the reference VO's loudness (-13.8 LUFS; the bed sits ~6 LU under it as in the reference), rumble cut, a little presence
 ffmpeg -nostdin -v error -y -i vo/voice.wav -af "aresample=48000,highpass=f=70,equalizer=f=3000:t=q:w=1.2:g=1.5,volume=3.5dB,apad,atrim=0:$DUR" -ac 2 -c:a pcm_f32le out/voice.wav
-# bed: the reference's own hits for its logo pops (28.6-29.6 s) land off our place-name pops, so it dips 7 dB under them
-ffmpeg -nostdin -v error -y -i "$BED" -af "aresample=48000,volume='if(between(t,28.15,29.95),0.45,1)':eval=frame,afade=t=out:st=49.3:d=0.45,apad,atrim=0:$DUR" -ac 2 -c:a pcm_f32le out/bed.wav
-# music fill: where the voice pauses (the teammate reads faster than the reference VO), the bed comes up 6 dB, so the sound never drops out
-python3 - <<'EOF' 2>/dev/null
-import subprocess, numpy as np
-SR = 48000
-rd = lambda f, ch: np.frombuffer(subprocess.run(["ffmpeg", "-v", "error", "-i", f, "-ac", str(ch), "-ar", str(SR), "-f", "f32le", "-"], capture_output=True).stdout, np.float32)
-v = rd("out/voice.wav", 1); b = rd("out/bed.wav", 2).reshape(-1, 2).copy(); n = min(len(v), len(b)); hop = 480
-env = np.array([np.sqrt((v[i:i + hop] ** 2).mean()) for i in range(0, n, hop)])
-talk = (20 * np.log10(env + 1e-9) > -38).astype(float)
-talk = np.convolve(talk, np.ones(35), "same") > 0                            # bridge pauses under ~0.35 s: no pumping between words
-g = np.where(talk, 1.0, 10 ** (6 / 20)); a = 0.12                              # 6 dB up in pauses, ~0.2 s glide
-for i in range(1, len(g)): g[i] = g[i - 1] + a * (g[i] - g[i - 1])
-gs = np.interp(np.arange(n), np.arange(len(g)) * hop + hop / 2, g)
-b[:n] *= gs[:, None]
-# where the music stem itself goes near silent (the reference's voice filled those bars), let the music's own echo tail carry over
-benv = np.array([np.sqrt((b[i:i + hop] ** 2).mean()) for i in range(0, n, hop)]); bdb = 20 * np.log10(benv + 1e-9)
-w = np.clip((-24 - bdb) / 8, 0, 1)
-for i in range(1, len(w)): w[i] = w[i - 1] + 0.15 * (w[i] - w[i - 1])
-ws = np.interp(np.arange(n), np.arange(len(w)) * hop + hop / 2, w)
-sh = lambda x, d: np.concatenate([np.zeros((int(d * SR), 2), np.float32), x[:len(x) - int(d * SR)]])
-tail = .5 * sh(b, .18) + .36 * sh(b, .36) + .25 * sh(b, .6) + .16 * sh(b, .9)
-b[:n] += tail[:n] * ws[:, None]
-subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "f32le", "-ar", str(SR), "-ac", "2", "-i", "-", "-c:a", "pcm_f32le", "out/bed.wav"], input=b.astype(np.float32).tobytes())
-print(f"music fill: {100 * (1 - talk.mean()):.0f}% of the reel is a voice pause")
-EOF
+# bed: the reference's own hits for its logo pops (28.6-29.6 s) land off our place-name pops, so it dips 7 dB under them; the music is thin
+# under 17-25.5 s (the reference's voice carried it), so it sits a steady +3 dB there (no swells that follow the voice)
+ffmpeg -nostdin -v error -y -i "$BED" -af "aresample=48000,volume='if(between(t,28.15,29.95),0.45,1)*(1+0.41*clip((t-16.6)/0.5,0,1)*clip((25.6-t)/0.5,0,1))':eval=frame,afade=t=out:st=49.3:d=0.45,apad,atrim=0:$DUR" -ac 2 -c:a pcm_f32le out/bed.wav
 python3 - <<'EOF'
 import json
 T = json.load(open("vo/times.json"))
