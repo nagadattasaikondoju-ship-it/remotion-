@@ -1,0 +1,161 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- BRIDL360 brand layer for the "smartest investments" land reel. A transparent 1080x1920 overlay laid on the AI-upscaled
+     reference, active only where the reference showed another brand. Everything else in the reel is the reference, untouched.
+     Pure function of time: seek(t), t = reel time in seconds. Windows (from the reference frames):
+       A 14.02-14.60  "Genome Valley" -> "Hyderabad" (text area re-plated with the blank satin from 14.0 s)
+       B 22.85-26.15  the other brand's logo on the growth arrows -> a BRIDL360 tag at the same tilt
+       C 26.86-28.50  the map pin's photo + label -> a BRIDL360 project photo + BRIDL360 label
+       D 28.35-30.60  HMDA / RERA logos -> "Homes in Kompally / Gachibowli / Sadashivpet" (full frame on the satin)
+       E 30.40-32.45  "Planned over 40 acres" aerial -> "Listed across Hyderabad: 5 projects" with project photos
+       F 45.15-49.77  end card -> BRIDL360 end card (logo, project photo, tagline, CTA, contacts, company) -->
+<style>
+@font-face { font-family: P; font-weight: 400; src: url(fonts/Poppins-Regular.ttf); }
+@font-face { font-family: P; font-weight: 500; src: url(fonts/Poppins-Medium.ttf); }
+@font-face { font-family: P; font-weight: 600; src: url(fonts/Poppins-SemiBold.ttf); }
+@font-face { font-family: P; font-weight: 700; src: url(fonts/Poppins-Bold.ttf); }
+@font-face { font-family: P; font-weight: 800; src: url(fonts/Poppins-ExtraBold.ttf); }
+@font-face { font-family: PI; font-weight: 400; src: url(fonts/Poppins-Italic.ttf); }
+@font-face { font-family: PI; font-weight: 300; src: url(fonts/Poppins-LightItalic.ttf); }
+@font-face { font-family: PI; font-weight: 700; src: url(fonts/Poppins-BoldItalic.ttf); }
+@font-face { font-family: PI; font-weight: 800; src: url(fonts/Poppins-ExtraBoldItalic.ttf); }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
+canvas { display: block; }
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+const C = document.getElementById('c'), X = C.getContext('2d'), W = 1080, H = 1920;
+const RED = '#DD2648', PIN = '#C90034', BTN = '#E90006', BLUE = '#004AAD', GREY = '#5B5B5B';
+const img = n => { const i = new Image(); i.src = n; return i; };
+const IM = { satin: img('img/plate_satin.png'), family: img('img/plate_family.png'), logo: img('img/logo_tile.png'),
+  vish: img('img/vishwasree_1.jpg'), mayfair: img('img/mayfair_kompally.jpg'), siva: img('img/siva_hills_sadashivpet.jpg') };
+const T = window.TIMES || {};   // word times of the new voice (set by render.cjs from vo/words.json)
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), lerp = (a, b, k) => a + (b - a) * k, seg = (t, a, b) => clamp((t - a) / (b - a));
+const eo = k => 1 - Math.pow(1 - k, 3), eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const back = k => { if (k <= 0) return 0; const c = 1.6; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); };
+function cover(im, x, y, w, h, z = 1, ax = .5, ay = .5) {   // draw image covering the box, zoom z about (ax, ay)
+  const s = Math.max(w / im.naturalWidth, h / im.naturalHeight) * z, iw = im.naturalWidth * s, ih = im.naturalHeight * s;
+  X.save(); X.beginPath(); X.rect(x, y, w, h); X.clip(); X.drawImage(im, x + (w - iw) * ax, y + (h - ih) * ay, iw, ih); X.restore();
+}
+function popText(s, x, y, size, k, col = RED, font = 'PI', weight = 800, align = 'center') {   // the reel's pop: blur + scale in
+  if (k <= 0) return; X.save(); X.globalAlpha = clamp(k * 1.4); X.translate(x, y); const sc = lerp(1.25, 1, eo(k)); X.scale(sc, sc);
+  X.filter = `blur(${(1 - eo(k)) * 14}px)`; X.font = `${weight} ${size}px ${font}`; X.textAlign = align; X.textBaseline = 'alphabetic';
+  X.shadowColor = 'rgba(60,0,10,.28)'; X.shadowOffsetX = 5; X.shadowOffsetY = 7; X.shadowBlur = 10; X.fillStyle = col; X.fillText(s, 0, 0);
+  X.restore(); X.filter = 'none';
+}
+function smallText(s, x, y, size, k, col = GREY, weight = 400, align = 'center') {
+  if (k <= 0) return; X.save(); X.globalAlpha = clamp(k); X.font = `${weight} ${size}px P`; X.textAlign = align; X.fillStyle = col; X.fillText(s, x, y + (1 - eo(k)) * 14); X.restore();
+}
+function logoRow(cx, cy, tile, word, k = 1, sub = null) {   // BRIDL360 tile + wordmark, centred on (cx, cy)
+  X.save(); X.globalAlpha = clamp(k); X.font = `800 ${word}px P`; const ww = X.measureText('BRIDL360').width, gap = tile * .18, tw = tile + gap + ww;
+  const x0 = cx - tw / 2; X.drawImage(IM.logo, x0, cy - tile / 2, tile, tile);
+  X.fillStyle = BLUE; X.textBaseline = 'middle'; X.textAlign = 'left'; X.fillText('BRIDL360', x0 + tile + gap, cy + word * .06);
+  if (sub) { X.font = `500 ${sub[1]}px P`; X.fillStyle = GREY; X.fillText(sub[0], x0 + tile + gap + 4, cy + word * .62); }
+  X.restore();
+}
+function pinIcon(x, y, r, col = PIN) { X.save(); X.translate(x, y); X.fillStyle = col; X.beginPath(); X.arc(0, -r * 1.1, r, Math.PI * .85, Math.PI * .15);
+  X.lineTo(0, 0); X.closePath(); X.fill(); X.fillStyle = '#FFFFFF'; X.beginPath(); X.arc(0, -r * 1.1, r * .42, 0, 6.28); X.fill(); X.restore(); }
+function softPlate(x, y, w, h, f = 40) {   // the clean satin plate over a box, feathered edges
+  const o = document.createElement('canvas'); o.width = w + 2 * f; o.height = h + 2 * f; const q = o.getContext('2d');
+  q.drawImage(IM.satin, x - f, y - f, w + 2 * f, h + 2 * f, 0, 0, w + 2 * f, h + 2 * f);
+  q.globalCompositeOperation = 'destination-in'; q.filter = `blur(${f * .5}px)`; q.fillStyle = '#000'; q.fillRect(f, f, w, h);
+  X.drawImage(o, x - f, y - f);
+}
+
+// ---------- A: "Hyderabad" in place of "Genome Valley" ----------
+function segA(t) {
+  if (t < 14.02 || t > 14.60) return;
+  softPlate(130, 300, 820, 460, 36);
+  popText('Hyderabad', 540, 590, 150, seg(t, 14.13, 14.30));
+}
+// ---------- B: BRIDL360 tag on the growth arrows (same place and tilt as the old logo) ----------
+function segB(t) {
+  if (t < 22.85 || t > 26.15) return;
+  const k = back(seg(t, 22.86, 23.10)), fade = 1 - seg(t, 25.62, 26.10);
+  X.save(); X.translate(392, 818); X.rotate(-0.70); X.scale(k || .001, k || .001);
+  X.fillStyle = '#FFFFFF'; X.beginPath(); X.roundRect(-238, -92, 476, 184, 26); X.fill();   // opaque white tag: hides the old logo; the scene fades to white anyway
+  X.globalAlpha = fade; X.shadowColor = 'rgba(0,0,0,.18)'; X.shadowBlur = 18; X.shadowOffsetY = 6; X.strokeStyle = 'rgba(0,74,173,.25)'; X.lineWidth = 3;
+  X.beginPath(); X.roundRect(-238, -92, 476, 184, 26); X.stroke(); X.shadowColor = 'transparent';
+  X.drawImage(IM.logo, -218, -72, 144, 144);
+  X.fillStyle = BLUE; X.font = '800 84px P'; X.textBaseline = 'middle'; X.textAlign = 'left'; X.fillText('BRIDL360', -60, -8);
+  X.fillStyle = GREY; X.font = '500 26px P'; X.fillText('Real estate · Hyderabad', -56, 48);
+  X.restore();
+}
+// ---------- C: the map pin: a BRIDL360 project photo + BRIDL360 label ----------
+function segC(t) {
+  if (t < 26.86 || t > 28.50) return;
+  const cx = 497, cy = 787, R = 214, k = seg(t, 26.86, 26.96);
+  X.save(); X.globalAlpha = k;
+  X.fillStyle = PIN; X.beginPath(); X.arc(cx, cy, R, Math.PI * .78, Math.PI * .22); X.lineTo(cx, 1226); X.closePath(); X.fill();
+  X.save(); X.beginPath(); X.arc(cx, cy, R - 32, 0, 6.28); X.clip(); cover(IM.vish, cx - R, cy - R, R * 2, R * 2, 1 + .06 * seg(t, 26.86, 28.5), .38, .5); X.restore();
+  X.fillStyle = '#FFFFFF'; X.shadowColor = 'rgba(0,0,0,.3)'; X.shadowBlur = 16; X.shadowOffsetY = 6; X.beginPath(); X.roundRect(330, 946, 334, 158, 14); X.fill(); X.shadowColor = 'transparent';
+  X.drawImage(IM.logo, 344, 962, 90, 90); X.fillStyle = BLUE; X.font = '800 44px P'; X.textAlign = 'left'; X.textBaseline = 'middle'; X.fillText('BRIDL360', 444, 995);
+  X.fillStyle = GREY; X.font = '500 17px P'; X.fillText('Real estate · Hyderabad', 446, 1033); X.font = '600 22px P'; X.fillStyle = PIN; X.fillText('Vishwasree Residency', 348, 1084);
+  X.restore();
+}
+// ---------- D: where (on the satin, like the logos it replaces) ----------
+const PLACES = [['Kompally', 'tKom'], ['Gachibowli', 'tGac'], ['Sadashivpet', 'tSad']];
+function segD(t) {
+  if (t < 28.35 || t > 30.62) return;
+  const inK = seg(t, 28.35, 28.50), out = eio(seg(t, 30.40, 30.60));
+  X.save(); X.globalAlpha = inK; X.translate(-out * W, 0);
+  X.drawImage(IM.satin, 0, 0, W, H);
+  smallText('Homes in', 540, 700, 44, seg(t, 28.40, 28.60));
+  PLACES.forEach(([name, key], i) => { const t0 = (T[key] || 28.45 + i * .62) - .06, k = seg(t, t0, t0 + .2), y = 860 + i * 175;
+    if (k > 0) { X.font = '800 118px PI'; const w = X.measureText(name).width, x0 = 540 - (w + 70) / 2;
+      X.save(); X.globalAlpha = clamp(k * 1.4); X.translate((1 - eo(k)) * 140, 0); pinIcon(x0 + 22, y - 10, 30); X.restore(); popText(name, x0 + 70, y, 118, k, RED, 'PI', 800, 'left'); } });
+  X.restore();
+}
+// ---------- E: listed across Hyderabad: 5 projects (three of them on screen) ----------
+const SHOTS = [['mayfair', 'Mayfair Luxury Apartments', 'Kompally'], ['vish', 'Vishwasree Residency', 'Gachibowli'], ['siva', 'Siva Hills', 'Sadashivpet']];
+function segE(t) {
+  if (t < 30.40 || t > 32.45) return;
+  const inK = eio(seg(t, 30.40, 30.60)), z = 1 + .05 * seg(t, 30.4, 32.45);
+  X.save(); X.translate((1 - inK) * W, 0);
+  X.drawImage(IM.satin, 0, 0, W, H);
+  SHOTS.forEach(([im, name, area], i) => { const y = 470 + i * 486, h = 470, k = eo(seg(t, 30.5 + i * .12, 30.8 + i * .12));
+    X.save(); X.globalAlpha = k; X.translate(0, (1 - k) * 60); cover(IM[im], 30, y, 1020, h, z, .5, .55);
+    const g = X.createLinearGradient(0, y + h - 150, 0, y + h); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.62)'); X.fillStyle = g; X.fillRect(30, y + h - 150, 1020, 150);
+    X.fillStyle = '#FFFFFF'; X.font = '700 40px P'; X.textAlign = 'left'; X.fillText(name, 66, y + h - 58); pinIcon(76, y + h - 14, 13, '#FFFFFF');
+    X.font = '500 30px P'; X.fillText(area, 98, y + h - 20); X.restore(); });
+  smallText('Listed across Hyderabad', 540, 205, 40, seg(t, 30.78, 30.98));
+  const kn = seg(t, (T.tFive || 30.62) + .02, (T.tFive || 30.62) + .2); popText('5', 470, 370, 170, kn); popText('Projects', 620, 368, 70, kn, RED, 'PI', 700, 'left');
+  X.restore();
+  if (t > 32.20) { X.globalAlpha = eio(seg(t, 32.20, 32.45)); X.drawImage(IM.family, 0, 0, W, H); X.globalAlpha = 1; }   // dissolve into the family shot, as the reference does
+}
+// ---------- F: BRIDL360 end card (same layout as the reference's card) ----------
+function segF(t) {
+  if (t < 45.15) return;
+  X.fillStyle = '#FFFFFF'; X.globalAlpha = seg(t, 45.15, 45.30); X.fillRect(0, 0, W, H); X.globalAlpha = 1;
+  const k = eo(seg(t, 45.40, 45.95)); if (k <= 0) return;
+  X.save(); X.globalAlpha = k;
+  cover(IM.vish, 0, 400, W, 680, 1.04 + .05 * seg(t, 45.4, 49.77), .45, .5);
+  let g = X.createLinearGradient(0, 400, 0, 560); g.addColorStop(0, '#FFFFFF'); g.addColorStop(1, 'rgba(255,255,255,0)'); X.fillStyle = g; X.fillRect(0, 400, W, 160);
+  X.fillStyle = '#FFFFFF'; X.beginPath(); X.moveTo(-10, 1100); X.quadraticCurveTo(470, 880, 1090, 915); X.lineTo(1090, H); X.lineTo(-10, H); X.closePath(); X.fill();
+  X.strokeStyle = PIN; X.lineWidth = 22; X.beginPath(); X.moveTo(-10, 1100); X.quadraticCurveTo(470, 880, 1090, 915); X.stroke();
+  X.restore();
+  logoRow(540, 215, 170, 104, k); smallText('Real estate advisory · Hyderabad', 540, 368, 38, seg(t, 45.6, 45.95), GREY, 500);
+  X.save(); X.globalAlpha = k; X.font = '300 68px PI'; X.fillStyle = '#3A3A3A'; X.textAlign = 'center'; X.fillText('Your Partner in Seamless', 540, 1170); X.fillText('Property Solutions', 540, 1252); X.restore();
+  const kb = back(seg(t, 46.75, 46.98)); if (kb > 0) { X.save(); X.translate(540, 1352); X.scale(kb, kb); X.fillStyle = BTN; X.beginPath(); X.roundRect(-300, -42, 600, 84, 18); X.fill();
+    X.fillStyle = '#FFFFFF'; X.font = '700 42px P'; X.textAlign = 'center'; X.textBaseline = 'middle'; X.fillText('DM US OR CALL NOW', 0, 2); X.restore(); }
+  const kc = seg(t, 47.0, 47.3);
+  if (kc > 0) { X.save(); X.globalAlpha = kc; X.translate((1 - eo(kc)) * -40, 0); X.fillStyle = '#2A2A2A'; X.font = '500 44px P'; X.textAlign = 'left'; X.textBaseline = 'middle';
+    // phone icon
+    X.strokeStyle = '#2A2A2A'; X.lineWidth = 4; X.beginPath(); X.arc(262, 1452, 22, 0, 6.28); X.stroke(); X.font = '700 26px P'; X.textAlign = 'center'; X.fillText('✆', 262, 1454);
+    X.font = '500 44px P'; X.textAlign = 'left'; X.fillText('+91 99666 96961', 302, 1454);
+    // instagram icon
+    X.beginPath(); X.roundRect(240, 1504, 44, 44, 12); X.stroke(); X.beginPath(); X.arc(262, 1526, 10, 0, 6.28); X.stroke(); X.fillStyle = '#2A2A2A'; X.beginPath(); X.arc(275, 1513, 3, 0, 6.28); X.fill();
+    X.fillText('@bridl360', 302, 1528);
+    X.font = '400 26px PI'; X.fillStyle = '#6A6A6A'; X.textAlign = 'center'; X.fillText('BRIDL360 Consulting Pvt. Ltd. · Hyderabad, Telangana', 540, 1622); X.fillText('CIN U74999TG2021PTC151874', 540, 1660);
+    X.restore(); }
+}
+// The reference's picture ends at x 1050 (an 11 px black strip from the screen recording) and has the player's timestamp in its bottom rows,
+// so the base is cropped to 1050x1867 and scaled 1080/1050 (see assemble.sh). Segments A-C sit on that base, so they get the same scale.
+const FIX = 1080 / 1050;
+function seek(t) { X.clearRect(0, 0, W, H); X.globalAlpha = 1; X.filter = 'none';
+  X.save(); X.scale(FIX, FIX); segA(t); segB(t); segC(t); X.restore(); segD(t); segE(t); segF(t); }
+const ACTIVE = t => (t >= 14.02 && t <= 14.60) || (t >= 22.85 && t <= 32.45) || t >= 45.15;
+window.seek = seek; window.ACTIVE = ACTIVE;
+window.ready = (async () => { await Promise.all(['800 100px P', '500 40px P', '400 40px P', '700 40px P', '600 40px P', '800 100px PI', '700 60px PI', '300 60px PI', '400 30px PI'].map(f => document.fonts.load(f)));
+  await document.fonts.ready; await Promise.all(Object.values(IM).map(i => i.decode().catch(() => 0))); return true; })();
+</script></body></html>
