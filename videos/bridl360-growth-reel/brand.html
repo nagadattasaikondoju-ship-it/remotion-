@@ -4,7 +4,7 @@
      reference, active only where the reference showed another brand. Everything else in the reel is the reference, untouched.
      Pure function of time: seek(t), t = reel time in seconds. Windows (from the reference frames):
        A 14.02-14.60  "Genome Valley" -> "Hyderabad" (text area re-plated with the blank satin from 14.0 s)
-       B 22.85-26.15  the other brand's logo on the growth arrows -> a BRIDL360 tag at the same tilt
+       B 22.95-26.14  the other brand's logo on the growth arrows -> painted out (clean plate) + a BRIDL360 mark at the same tilt and fade
        C 26.86-28.50  the map pin's photo + label -> a BRIDL360 project photo + BRIDL360 label
        D 28.35-30.60  HMDA / RERA logos -> "Homes in Kompally / Gachibowli / Sadashivpet" (full frame on the satin)
        E 30.40-32.45  "Planned over 40 acres" aerial -> "Listed across Hyderabad: 5 projects" with project photos
@@ -30,7 +30,7 @@ const C = document.getElementById('c'), X = C.getContext('2d'), W = 1080, H = 19
 const RED = '#DD2648', PIN = '#C90034', BTN = '#E90006', BLUE = '#004AAD', GREY = '#5B5B5B';
 const img = n => { const i = new Image(); i.src = n; return i; };
 const IM = { satin: img('img/plate_satin.png'), satinFix: img('img/plate_satin_fix.png'), family: img('img/plate_family.png'), logo: img('img/logo_tile.png'),
-  presenter: img('img/presenter.png'), manMask: img('img/man_mask.png'), plate40: img('img/plate_scene40.png'),
+  presenter: img('img/presenter.png'), arrowsPlate: img('img/plate_arrows.png'), arrowsMask: img('img/arrows_mask.png'), manMask: img('img/man_mask.png'), plate40: img('img/plate_scene40.png'),
   vish: img('img/vishwasree_1.jpg'), mayfair: img('img/mayfair_kompally.jpg'), siva: img('img/siva_hills_sadashivpet.jpg') };
 const T = window.TIMES || {};   // word times of the new voice (set by render.cjs from vo/words.json)
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), lerp = (a, b, k) => a + (b - a) * k, seg = (t, a, b) => clamp((t - a) / (b - a));
@@ -58,6 +58,7 @@ function logoRow(cx, cy, tile, word, k = 1, sub = null) {   // BRIDL360 tile + w
 }
 function pinIcon(x, y, r, col = PIN) { X.save(); X.translate(x, y); X.fillStyle = col; X.beginPath(); X.arc(0, -r * 1.1, r, Math.PI * .85, Math.PI * .15);
   X.lineTo(0, 0); X.closePath(); X.fill(); X.fillStyle = '#FFFFFF'; X.beginPath(); X.arc(0, -r * 1.1, r * .42, 0, 6.28); X.fill(); X.restore(); }
+const GC = document.createElement('canvas'); GC.width = W; GC.height = H; const G = GC.getContext('2d');   // scratch layer for patched segments
 function softPlate(x, y, w, h, f = 40) {   // the clean satin plate over a box, feathered edges
   const o = document.createElement('canvas'); o.width = w + 2 * f; o.height = h + 2 * f; const q = o.getContext('2d');
   q.drawImage(IM.satin, x - f, y - f, w + 2 * f, h + 2 * f, 0, 0, w + 2 * f, h + 2 * f);
@@ -71,18 +72,30 @@ function segA(t) {
   softPlate(130, 300, 820, 460, 36);
   popText('Hyderabad', 540, 590, 150, seg(t, 14.13, 14.30));
 }
-// ---------- B: BRIDL360 tag on the growth arrows (same place and tilt as the old logo) ----------
+// ---------- B: BRIDL360 mark on the growth arrows (in place of the old logo, made the same way: no box, tilted, slow fade) ----------
+// Measured on the reference: arrows still from 22.87 s; the old logo fades in 23.07-24.00 s, holds, and the frame washes to white
+// 25.47-26.00 s before the cut. img/plate_arrows.png is the 24.0 s frame with the old logo painted out (inpainted shading + the
+// grid copied from whole squares away; arrows untouched), shown through img/arrows_mask.png from 22.95 s.
+const WASH_B = [[25.47, 0], [25.53, .1], [25.60, .26], [25.67, .42], [25.73, .8], [25.80, .87], [25.87, .95], [26.0, 1]];
+const washB = t => { if (t <= WASH_B[0][0]) return 0; for (let i = 1; i < WASH_B.length; i++) if (t <= WASH_B[i][0]) { const [t0, v0] = WASH_B[i - 1], [t1, v1] = WASH_B[i]; return lerp(v0, v1, (t - t0) / (t1 - t0)); } return 1; };
 function segB(t) {
-  if (t < 22.85 || t > 26.15) return;
-  const k = back(seg(t, 22.86, 23.10)), fade = 1 - seg(t, 25.62, 26.10);
-  X.save(); X.translate(392, 818); X.rotate(-0.70); X.scale(k || .001, k || .001);
-  X.fillStyle = '#FFFFFF'; X.beginPath(); X.roundRect(-238, -92, 476, 184, 26); X.fill();   // opaque white tag: hides the old logo; the scene fades to white anyway
-  X.globalAlpha = fade; X.shadowColor = 'rgba(0,0,0,.18)'; X.shadowBlur = 18; X.shadowOffsetY = 6; X.strokeStyle = 'rgba(0,74,173,.25)'; X.lineWidth = 3;
-  X.beginPath(); X.roundRect(-238, -92, 476, 184, 26); X.stroke(); X.shadowColor = 'transparent';
-  X.drawImage(IM.logo, -218, -72, 144, 144);
-  X.fillStyle = BLUE; X.font = '800 84px P'; X.textBaseline = 'middle'; X.textAlign = 'left'; X.fillText('BRIDL360', -60, -8);
-  X.fillStyle = GREY; X.font = '500 26px P'; X.fillText('Real estate · Hyderabad', -56, 48);
-  X.restore();
+  if (t < 22.95 || t > 26.14) return;
+  const w = washB(t);
+  G.globalCompositeOperation = 'source-over'; G.globalAlpha = 1; G.clearRect(0, 0, W, H);
+  G.drawImage(IM.arrowsMask, 0, 0, W, H); G.globalCompositeOperation = 'source-in'; G.drawImage(IM.arrowsPlate, 0, 0, W, H);
+  G.globalCompositeOperation = 'source-over';
+  const k = clamp((t - 23.07) / (24.0 - 23.07)), ke = k * k * (3 - 2 * k);
+  if (ke > 0) {
+    G.save(); G.globalAlpha = ke; G.translate(380, 822); G.rotate(-0.725); const sc = 1.04 - .04 * ke; G.scale(sc, sc);
+    G.font = '800 96px P'; const tw = G.measureText('BRIDL360').width, tile = 118, gap = 16, L = tile + gap + tw, x0 = -L / 2;
+    G.shadowColor = 'rgba(255,255,255,.95)'; G.shadowBlur = 14;               // the white halo the old logo had
+    G.drawImage(IM.logo, x0, -tile / 2 + 6, tile, tile);
+    G.fillStyle = BLUE; G.textBaseline = 'alphabetic'; G.textAlign = 'left'; G.fillText('BRIDL360', x0 + tile + gap, 50);
+    G.font = '700 30px P'; G.fillStyle = RED; G.fillText('REAL ESTATE', x0 + tile + gap + 4, -38);
+    G.restore();
+  }
+  if (w > 0) { G.globalCompositeOperation = 'source-atop'; G.globalAlpha = w; G.fillStyle = '#FFFFFF'; G.fillRect(0, 0, W, H); G.globalAlpha = 1; }
+  X.drawImage(GC, 0, 0);
 }
 // ---------- C: the map pin: a BRIDL360 project photo + BRIDL360 label ----------
 function segC(t) {
@@ -129,7 +142,7 @@ function segE(t) {
 // ---------- G: the presenter: the user's photo in place of the stock model ----------
 // Measured on the reference (420x746 px): the model slides in from the right with an ease-out, 40.66-42.30 s (262 px -> 0),
 // head top at y 337, thumb tip at x 148; static until 44.63, then the whole frame washes to white (~0.88 s).
-const KR = 1080 / 420, GC = document.createElement('canvas'); GC.width = W; GC.height = H; const G = GC.getContext('2d');
+const KR = 1080 / 420;
 // measured offset of the old figure per frame from 40.667 s (the recording updates it every other frame), so the patch follows it exactly
 const GOFF = [259, 251, 240, 240, 224, 204, 181, 159, 141, 141, 125, 111, 99, 99, 89, 80, 65, 58, 58, 53, 47, 43, 38, 38, 34, 31, 27, 24, 24, 21, 19, 17, 15, 15, 11, 9, 8, 7, 7, 5, 4, 3, 3, 3, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0];
 const goff = t => { const i = Math.round(t * 30) - 1220; return i < 0 ? 262 : i >= GOFF.length ? 0 : GOFF[i]; };

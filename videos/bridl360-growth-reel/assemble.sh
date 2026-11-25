@@ -4,7 +4,7 @@
 # BRIDL360 project, the places + "5 projects", the end card). New male VO (Kokoro hm_omega, vo/), the reference's music stem
 # (Demucs no_vocals) as the bed. 49.77 s, 1080x1920, 30 fps. The SFX track is lifted 12 dB after mix.py: its layer match left
 # the pops ~22 dB under the bed (inaudible); lifted, they sit just over the bed and well under the voice.
-#   REF_UP=<reference cropped to 420x746 and ESRGAN-upscaled to 1080x1920> BED=<no_vocals.wav> bash assemble.sh
+#   REF_UP=out/base_smooth.mp4 (smooth_base.sh) BED=<no_vocals.wav> bash assemble.sh
 #   (first: python3 build_vo.py; REF_UP=... bash plates.sh; node render.cjs overlay)
 # Framing fix: the screen recording has an 11 px black strip at its right edge and the player's timestamp in its bottom rows, so the
 # base is cropped to 1050x1867 and scaled back to 1080x1920 (brand.html applies the same scale to the segments that sit on it).
@@ -13,7 +13,7 @@ HERE=$(cd "$(dirname "$0")" && pwd); REPO=$(cd "$HERE/../.." && pwd); cd "$HERE"
 REF_UP=${REF_UP:?upscaled reference}; BED=${BED:?music stem}
 N=BRIDL360_LandAroundGrowth; DUR=49.7667
 FIXV="crop=1050:1867:0:0,scale=1080:1920:flags=lanczos,setsar=1"
-ffmpeg -nostdin -v error -y -i "$REF_UP" -i out/overlay.mov -filter_complex "[0:v]$FIXV,trim=0:$DUR,setpts=PTS-STARTPTS[b];[b][1:v]overlay=0:0:format=auto:shortest=1,format=yuv420p[v]" \
+ffmpeg -nostdin -v error -y -i "$REF_UP" -i out/overlay.mov -filter_complex "[0:v]$FIXV,trim=0:$DUR,setpts=PTS-STARTPTS[b];[b][1:v]overlay=0:0:format=auto:shortest=1,format=yuv420p,noise=c0s=3:c0f=t[v]" \
   -map "[v]" -c:v libx264 -preset slow -crf 10 -tune film -colorspace bt709 -color_primaries bt709 -color_trc bt709 -r 30 out/picture.mp4
 # voice: raised to the reference VO's loudness (-13.8 LUFS; the bed sits ~6 LU under it as in the reference), rumble cut, a little presence
 ffmpeg -nostdin -v error -y -i vo/voice.wav -af "aresample=48000,highpass=f=70,equalizer=f=3000:t=q:w=1.2:g=1.5,volume=3.5dB,apad,atrim=0:$DUR" -ac 2 -c:a pcm_f32le out/voice.wav
