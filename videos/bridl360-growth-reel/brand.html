@@ -144,7 +144,7 @@ function segE(t) {
 // head top at y 337, thumb tip at x 148; static until 44.63, then the whole frame washes to white (~0.88 s).
 const KR = 1080 / 420;
 // measured offset of the old figure per frame from 40.667 s (the recording updates it every other frame), so the patch follows it exactly
-const GOFF = [259, 251, 240, 240, 224, 204, 181, 159, 141, 141, 125, 111, 99, 99, 89, 80, 65, 58, 58, 53, 47, 43, 38, 38, 34, 31, 27, 24, 24, 21, 19, 17, 15, 15, 11, 9, 8, 7, 7, 5, 4, 3, 3, 3, 2, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0];
+const GOFF = [272, 272, 240, 231, 224, 203, 181, 159, 141, 132, 125, 111, 99, 94, 89, 80, 65, 58, 58, 52, 47, 42, 38, 38, 34, 31, 27, 24, 24, 21, 19, 17, 15, 15, 11, 9, 8, 6, 6, 5, 4, 3, 3, 3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0];
 const goff = t => { const i = Math.round(t * 30) - 1220; return i < 0 ? 262 : i >= GOFF.length ? 0 : GOFF[i]; };
 function segG(t) {
   if (t < 40.66 || t > 45.32) return;
