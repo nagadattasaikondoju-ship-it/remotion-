@@ -1,0 +1,170 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #000;
+    }
+    .full {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    #r-plate {
+      object-fit: cover;
+    }
+    #r-white {
+      background: #ffffff;
+    }
+    /* each strip is a window onto the plate at its true position, so at rest the bit IS the photo */
+    .r-strip {
+      position: absolute;
+      top: 1085px;
+      height: 340px;
+      overflow: hidden;
+    }
+    .r-strip img {
+      position: absolute;
+      left: 0;
+      top: -1085px;
+      width: 1080px;
+      height: 1920px;
+    }
+    #r-key-svg {
+      overflow: visible;
+    }
+    #r-caption {
+      position: absolute;
+      left: 0;
+      top: 1300px;
+      width: 1080px;
+      text-align: center;
+      font-family: "Lato", sans-serif;
+      font-weight: 400;
+      font-size: 44px;
+      letter-spacing: 0.01em;
+      color: #ffffff;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+    #r-sign {
+      position: absolute;
+      left: 0;
+      top: 1376px;
+      width: 1080px;
+      text-align: center;
+      font-family: "Lato", sans-serif;
+      font-weight: 700;
+      font-size: 30px;
+      letter-spacing: 0.3em;
+      color: rgba(255, 255, 255, 0.92);
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+    }
+    #r-black {
+      background: #000;
+    }
+  </style>
+  <div id="root" data-composition-id="reel" data-width="1080" data-height="1920">
+    <img id="r-plate" class="full" src="assets/images/plate.jpg" alt="Hyderabad at golden hour" />
+    <div id="r-white" class="full"></div>
+
+    <!-- the building piece: the photo's own buildings, cut into seven pins -->
+    <div id="r-bit" class="full" data-layout-allow-overflow>
+      <div class="r-strip" id="r-s0" style="left: 140px; width: 60px"><img src="assets/images/plate.jpg" alt="" style="left: -140px" /></div>
+      <div class="r-strip" id="r-s1" style="left: 200px; width: 60px"><img src="assets/images/plate.jpg" alt="" style="left: -200px" /></div>
+      <div class="r-strip" id="r-s2" style="left: 260px; width: 60px"><img src="assets/images/plate.jpg" alt="" style="left: -260px" /></div>
+      <div class="r-strip" id="r-s3" style="left: 320px; width: 60px"><img src="assets/images/plate.jpg" alt="" style="left: -320px" /></div>
+      <div class="r-strip" id="r-s4" style="left: 380px; width: 60px"><img src="assets/images/plate.jpg" alt="" style="left: -380px" /></div>
+      <div class="r-strip" id="r-s5" style="left: 440px; width: 60px"><img src="assets/images/plate.jpg" alt="" style="left: -440px" /></div>
+      <div class="r-strip" id="r-s6" style="left: 500px; width: 60px"><img src="assets/images/plate.jpg" alt="" style="left: -500px" /></div>
+    </div>
+
+    <!-- the key: BRIDL360 blue, its bow is the BRIDL360 mark -->
+    <div id="r-key" class="full" data-layout-allow-overflow>
+      <svg id="r-key-svg" class="full" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+        <!-- blade: underside cut to the pins' final heights (1085 + dy) -->
+        <polygon
+          id="r-blade"
+          fill="var(--color-brand, #0047AB)"
+          points="120,1036 148,1000 800,1000 800,1080 560,1080 560,1120 500,1120 500,1095 440,1095 440,1140 380,1140 380,1100 320,1100 320,1130 260,1130 260,1085 200,1085 200,1115 140,1115 140,1062 128,1062"
+        />
+        <g transform="translate(742 880) scale(0.6) translate(-190 -142)">
+          <polygon
+            fill="var(--color-brand, #0047AB)"
+            stroke="var(--color-brand, #0047AB)"
+            stroke-width="44"
+            stroke-linejoin="round"
+            points="190,142 326,212 410,179 630,294 630,568 416,684 326,636 326,598 284,620 190,570"
+          />
+          <g fill="none" stroke="#FFFFFF" stroke-width="15" stroke-linejoin="miter" stroke-linecap="square">
+            <polyline points="190,570 190,142 326,212 194,292 412,407 630,294" />
+            <polyline points="326,212 410,179 630,294 630,568" />
+            <polyline points="326,212 326,636" />
+            <polyline points="511,230 511,500" />
+            <polyline points="190,570 284,620 511,500 630,568 416,684 326,636" />
+          </g>
+          <g fill="none" stroke="#FFFFFF" stroke-width="4">
+            <rect x="395" y="268" width="14" height="14" rx="3" />
+            <rect x="417" y="268" width="14" height="14" rx="3" />
+            <rect x="395" y="288" width="14" height="14" rx="3" />
+            <rect x="417" y="288" width="14" height="14" rx="3" />
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <div id="r-caption" data-var-text="tagline">The doorway to better living</div>
+    <div id="r-sign">BRIDL360 · BRIDL360.IN</div>
+    <div id="r-black" class="full"></div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const DY_START = [8, 0, 12, 4, 20, 0, 6]; // the loose building block
+      const DY_KEY = [30, 0, 45, 15, 55, 10, 35]; // pins set to the key's cuts (matches the blade underside)
+      const CENTERS = [170, 230, 290, 350, 410, 470, 530];
+
+      // static start states
+      gsap.set("#r-white, #r-key", { opacity: 1 });
+      gsap.set("#r-caption, #r-sign, #r-black", { opacity: 0 });
+
+      // 0 - 1.0: the building piece rises into place
+      tl.fromTo("#r-bit", { y: 150 }, { y: 0, duration: 0.7, ease: "power2.inOut" }, 0.32);
+      DY_START.forEach((d, i) => tl.fromTo("#r-s" + i, { y: d }, { y: d, duration: 0.01 }, 0));
+
+      // 0.35 - 1.0: the key tips up and flies out to the right
+      tl.fromTo(
+        "#r-key",
+        { x: -32, y: -112, rotation: -2, transformOrigin: "874px 1043px" },
+        { x: 980, y: -230, rotation: -15, duration: 0.65, ease: "power2.in" },
+        0.35,
+      );
+      // 1.0 - 2.9: it slides back in from the right along the pins and comes to rest
+      const ENTER_FROM = 1150, T0 = 1.0, DUR = 1.9;
+      tl.fromTo("#r-key", { x: ENTER_FROM, y: 0, rotation: 0 }, { x: 0, y: 0, rotation: 0, duration: DUR, ease: "power3.out", immediateRender: false }, T0);
+      // each pin drops to its cut as the key's tip (x = 120 + offset) passes over it
+      CENTERS.forEach((c, i) => {
+        const u = 1 - Math.cbrt((c - 120) / ENTER_FROM); // power3.out inverted: offset = FROM * (1 - u)^3
+        const t = T0 + u * DUR;
+        tl.fromTo("#r-s" + i, { y: DY_START[i] }, { y: DY_KEY[i], duration: 0.28, ease: "back.out(1.6)", immediateRender: false }, t);
+      });
+
+      // 3.2 - 4.35: the pins line up, the white falls away, the building piece becomes the photo
+      tl.to(".r-strip", { y: 0, duration: 0.38, ease: "power2.inOut", stagger: 0.025 }, 3.2);
+      tl.to("#r-white", { opacity: 0, duration: 1.1, ease: "power1.inOut" }, 3.25);
+      tl.to("#r-key", { opacity: 0, duration: 0.85, ease: "power1.inOut" }, 3.5);
+
+      // 4.6: the line
+      tl.to("#r-caption", { opacity: 1, duration: 0.45, ease: "power1.out" }, 4.6);
+      tl.to("#r-sign", { opacity: 1, duration: 0.45, ease: "power1.out" }, 4.9);
+
+      // 7.2: fade to black
+      tl.to("#r-black", { opacity: 1, duration: 0.55, ease: "power1.in" }, 7.2);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["reel"] = tl;
+    })();
+  </script>
+</template>

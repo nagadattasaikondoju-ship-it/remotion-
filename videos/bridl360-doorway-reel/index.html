@@ -1,0 +1,69 @@
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"color-brand","type":"color","label":"BRIDL360 blue","default":"#0047AB"},
+    {"id":"tagline","type":"string","label":"Tagline","default":"The doorway to better living"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      :root {
+        --color-brand: #0047ab;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #000;
+      }
+      #root {
+        position: relative;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #000;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="7.866"
+      data-width="1080"
+      data-height="1920"
+      data-fps="30"
+    >
+      <!-- One continuous shot, timed to the reference frame by frame -->
+      <div
+        id="reel"
+        data-composition-id="reel"
+        data-composition-src="compositions/reel.html"
+        data-start="0"
+        data-duration="7.866"
+        data-track-index="1"
+        data-track-kind="graphics"
+        data-width="1080"
+        data-height="1920"
+        style="z-index: 1"
+      ></div>
+      <!-- The reference's own soundtrack, untouched -->
+      <audio id="ref-audio" class="clip" src="assets/audio/reference.mp4" data-start="0" data-duration="7.866" data-track-index="10" data-volume="1"></audio>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>
