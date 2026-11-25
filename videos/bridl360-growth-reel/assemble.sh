@@ -46,7 +46,7 @@ m() { echo "$J" | python3 -I -c "import json,sys; print(json.load(sys.stdin)['$1
 ffmpeg -nostdin -v error -y -i out/_pre.wav -af "loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(m input_i):measured_TP=$(m input_tp):measured_LRA=$(m input_lra):measured_thresh=$(m input_thresh):offset=$(m target_offset):linear=true,aresample=48000,apad,atrim=0:$DUR" -c:a pcm_s24le out/mix.wav
 rm -f out/_pre.wav out/base.wav
 O="-map 0:v -map 1:a -c:v libx264 -preset slow -pix_fmt yuv420p -profile:v high -colorspace bt709 -color_primaries bt709 -color_trc bt709 -r 30 -movflags +faststart -t $DUR"
-ffmpeg -nostdin -v error -y -i out/picture.mp4 -i out/mix.wav $O -crf 10 -tune film -c:a aac -b:a 320k out/${N}_1080x1920_MASTER.mp4
+ffmpeg -nostdin -v error -y -i out/picture.mp4 -i out/mix.wav $O -crf 14 -tune film -c:a aac -b:a 320k out/${N}_1080x1920_MASTER.mp4
 ffmpeg -nostdin -v error -y -i out/picture.mp4 -i out/mix.wav $O -crf 17 -maxrate 14M -bufsize 28M -c:a aac -b:a 256k out/${N}_1080x1920_share.mp4
 for f in out/${N}_*.mp4; do echo "$f $(ffprobe -v error -show_entries format=duration,size -of csv=p=0 "$f")"; done
 ffmpeg -nostdin -hide_banner -i out/${N}_1080x1920_share.mp4 -af ebur128=peak=true -f null - 2>&1 | grep -E "^\s+I:|Peak:"
