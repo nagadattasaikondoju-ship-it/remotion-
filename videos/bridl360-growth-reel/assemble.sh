@@ -13,16 +13,34 @@ HERE=$(cd "$(dirname "$0")" && pwd); REPO=$(cd "$HERE/../.." && pwd); cd "$HERE"
 REF_UP=${REF_UP:?upscaled reference}; BED=${BED:?music stem}
 N=BRIDL360_LandAroundGrowth; DUR=49.7667
 FIXV="crop=1050:1867:0:0,scale=1080:1920:flags=lanczos,setsar=1"
+if [ "${AUDIO_ONLY:-0}" != 1 ]; then
 ffmpeg -nostdin -v error -y -i "$REF_UP" -i out/overlay.mov -filter_complex "[0:v]$FIXV,trim=0:$DUR,setpts=PTS-STARTPTS[b];[b][1:v]overlay=0:0:format=auto:shortest=1,format=yuv420p,noise=c0s=3:c0f=t[v]" \
   -map "[v]" -c:v libx264 -preset slow -crf 10 -tune film -colorspace bt709 -color_primaries bt709 -color_trc bt709 -r 30 out/picture.mp4
+fi
 # voice: raised to the reference VO's loudness (-13.8 LUFS; the bed sits ~6 LU under it as in the reference), rumble cut, a little presence
 ffmpeg -nostdin -v error -y -i vo/voice.wav -af "aresample=48000,highpass=f=70,equalizer=f=3000:t=q:w=1.2:g=1.5,volume=3.5dB,apad,atrim=0:$DUR" -ac 2 -c:a pcm_f32le out/voice.wav
 # bed: the reference's own hits for its logo pops (28.6-29.6 s) land off our place-name pops, so it dips 7 dB under them
 ffmpeg -nostdin -v error -y -i "$BED" -af "aresample=48000,volume='if(between(t,28.15,29.95),0.45,1)':eval=frame,afade=t=out:st=49.3:d=0.45,apad,atrim=0:$DUR" -ac 2 -c:a pcm_f32le out/bed.wav
+# music fill: where the voice pauses (the teammate reads faster than the reference VO), the bed comes up 6 dB, so the sound never drops out
+python3 - <<'EOF' 2>/dev/null
+import subprocess, numpy as np
+SR = 48000
+rd = lambda f, ch: np.frombuffer(subprocess.run(["ffmpeg", "-v", "error", "-i", f, "-ac", str(ch), "-ar", str(SR), "-f", "f32le", "-"], capture_output=True).stdout, np.float32)
+v = rd("out/voice.wav", 1); b = rd("out/bed.wav", 2).reshape(-1, 2).copy(); n = min(len(v), len(b)); hop = 480
+env = np.array([np.sqrt((v[i:i + hop] ** 2).mean()) for i in range(0, n, hop)])
+talk = (20 * np.log10(env + 1e-9) > -38).astype(float)
+talk = np.convolve(talk, np.ones(35), "same") > 0                            # bridge pauses under ~0.35 s: no pumping between words
+g = np.where(talk, 1.0, 10 ** (6 / 20)); a = 0.12                              # 6 dB up in pauses, ~0.2 s glide
+for i in range(1, len(g)): g[i] = g[i - 1] + a * (g[i] - g[i - 1])
+gs = np.interp(np.arange(n), np.arange(len(g)) * hop + hop / 2, g)
+b[:n] *= gs[:, None]
+subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "f32le", "-ar", str(SR), "-ac", "2", "-i", "-", "-c:a", "pcm_f32le", "out/bed.wav"], input=b.astype(np.float32).tobytes())
+print(f"music fill: {100 * (1 - talk.mean()):.0f}% of the reel is a voice pause")
+EOF
 python3 - <<'EOF'
 import json
 T = json.load(open("vo/times.json"))
-C = [(14.14, "pop", .4, "Hyderabad pops in"), (22.88, "pop", .45, "BRIDL360 tag lands on the arrows"), (26.88, "pop", .35, "BRIDL360 project in the map pin"),
+C = [(14.14, "pop", .4, "Hyderabad pops in"), (26.88, "pop", .35, "BRIDL360 project in the map pin"),
      (T["tKom"] - .04, "pop", .45, "Kompally"), (T["tGac"] - .04, "pop", .45, "Gachibowli"), (T["tSad"] - .04, "pop", .45, "Sadashivpet"),
      (30.44, "swipe", .4, "places slide out, projects slide in"), (T["tFive"] + .04, "pop", .5, "5 projects"),
      (45.42, "softwhoosh", .35, "end card rises"), (46.78, "chime", .45, "DM US OR CALL NOW lands")]
@@ -46,7 +64,12 @@ m() { echo "$J" | python3 -I -c "import json,sys; print(json.load(sys.stdin)['$1
 ffmpeg -nostdin -v error -y -i out/_pre.wav -af "loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(m input_i):measured_TP=$(m input_tp):measured_LRA=$(m input_lra):measured_thresh=$(m input_thresh):offset=$(m target_offset):linear=true,aresample=48000,apad,atrim=0:$DUR" -c:a pcm_s24le out/mix.wav
 rm -f out/_pre.wav out/base.wav
 O="-map 0:v -map 1:a -c:v libx264 -preset slow -pix_fmt yuv420p -profile:v high -colorspace bt709 -color_primaries bt709 -color_trc bt709 -r 30 -movflags +faststart -t $DUR"
+if [ "${AUDIO_ONLY:-0}" = 1 ]; then   # picture unchanged: swap the sound into the existing files
+  for V in MASTER:320k share:256k; do f=out/${N}_1080x1920_${V%%:*}.mp4
+    ffmpeg -nostdin -v error -y -i $f -i out/mix.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a ${V##*:} -movflags +faststart -t $DUR out/_r.mp4 && mv out/_r.mp4 $f; done
+else
 ffmpeg -nostdin -v error -y -i out/picture.mp4 -i out/mix.wav $O -crf 14 -tune film -c:a aac -b:a 320k out/${N}_1080x1920_MASTER.mp4
 ffmpeg -nostdin -v error -y -i out/picture.mp4 -i out/mix.wav $O -crf 17 -maxrate 14M -bufsize 28M -c:a aac -b:a 256k out/${N}_1080x1920_share.mp4
+fi
 for f in out/${N}_*.mp4; do echo "$f $(ffprobe -v error -show_entries format=duration,size -of csv=p=0 "$f")"; done
 ffmpeg -nostdin -hide_banner -i out/${N}_1080x1920_share.mp4 -af ebur128=peak=true -f null - 2>&1 | grep -E "^\s+I:|Peak:"
