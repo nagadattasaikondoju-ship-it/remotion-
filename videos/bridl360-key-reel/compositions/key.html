@@ -1,0 +1,203 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Fraunces";
+      src: url("assets/fonts/fraunces-latin-400-normal.woff2") format("woff2");
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: "Montserrat";
+      src: url("assets/fonts/montserrat-latin-600-normal.woff2") format("woff2");
+      font-weight: 600;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--color-ivory, #f5efe4);
+    }
+    #k-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 70% 42% at 62% 56%, rgba(255, 250, 240, 1) 0%, rgba(245, 239, 228, 0) 70%);
+    }
+    #k-plate {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    #k-plate img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    #k-zoom,
+    #k-glide {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    #k-shadow {
+      position: absolute;
+      left: 170px;
+      top: 1150px;
+      width: 760px;
+      height: 70px;
+      border-radius: 50%;
+      background: rgba(20, 33, 61, 0.22);
+      filter: blur(26px);
+    }
+    #k-svg {
+      position: absolute;
+      left: 90px;
+      top: 760px;
+      width: 900px;
+      height: 468px;
+      overflow: visible;
+    }
+    .k-type {
+      position: absolute;
+      left: 0;
+      width: 1080px;
+      text-align: center;
+    }
+    #k-eyebrow {
+      top: 330px;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 600;
+      font-size: 28px;
+      letter-spacing: 0.42em;
+      color: var(--color-brand, #0047ab);
+    }
+    #k-head {
+      top: 392px;
+      font-family: "Fraunces", serif;
+      font-weight: 400;
+      font-size: 146px;
+      line-height: 1.02;
+      letter-spacing: -0.02em;
+      color: var(--color-ink, #14213d);
+    }
+    .k-w {
+      display: inline-block;
+    }
+  </style>
+  <div id="root" data-composition-id="key" data-width="1080" data-height="1920">
+    <div id="k-glow"></div>
+    <div id="k-plate"><img src="assets/images/hyd-plate.jpg" alt="" /></div>
+    <div id="k-zoom" data-layout-allow-overflow>
+      <div id="k-glide">
+        <div id="k-shadow"></div>
+        <svg id="k-svg" viewBox="0 0 1000 520" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <clipPath id="k-bitclip">
+              <polygon
+                points="70,300 70,290 96,290 96,272 130,272 130,254 150,254 150,282 190,282 190,260 204,260 218,260 218,276 248,276 248,248 292,248 292,270 314,270 314,286 350,286 350,242 368,242 368,264 398,264 398,278 440,278 440,252 464,252 464,288 498,288 498,266 526,266 526,274 566,274 566,256 586,256 586,300 586,384 580,384 464,384 452,350 404,350 392,404 356,404 344,366 292,366 280,392 240,392 228,356 182,356 170,398 136,398 124,372 76,372 70,372"
+              />
+            </clipPath>
+          </defs>
+          <!-- the bit: a slice of the Hyderabad skyline, cut to the key's teeth -->
+          <g id="k-bit">
+            <image
+              href="assets/images/hyd-strip.jpg"
+              x="70"
+              y="236"
+              width="516"
+              height="172"
+              preserveAspectRatio="xMidYMid slice"
+              clip-path="url(#k-bitclip)"
+            />
+          </g>
+          <!-- blade: its underside is the skyline, so the bit locks in -->
+          <polygon
+            fill="var(--color-brand, #0047AB)"
+            points="30,248 52,212 640,212 640,300 590,300 586,256 566,256 566,274 526,274 526,266 498,266 498,288 464,288 464,252 440,252 440,278 398,278 398,264 368,264 368,242 350,242 350,286 314,286 314,270 292,270 292,248 248,248 248,276 218,276 218,260 190,260 190,282 150,282 150,254 130,254 130,272 96,272 96,290 70,290 66,300 52,300"
+          />
+          <!-- bow: the BRIDL360 mark, its front panel cut open as a door -->
+          <polygon
+            fill="none"
+            stroke="var(--color-brand, #0047AB)"
+            stroke-width="26"
+            stroke-linejoin="round"
+            points="600.0,40.0 706.1,94.6 771.6,68.9 943.2,158.6 943.2,372.3 776.3,462.8 706.1,425.3 706.1,395.7 673.3,412.8 600.0,373.8"
+          />
+          <path
+            fill="var(--color-brand, #0047AB)"
+            fill-rule="evenodd"
+            d="M600.0,40.0 L706.1,94.6 L771.6,68.9 L943.2,158.6 L943.2,372.3 L776.3,462.8 L706.1,425.3 L706.1,395.7 L673.3,412.8 L600.0,373.8 Z M706.1,211.3 L773.2,246.7 L850.4,206.7 L850.4,319.2 L706.1,395.5 Z"
+          />
+          <polygon id="k-door" fill="var(--color-brand, #0047AB)" points="706.1,211.3 773.2,246.7 850.4,206.7 850.4,319.2 706.1,395.5" />
+          <g fill="none" stroke="#FFFFFF" stroke-width="10.9" stroke-linejoin="miter" stroke-linecap="square">
+            <polyline points="600.0,373.8 600.0,40.0 706.1,94.6 603.1,157.0 773.2,246.7 943.2,158.6" />
+            <polyline points="706.1,94.6 771.6,68.9 943.2,158.6 943.2,372.3" />
+            <polyline points="706.1,94.6 706.1,425.3" />
+            <polyline points="850.4,108.6 850.4,319.2" />
+            <polyline points="600.0,373.8 673.3,412.8 850.4,319.2 943.2,372.3 776.3,462.8 706.1,425.3" />
+          </g>
+          <g fill="none" stroke="#FFFFFF" stroke-width="2.4">
+            <rect x="759.9" y="138.3" width="10.9" height="10.9" rx="2.4" />
+            <rect x="777.1" y="138.3" width="10.9" height="10.9" rx="2.4" />
+            <rect x="759.9" y="153.9" width="10.9" height="10.9" rx="2.4" />
+            <rect x="777.1" y="153.9" width="10.9" height="10.9" rx="2.4" />
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div id="k-eyebrow" class="k-type">
+      <span class="k-w">BRIDL360</span>&nbsp;&nbsp;<span class="k-w">·</span>&nbsp;&nbsp;<span class="k-w">HYDERABAD</span>
+    </div>
+    <div id="k-head" class="k-type"><span class="k-w">Unlock</span><br /><span class="k-w">Hyderabad.</span></div>
+  </div>
+  <script>
+    (function () {
+      // logo space (806px trace) -> key svg space -> frame px
+      const KX = 90, KY = 760, KS = 0.9;
+      const toFrame = (x, y) => [KX + KS * (600 + (x - 190) * 0.78), KY + KS * (40 + (y - 142) * 0.78)];
+      const DOOR = [[326, 361.6], [412, 407], [511, 355.7], [511, 500], [326, 597.8]].map((p) => toFrame(p[0], p[1]));
+      const Z = toFrame(418.5, 453.5); // middle of the door
+      const C = [540, 960];
+      const SMAX = 42;
+      const zoom = document.querySelector("#k-zoom");
+      const plate = document.querySelector("#k-plate");
+      const plateImg = document.querySelector("#k-plate img");
+      const proxy = { p: 0 };
+      function apply(p) {
+        const s = Math.pow(SMAX, p);
+        const tx = (C[0] - Z[0]) * p, ty = (C[1] - Z[1]) * p;
+        gsap.set(zoom, { transformOrigin: Z[0] + "px " + Z[1] + "px", x: tx, y: ty, scale: s });
+        const poly = DOOR.map((q) => (Z[0] + tx + s * (q[0] - Z[0])).toFixed(2) + "px " + (Z[1] + ty + s * (q[1] - Z[1])).toFixed(2) + "px");
+        plate.style.clipPath = "polygon(" + poly.join(", ") + ")";
+        // at rest the door frames the sunset skyline; it slides to the full-frame position as we fly in
+        gsap.set(plateImg, { transformOrigin: "540px 960px", scale: 1.12, y: -470 * (1 - p) });
+      }
+      apply(0);
+
+      const tl = gsap.timeline({ paused: true });
+      // key glides in and settles
+      tl.fromTo("#k-glide", { x: 110, rotation: -7, transformOrigin: "780px 1010px" }, { x: 0, rotation: 0, duration: 1.0, ease: "expo.out" }, 0);
+      // the skyline bit rises and locks into the blade
+      tl.fromTo("#k-bit", { x: -34, y: 190, rotation: 7, svgOrigin: "330 320" }, { x: 0, y: 0, rotation: 0, duration: 0.82, ease: "power4.out" }, 0.3);
+      // lock impact: a 6px knock along the blade
+      tl.fromTo("#k-svg", { x: 0 }, { x: 7, duration: 0.06, ease: "power2.out" }, 1.12);
+      tl.to("#k-svg", { x: 0, duration: 0.24, ease: "power3.out" }, 1.18);
+      // the door in the logo opens onto the city
+      tl.fromTo("#k-door", { opacity: 1 }, { opacity: 0, duration: 0.4, ease: "power2.inOut" }, 1.3);
+      // type leaves before the fly-through
+      tl.fromTo(
+        "#k-head .k-w, #k-eyebrow .k-w",
+        { opacity: 1, filter: "blur(0px)" },
+        { opacity: 0, filter: "blur(8px)", duration: 0.2, stagger: 0.05, ease: "power2.in" },
+        1.46,
+      );
+      // fly through the door
+      tl.fromTo(proxy, { p: 0 }, { p: 1, duration: 0.86, ease: "power2.in" }, 1.7);
+      tl.eventCallback("onUpdate", () => apply(proxy.p));
+      window.__timelines = window.__timelines || {};
+      window.__timelines["key"] = tl;
+    })();
+  </script>
+</template>

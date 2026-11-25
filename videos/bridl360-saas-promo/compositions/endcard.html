@@ -1,0 +1,186 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Montserrat";
+      src: url("assets/fonts/montserrat-latin-800-normal.woff2") format("woff2");
+      font-weight: 800;
+    }
+    @font-face {
+      font-family: "Montserrat";
+      src: url("assets/fonts/montserrat-latin-600-normal.woff2") format("woff2");
+      font-weight: 600;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: radial-gradient(ellipse 70% 70% at 50% 50%, #93a6c6 0%, #6c82aa 100%);
+      font-family: "Inter", sans-serif;
+      color: #ffffff;
+    }
+    .e-full {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+    }
+    #e-vig {
+      background: radial-gradient(ellipse 60% 55% at 50% 50%, rgba(10, 26, 58, 0) 0%, rgba(10, 26, 58, 0.92) 100%);
+    }
+    #e-night {
+      background: radial-gradient(ellipse 75% 70% at 50% 45%, #14295a 0%, var(--color-night, #0a1a3a) 75%);
+    }
+    #e-city {
+      object-fit: cover;
+    }
+    #e-shade {
+      background: linear-gradient(180deg, rgba(10, 26, 58, 0.55) 0%, rgba(10, 26, 58, 0.7) 55%, rgba(10, 26, 58, 0.95) 100%);
+    }
+    .e-word {
+      position: absolute;
+      left: 0;
+      top: 494px;
+      width: 1920px;
+      text-align: center;
+      font-size: 76px;
+      font-weight: 500;
+      line-height: 92px;
+    }
+    .e-end {
+      position: absolute;
+      left: 0;
+      width: 1920px;
+      text-align: center;
+    }
+    #e-word {
+      top: 528px;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 800;
+      font-size: 96px;
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+    #e-word .e-l {
+      display: inline-block;
+    }
+    #e-word sup {
+      font-size: 28px;
+      font-weight: 600;
+      vertical-align: top;
+      position: relative;
+      top: 6px;
+      margin-left: 4px;
+    }
+    #e-tag {
+      top: 648px;
+      font-size: 34px;
+      color: rgba(255, 255, 255, 0.86);
+    }
+    #e-cta {
+      position: absolute;
+      left: 690px;
+      top: 718px;
+      width: 540px;
+      height: 88px;
+      border-radius: 44px;
+      background: #ffffff;
+      color: var(--color-brand, #0047ab);
+      text-align: center;
+      line-height: 88px;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 800;
+      font-size: 32px;
+      box-shadow: 0 14px 40px rgba(0, 10, 40, 0.45);
+    }
+    #e-info {
+      top: 848px;
+      font-size: 28px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      color: rgba(255, 255, 255, 0.92);
+    }
+    .e-dot {
+      color: #6fa3ff;
+      padding: 0 16px;
+    }
+    #e-black {
+      background: #000;
+    }
+  </style>
+  <div id="root" data-composition-id="endcard" data-width="1920" data-height="1080">
+    <div id="e-vig" class="e-full"></div>
+    <div id="e-night" class="e-full"></div>
+    <img id="e-city" class="e-full" src="assets/images/hyd-wide-soft.jpg" alt="Hyderabad skyline" />
+    <div id="e-shade" class="e-full"></div>
+    <div id="e-just" class="e-word">Just</div>
+    <div id="e-with" class="e-word">With</div>
+    <div id="e-us" class="e-word">Us</div>
+    <svg id="e-logo" class="e-full" viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="e-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="6" /></filter>
+      </defs>
+      <g transform="translate(960 318) scale(0.46) translate(-410 -413)">
+        <g id="e-shadow" fill="none" stroke="#000a24" stroke-width="16" stroke-linejoin="miter" stroke-linecap="square" filter="url(#e-soft)" transform="translate(10 14)">
+          <polyline points="190,570 190,142 326,212 194,292 412,407 630,294" />
+          <polyline points="326,212 410,179 630,294 630,568" />
+          <polyline points="326,212 326,636" />
+          <polyline points="511,230 511,500" />
+          <polyline points="190,570 284,620 511,500 630,568 416,684 326,636" />
+        </g>
+        <g fill="none" stroke="#FFFFFF" stroke-width="16" stroke-linejoin="miter" stroke-linecap="square">
+          <polyline class="e-draw" pathLength="1" points="190,570 190,142 326,212 194,292 412,407 630,294" />
+          <polyline class="e-draw" pathLength="1" points="326,212 410,179 630,294 630,568" />
+          <polyline class="e-draw" pathLength="1" points="326,212 326,636" />
+          <polyline class="e-draw" pathLength="1" points="511,230 511,500" />
+          <polyline class="e-draw" pathLength="1" points="190,570 284,620 511,500 630,568 416,684 326,636" />
+        </g>
+        <g id="e-win" fill="none" stroke="#FFFFFF" stroke-width="4.5">
+          <rect x="395" y="268" width="14" height="14" rx="3" />
+          <rect x="417" y="268" width="14" height="14" rx="3" />
+          <rect x="395" y="288" width="14" height="14" rx="3" />
+          <rect x="417" y="288" width="14" height="14" rx="3" />
+        </g>
+      </g>
+    </svg>
+    <div id="e-word" class="e-end"><span class="e-l">B</span><span class="e-l">R</span><span class="e-l">I</span><span class="e-l">D</span><span class="e-l">L</span><span class="e-l">3</span><span class="e-l">6</span><span class="e-l">0</span><sup class="e-l">®</sup></div>
+    <div id="e-tag" class="e-end">Your partner in seamless property solutions</div>
+    <div id="e-cta">Book a consultation&nbsp;&nbsp;→</div>
+    <div id="e-info" class="e-end">www.bridl360.in<span class="e-dot">•</span>@bridl360<span class="e-dot">•</span>Hyderabad, Telangana</div>
+    <div id="e-black" class="e-full"></div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      gsap.set("#e-vig, #e-night, #e-city, #e-shade, #e-shadow, #e-tag, #e-cta, #e-info, #e-black, .e-word, #e-word .e-l", { opacity: 0 });
+      gsap.set(".e-draw", { strokeDasharray: 1, strokeDashoffset: 1 });
+      gsap.set("#e-win rect", { scale: 0, transformOrigin: "50% 50%" });
+      const wordIn = (sel, t) => tl.fromTo(sel, { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.16, ease: "power2.out" }, t);
+      const wordOut = (sel, t) => tl.to(sel, { opacity: 0, filter: "blur(10px)", duration: 0.12, ease: "power2.in" }, t);
+      // Just. With. Us. — the light falls away to brand night
+      wordIn("#e-just", 0.05);
+      wordOut("#e-just", 0.5);
+      wordIn("#e-with", 0.56);
+      tl.to("#e-vig", { opacity: 1, duration: 0.5, ease: "power2.inOut" }, 0.56);
+      wordOut("#e-with", 1.0);
+      tl.to("#e-night", { opacity: 1, duration: 0.14, ease: "power1.inOut" }, 0.98);
+      wordIn("#e-us", 1.06);
+      wordOut("#e-us", 1.72);
+      // Hyderabad rises behind; the BRIDL360 mark draws itself
+      tl.to("#e-city", { opacity: 0.55, duration: 0.8, ease: "power1.inOut" }, 1.65);
+      tl.to("#e-shade", { opacity: 1, duration: 0.8, ease: "power1.inOut" }, 1.65);
+      tl.to(".e-draw", { strokeDashoffset: 0, duration: 0.7, stagger: 0.1, ease: "power2.inOut" }, 1.85);
+      tl.to("#e-win rect", { scale: 1, duration: 0.38, stagger: 0.05, ease: "back.out(2)" }, 2.62);
+      tl.to("#e-shadow", { opacity: 0.6, duration: 0.5, ease: "power2.out" }, 2.6);
+      // wordmark, tagline, the call to action, the details
+      tl.fromTo("#e-word .e-l", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, stagger: 0.05, ease: "power2.out" }, 2.72);
+      tl.fromTo("#e-tag", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.25, ease: "power2.out" }, 3.15);
+      tl.fromTo("#e-cta", { opacity: 0, scale: 0.86 }, { opacity: 1, scale: 1, duration: 0.55, ease: "back.out(1.6)" }, 3.38);
+      tl.fromTo("#e-info", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 3.68);
+      tl.fromTo("#e-cta", { boxShadow: "0 14px 40px rgba(0,10,40,0.45), 0 0 0 0px rgba(255,255,255,0.55)" }, { boxShadow: "0 14px 40px rgba(0,10,40,0.45), 0 0 0 24px rgba(255,255,255,0)", duration: 0.8, ease: "power2.out", immediateRender: false }, 4.1);
+      tl.to("#e-black", { opacity: 1, duration: 0.4, ease: "power1.in" }, 5.62);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["endcard"] = tl;
+    })();
+  </script>
+</template>

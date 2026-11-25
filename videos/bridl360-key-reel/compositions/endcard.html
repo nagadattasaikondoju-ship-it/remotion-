@@ -1,0 +1,197 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Montserrat";
+      src: url("assets/fonts/montserrat-latin-500-normal.woff2") format("woff2");
+      font-weight: 500;
+    }
+    @font-face {
+      font-family: "Montserrat";
+      src: url("assets/fonts/montserrat-latin-600-normal.woff2") format("woff2");
+      font-weight: 600;
+    }
+    @font-face {
+      font-family: "Montserrat";
+      src: url("assets/fonts/montserrat-latin-800-normal.woff2") format("woff2");
+      font-weight: 800;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: var(--color-brand, #0047ab);
+    }
+    #e-glow {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 62% 36% at 50% 36%, rgba(64, 132, 230, 0.55) 0%, rgba(0, 71, 171, 0) 72%);
+    }
+    #e-plate {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    #e-plate img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    #e-zoom {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    #e-logo {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      overflow: visible;
+    }
+    #e-type {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    #e-word {
+      position: absolute;
+      left: 0;
+      top: 900px;
+      width: 1080px;
+      text-align: center;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 800;
+      font-size: 116px;
+      letter-spacing: 0.02em;
+      line-height: 1;
+      color: #ffffff;
+    }
+    #e-word .e-l {
+      display: inline-block;
+    }
+    #e-word sup {
+      font-size: 30px;
+      font-weight: 600;
+      vertical-align: top;
+      position: relative;
+      top: 4px;
+      margin-left: 4px;
+    }
+    #e-tag {
+      position: absolute;
+      left: 0;
+      top: 1044px;
+      width: 1080px;
+      text-align: center;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 500;
+      font-size: 38px;
+      color: rgba(255, 255, 255, 0.88);
+    }
+    #e-url {
+      position: absolute;
+      left: 340px;
+      top: 1116px;
+      width: 400px;
+      height: 70px;
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      border-radius: 35px;
+      text-align: center;
+      line-height: 66px;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 600;
+      font-size: 32px;
+      letter-spacing: 0.02em;
+      color: #ffffff;
+    }
+  </style>
+  <div id="root" data-composition-id="endcard" data-width="1080" data-height="1920">
+    <div id="e-glow"></div>
+    <div id="e-plate"><img src="assets/images/hyd-plate.jpg" alt="" /></div>
+    <div id="e-zoom" data-layout-allow-overflow>
+      <!-- the BRIDL360 mark at 0.85 px per unit of the 806px trace; logo bbox x 190..630, y 142..684 -->
+      <svg id="e-logo" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="e-soft" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="6" />
+          </filter>
+        </defs>
+        <g transform="translate(353 380) scale(0.85) translate(-190 -142)">
+          <polygon id="e-door" fill="var(--color-brand, #0047AB)" points="326,361.6 412,407 511,355.7 511,500 326,597.8" />
+          <g id="e-shadow" fill="none" stroke="#001a4d" stroke-width="14" stroke-linejoin="miter" stroke-linecap="square" filter="url(#e-soft)" transform="translate(9 12)">
+            <polyline points="190,570 190,142 326,212 194,292 412,407 630,294" />
+            <polyline points="326,212 410,179 630,294 630,568" />
+            <polyline points="326,212 326,636" />
+            <polyline points="511,230 511,500" />
+            <polyline points="190,570 284,620 511,500 630,568 416,684 326,636" />
+          </g>
+          <g fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linejoin="miter" stroke-linecap="square">
+            <polyline points="190,570 190,142 326,212 194,292 412,407 630,294" />
+            <polyline points="326,212 410,179 630,294 630,568" />
+            <polyline points="326,212 326,636" />
+            <polyline points="511,230 511,500" />
+            <polyline points="190,570 284,620 511,500 630,568 416,684 326,636" />
+          </g>
+          <g id="e-win" fill="none" stroke="#FFFFFF" stroke-width="3.2">
+            <rect x="395" y="268" width="14" height="14" rx="3" />
+            <rect x="417" y="268" width="14" height="14" rx="3" />
+            <rect x="395" y="288" width="14" height="14" rx="3" />
+            <rect x="417" y="288" width="14" height="14" rx="3" />
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div id="e-type">
+      <div id="e-word"><span class="e-l">B</span><span class="e-l">R</span><span class="e-l">I</span><span class="e-l">D</span><span class="e-l">L</span><span class="e-l">3</span><span class="e-l">6</span><span class="e-l">0</span><sup class="e-l">®</sup></div>
+      <div id="e-tag">Seamless property solutions</div>
+      <div id="e-url">www.bridl360.in</div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const toFrame = (x, y) => [353 + 0.85 * (x - 190), 380 + 0.85 * (y - 142)];
+      const DOOR = [[326, 361.6], [412, 407], [511, 355.7], [511, 500], [326, 597.8]].map((p) => toFrame(p[0], p[1]));
+      const Z = toFrame(418.5, 453.5);
+      const C = [540, 960];
+      const SMAX = 30;
+      const zoom = document.querySelector("#e-zoom");
+      const plate = document.querySelector("#e-plate");
+      const plateImg = document.querySelector("#e-plate img");
+      const proxy = { p: 1 };
+      function apply(p) {
+        const s = Math.pow(SMAX, p);
+        const tx = (C[0] - Z[0]) * p, ty = (C[1] - Z[1]) * p;
+        gsap.set(zoom, { transformOrigin: Z[0] + "px " + Z[1] + "px", x: tx, y: ty, scale: s });
+        const poly = DOOR.map((q) => (Z[0] + tx + s * (q[0] - Z[0])).toFixed(2) + "px " + (Z[1] + ty + s * (q[1] - Z[1])).toFixed(2) + "px");
+        plate.style.clipPath = "polygon(" + poly.join(", ") + ")";
+        // as we pull back, the city slides so the door ends framing the skyline
+        gsap.set(plateImg, { y: -820 * (1 - p) });
+      }
+      apply(1);
+
+      const tl = gsap.timeline({ paused: true });
+      // pull back out of the door: the city shrinks into the BRIDL360 mark
+      tl.fromTo(proxy, { p: 1 }, { p: 0, duration: 1.15, ease: "expo.out" }, 0);
+      tl.eventCallback("onUpdate", () => apply(proxy.p));
+      // the door closes to brand blue, the mark lands
+      tl.fromTo("#e-door", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.inOut" }, 0.85);
+      tl.fromTo("#e-plate", { opacity: 1 }, { opacity: 0, duration: 0.4, ease: "power2.inOut" }, 0.85);
+      tl.fromTo("#e-shadow", { opacity: 0 }, { opacity: 0.55, duration: 0.5, ease: "power2.out" }, 0.9);
+      tl.fromTo("#e-win rect", { scale: 0, transformOrigin: "50% 50%" }, { scale: 1, duration: 0.42, stagger: 0.05, ease: "back.out(2)" }, 1.0);
+      // wordmark letter by letter, then tagline and URL
+      tl.fromTo("#e-word .e-l", { opacity: 0.0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, stagger: 0.05, ease: "power2.out" }, 1.1);
+      tl.fromTo("#e-tag", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.24, ease: "power2.out" }, 1.65);
+      tl.fromTo("#e-url", { opacity: 0, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.5, ease: "expo.out" }, 1.9);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["endcard"] = tl;
+    })();
+  </script>
+</template>

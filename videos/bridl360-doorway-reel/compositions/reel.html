@@ -1,0 +1,261 @@
+<template>
+  <style>
+    @font-face { font-family: "Montserrat"; src: url("assets/fonts/montserrat-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+    @font-face { font-family: "Montserrat"; src: url("assets/fonts/montserrat-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+    @font-face { font-family: "Montserrat"; src: url("assets/fonts/montserrat-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #000;
+    }
+    .full {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    #r-white {
+      background: #ffffff;
+    }
+    /* each slice is a window onto the photo at its true place: once the slices line up, the building piece IS the photo */
+    .r-strip {
+      position: absolute;
+      top: 595.0px;
+      height: 527.4px;
+      overflow: hidden;
+    }
+    .r-strip img {
+      position: absolute;
+      top: -595.0px;
+      width: 1080px;
+      height: 1920px;
+    }
+    #r-caption {
+      position: absolute;
+      left: 0;
+      top: 1304px;
+      width: 1080px;
+      text-align: center;
+      font-family: "Lato", sans-serif;
+      font-weight: 400;
+      font-size: 44px;
+      letter-spacing: 0.005em;
+      color: #ffffff;
+      text-shadow: 0 2px 14px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.5);
+    }
+    #r-sign {
+      position: absolute;
+      left: 0;
+      top: 1374px;
+      width: 1080px;
+      text-align: center;
+      font-family: "Lato", sans-serif;
+      font-weight: 700;
+      font-size: 30px;
+      letter-spacing: 0.3em;
+      color: rgba(255, 255, 255, 0.92);
+      text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+    }
+    #r-black {
+      background: #000;
+    }
+    #r-dim {
+      background: radial-gradient(ellipse 85% 55% at 50% 42%, rgba(0, 30, 80, 0.62) 0%, rgba(2, 10, 28, 0.86) 100%);
+    }
+    .r-end {
+      position: absolute;
+      left: 0;
+      width: 1080px;
+      text-align: center;
+      color: #ffffff;
+      font-family: "Montserrat", sans-serif;
+    }
+    #r-word {
+      top: 842px;
+      font-weight: 800;
+      font-size: 104px;
+      letter-spacing: 0.02em;
+      line-height: 1;
+    }
+    #r-word .r-l {
+      display: inline-block;
+    }
+    #r-word sup {
+      font-size: 28px;
+      font-weight: 600;
+      vertical-align: top;
+      position: relative;
+      top: 6px;
+      margin-left: 4px;
+    }
+    #r-tag {
+      top: 970px;
+      font-weight: 500;
+      font-size: 36px;
+      color: rgba(255, 255, 255, 0.88);
+    }
+    #r-cta {
+      position: absolute;
+      left: 270px;
+      top: 1052px;
+      width: 540px;
+      height: 96px;
+      border-radius: 48px;
+      background: #ffffff;
+      color: var(--color-brand, #0047ab);
+      text-align: center;
+      line-height: 96px;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 800;
+      font-size: 36px;
+      letter-spacing: 0.01em;
+      box-shadow: 0 14px 40px rgba(0, 10, 40, 0.45);
+    }
+    #r-info {
+      top: 1188px;
+      font-weight: 600;
+      font-size: 30px;
+      letter-spacing: 0.04em;
+      color: rgba(255, 255, 255, 0.92);
+    }
+    #r-info .r-dot {
+      color: #6fa3ff;
+      padding: 0 14px;
+    }
+  </style>
+  <div id="root" data-composition-id="reel" data-width="1080" data-height="1920">
+    <img id="r-plate" class="full" src="assets/images/plate.jpg" alt="Hyderabad at golden hour" />
+    <div id="r-white" class="full"></div>
+
+    <!-- the building piece: ten slices of the photo's own buildings, rooftop-cut like the reference -->
+    <div id="r-bit" class="full" data-layout-allow-overflow>
+      <div class="r-strip" id="r-s0" style="left: 126.6px; width: 42.2px; clip-path: polygon(0.0px 527.4px, 0.0px 185.6px, 23.2px 185.6px, 23.2px 198.3px, 29.5px 198.3px, 29.5px 160.3px, 42.2px 160.3px, 42.2px 527.4px)"><img src="assets/images/plate.jpg" alt="" style="left: -126.6px" /></div>
+      <div class="r-strip" id="r-s1" style="left: 168.8px; width: 59.1px; clip-path: polygon(0.0px 527.4px, 0.0px 223.6px, 59.1px 223.6px, 59.1px 527.4px)"><img src="assets/images/plate.jpg" alt="" style="left: -168.8px" /></div>
+      <div class="r-strip" id="r-s2" style="left: 227.8px; width: 25.3px; clip-path: polygon(0.0px 527.4px, 0.0px 286.9px, 2.1px 286.9px, 2.1px 274.2px, 8.4px 274.2px, 8.4px 261.6px, 19.0px 261.6px, 19.0px 286.9px, 25.3px 286.9px, 25.3px 527.4px)"><img src="assets/images/plate.jpg" alt="" style="left: -227.8px" /></div>
+      <div class="r-strip" id="r-s3" style="left: 253.1px; width: 25.3px; clip-path: polygon(0.0px 527.4px, 0.0px 274.2px, 4.2px 274.2px, 4.2px 261.6px, 12.7px 261.6px, 12.7px 248.9px, 23.2px 248.9px, 23.2px 274.2px, 25.3px 274.2px, 25.3px 527.4px)"><img src="assets/images/plate.jpg" alt="" style="left: -253.1px" /></div>
+      <div class="r-strip" id="r-s4" style="left: 278.4px; width: 67.5px; clip-path: polygon(0.0px 527.4px, 0.0px 236.3px, 16.9px 236.3px, 16.9px 223.6px, 44.3px 223.6px, 44.3px 198.3px, 50.6px 198.3px, 50.6px 223.6px, 52.7px 223.6px, 52.7px 236.3px, 65.4px 236.3px, 65.4px 223.6px, 67.5px 223.6px, 67.5px 527.4px)"><img src="assets/images/plate.jpg" alt="" style="left: -278.4px" /></div>
+      <div class="r-strip" id="r-s5" style="left: 345.9px; width: 25.3px; clip-path: polygon(0.0px 527.4px, 0.0px 236.3px, 12.7px 236.3px, 12.7px 210.9px, 25.3px 210.9px, 25.3px 527.4px)"><img src="assets/images/plate.jpg" alt="" style="left: -345.9px" /></div>
+      <div class="r-strip" id="r-s6" style="left: 371.3px; width: 16.9px; clip-path: polygon(0.0px 527.4px, 0.0px 236.3px, 6.3px 236.3px, 6.3px 261.6px, 16.9px 261.6px, 16.9px 527.4px)"><img src="assets/images/plate.jpg" alt="" style="left: -371.3px" /></div>
+      <div class="r-strip" id="r-s7" style="left: 388.1px; width: 84.4px; clip-path: polygon(0.0px 527.4px, 0.0px 198.3px, 84.4px 198.3px, 84.4px 527.4px)"><img src="assets/images/plate.jpg" alt="" style="left: -388.1px" /></div>
+      <div class="r-strip" id="r-s8" style="left: 472.5px; width: 33.8px; clip-path: polygon(0.0px 527.4px, 0.0px 210.9px, 2.1px 210.9px, 2.1px 160.3px, 8.4px 160.3px, 8.4px 185.6px, 12.7px 185.6px, 12.7px 198.3px, 14.8px 198.3px, 14.8px 160.3px, 21.1px 160.3px, 21.1px 210.9px, 25.3px 210.9px, 25.3px 185.6px, 33.8px 185.6px, 33.8px 527.4px)"><img src="assets/images/plate.jpg" alt="" style="left: -472.5px" /></div>
+      <div class="r-strip" id="r-s9" style="left: 506.3px; width: 46.4px; clip-path: polygon(0.0px 527.4px, 0.0px 286.9px, 25.3px 286.9px, 25.3px 261.6px, 40.1px 261.6px, 40.1px 286.9px, 46.4px 286.9px, 46.4px 527.4px)"><img src="assets/images/plate.jpg" alt="" style="left: -506.3px" /></div>
+    </div>
+
+    <!-- the key: the reference's exact silhouette (skyline teeth), BRIDL360 blue, the BRIDL360 mark in its bow -->
+    <div id="r-key" class="full" data-layout-allow-overflow>
+      <svg class="full" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg" style="overflow: visible">
+        <g fill="var(--color-brand, #0047AB)" stroke="var(--color-brand, #0047AB)" stroke-linejoin="round">
+          <path stroke-width="4" d="M126.6,652 L134,630 L158,611 L612,610 L612,770 L606,772 L573.8,768 L573.8,732 L540,732 L540,755 L493.6,755 L493.6,688 L481,688 L481,658 L468.3,658 L468.3,675 L375.5,675 L375.5,738.5 L367,738.5 L367,711 L324.8,711 L324.8,692 L286.9,692 L286.9,713 L274.2,713 L274.2,738 L219.4,757 L219.4,698 L164.5,698 L164.5,671 L135,671 Z" />
+          <path stroke-width="4" d="M570,612 L570,582 L606,576 L606,612 Z M570,766 L606,770 L606,740 L570,740 Z" />
+          <polygon stroke-width="36" points="698,523 815,523 923,668 815,817 682,817 618,760 618,585" />
+        </g>
+        <g transform="translate(784 668) scale(0.36) translate(-410 -413)" fill="none" stroke="#FFFFFF" stroke-width="16" stroke-linejoin="miter" stroke-linecap="square">
+            <polyline points="190,570 190,142 326,212 194,292 412,407 630,294" />
+            <polyline points="326,212 410,179 630,294 630,568" />
+            <polyline points="326,212 326,636" />
+            <polyline points="511,230 511,500" />
+            <polyline points="190,570 284,620 511,500 630,568 416,684 326,636" />
+        </g>
+        <g transform="translate(784 668) scale(0.36) translate(-410 -413)" fill="none" stroke="#FFFFFF" stroke-width="5">
+          <rect x="395" y="268" width="14" height="14" rx="3" />
+          <rect x="417" y="268" width="14" height="14" rx="3" />
+          <rect x="395" y="288" width="14" height="14" rx="3" />
+          <rect x="417" y="288" width="14" height="14" rx="3" />
+        </g>
+      </svg>
+    </div>
+
+    <div id="r-caption" data-var-text="tagline">The doorway to better living</div>
+    <div id="r-sign">BRIDL360 · BRIDL360.IN</div>
+    <!-- end card: the BRIDL360 mark draws itself, then the call to action -->
+    <div id="r-dim" class="full"></div>
+    <svg id="r-logo" class="full" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="r-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="7" /></filter>
+      </defs>
+      <g transform="translate(540 630) scale(0.5) translate(-410 -413)">
+        <g id="r-logo-shadow" fill="none" stroke="#000a24" stroke-width="16" stroke-linejoin="miter" stroke-linecap="square" filter="url(#r-soft)" transform="translate(10 14)">
+          <polyline points="190,570 190,142 326,212 194,292 412,407 630,294" />
+          <polyline points="326,212 410,179 630,294 630,568" />
+          <polyline points="326,212 326,636" />
+          <polyline points="511,230 511,500" />
+          <polyline points="190,570 284,620 511,500 630,568 416,684 326,636" />
+        </g>
+        <g fill="none" stroke="#FFFFFF" stroke-width="16" stroke-linejoin="miter" stroke-linecap="square">
+          <polyline class="r-draw" pathLength="1" points="190,570 190,142 326,212 194,292 412,407 630,294" />
+          <polyline class="r-draw" pathLength="1" points="326,212 410,179 630,294 630,568" />
+          <polyline class="r-draw" pathLength="1" points="326,212 326,636" />
+          <polyline class="r-draw" pathLength="1" points="511,230 511,500" />
+          <polyline class="r-draw" pathLength="1" points="190,570 284,620 511,500 630,568 416,684 326,636" />
+        </g>
+        <g id="r-win" fill="none" stroke="#FFFFFF" stroke-width="4.5">
+          <rect x="395" y="268" width="14" height="14" rx="3" />
+          <rect x="417" y="268" width="14" height="14" rx="3" />
+          <rect x="395" y="288" width="14" height="14" rx="3" />
+          <rect x="417" y="288" width="14" height="14" rx="3" />
+        </g>
+      </g>
+    </svg>
+    <div id="r-word" class="r-end"><span class="r-l">B</span><span class="r-l">R</span><span class="r-l">I</span><span class="r-l">D</span><span class="r-l">L</span><span class="r-l">3</span><span class="r-l">6</span><span class="r-l">0</span><sup class="r-l">®</sup></div>
+    <div id="r-tag" class="r-end">Your partner in seamless property solutions</div>
+    <div id="r-cta">Book a consultation&nbsp;&nbsp;→</div>
+    <div id="r-info" class="r-end">www.bridl360.in<span class="r-dot">•</span>@bridl360<span class="r-dot">•</span>Hyderabad</div>
+    <div id="r-black" class="full"></div>
+  </div>
+  <script>
+    (function () {
+      // Motion measured frame by frame from the reference (30 fps), mapped to 1080x1920.
+      // key: [t, x, y, rotation] for the pivot at the bow; strips: [t, dy] per slice (0 = lined up with the photo)
+      const M = {"key":[[0.1,0.0,0.0,-0.0],[0.1333,0.0,0.0,-0.0],[0.1667,0.0,0.0,-0.0],[0.2,0.0,0.0,-0.0],[0.2333,0.0,0.0,-0.0],[0.2667,0.0,0.0,-0.0],[0.3,0.0,0.0,-0.0],[0.3333,0.0,-4.2,-1.0],[0.3667,8.4,-8.4,-2.0],[0.4,21.1,-25.3,-3.0],[0.4333,59.1,-54.8,-5.0],[0.4667,88.6,-67.5,-5.0],[0.5,88.6,-67.5,-5.0],[0.5333,126.6,-80.2,-5.0],[0.5667,156.1,-101.3,-5.0],[0.6,202.5,-101.3,-5.0],[0.6333,244.7,-105.5,-5.0],[0.6667,295.3,-92.8,-5.0],[0.7,337.5,-88.6,-5.0],[0.7333,455.6,-71.7,-5.0],[0.7667,497.8,-54.8,-5.0],[0.8,497.8,-54.8,-5.0],[0.8333,534.5,19.8,-3.0],[0.8667,570.4,57.8,-2.0],[0.9,597.8,93.7,-1.0],[0.9333,597.8,110.5,-0.5],[0.9667,593.6,118.1,-0.0],[1.0,564.1,118.1,-0.0],[1.0333,534.5,118.1,-0.0],[1.1,471.2,118.1,-0.0],[1.1333,467.0,118.1,-0.0],[1.1667,461.9,118.1,-0.0],[1.2,452.0,118.1,-0.0],[1.2333,442.1,118.1,-0.0],[1.2667,432.3,118.1,-0.0],[1.3,422.5,118.1,-0.0],[1.3333,412.8,118.1,-0.0],[1.3667,403.1,118.1,-0.0],[1.4,393.5,118.1,-0.0],[1.4333,384.0,118.1,-0.0],[1.4667,374.5,118.1,-0.0],[1.5,365.1,118.1,-0.0],[1.5333,355.8,118.1,-0.0],[1.5667,346.5,118.1,-0.0],[1.6,337.4,118.1,-0.0],[1.6333,328.3,118.1,-0.0],[1.6667,319.2,118.1,-0.0],[1.7,310.3,118.1,-0.0],[1.7333,301.4,118.1,-0.0],[1.7667,292.7,118.1,-0.0],[1.8,284.0,118.1,-0.0],[1.8333,275.4,118.1,-0.0],[1.8667,266.9,118.1,-0.0],[1.9,258.5,118.1,-0.0],[1.9333,250.2,118.1,-0.0],[1.9667,242.0,118.1,-0.0],[2.0,233.9,118.1,-0.0],[2.0333,225.9,118.1,-0.0],[2.0667,218.0,118.1,-0.0],[2.1,210.2,118.1,-0.0],[2.1333,202.6,118.1,-0.0],[2.1667,195.0,118.1,-0.0],[2.2,187.6,118.1,-0.0],[2.2333,180.3,118.1,-0.0],[2.2667,173.1,118.1,-0.0],[2.3,166.0,118.1,-0.0],[2.3333,159.0,118.1,-0.0],[2.3667,152.2,118.1,-0.0],[2.4,145.5,118.1,-0.0],[2.4333,139.0,118.1,-0.0],[2.4667,132.5,118.1,-0.0],[2.5,126.3,118.1,-0.0],[2.5333,120.1,118.1,-0.0],[2.5667,114.1,118.1,-0.0],[2.6,108.2,118.1,-0.0],[2.6333,102.5,118.1,-0.0],[2.6667,97.0,118.1,-0.0],[2.7,91.5,118.1,-0.0],[2.7333,86.3,118.1,-0.0],[2.7667,81.2,118.1,-0.0],[2.8,76.2,118.1,-0.0],[2.8333,71.4,118.1,-0.0],[2.8667,66.8,118.1,-0.0],[2.9,62.3,118.1,-0.0],[2.9333,58.0,118.1,-0.0],[2.9667,53.9,118.1,-0.0],[3.0,50.0,118.1,-0.0],[3.0333,46.2,118.1,-0.0],[3.0667,42.6,118.1,-0.0],[3.1,39.1,118.1,-0.0],[3.1333,35.9,118.1,-0.0],[3.1667,32.8,118.1,-0.0],[3.2,29.9,118.1,-0.0],[3.2333,27.2,118.1,-0.0],[3.2667,24.7,118.1,-0.0],[3.3,22.4,118.1,-0.0],[3.3333,20.3,118.1,-0.0],[3.3667,18.4,118.1,-0.0],[3.4,16.7,118.1,-0.0],[3.4333,15.1,118.1,-0.0],[3.4667,13.8,118.1,-0.0],[3.5,12.7,118.1,-0.0],[3.5333,11.8,118.1,-0.0],[3.5667,11.1,118.1,-0.0],[3.6,10.6,118.1,-0.0],[3.6333,10.4,118.1,-0.0],[3.6667,10.3,118.1,-0.0],[3.75,10.3,118.1,0]],"strips":[[[0.1,151.9],[0.1667,151.9],[0.2333,151.9],[0.3,151.9],[0.3667,150.5],[0.4333,143.4],[0.5,136.4],[0.5667,126.6],[0.6333,106.9],[0.7,77.3],[0.7667,46.4],[0.8333,32.3],[0.9,14.1],[0.9667,8.4],[1.0333,2.1],[1.1,0.0],[1.1667,0.0],[1.2333,0.0],[1.3,0.0],[1.3667,0.0],[1.4333,0.0],[1.5,0.0],[1.5667,0.0],[1.6333,0.0],[1.7,0.0],[1.7667,0.0],[1.8333,0.0],[1.9,0.0],[1.9667,0.0],[2.0333,0.0],[2.1,0.0],[2.1667,0.0],[2.2333,0.0],[2.3,0.0],[2.3667,0.0],[2.4333,0.0],[2.5,0.0],[2.5667,0.0],[2.6333,0.0],[2.7,0.0],[2.7667,0.0],[2.8333,0.0],[2.9,0.0],[2.9667,0.0],[3.0333,0.0],[3.1,0.0],[3.1667,0.0],[3.2333,0.0],[3.3,0.0],[3.3667,0.0],[3.4333,0.0],[3.5,0.0],[3.5667,0.0],[3.7,0.0]],[[0.1,109.7],[0.1667,109.7],[0.2333,109.7],[0.3,109.7],[0.3667,109.0],[0.4333,101.3],[0.5,94.2],[0.5667,84.4],[0.6333,64.7],[0.7,35.2],[0.7667,4.2],[0.8333,-9.1],[0.9,-26.7],[0.9667,-33.8],[1.0333,-39.4],[1.1,-40.1],[1.1667,-40.1],[1.2333,-40.1],[1.3,-40.1],[1.3667,-40.1],[1.4333,-40.1],[1.5,-40.1],[1.5667,-40.1],[1.6333,-40.1],[1.7,-40.1],[1.7667,-40.1],[1.8333,-40.1],[1.9,-40.1],[1.9667,-40.1],[2.0333,-40.1],[2.1,-40.1],[2.1667,-40.1],[2.2333,-40.1],[2.3,-40.1],[2.3667,-40.1],[2.4333,-40.1],[2.5,-40.1],[2.5667,-40.1],[2.6333,-40.1],[2.7,-39.4],[2.7667,-31.6],[2.8333,-27.4],[2.9,-14.8],[2.9667,0.0],[3.0333,1.4],[3.1,2.1],[3.1667,2.1],[3.2333,2.1],[3.3,1.4],[3.3667,0.0],[3.4333,0.0],[3.5,-0.7],[3.5667,-0.7],[3.7,0.0]],[[0.1,52.7],[0.1667,52.7],[0.2333,52.7],[0.3,52.7],[0.3667,51.3],[0.4333,44.3],[0.5,36.6],[0.5667,26.0],[0.6333,6.3],[0.7,-22.5],[0.7667,-53.4],[0.8333,-67.5],[0.9,-85.1],[0.9667,-90.7],[1.0333,-97.0],[1.1,-99.1],[1.1667,-99.1],[1.2333,-99.1],[1.3,-99.1],[1.3667,-99.1],[1.4333,-99.1],[1.5,-99.1],[1.5667,-99.1],[1.6333,-99.1],[1.7,-99.1],[1.7667,-99.1],[1.8333,-99.1],[1.9,-99.1],[1.9667,-99.1],[2.0333,-99.1],[2.1,-99.1],[2.1667,-99.1],[2.2333,-99.1],[2.3,-99.1],[2.3667,-98.4],[2.4333,-97.0],[2.5,-96.3],[2.5667,-94.9],[2.6333,-90.7],[2.7,-69.6],[2.7667,-54.8],[2.8333,-52.7],[2.9,-50.6],[2.9667,-48.5],[3.0333,-47.8],[3.1,-46.4],[3.1667,-31.6],[3.2333,0.0],[3.3,4.2],[3.3667,5.6],[3.4333,4.2],[3.5,4.2],[3.5667,4.2],[3.7,0.0]],[[0.1,69.6],[0.1667,69.6],[0.2333,69.6],[0.3,69.6],[0.3667,67.5],[0.4333,59.8],[0.5,53.4],[0.5667,42.9],[0.6333,23.2],[0.7,-5.6],[0.7667,-38.0],[0.8333,-51.3],[0.9,-68.9],[0.9667,-75.9],[1.0333,-80.9],[1.1,-83.7],[1.1667,-84.4],[1.2333,-84.4],[1.3,-84.4],[1.3667,-84.4],[1.4333,-84.4],[1.5,-84.4],[1.5667,-84.4],[1.6333,-84.4],[1.7,-84.4],[1.7667,-84.4],[1.8333,-84.4],[1.9,-84.4],[1.9667,-84.4],[2.0333,-84.4],[2.1,-84.4],[2.1667,-84.4],[2.2333,-84.4],[2.3,-84.4],[2.3667,-82.3],[2.4333,-76.6],[2.5,-64.7],[2.5667,-42.9],[2.6333,-32.3],[2.7,-21.8],[2.7667,-7.7],[2.8333,1.4],[2.9,10.5],[2.9667,19.7],[3.0333,22.5],[3.1,23.2],[3.1667,23.2],[3.2333,24.6],[3.3,26.7],[3.3667,26.0],[3.4333,23.9],[3.5,21.8],[3.5667,15.5],[3.7,0.0]],[[0.1,113.9],[0.1667,113.9],[0.2333,113.9],[0.3,113.9],[0.3667,113.2],[0.4333,105.5],[0.5,98.4],[0.5667,88.6],[0.6333,68.9],[0.7,39.4],[0.7667,8.4],[0.8333,-4.9],[0.9,-22.5],[0.9667,-29.5],[1.0333,-35.2],[1.1,-35.9],[1.1667,-35.9],[1.2333,-37.3],[1.3,-38.0],[1.3667,-38.0],[1.4333,-38.0],[1.5,-38.0],[1.5667,-37.3],[1.6333,-35.9],[1.7,-35.9],[1.7667,-34.5],[1.8333,-33.8],[1.9,-33.8],[1.9667,-33.0],[2.0333,-31.6],[2.1,-31.6],[2.1667,-29.5],[2.2333,-16.9],[2.3,1.4],[2.3667,13.4],[2.4333,18.3],[2.5,40.1],[2.5667,61.9],[2.6333,68.2],[2.7,69.6],[2.7667,71.0],[2.8333,71.7],[2.9,71.0],[2.9667,68.2],[3.0333,64.7],[3.1,58.4],[3.1667,57.0],[3.2333,57.0],[3.3,56.3],[3.3667,49.2],[3.4333,37.3],[3.5,28.8],[3.5667,12.7],[3.7,0.0]],[[0.1,97.0],[0.1667,97.0],[0.2333,97.0],[0.3,97.0],[0.3667,94.9],[0.4333,86.5],[0.5,79.5],[0.5667,69.6],[0.6333,49.9],[0.7,21.1],[0.7667,-10.5],[0.8333,-23.9],[0.9,-41.5],[0.9667,-48.5],[1.0333,-53.4],[1.1,-54.8],[1.1667,-54.8],[1.2333,-54.8],[1.3,-54.8],[1.3667,-54.8],[1.4333,-54.8],[1.5,-54.8],[1.5667,-54.8],[1.6333,-54.8],[1.7,-54.1],[1.7667,-52.7],[1.8333,-52.7],[1.9,-52.7],[1.9667,-52.7],[2.0333,-45.7],[2.1,-30.2],[2.1667,-4.2],[2.2333,15.5],[2.3,28.1],[2.3667,44.3],[2.4333,53.4],[2.5,54.8],[2.5667,50.6],[2.6333,44.3],[2.7,34.5],[2.7667,19.0],[2.8333,9.1],[2.9,-2.1],[2.9667,-19.0],[3.0333,-16.9],[3.1,-3.5],[3.1667,2.1],[3.2333,2.1],[3.3,2.1],[3.3667,1.4],[3.4333,0.0],[3.5,0.0],[3.5667,0.0],[3.7,0.0]],[[0.1,71.7],[0.1667,67.5],[0.2333,64.7],[0.3,63.3],[0.3667,63.3],[0.4333,57.7],[0.5,49.2],[0.5667,38.0],[0.6333,19.0],[0.7,-9.1],[0.7667,-40.8],[0.8333,-54.8],[0.9,-72.4],[0.9667,-78.8],[1.0333,-84.4],[1.1,-84.4],[1.1667,-84.4],[1.2333,-84.4],[1.3,-84.4],[1.3667,-84.4],[1.4333,-84.4],[1.5,-84.4],[1.5667,-84.4],[1.6333,-85.1],[1.7,-85.8],[1.7667,-84.4],[1.8333,-84.4],[1.9,-84.4],[1.9667,-77.3],[2.0333,-54.1],[2.1,-45.0],[2.1667,-42.9],[2.2333,-39.4],[2.3,2.8],[2.3667,25.3],[2.4333,23.9],[2.5,16.9],[2.5667,3.5],[2.6333,-11.3],[2.7,-28.1],[2.7667,-43.6],[2.8333,-45.0],[2.9,-35.9],[2.9667,-26.0],[3.0333,-24.6],[3.1,-21.8],[3.1667,-19.7],[3.2333,-16.9],[3.3,-10.5],[3.3667,2.8],[3.4333,4.2],[3.5,2.8],[3.5667,3.5],[3.7,0.0]],[[0.1,130.8],[0.1667,130.8],[0.2333,130.8],[0.3,130.8],[0.3667,128.7],[0.4333,120.2],[0.5,113.2],[0.5667,103.4],[0.6333,83.7],[0.7,54.8],[0.7667,23.2],[0.8333,9.8],[0.9,-7.7],[0.9667,-14.8],[1.0333,-19.7],[1.1,-19.7],[1.1667,-19.0],[1.2333,-19.0],[1.3,-19.0],[1.3667,-19.0],[1.4333,-19.0],[1.5,-19.0],[1.5667,-17.6],[1.6333,-12.7],[1.7,7.7],[1.7667,42.2],[1.8333,59.1],[1.9,80.9],[1.9667,90.0],[2.0333,90.0],[2.1,87.9],[2.1667,85.1],[2.2333,81.6],[2.3,79.5],[2.3667,75.9],[2.4333,73.8],[2.5,73.1],[2.5667,68.9],[2.6333,65.4],[2.7,61.2],[2.7667,55.5],[2.8333,52.0],[2.9,47.8],[2.9667,42.9],[3.0333,40.1],[3.1,35.9],[3.1667,32.3],[3.2333,27.4],[3.3,23.2],[3.3667,19.0],[3.4333,14.8],[3.5,10.5],[3.5667,5.6],[3.7,0.0]],[[0.1,151.9],[0.1667,151.9],[0.2333,151.9],[0.3,151.9],[0.3667,151.2],[0.4333,143.4],[0.5,136.4],[0.5667,126.6],[0.6333,106.9],[0.7,77.3],[0.7667,46.4],[0.8333,33.0],[0.9,15.5],[0.9667,8.4],[1.0333,2.8],[1.1,0.7],[1.1667,0.0],[1.2333,0.0],[1.3,0.0],[1.3667,0.0],[1.4333,0.0],[1.5,0.0],[1.5667,6.3],[1.6333,15.5],[1.7,38.7],[1.7667,53.4],[1.8333,65.4],[1.9,95.6],[1.9667,106.9],[2.0333,97.7],[2.1,87.2],[2.1667,56.3],[2.2333,45.0],[2.3,52.7],[2.3667,58.4],[2.4333,59.1],[2.5,73.8],[2.5667,82.3],[2.6333,71.7],[2.7,38.7],[2.7667,24.6],[2.8333,23.2],[2.9,23.2],[2.9667,23.2],[3.0333,23.2],[3.1,23.2],[3.1667,23.9],[3.2333,25.3],[3.3,25.3],[3.3667,26.0],[3.4333,28.1],[3.5,27.4],[3.5667,21.1],[3.7,0.0]],[[0.1,50.6],[0.1667,50.6],[0.2333,50.6],[0.3,50.6],[0.3667,49.9],[0.4333,42.2],[0.5,35.2],[0.5667,25.3],[0.6333,5.6],[0.7,-23.9],[0.7667,-54.8],[0.8333,-68.2],[0.9,-85.8],[0.9667,-92.8],[1.0333,-98.4],[1.1,-99.1],[1.1667,-99.1],[1.2333,-99.1],[1.3,-97.7],[1.3667,-85.1],[1.4333,-61.2],[1.5,-57.0],[1.5667,-43.6],[1.6333,-9.8],[1.7,5.6],[1.7667,4.9],[1.8333,2.1],[1.9,-2.1],[1.9667,-16.2],[2.0333,-35.9],[2.1,-40.1],[2.1667,-26.7],[2.2333,-10.5],[2.3,-10.5],[2.3667,-10.5],[2.4333,-10.5],[2.5,-55.5],[2.5667,-78.0],[2.6333,-78.0],[2.7,-75.2],[2.7667,-69.6],[2.8333,-67.5],[2.9,-42.2],[2.9667,-2.8],[3.0333,0.0],[3.1,0.0],[3.1667,0.0],[3.2333,0.0],[3.3,0.0],[3.3667,0.0],[3.4333,0.0],[3.5,-0.7],[3.5667,-2.1],[3.7,0.0]]]};
+      const tl = gsap.timeline({ paused: true });
+      gsap.set("#r-caption, #r-sign, #r-black, #r-dim, #r-logo-shadow, #r-tag, #r-cta, #r-info", { opacity: 0 });
+      gsap.set(".r-draw", { strokeDasharray: 1, strokeDashoffset: 1 });
+      gsap.set("#r-win rect", { scale: 0, transformOrigin: "50% 50%" });
+      gsap.set("#r-word .r-l", { opacity: 0 });
+
+      const k0 = M.key[0];
+      tl.fromTo("#r-key", { x: k0[1], y: k0[2], rotation: k0[3], transformOrigin: "822.7px 664.8px" }, { x: k0[1], y: k0[2], rotation: k0[3], duration: k0[0], ease: "none" }, 0);
+      for (let i = 1; i < M.key.length; i++) {
+        const a = M.key[i - 1], b = M.key[i];
+        tl.to("#r-key", { x: b[1], y: b[2], rotation: b[3], duration: b[0] - a[0], ease: "none" }, a[0]);
+      }
+      M.strips.forEach((keys, s) => {
+        const id = "#r-s" + s;
+        tl.fromTo(id, { y: keys[0][1] }, { y: keys[0][1], duration: keys[0][0], ease: "none" }, 0);
+        for (let i = 1; i < keys.length; i++) {
+          tl.to(id, { y: keys[i][1], duration: keys[i][0] - keys[i - 1][0], ease: "none" }, keys[i - 1][0]);
+        }
+      });
+
+      // 3.35 - 4.2: white falls away, the key fades, the slices are the photo
+      tl.fromTo("#r-white", { opacity: 1 }, { opacity: 0, duration: 0.85, ease: "sine.inOut" }, 3.35);
+      tl.fromTo("#r-key", { opacity: 1 }, { opacity: 0, duration: 0.65, ease: "sine.inOut" }, 3.45);
+      // the line, then BRIDL360
+      tl.to("#r-caption", { opacity: 1, duration: 0.45, ease: "power1.out" }, 4.6);
+      tl.to("#r-sign", { opacity: 1, duration: 0.45, ease: "power1.out" }, 4.9);
+      // 7.1 - 7.8: fade to black
+      // 6.4: the line clears, the city dims to the brand night
+      tl.to("#r-caption, #r-sign", { opacity: 0, filter: "blur(6px)", duration: 0.3, ease: "power2.in" }, 6.4);
+      tl.to("#r-dim", { opacity: 1, duration: 0.6, ease: "power2.inOut" }, 6.45);
+      // the BRIDL360 mark draws itself, stroke by stroke
+      tl.to(".r-draw", { strokeDashoffset: 0, duration: 0.75, ease: "power2.inOut", stagger: 0.12 }, 6.7);
+      tl.to("#r-win rect", { scale: 1, duration: 0.4, stagger: 0.05, ease: "back.out(2)" }, 7.55);
+      tl.to("#r-logo-shadow", { opacity: 0.6, duration: 0.5, ease: "power2.out" }, 7.5);
+      // wordmark, tagline, CTA, details
+      tl.fromTo("#r-word .r-l", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, stagger: 0.05, ease: "power2.out" }, 7.6);
+      tl.fromTo("#r-tag", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.25, ease: "power2.out" }, 8.1);
+      tl.fromTo("#r-cta", { opacity: 0, scale: 0.86 }, { opacity: 1, scale: 1, duration: 0.55, ease: "back.out(1.6)" }, 8.35);
+      tl.fromTo("#r-info", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "expo.out" }, 8.65);
+      // a light sheen across the button so the eye lands on it
+      tl.fromTo("#r-cta", { boxShadow: "0 14px 40px rgba(0,10,40,0.45), 0 0 0 0 rgba(255,255,255,0.0)" }, { boxShadow: "0 14px 40px rgba(0,10,40,0.45), 0 0 0 14px rgba(255,255,255,0.0)", duration: 0.01 }, 8.9);
+      tl.fromTo("#r-cta", { boxShadow: "0 14px 40px rgba(0,10,40,0.45), 0 0 0 0px rgba(255,255,255,0.55)" }, { boxShadow: "0 14px 40px rgba(0,10,40,0.45), 0 0 0 22px rgba(255,255,255,0)", duration: 0.7, ease: "power2.out", immediateRender: false }, 9.0);
+      // 10.2 - 10.8: fade to black
+      tl.to("#r-black", { opacity: 1, duration: 0.6, ease: "power1.in" }, 10.2);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["reel"] = tl;
+    })();
+  </script>
+</template>

@@ -1,0 +1,68 @@
+<!doctype html>
+<html
+  lang="en"
+  data-composition-variables='[
+    {"id":"color-brand","type":"color","label":"BRIDL360 blue","default":"#0047AB"},
+    {"id":"color-ground","type":"color","label":"Light ground","default":"#E4EAF4"},
+    {"id":"color-night","type":"color","label":"Night navy","default":"#0A1A3A"},
+    {"id":"color-ink","type":"color","label":"Ink","default":"#0B1B36"}
+  ]'
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      :root {
+        --color-brand: #0047ab;
+        --color-ground: #e4eaf4;
+        --color-night: #0a1a3a;
+        --color-ink: #0b1b36;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: #000;
+      }
+      #root {
+        position: relative;
+        width: 1920px;
+        height: 1080px;
+        overflow: hidden;
+        background: var(--color-ground);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root" data-composition-id="main" data-start="0" data-duration="22.6" data-width="1920" data-height="1080" data-fps="30">
+      <!-- light ground with flowing brand ribbons under the opening -->
+      <div id="ground" data-composition-id="ground" data-composition-src="compositions/ground.html" data-start="0" data-duration="4.35" data-track-index="1" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 1"></div>
+      <!-- 1. LOOKING FOR A HOME: typing, selection, word roll, the click -->
+      <div id="type" data-composition-id="type" data-composition-src="compositions/type.html" data-start="0" data-duration="2.95" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 2"></div>
+      <!-- 2. the word opens into a property card, then we dive into it -->
+      <div id="card" data-composition-id="card" data-composition-src="compositions/card.html" data-start="2.85" data-duration="1.5" data-track-index="3" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 4"></div>
+      <!-- 3. the home builds itself, a slider reveals the next one: Whatever. Whenever. -->
+      <div id="build" data-composition-id="build" data-composition-src="compositions/build.html" data-start="4.1" data-duration="4.65" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 3"></div>
+      <!-- 4. pick a slot, book the visit, confirmation rings -->
+      <div id="book" data-composition-id="book" data-composition-src="compositions/book.html" data-start="8.35" data-duration="4.6" data-track-index="3" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 5"></div>
+      <!-- 5. find the best opportunity: Quick / Confident / Easy -->
+      <div id="dark" data-composition-id="dark" data-composition-src="compositions/dark.html" data-start="12.6" data-duration="4" data-track-index="2" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 6"></div>
+      <!-- 6. Just. With. Us. then the BRIDL360 end card -->
+      <div id="endcard" data-composition-id="endcard" data-composition-src="compositions/endcard.html" data-start="16.55" data-duration="6.05" data-track-index="3" data-track-kind="graphics" data-width="1920" data-height="1080" style="z-index: 7"></div>
+
+      <!-- the reference's soundtrack, extended under the end card with an on-beat loop of its own music -->
+      <audio id="bgm" class="clip" src="assets/audio/soundtrack.wav" data-start="0" data-duration="22.6" data-track-index="10" data-volume="1"></audio>
+    </div>
+    <script>
+      window.__timelines = window.__timelines || {};
+      window.__timelines["main"] = gsap.timeline({ paused: true });
+    </script>
+  </body>
+</html>

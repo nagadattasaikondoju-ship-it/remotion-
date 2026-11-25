@@ -1,0 +1,191 @@
+<template>
+  <style>
+    @font-face {
+      font-family: "Fraunces";
+      src: url("assets/fonts/fraunces-latin-400-normal.woff2") format("woff2");
+      font-weight: 400;
+    }
+    @font-face {
+      font-family: "Montserrat";
+      src: url("assets/fonts/montserrat-latin-500-normal.woff2") format("woff2");
+      font-weight: 500;
+    }
+    @font-face {
+      font-family: "Montserrat";
+      src: url("assets/fonts/montserrat-latin-600-normal.woff2") format("woff2");
+      font-weight: 600;
+    }
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: #1e2c44;
+    }
+    #c-cam {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    #c-cam img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+    }
+    #c-scrim {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 130% 34% at 50% 24%, rgba(10, 18, 36, 0.34) 0%, rgba(10, 18, 36, 0) 80%);
+      opacity: 0;
+    }
+    .c-eyebrow {
+      position: absolute;
+      left: 0;
+      top: 330px;
+      width: 1080px;
+      text-align: center;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 600;
+      font-size: 30px;
+      letter-spacing: 0.42em;
+      color: var(--color-ivory, #f5efe4);
+    }
+    #c-rule {
+      position: absolute;
+      left: 480px;
+      top: 392px;
+      width: 120px;
+      height: 3px;
+      background: var(--color-ivory, #f5efe4);
+    }
+    #c-head {
+      position: absolute;
+      left: 0;
+      top: 446px;
+      width: 1080px;
+      text-align: center;
+      font-family: "Fraunces", serif;
+      font-size: 128px;
+      line-height: 1.04;
+      letter-spacing: -0.02em;
+      color: #fbf4e8;
+      text-shadow: 0 4px 30px rgba(8, 14, 30, 0.35);
+    }
+    #c-sub {
+      position: absolute;
+      left: 0;
+      top: 752px;
+      width: 1080px;
+      text-align: center;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 500;
+      font-size: 40px;
+      color: #fbf4e8;
+    }
+    .c-w {
+      display: inline-block;
+    }
+    .c-row {
+      position: absolute;
+      left: 150px;
+      width: 720px;
+      height: 110px;
+    }
+    .c-num {
+      position: absolute;
+      left: 0;
+      top: 18px;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 600;
+      font-size: 40px;
+      letter-spacing: 0.04em;
+      color: var(--color-sun, #f4b26a);
+    }
+    .c-txt {
+      position: absolute;
+      left: 96px;
+      top: 8px;
+      font-family: "Montserrat", sans-serif;
+      font-weight: 600;
+      font-size: 52px;
+      letter-spacing: -0.01em;
+      color: #fbf4e8;
+      white-space: nowrap;
+    }
+    .c-line {
+      position: absolute;
+      left: 0;
+      top: 104px;
+      width: 720px;
+      height: 2px;
+      background: rgba(251, 244, 232, 0.4);
+      transform-origin: 0 50%;
+    }
+  </style>
+  <div id="root" data-composition-id="city" data-width="1080" data-height="1920">
+    <div id="c-cam" data-layout-allow-overflow><img src="assets/images/hyd-plate.jpg" alt="Hyderabad skyline at golden hour" /></div>
+    <div id="c-scrim"></div>
+
+    <div id="c-eyebrow-a" class="c-eyebrow">THE PORTFOLIO SERIES</div>
+    <div id="c-eyebrow-b" class="c-eyebrow">WHY BRIDL360</div>
+    <div id="c-rule"></div>
+
+    <div id="c-head"><span class="c-w">Your</span> <span class="c-w">key</span> <span class="c-w">to</span><br /><span class="c-w">better</span> <span class="c-w">living.</span></div>
+    <div id="c-sub">Verified properties&nbsp;&nbsp;•&nbsp;&nbsp;Hyderabad</div>
+
+    <div id="c-row-1" class="c-row" style="top: 470px">
+      <div class="c-num">01</div>
+      <div class="c-txt">Smart buyer matching</div>
+      <div class="c-line"></div>
+    </div>
+    <div id="c-row-2" class="c-row" style="top: 610px">
+      <div class="c-num">02</div>
+      <div class="c-txt">Verified properties</div>
+      <div class="c-line"></div>
+    </div>
+    <div id="c-row-3" class="c-row" style="top: 750px">
+      <div class="c-num">03</div>
+      <div class="c-txt">Local market insight</div>
+      <div class="c-line"></div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      // camera: lands from the fly-through (1.12, same as the key scene's plate) then drifts to rest
+      tl.fromTo("#c-cam", { scale: 1.12, transformOrigin: "540px 960px" }, { scale: 1.03, duration: 1.3, ease: "expo.out" }, 0);
+      tl.fromTo("#c-cam", { scale: 1.03 }, { scale: 1.0, duration: 5.25, ease: "none", immediateRender: false }, 1.3);
+
+      tl.fromTo("#c-scrim", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 0.2);
+      tl.to("#c-scrim", { opacity: 0, duration: 0.5, ease: "power2.inOut" }, 6.0);
+      // eyebrow + rule
+      tl.fromTo("#c-eyebrow-a", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.3, ease: "power3.out" }, 0.3);
+      tl.fromTo("#c-rule", { scaleX: 0, transformOrigin: "50% 50%" }, { scaleX: 1, duration: 0.6, ease: "expo.out" }, 0.38);
+      // headline: per word, blur to sharp
+      tl.fromTo("#c-head .c-w", { opacity: 0, filter: "blur(10px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.16, stagger: 0.085, ease: "power2.out" }, 0.5);
+      tl.fromTo("#c-sub", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.22, ease: "power2.out" }, 1.15);
+
+      // headline leaves word by word, eyebrow swaps on the same stage
+      tl.to("#c-head .c-w, #c-sub", { opacity: 0, filter: "blur(8px)", duration: 0.18, stagger: 0.04, ease: "power2.in" }, 3.35);
+      tl.to("#c-eyebrow-a", { opacity: 0, filter: "blur(8px)", duration: 0.16, ease: "power2.in" }, 3.4);
+      tl.fromTo("#c-eyebrow-b", { opacity: 0, filter: "blur(8px)" }, { opacity: 1, filter: "blur(0px)", duration: 0.2, ease: "power3.out" }, 3.6);
+
+      // three proof points, wiped in left to right
+      [1, 2, 3].forEach((i, k) => {
+        const t = 3.72 + k * 0.45;
+        tl.fromTo("#c-row-" + i, { clipPath: "inset(0% 100% 0% 0%)", filter: "blur(6px)" }, { clipPath: "inset(0% 0% 0% 0%)", filter: "blur(0px)", duration: 0.55, ease: "expo.out" }, t);
+        tl.fromTo("#c-row-" + i + " .c-line", { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: "expo.out" }, t + 0.08);
+      });
+
+      // clear the stage for the end card
+      tl.to(".c-row", { opacity: 0, filter: "blur(8px)", duration: 0.2, stagger: 0.05, ease: "power2.in" }, 6.0);
+      tl.to("#c-eyebrow-b, #c-rule", { opacity: 0, filter: "blur(8px)", duration: 0.2, ease: "power2.in" }, 6.05);
+
+      window.__timelines = window.__timelines || {};
+      window.__timelines["city"] = tl;
+    })();
+  </script>
+</template>

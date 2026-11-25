@@ -1,0 +1,145 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      font-family: "Inter", sans-serif;
+      color: var(--color-ink, #0b1b36);
+    }
+    .t-row {
+      position: absolute;
+      top: 500px;
+      height: 80px;
+      font-size: 64px;
+      line-height: 80px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    #t-pre {
+      left: 0;
+      width: 1046px;
+      text-align: right;
+    }
+    .t-c {
+      position: relative;
+      display: inline-block;
+    }
+    .t-cr {
+      position: absolute;
+      right: -6px;
+      top: 12px;
+      width: 4px;
+      height: 58px;
+      background: var(--color-brand, #0047ab);
+      opacity: 0;
+    }
+    #t-sel {
+      border-radius: 6px;
+    }
+    #t-slot {
+      left: 1066px;
+      width: 220px;
+    }
+    #t-pill {
+      position: absolute;
+      left: -20px;
+      top: -8px;
+      width: 260px;
+      height: 96px;
+      border-radius: 48px;
+      background: #c9d8f0;
+      opacity: 0;
+    }
+    #t-col {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 220px;
+    }
+    .t-item {
+      position: absolute;
+      left: 0;
+      width: 220px;
+      text-align: center;
+      height: 80px;
+    }
+    .t-item.t-sub {
+      font-size: 40px;
+      color: #5d6f8f;
+      opacity: 0;
+    }
+    #t-cursor {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 64px;
+      height: 64px;
+      opacity: 0;
+      filter: drop-shadow(0 3px 6px rgba(0, 20, 60, 0.35));
+    }
+  </style>
+  <div id="root" data-composition-id="type" data-width="1920" data-height="1080">
+    <div id="t-pre" class="t-row">
+      <span class="t-c">L<i class="t-cr"></i></span><span class="t-c">O<i class="t-cr"></i></span><span class="t-c">O<i class="t-cr"></i></span><span class="t-c">K<i class="t-cr"></i></span><span class="t-c">I<i class="t-cr"></i></span><span class="t-c">N<i class="t-cr"></i></span><span class="t-c">G<i class="t-cr"></i></span><span class="t-c">&nbsp;<i class="t-cr"></i></span><span id="t-sel"><span class="t-c">F<i class="t-cr"></i></span><span class="t-c">O<i class="t-cr"></i></span><span class="t-c">R<i class="t-cr"></i></span><span class="t-c">&nbsp;<i class="t-cr"></i></span><span class="t-c">A<i class="t-cr"></i></span></span>
+    </div>
+    <div id="t-slot" class="t-row">
+      <div id="t-pill"></div>
+      <div id="t-col">
+        <div class="t-item" style="top: 0px"><span class="t-c">H<i class="t-cr"></i></span><span class="t-c">O<i class="t-cr"></i></span><span class="t-c">M<i class="t-cr"></i></span><span class="t-c">E<i class="t-cr"></i></span></div>
+        <div class="t-item t-sub" style="top: 80px">Apartment</div>
+        <div class="t-item t-sub" style="top: 160px">Villa</div>
+        <div class="t-item t-sub" style="top: 240px">Plot</div>
+        <div class="t-item t-sub" style="top: 320px">Office</div>
+      </div>
+    </div>
+    <svg id="t-cursor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#ffffff" stroke="#0B1B36" stroke-width="0.9" stroke-linejoin="round" d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.75-5.27c.01-.07.02-.14.02-.2 0-.62-.38-1.16-.91-1.38z" />
+    </svg>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      const chars = Array.from(document.querySelectorAll("#root .t-c"));
+      const carets = chars.map((c) => c.querySelector(".t-cr"));
+      // typing times (s): LOOKING_ FOR_A, a beat, HOME
+      const T = [0.05, 0.08, 0.11, 0.14, 0.17, 0.2, 0.23, 0.27, 0.3, 0.33, 0.36, 0.39, 0.42, 0.62, 0.65, 0.68, 0.71];
+      gsap.set(chars, { opacity: 0 });
+      gsap.set("#t-cursor", { x: 1180, y: 960 });
+      chars.forEach((c, i) => {
+        tl.to(c, { opacity: 1, duration: 0.01 }, T[i]);
+        const next = i + 1 < T.length ? T[i + 1] : 1.0;
+        tl.to(carets[i], { opacity: 1, duration: 0.01 }, T[i]);
+        tl.to(carets[i], { opacity: 0, duration: 0.01 }, next);
+      });
+      // blinking caret after HOME until the selection
+      [0.86].forEach((t) => {
+        tl.to(carets[16], { opacity: 0, duration: 0.01 }, t);
+      });
+      // the editor selects "FOR A"
+      tl.to("#t-sel", { backgroundColor: "rgba(0,71,171,0.26)", duration: 0.06 }, 1.0);
+      tl.to("#t-sel", { backgroundColor: "rgba(0,71,171,0)", duration: 0.08 }, 1.24);
+      // the word rolls through the options
+      tl.to(".t-sub", { opacity: 0.45, duration: 0.18, stagger: 0.05, ease: "power1.out" }, 1.22);
+      tl.to("#t-col", { y: -320, duration: 0.62, ease: "power2.inOut" }, 1.38);
+      tl.to("#t-col .t-item:first-child", { opacity: 0.4, duration: 0.25 }, 1.4);
+      tl.to("#t-col .t-item:last-child", { opacity: 1, duration: 0.25 }, 1.75);
+      // ...and lands back on HOME, centred, as the rest of the line leaves
+      tl.to("#t-col", { y: 0, duration: 0.36, ease: "power3.inOut" }, 2.04);
+      tl.to(".t-sub", { opacity: 0, duration: 0.2, ease: "power1.in" }, 2.04);
+      tl.to("#t-col .t-item:first-child", { opacity: 1, duration: 0.2 }, 2.12);
+      tl.to("#t-pre .t-c", { opacity: 0, x: -50, filter: "blur(6px)", duration: 0.22, stagger: { each: 0.015, from: "end" }, ease: "power2.in" }, 2.04);
+      tl.to("#t-slot", { x: -216, duration: 0.4, ease: "power3.inOut" }, 2.06);
+      // hover: the word becomes a button
+      tl.fromTo("#t-pill", { opacity: 0, scale: 0.86 }, { opacity: 1, scale: 1, duration: 0.3, ease: "back.out(1.6)" }, 2.5);
+      // the cursor comes up and clicks it
+      tl.to("#t-cursor", { opacity: 1, duration: 0.12 }, 2.24);
+      tl.to("#t-cursor", { x: 948, y: 548, duration: 0.5, ease: "power2.out" }, 2.25);
+      tl.to("#t-cursor", { scale: 0.82, transformOrigin: "45% 20%", duration: 0.06, ease: "power2.in" }, 2.8);
+      tl.to("#t-cursor", { scale: 1, duration: 0.1, ease: "power2.out" }, 2.86);
+      tl.to("#t-pill", { scale: 0.94, duration: 0.06 }, 2.8);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["type"] = tl;
+    })();
+  </script>
+</template>
