@@ -34,6 +34,14 @@ g = np.where(talk, 1.0, 10 ** (6 / 20)); a = 0.12                              #
 for i in range(1, len(g)): g[i] = g[i - 1] + a * (g[i] - g[i - 1])
 gs = np.interp(np.arange(n), np.arange(len(g)) * hop + hop / 2, g)
 b[:n] *= gs[:, None]
+# where the music stem itself goes near silent (the reference's voice filled those bars), let the music's own echo tail carry over
+benv = np.array([np.sqrt((b[i:i + hop] ** 2).mean()) for i in range(0, n, hop)]); bdb = 20 * np.log10(benv + 1e-9)
+w = np.clip((-24 - bdb) / 8, 0, 1)
+for i in range(1, len(w)): w[i] = w[i - 1] + 0.15 * (w[i] - w[i - 1])
+ws = np.interp(np.arange(n), np.arange(len(w)) * hop + hop / 2, w)
+sh = lambda x, d: np.concatenate([np.zeros((int(d * SR), 2), np.float32), x[:len(x) - int(d * SR)]])
+tail = .5 * sh(b, .18) + .36 * sh(b, .36) + .25 * sh(b, .6) + .16 * sh(b, .9)
+b[:n] += tail[:n] * ws[:, None]
 subprocess.run(["ffmpeg", "-v", "error", "-y", "-f", "f32le", "-ar", str(SR), "-ac", "2", "-i", "-", "-c:a", "pcm_f32le", "out/bed.wav"], input=b.astype(np.float32).tobytes())
 print(f"music fill: {100 * (1 - talk.mean()):.0f}% of the reel is a voice pause")
 EOF

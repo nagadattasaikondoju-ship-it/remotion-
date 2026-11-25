@@ -10,13 +10,14 @@ W = json.load(open("vo/team_words.json"))
 slots = [tuple(map(float, l.split("\t")[:2])) for l in open("vo/lines.tsv").read().strip().split("\n")]
 # 17-26 s: the reference VO was slow here and the picture's beats ("Growth" 22.96, "Value" 24.46) follow it, so lines 5 and 6 are split
 # into phrases anchored on the reference's own words, eased 10 % slower; otherwise the teammate's faster read left ~1.6 s holes
-SPLIT = {4: [((47, 50), 17.92, 1.0), ((51, 53), 19.66, 0.9)], 5: [((54, 57), 21.66, 0.9), ((58, 62), 23.90, 0.9)]}
+SPLIT = {4: [((47, 50), 17.55, 1.0), ((51, 53), 19.66, 0.9)], 5: [((54, 57), 21.66, 0.9), ((58, 62), 23.90, 0.9)]}
+SHIFT = {2: 0.25}   # line 3 a touch later so it carries over the music's quiet bar at 11.5 s
 PH = []   # (first word, last word, start, slot end, forced tempo or None)
 for k, (ij, (st, en)) in enumerate(zip(LINES, slots)):
     if k in SPLIT:
         parts = SPLIT[k]
         for m, ((i, j), t0, tp) in enumerate(parts): PH.append((i, j, t0, parts[m + 1][1] if m + 1 < len(parts) else en, tp))
-    else: PH.append((ij[0], ij[1], st, en, None))
+    else: PH.append((ij[0], ij[1], st + SHIFT.get(k, 0), en, None))
 raw = subprocess.run(["ffmpeg", "-v", "error", "-i", "vo/team_vo.wav", "-af", "highpass=f=80,afftdn=nf=-42:nr=10", "-ac", "1", "-ar", str(SR), "-f", "f32le", "-"], capture_output=True).stdout
 a = np.frombuffer(raw, np.float32).copy()
 def quiet(t0, t1):   # quietest 10 ms in [t0, t1]
