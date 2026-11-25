@@ -2,7 +2,8 @@
 # BRIDL360 version of a land-investment reel the user supplied (25 Nov 2026): the reference's picture and motion graphics are kept
 # as they are; only the brand moments are replaced by brand.html (Hyderabad, the BRIDL360 tag on the arrows, the map pin with a
 # BRIDL360 project, the places + "5 projects", the end card). New male VO (Kokoro hm_omega, vo/), the reference's music stem
-# (Demucs no_vocals) as the bed. 49.77 s, 1080x1920, 30 fps.
+# (Demucs no_vocals) as the bed. 49.77 s, 1080x1920, 30 fps. The SFX track is lifted 12 dB after mix.py: its layer match left
+# the pops ~22 dB under the bed (inaudible); lifted, they sit just over the bed and well under the voice.
 #   REF_UP=<reference cropped to 420x746 and ESRGAN-upscaled to 1080x1920> BED=<no_vocals.wav> bash assemble.sh
 #   (first: python3 build_vo.py; REF_UP=... bash plates.sh; node render.cjs overlay)
 # Framing fix: the screen recording has an 11 px black strip at its right edge and the player's timestamp in its bottom rows, so the
@@ -34,12 +35,12 @@ export REAL_SFX_CONFIG=$REPO/tools/real-sfx.config.json REAL_SFX_INDEX=$REPO/too
 SFX=$REPO/.claude/skills/real-sfx; W=$HERE/out/sfxwork; mkdir -p "$W/work" "$W/result"
 ffmpeg -nostdin -v error -y -i out/picture.mp4 -i out/base.wav -map 0:v -map 1:a -c:v copy -c:a pcm_s16le -shortest out/_a.mov
 (cd "$SFX" && python3 -I scripts/from_cues.py "$HERE/sfx_cues.json" --video "$HERE/out/_a.mov" --out "$W/work/cues.json" --ui library --map "$HERE/sfx_map.json" \
- && python3 -I scripts/mix.py "$W/work/cues.json" --out "$W/result/mix.mp4" --base-audio "$HERE/out/base.wav" --sfx-trim-db ${SFX_TRIM:-3}) 2>&1 \
+ && python3 -I scripts/mix.py "$W/work/cues.json" --out "$W/result/mix.mp4" --base-audio "$HERE/out/base.wav" --sfx-trim-db ${SFX_TRIM:--3}) 2>&1 \
  | grep -v -E "distutils|_distutils_hack|frozen site|addpackage|Remainder|Traceback|File \"<|ModuleNotFound|^\s*$" | tail -3
 (cd "$SFX" && python3 -I scripts/critique.py "$W/result/mix_resolved_cues.json" "$W/result/mix_sfx_track.wav" > "$W/result/critique.txt") 2>/dev/null || true
 grep -E "^\| (sync|balance|headroom|loudness)" "$W/result/critique.txt" || true
 rm -f out/_a.mov "$W/result/mix.mp4"
-ffmpeg -nostdin -v error -y -i out/base.wav -i "$W/result/mix_sfx_track.wav" -filter_complex "[1:a]apad=whole_dur=$DUR[s];[0:a][s]amix=inputs=2:normalize=0:duration=first,atrim=0:$DUR" -c:a pcm_f32le out/_pre.wav
+ffmpeg -nostdin -v error -y -i out/base.wav -i "$W/result/mix_sfx_track.wav" -filter_complex "[1:a]volume=12dB,apad=whole_dur=$DUR[s];[0:a][s]amix=inputs=2:normalize=0:duration=first,atrim=0:$DUR" -c:a pcm_f32le out/_pre.wav
 J=$(ffmpeg -nostdin -hide_banner -i out/_pre.wav -af loudnorm=I=-14:TP=-1.5:LRA=11:print_format=json -f null - 2>&1 | sed -n '/^{/,/^}/p')
 m() { echo "$J" | python3 -I -c "import json,sys; print(json.load(sys.stdin)['$1'])" 2>/dev/null; }
 ffmpeg -nostdin -v error -y -i out/_pre.wav -af "loudnorm=I=-14:TP=-1.5:LRA=11:measured_I=$(m input_i):measured_TP=$(m input_tp):measured_LRA=$(m input_lra):measured_thresh=$(m input_thresh):offset=$(m target_offset):linear=true,aresample=48000,apad,atrim=0:$DUR" -c:a pcm_s24le out/mix.wav
