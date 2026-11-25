@@ -8,6 +8,8 @@
        C 26.86-28.50  the map pin's photo + label -> a BRIDL360 project photo + BRIDL360 label
        D 28.35-30.60  HMDA / RERA logos -> "Homes in Kompally / Gachibowli / Sadashivpet" (full frame on the satin)
        E 30.40-32.45  "Planned over 40 acres" aerial -> "Listed across Hyderabad: 5 projects" with project photos
+       G 40.66-45.30  the stock presenter (thumb toward the land) -> the user's own presenter photo (img/presenter.png), same slide,
+                      hold and wash to white; the old figure is re-plated with the clean frame at 40.6 s through its tracked mask
        F 45.15-49.77  end card -> BRIDL360 end card (logo, project photo, tagline, CTA, contacts, company) -->
 <style>
 @font-face { font-family: P; font-weight: 400; src: url(fonts/Poppins-Regular.ttf); }
@@ -27,7 +29,8 @@ canvas { display: block; }
 const C = document.getElementById('c'), X = C.getContext('2d'), W = 1080, H = 1920;
 const RED = '#DD2648', PIN = '#C90034', BTN = '#E90006', BLUE = '#004AAD', GREY = '#5B5B5B';
 const img = n => { const i = new Image(); i.src = n; return i; };
-const IM = { satin: img('img/plate_satin.png'), family: img('img/plate_family.png'), logo: img('img/logo_tile.png'),
+const IM = { satin: img('img/plate_satin.png'), satinFix: img('img/plate_satin_fix.png'), family: img('img/plate_family.png'), logo: img('img/logo_tile.png'),
+  presenter: img('img/presenter.png'), manMask: img('img/man_mask.png'), plate40: img('img/plate_scene40.png'),
   vish: img('img/vishwasree_1.jpg'), mayfair: img('img/mayfair_kompally.jpg'), siva: img('img/siva_hills_sadashivpet.jpg') };
 const T = window.TIMES || {};   // word times of the new voice (set by render.cjs from vo/words.json)
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), lerp = (a, b, k) => a + (b - a) * k, seg = (t, a, b) => clamp((t - a) / (b - a));
@@ -99,7 +102,7 @@ function segD(t) {
   if (t < 28.35 || t > 30.62) return;
   const inK = seg(t, 28.35, 28.50), out = eio(seg(t, 30.40, 30.60));
   X.save(); X.globalAlpha = inK; X.translate(-out * W, 0);
-  X.drawImage(IM.satin, 0, 0, W, H);
+  X.drawImage(IM.satinFix, 0, 0, W, H);
   smallText('Homes in', 540, 700, 44, seg(t, 28.40, 28.60));
   PLACES.forEach(([name, key], i) => { const t0 = (T[key] || 28.45 + i * .62) - .06, k = seg(t, t0, t0 + .2), y = 860 + i * 175;
     if (k > 0) { X.font = '800 118px PI'; const w = X.measureText(name).width, x0 = 540 - (w + 70) / 2;
@@ -112,7 +115,7 @@ function segE(t) {
   if (t < 30.40 || t > 32.45) return;
   const inK = eio(seg(t, 30.40, 30.60)), z = 1 + .05 * seg(t, 30.4, 32.45);
   X.save(); X.translate((1 - inK) * W, 0);
-  X.drawImage(IM.satin, 0, 0, W, H);
+  X.drawImage(IM.satinFix, 0, 0, W, H);
   SHOTS.forEach(([im, name, area], i) => { const y = 470 + i * 486, h = 470, k = eo(seg(t, 30.5 + i * .12, 30.8 + i * .12));
     X.save(); X.globalAlpha = k; X.translate(0, (1 - k) * 60); cover(IM[im], 30, y, 1020, h, z, .5, .55);
     const g = X.createLinearGradient(0, y + h - 150, 0, y + h); g.addColorStop(0, 'rgba(0,0,0,0)'); g.addColorStop(1, 'rgba(0,0,0,.62)'); X.fillStyle = g; X.fillRect(30, y + h - 150, 1020, 150);
@@ -122,6 +125,21 @@ function segE(t) {
   const kn = seg(t, (T.tFive || 30.62) + .02, (T.tFive || 30.62) + .2); popText('5', 470, 370, 170, kn); popText('Projects', 620, 368, 70, kn, RED, 'PI', 700, 'left');
   X.restore();
   if (t > 32.20) { X.globalAlpha = eio(seg(t, 32.20, 32.45)); X.drawImage(IM.family, 0, 0, W, H); X.globalAlpha = 1; }   // dissolve into the family shot, as the reference does
+}
+// ---------- G: the presenter: the user's photo in place of the stock model ----------
+// Measured on the reference (420x746 px): the model slides in from the right with an ease-out, 40.66-42.30 s (262 px -> 0),
+// head top at y 337, thumb tip at x 148; static until 44.63, then the whole frame washes to white (~0.88 s).
+const KR = 1080 / 420, GC = document.createElement('canvas'); GC.width = W; GC.height = H; const G = GC.getContext('2d');
+function segG(t) {
+  if (t < 40.66 || t > 45.32) return;
+  const dx = 262 * (1 - eo(seg(t, 40.66, 42.30))) * KR, wash = clamp((t - 44.63) / 0.88);
+  G.globalCompositeOperation = 'source-over'; G.globalAlpha = 1; G.clearRect(0, 0, W, H);
+  G.drawImage(IM.manMask, dx, 0, W, H);                                 // where the old figure is now
+  G.globalCompositeOperation = 'source-in'; G.drawImage(IM.plate40, 0, 0, W, H);   // -> the clean background there
+  G.globalCompositeOperation = 'source-over';
+  const s = 0.29 * KR; G.drawImage(IM.presenter, (120 * KR) + dx, 335 * KR, 1122 * s, 1402 * s);
+  if (wash > 0) { G.globalCompositeOperation = 'source-atop'; G.globalAlpha = wash; G.fillStyle = '#FFFFFF'; G.fillRect(0, 0, W, H); }
+  X.drawImage(GC, 0, 0);
 }
 // ---------- F: BRIDL360 end card (same layout as the reference's card) ----------
 function segF(t) {
@@ -153,8 +171,8 @@ function segF(t) {
 // so the base is cropped to 1050x1867 and scaled 1080/1050 (see assemble.sh). Segments A-C sit on that base, so they get the same scale.
 const FIX = 1080 / 1050;
 function seek(t) { X.clearRect(0, 0, W, H); X.globalAlpha = 1; X.filter = 'none';
-  X.save(); X.scale(FIX, FIX); segA(t); segB(t); segC(t); X.restore(); segD(t); segE(t); segF(t); }
-const ACTIVE = t => (t >= 14.02 && t <= 14.60) || (t >= 22.85 && t <= 32.45) || t >= 45.15;
+  X.save(); X.scale(FIX, FIX); segA(t); segB(t); segC(t); segG(t); X.restore(); segD(t); segE(t); segF(t); }
+const ACTIVE = t => (t >= 14.02 && t <= 14.60) || (t >= 22.85 && t <= 32.45) || t >= 40.66;
 window.seek = seek; window.ACTIVE = ACTIVE;
 window.ready = (async () => { await Promise.all(['800 100px P', '500 40px P', '400 40px P', '700 40px P', '600 40px P', '800 100px PI', '700 60px PI', '300 60px PI', '400 30px PI'].map(f => document.fonts.load(f)));
   await document.fonts.ready; await Promise.all(Object.values(IM).map(i => i.decode().catch(() => 0))); return true; })();

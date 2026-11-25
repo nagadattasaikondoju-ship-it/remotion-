@@ -4,7 +4,7 @@
 # BRIDL360 project, the places + "5 projects", the end card). New male VO (Kokoro hm_omega, vo/), the reference's music stem
 # (Demucs no_vocals) as the bed. 49.77 s, 1080x1920, 30 fps.
 #   REF_UP=<reference cropped to 420x746 and ESRGAN-upscaled to 1080x1920> BED=<no_vocals.wav> bash assemble.sh
-#   (first: python3 build_vo.py; node render.cjs overlay)
+#   (first: python3 build_vo.py; REF_UP=... bash plates.sh; node render.cjs overlay)
 # Framing fix: the screen recording has an 11 px black strip at its right edge and the player's timestamp in its bottom rows, so the
 # base is cropped to 1050x1867 and scaled back to 1080x1920 (brand.html applies the same scale to the segments that sit on it).
 set -euo pipefail

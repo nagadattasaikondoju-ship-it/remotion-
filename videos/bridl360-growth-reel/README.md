@@ -18,6 +18,7 @@ Times are in the reference's own timeline.
 | 26.9–28.5 | the other brand's logo in the map pin | the pin holds a Vishwasree Residency photo, plus a BRIDL360 label |
 | 28.4–30.6 | approval-body logos on the satin | "Homes in" Kompally / Gachibowli / Sadashivpet, each popping on its spoken word (`vo/times.json`) |
 | 30.4–32.45 | "40 acres" | "Listed across Hyderabad · 5 Projects" with three project photos, then the reference's dissolve to the family shot |
+| 40.66–45.3 | a stock model pointing his thumb at the land | the user's presenter photo (`img/presenter.png`, supplied 25 Nov). Same slide-in (ease-out, measured per frame), hold and wash to white. The old figure is re-plated with the clean 40.6 s frame through its tracked mask (`img/man_mask.png`) |
 | 45.15–49.77 | the other brand's end card | BRIDL360 end card in the same layout: logo, tagline, DM US OR CALL NOW, phone, @bridl360, company name and CIN |
 
 Everything else in the picture is the reference's own footage, AI-upscaled with Real-ESRGAN
@@ -61,6 +62,7 @@ timestamp in the bottom rows. Segments A–C get the same scale, so they stay on
 ```
 python3 build_vo.py                          # vo/l*.wav -> vo/voice.wav, vo/times.json (needs the explainroo Kokoro clone)
 NODE_PATH=$(npm root -g) node render.cjs overlay
+REF_UP=<ref_up.mp4> bash plates.sh                # background plates from the upscaled reference
 REF_UP=<ref_up.mp4> BED=<no_vocals.wav> bash assemble.sh
 ```
 
