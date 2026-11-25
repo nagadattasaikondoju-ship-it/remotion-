@@ -1,0 +1,151 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      font-family: "Inter", sans-serif;
+    }
+    #c-pill {
+      position: absolute;
+      left: 830px;
+      top: 492px;
+      width: 260px;
+      height: 96px;
+      border-radius: 48px;
+      background: #c9d8f0;
+      color: var(--color-ink, #0b1b36);
+      font-size: 64px;
+      line-height: 96px;
+      letter-spacing: 0.02em;
+      text-align: center;
+    }
+    #c-dive {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1920px;
+      height: 1080px;
+    }
+    #c-card {
+      position: absolute;
+      left: 640px;
+      top: 320px;
+      width: 640px;
+      height: 440px;
+      overflow: hidden;
+      border-radius: 36px;
+      box-shadow: 0 30px 70px rgba(10, 26, 58, 0.25);
+    }
+    #c-card img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 640px;
+      height: 440px;
+      object-fit: cover;
+    }
+    .c-chip {
+      position: absolute;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      height: 72px;
+      padding: 0 30px 0 14px;
+      border-radius: 36px;
+      background: #ffffff;
+      color: var(--color-ink, #0b1b36);
+      font-size: 28px;
+      font-weight: 700;
+      white-space: nowrap;
+      box-shadow: 0 12px 30px rgba(10, 26, 58, 0.18);
+    }
+    .c-dot {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--color-brand, #0047ab);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .c-dot svg {
+      width: 24px;
+      height: 24px;
+    }
+    #c-icon {
+      position: absolute;
+      left: 640px;
+      top: 248px;
+      width: 88px;
+      height: 88px;
+      border-radius: 50%;
+      background: var(--color-brand, #0047ab);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 30px rgba(0, 71, 171, 0.35);
+    }
+    #c-icon svg {
+      width: 46px;
+      height: 46px;
+    }
+    #c-cursor {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 64px;
+      height: 64px;
+      filter: drop-shadow(0 3px 6px rgba(0, 20, 60, 0.35));
+    }
+  </style>
+  <div id="root" data-composition-id="card" data-width="1920" data-height="1080">
+    <div id="c-pill">HOME</div>
+    <div id="c-dive" data-layout-allow-overflow>
+      <div id="c-card">
+        <img id="c-img" src="assets/images/card.jpg" alt="Modern home at dusk" />
+        <img id="c-img2" src="assets/images/build-plot.jpg" alt="" />
+      </div>
+      <div id="c-icon">
+        <svg viewBox="0 0 24 24"><path fill="#fff" d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" /></svg>
+      </div>
+      <div id="c-chip-a" class="c-chip" style="left: 1110px; top: 282px; padding-left: 30px">Matched to your needs</div>
+      <div id="c-chip-b" class="c-chip" style="left: 400px; top: 588px">
+        <span class="c-dot"><svg viewBox="0 0 24 24"><path fill="#fff" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" /></svg></span>Talk to an expert
+      </div>
+      <div id="c-chip-c" class="c-chip" style="left: 1130px; top: 720px; background: var(--color-brand, #0047ab); color: #fff">
+        <span class="c-dot" style="background: #fff"><svg viewBox="0 0 24 24"><path fill="#0047AB" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" /></svg></span>Save &amp; compare
+      </div>
+    </div>
+    <svg id="c-cursor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#ffffff" stroke="#0B1B36" stroke-width="0.9" stroke-linejoin="round" d="M9 11.24V7.5C9 6.12 10.12 5 11.5 5S14 6.12 14 7.5v3.74c1.21-.81 2-2.18 2-3.74C16 5.01 13.99 3 11.5 3S7 5.01 7 7.5c0 1.56.79 2.93 2 3.74zm9.84 4.63l-4.54-2.26c-.17-.07-.35-.11-.54-.11H13v-6c0-.83-.67-1.5-1.5-1.5S10 6.67 10 7.5v10.74l-3.43-.72c-.08-.01-.15-.03-.24-.03-.31 0-.59.13-.79.33l-.79.8 4.94 4.94c.27.27.65.44 1.06.44h6.79c.75 0 1.33-.55 1.44-1.28l.75-5.27c.01-.07.02-.14.02-.2 0-.62-.38-1.16-.91-1.38z" />
+    </svg>
+  </div>
+  <script>
+    (function () {
+      const tl = gsap.timeline({ paused: true });
+      gsap.set("#c-cursor", { x: 948, y: 548 });
+      gsap.set("#c-img2", { opacity: 0 });
+      // the button opens into a property card
+      tl.fromTo("#c-card", { clipPath: "inset(172px 190px 172px 190px round 48px)" }, { clipPath: "inset(0px 0px 0px 0px round 36px)", duration: 0.42, ease: "expo.out" }, 0.05);
+      tl.fromTo("#c-img", { scale: 1.3 }, { scale: 1, duration: 0.7, ease: "expo.out" }, 0.05);
+      tl.to("#c-pill", { opacity: 0, duration: 0.14, ease: "power1.in" }, 0.08);
+      // UI chips orbit in around it
+      tl.fromTo("#c-icon", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.42, ease: "back.out(2)" }, 0.22);
+      tl.fromTo("#c-chip-a", { scale: 0.6, opacity: 0, x: 30 }, { scale: 1, opacity: 1, x: 0, duration: 0.4, ease: "back.out(1.6)" }, 0.28);
+      tl.fromTo("#c-chip-b", { scale: 0.6, opacity: 0, x: -30 }, { scale: 1, opacity: 1, x: 0, duration: 0.4, ease: "back.out(1.6)" }, 0.34);
+      tl.fromTo("#c-chip-c", { scale: 0.6, opacity: 0, y: 24 }, { scale: 1, opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.6)" }, 0.4);
+      // the cursor picks the card
+      tl.to("#c-cursor", { x: 1000, y: 505, duration: 0.36, ease: "power2.inOut" }, 0.6);
+      tl.to("#c-cursor", { scale: 0.82, transformOrigin: "45% 20%", duration: 0.06 }, 1.0);
+      tl.to("#c-cursor", { scale: 1, duration: 0.08 }, 1.06);
+      // dive into the card: it fills the frame and becomes the plot
+      tl.to("#c-icon, .c-chip, #c-cursor", { opacity: 0, filter: "blur(8px)", duration: 0.16, ease: "power2.in" }, 1.06);
+      tl.to("#c-dive", { scale: 3.05, transformOrigin: "960px 540px", duration: 0.42, ease: "power3.inOut" }, 1.08);
+      tl.to("#c-img2", { opacity: 1, duration: 0.24, ease: "power1.inOut" }, 1.12);
+      tl.to("#c-card", { opacity: 0, duration: 0.12, ease: "power1.in" }, 1.38);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["card"] = tl;
+    })();
+  </script>
+</template>

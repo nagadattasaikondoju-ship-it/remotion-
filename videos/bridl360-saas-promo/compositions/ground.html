@@ -1,0 +1,65 @@
+<template>
+  <style>
+    #root {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      background: radial-gradient(ellipse 80% 70% at 50% 45%, #eef2f9 0%, var(--color-ground, #e4eaf4) 70%, #d9e1ee 100%);
+    }
+    #g-ribbons {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 3840px;
+      height: 1080px;
+    }
+  </style>
+  <div id="root" data-composition-id="ground" data-width="1920" data-height="1080">
+    <svg id="g-ribbons" viewBox="0 0 3840 1080" xmlns="http://www.w3.org/2000/svg" data-layout-allow-overflow>
+      <defs>
+        <linearGradient id="g-fade" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0" stop-color="#0047AB" stop-opacity="0.05" />
+          <stop offset="0.25" stop-color="#0047AB" stop-opacity="0.32" />
+          <stop offset="0.5" stop-color="#3A72CF" stop-opacity="0.12" />
+          <stop offset="0.75" stop-color="#0047AB" stop-opacity="0.32" />
+          <stop offset="1" stop-color="#0047AB" stop-opacity="0.05" />
+        </linearGradient>
+        <filter id="g-soft" x="-5%" y="-50%" width="110%" height="200%"><feGaussianBlur stdDeviation="5" /></filter>
+        <filter id="g-softer" x="-5%" y="-50%" width="110%" height="200%"><feGaussianBlur stdDeviation="12" /></filter>
+      </defs>
+      <g id="g-paths" fill="none" stroke="url(#g-fade)" stroke-linecap="round"></g>
+    </svg>
+  </div>
+  <script>
+    (function () {
+      // flowing ribbons: sums of sines over two seamless periods (1920 px), drifting left at constant speed
+      const g = document.querySelector("#g-paths");
+      const R = [
+        { a: 70, b: 26, y: 540, w: 16, f: "g-softer", o: 0.55, p: 0.0 },
+        { a: 55, b: 34, y: 548, w: 4, f: "g-soft", o: 0.9, p: 1.1 },
+        { a: 90, b: 18, y: 532, w: 2.5, f: "", o: 0.7, p: 2.3 },
+        { a: 40, b: 30, y: 556, w: 7, f: "g-soft", o: 0.5, p: 3.4 },
+        { a: 82, b: 22, y: 528, w: 1.6, f: "", o: 0.6, p: 4.6 },
+      ];
+      R.forEach((r) => {
+        let d = "";
+        for (let x = 0; x <= 3840; x += 16) {
+          const t = (x / 1920) * Math.PI * 2;
+          const y = r.y + r.a * Math.sin(t + r.p) + r.b * Math.sin(2 * t + r.p * 1.7);
+          d += (x === 0 ? "M" : "L") + x + "," + y.toFixed(1);
+        }
+        const p = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        p.setAttribute("d", d);
+        p.setAttribute("stroke-width", r.w);
+        p.setAttribute("opacity", r.o);
+        if (r.f) p.setAttribute("filter", "url(#" + r.f + ")");
+        g.appendChild(p);
+      });
+      const tl = gsap.timeline({ paused: true });
+      tl.fromTo("#g-ribbons", { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "power1.out" }, 0.25);
+      tl.fromTo("#g-ribbons", { x: 0 }, { x: -1920, duration: 9, ease: "none" }, 0);
+      window.__timelines = window.__timelines || {};
+      window.__timelines["ground"] = tl;
+    })();
+  </script>
+</template>
