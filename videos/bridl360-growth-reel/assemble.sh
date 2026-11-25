@@ -20,8 +20,8 @@ fi
 # voice: raised to the reference VO's loudness (-13.8 LUFS; the bed sits ~6 LU under it as in the reference), rumble cut, a little presence
 ffmpeg -nostdin -v error -y -i vo/voice.wav -af "aresample=48000,highpass=f=70,equalizer=f=3000:t=q:w=1.2:g=1.5,volume=3.5dB,apad,atrim=0:$DUR" -ac 2 -c:a pcm_f32le out/voice.wav
 # bed: the reference's own hits for its logo pops (28.6-29.6 s) land off our place-name pops, so it dips 7 dB under them; the music is thin
-# under 17-25.5 s (the reference's voice carried it), so it sits a steady +3 dB there (no swells that follow the voice)
-ffmpeg -nostdin -v error -y -i "$BED" -af "aresample=48000,volume='if(between(t,28.15,29.95),0.45,1)*(1+0.41*clip((t-16.6)/0.5,0,1)*clip((25.6-t)/0.5,0,1))':eval=frame,afade=t=out:st=49.3:d=0.45,apad,atrim=0:$DUR" -ac 2 -c:a pcm_f32le out/bed.wav
+# under 17-25.5 s (the reference's voice carried it), so it sits a steady +6 dB there (no swells that follow the voice)
+ffmpeg -nostdin -v error -y -i "$BED" -af "aresample=48000,volume='if(between(t,28.15,29.95),0.45,1)*(1+1.0*clip((t-16.6)/0.5,0,1)*clip((25.6-t)/0.5,0,1))':eval=frame,afade=t=out:st=49.3:d=0.45,apad,atrim=0:$DUR" -ac 2 -c:a pcm_f32le out/bed.wav
 python3 - <<'EOF'
 import json
 T = json.load(open("vo/times.json"))
