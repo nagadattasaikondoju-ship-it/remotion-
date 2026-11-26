@@ -1,0 +1,468 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- "The Ice Cream Betrayal": a flat 2D explainer on tooth sensitivity for Dr. Sri Sushma Multispeciality Dental Clinic.
+     Pure function of time: seek(t) draws the frame at t seconds (0 .. TEND). Beats are tied to the narration's word times
+     (timeline.js, from build_vo.py), so the picture follows the voice. 1080x1920, rendered at 60 fps by render.cjs.
+     Scenes: Riya + kulfi (hook, the zap) / three habits / dive into the tooth / cross-section: enamel, hard brushing, thin enamel,
+     gum recession, exposed root, tubules, cold reaching the nerve, "a door in winter" / the clinic finds the cause /
+     the fix: sealed + soft brush / kulfi is back. End card is endcard/ (the clinic's own card). -->
+<style>
+@font-face { font-family: P; font-weight: 500; src: url(fonts/Poppins-Medium.ttf); }
+@font-face { font-family: P; font-weight: 600; src: url(fonts/Poppins-SemiBold.ttf); }
+@font-face { font-family: P; font-weight: 700; src: url(fonts/Poppins-Bold.ttf); }
+@font-face { font-family: P; font-weight: 800; src: url(fonts/Poppins-ExtraBold.ttf); }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+canvas { display: block; }
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="timeline.js"></script>
+<script>
+const C = document.getElementById('c'), X = C.getContext('2d'), W = 1080, H = 1920;
+const TEND = 36.5;
+window.TIMING = { TEND };
+// ---------- maths ----------
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), lerp = (a, b, k) => a + (b - a) * k, seg = (t, a, b) => clamp((t - a) / (b - a));
+const eo = k => 1 - Math.pow(1 - k, 3), ei = k => k * k * k, eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const back = (k, s = 1.7) => k <= 0 ? 0 : 1 + (s + 1) * Math.pow(k - 1, 3) + s * Math.pow(k - 1, 2);
+const sm = k => k * k * (3 - 2 * k);
+const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+// ---------- narration word times ----------
+const LINES = window.TL.lines;
+function WT(li, word, nth = 0) {   // start time of a word in line li (1-based); prefix match
+  const L = LINES[li - 1]; let n = 0;
+  for (const w of L.words) if (w.w.toLowerCase().replace(/[^a-z']/g, '').startsWith(word)) { if (n++ === nth) return w.s; }
+  return L.start;
+}
+const LS = li => LINES[li - 1].start, LE = li => LINES[li - 1].end;
+const K = {
+  love: WT(1, 'loved'), hating: WT(2, 'hating'), bite: WT(3, 'bite'), zap: WT(3, 'zap'),
+  warm: LS(4), chew: WT(4, 'chewing'), fake: WT(4, 'fake'),
+  what: LS(5), inside: WT(5, 'inside'),
+  enamel: LS(6), shield: WT(6, 'shield'), brushed: WT(6, 'brushed'),
+  thin: WT(7, 'thin'), gums: WT(7, 'gums'),
+  exposed: WT(8, 'exposed'), tubes: WT(8, 'tubes'), nerve: WT(8, 'nerve'),
+  cold: WT(9, 'cold'), door: WT(9, 'door'),
+  clinic: LS(10), cause: WT(10, 'real'),
+  sealed: WT(11, 'sealed'), soft: WT(11, 'soft'), circles: WT(11, 'gentle'),
+  now: LS(12), kulfi: WT(12, 'kulfi'), cta: LS(13)
+};
+window.KEYS = K;
+// ---------- palette ----------
+const P = {
+  skin: '#D69469', skinD: '#BF7C54', hair: '#2A1A2E', top: '#19B3A3', topD: '#11897C', blush: 'rgba(255,120,130,.45)',
+  kulfi1: '#F8DB92', kulfi2: '#EDB35E', pista: '#8CC152', stick: '#DDA466',
+  enamel: '#F4FAFF', enamelEdge: '#BFDDF2', dentin: '#F2DDB0', dentinD: '#E2C48C', root: '#E8C98E', pulp: '#F27A8A', pulpD: '#D9566E',
+  nerve: '#FFE066', gum: '#F3899B', gumD: '#D9687D', bone: '#F6E7CF', boneD: '#E8D3B0',
+  zap: '#FFE45C', cold: '#9FE7FF', seal: '#36D1C4', red: '#FF5A5F', green: '#3DDC84', ink: '#1B1638', yellow: '#FFD54A'
+};
+// ---------- drawing helpers ----------
+function grad(y0, y1, stops) { const g = X.createLinearGradient(0, y0, 0, y1); stops.forEach(([o, c]) => g.addColorStop(o, c)); return g; }
+function rgrad(x, y, r0, r1, stops) { const g = X.createRadialGradient(x, y, r0, x, y, r1); stops.forEach(([o, c]) => g.addColorStop(o, c)); return g; }
+function bg(stops) { X.fillStyle = grad(0, H, stops); X.fillRect(0, 0, W, H); }
+function circle(x, y, r, col) { X.beginPath(); X.arc(x, y, Math.max(0, r), 0, 6.2832); X.fillStyle = col; X.fill(); }
+function ell(x, y, rx, ry, col, rot = 0) { X.beginPath(); X.ellipse(x, y, Math.max(0, rx), Math.max(0, ry), rot, 0, 6.2832); X.fillStyle = col; X.fill(); }
+function rr(x, y, w, h, r, col) { X.beginPath(); X.roundRect(x, y, w, h, r); X.fillStyle = col; X.fill(); }
+function glow(x, y, r, col, a = 1) { X.save(); X.globalAlpha *= a; X.fillStyle = rgrad(x, y, 0, r, [[0, col], [1, 'rgba(0,0,0,0)']]); X.fillRect(x - r, y - r, r * 2, r * 2); X.restore(); }
+function heart(x, y, s, col, a = 1) { X.save(); X.globalAlpha *= a; X.translate(x, y); X.scale(s, s); X.beginPath(); X.moveTo(0, 10);
+  X.bezierCurveTo(-30, -12, -14, -40, 0, -20); X.bezierCurveTo(14, -40, 30, -12, 0, 10); X.fillStyle = col; X.fill(); X.restore(); }
+function sparkle(x, y, s, col, a = 1, rot = 0) { if (s <= 0) return; X.save(); X.globalAlpha *= a; X.translate(x, y); X.rotate(rot); X.scale(s, s); X.beginPath();
+  for (let i = 0; i < 8; i++) { const r = i % 2 ? 7 : 30, an = i * Math.PI / 4; X.lineTo(Math.cos(an) * r, Math.sin(an) * r); } X.closePath(); X.fillStyle = col; X.fill(); X.restore(); }
+function snow(x, y, s, a = 1, rot = 0) { X.save(); X.globalAlpha *= a; X.translate(x, y); X.rotate(rot); X.strokeStyle = '#EFFBFF'; X.lineWidth = 3.2 * s; X.lineCap = 'round';
+  for (let i = 0; i < 3; i++) { X.rotate(Math.PI / 3); X.beginPath(); X.moveTo(-11 * s, 0); X.lineTo(11 * s, 0); X.stroke(); }
+  X.restore(); }
+function bolt(x1, y1, x2, y2, w, seed, a = 1) {   // jagged lightning from (x1,y1) to (x2,y2)
+  if (a <= 0) return; const n = 7, pts = [];
+  for (let i = 0; i <= n; i++) { const k = i / n, j = (i === 0 || i === n) ? 0 : (rnd(seed + i) - .5) * w * 2.2; const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy);
+    pts.push([x1 + dx * k - dy / L * j, y1 + dy * k + dx / L * j]); }
+  X.save(); X.globalAlpha *= a; X.lineJoin = 'round'; X.lineCap = 'round';
+  X.shadowColor = P.zap; X.shadowBlur = 40; X.strokeStyle = P.zap; X.lineWidth = w; X.beginPath(); pts.forEach((p, i) => i ? X.lineTo(...p) : X.moveTo(...p)); X.stroke();
+  X.shadowBlur = 0; X.strokeStyle = '#FFFFFF'; X.lineWidth = w * .38; X.stroke(); X.restore();
+}
+function text(s, x, y, size, col, weight = 800, align = 'center', a = 1, stroke = null) {
+  X.save(); X.globalAlpha *= a; X.font = `${weight} ${size}px P`; X.textAlign = align; X.textBaseline = 'middle';
+  if (stroke) { X.lineJoin = 'round'; X.lineWidth = stroke[1]; X.strokeStyle = stroke[0]; X.strokeText(s, x, y); }
+  X.fillStyle = col; X.fillText(s, x, y); X.restore();
+}
+function label(s, x, y, k, col = '#FFFFFF', bgc = 'rgba(20,16,50,.82)', size = 40, lx = null, ly = null) {   // pill label with an optional leader line to (lx, ly)
+  if (k <= 0) return; X.save(); const e = back(k, 1.6);
+  if (lx !== null) { X.globalAlpha = clamp(k * 2); X.strokeStyle = bgc; X.lineWidth = 5; X.lineCap = 'round'; X.beginPath(); X.moveTo(x, y); X.lineTo(lerp(x, lx, eo(k)), lerp(y, ly, eo(k))); X.stroke(); circle(lerp(x, lx, eo(k)), lerp(y, ly, eo(k)), 9, bgc); }
+  X.translate(x, y); X.scale(e, e); X.globalAlpha = clamp(k * 3); X.font = `800 ${size}px P`; const w = X.measureText(s).width + size * 1.1;
+  X.shadowColor = 'rgba(0,0,0,.25)'; X.shadowBlur = 18; X.shadowOffsetY = 6; rr(-w / 2, -size * .78, w, size * 1.56, size * .78, bgc); X.shadowColor = 'transparent';
+  X.fillStyle = col; X.textAlign = 'center'; X.textBaseline = 'middle'; X.fillText(s, 0, 2); X.restore();
+}
+function particles(t, n, seed, col, rmax, a = 1) {   // slow drifting ambient dots (the explainer look)
+  for (let i = 0; i < n; i++) { const x = (rnd(seed + i) * W + t * (8 + rnd(seed + i * 3) * 14)) % W, y = (rnd(seed + i * 7) * H - t * (10 + rnd(seed + i * 5) * 22) + H * 4) % H;
+    glow(x, y, 6 + rnd(seed + i * 11) * rmax, col, a * (.35 + .5 * rnd(seed + i * 13))); }
+}
+// ---------- characters ----------
+function riya(x, y, s, o = {}) {   // origin = head centre. o: expr, hand [x,y] (right hand, local), lhand, sweat, hairUp, mouthOpen, look
+  X.save(); X.translate(x, y); X.scale(s, s);
+  const t = o.t || 0, sway = Math.sin(t * 2.2) * .06;
+  // ponytail + hair back
+  X.save(); X.translate(96, -30); X.rotate(.5 + sway); ell(30, 40, 52, 96, P.hair); X.restore();
+  circle(0, -8, 130, P.hair);
+  // body
+  rr(-30, 90, 60, 70, 20, P.skinD);
+  X.beginPath(); X.moveTo(-160, 150); X.quadraticCurveTo(0, 105, 160, 150); X.quadraticCurveTo(195, 400, 175, 560); X.lineTo(-175, 560); X.quadraticCurveTo(-195, 400, -160, 150); X.closePath();
+  X.fillStyle = grad(130, 560, [[0, P.top], [1, P.topD]]); X.fill();
+  X.beginPath(); X.moveTo(-46, 128); X.lineTo(0, 190); X.lineTo(46, 128); X.strokeStyle = P.topD; X.lineWidth = 10; X.lineCap = 'round'; X.stroke();
+  // arms (sleeve stroke + hand)
+  const arm = (sx, sy, hx, hy) => { X.strokeStyle = P.top; X.lineWidth = 58; X.lineCap = 'round'; X.beginPath(); X.moveTo(sx, sy);
+    X.quadraticCurveTo(sx + (hx - sx) * .2 + (sx > 0 ? 40 : -40), (sy + hy) / 2 + 60, hx, hy); X.stroke(); circle(hx, hy, 34, P.skin); };
+  if (o.lhand) arm(-140, 190, ...o.lhand); else arm(-140, 190, -170, 470);
+  if (o.hand) arm(140, 190, ...o.hand); else arm(140, 190, 170, 470);
+  // head
+  circle(-118, 14, 26, P.skinD); circle(118, 14, 26, P.skinD);
+  circle(0, 0, 120, P.skin);
+  if (o.cheek) circle(70, 55, 46 * o.cheek, P.skin);
+  // fringe
+  X.save(); X.translate(0, o.hairUp ? -14 * o.hairUp : 0);
+  X.beginPath(); X.moveTo(-126, -4); X.bezierCurveTo(-136, -130, -40, -158, 6, -144); X.bezierCurveTo(70, -156, 138, -112, 126, -4);
+  X.bezierCurveTo(104, -66, 64, -86, 22, -76); X.bezierCurveTo(-8, -102, -70, -84, -126, -4); X.closePath(); X.fillStyle = P.hair; X.fill();
+  if (o.hairUp) { X.strokeStyle = P.hair; X.lineWidth = 14; X.lineCap = 'round'; for (let i = -2; i <= 2; i++) { X.beginPath(); X.moveTo(i * 34, -132); X.lineTo(i * 46, -132 - 50 * o.hairUp); X.stroke(); } }
+  X.restore();
+  circle(-72, 48, 20, P.blush); circle(72, 48, 20, P.blush);
+  const ex = o.look ? o.look[0] : 0, ey = o.look ? o.look[1] : 0, e = o.expr || 'neutral';
+  X.strokeStyle = P.ink; X.lineCap = 'round'; X.lineWidth = 8; X.fillStyle = P.ink;
+  if (e === 'happy') { for (const sx of [-44, 44]) { X.beginPath(); X.arc(sx, 18, 17, Math.PI * 1.1, Math.PI * 1.9); X.stroke(); } }
+  else if (e === 'shock') { for (const sx of [-44, 44]) { circle(sx, 12, 30, '#FFFFFF'); circle(sx + ex, 14 + ey, 10, P.ink); } X.beginPath(); X.moveTo(-70, -36); X.lineTo(-24, -48); X.moveTo(70, -36); X.lineTo(24, -48); X.stroke(); }
+  else if (e === 'wince') { X.beginPath(); X.moveTo(-62, 0); X.lineTo(-30, 14); X.lineTo(-62, 28); X.moveTo(62, 0); X.lineTo(30, 14); X.lineTo(62, 28); X.stroke(); }
+  else if (e === 'fake') { ell(-44, 14, 12, 16, P.ink); X.beginPath(); X.moveTo(28, 14); X.lineTo(60, 10); X.stroke(); X.beginPath(); X.moveTo(-70, -34); X.lineTo(-22, -40); X.moveTo(22, -46); X.lineTo(70, -30); X.stroke(); }
+  else { for (const sx of [-44, 44]) { ell(sx + ex, 14 + ey, 12, 16, P.ink); circle(sx + ex + 4, 8 + ey, 4.5, '#FFFFFF'); } }
+  // mouth
+  X.lineWidth = 8;
+  if (e === 'shock' || o.mouthOpen) { const mo = o.mouthOpen ?? 1; ell(0, 66, 26, 30 * mo + 4, '#5A1E2E'); if (mo > .3) { X.save(); X.beginPath(); X.ellipse(0, 66, 26, 30 * mo + 4, 0, 0, 6.29); X.clip(); rr(-22, 66 - 30 * mo, 44, 16, 6, '#FFFFFF'); X.restore(); } }
+  else if (e === 'happy') { X.beginPath(); X.arc(0, 46, 40, .15 * Math.PI, .85 * Math.PI); X.fillStyle = '#5A1E2E'; X.fill(); X.save(); X.clip(); rr(-34, 48, 68, 16, 6, '#FFFFFF'); X.restore(); }
+  else if (e === 'fake') { rr(-50, 52, 100, 34, 14, '#FFFFFF'); X.strokeStyle = P.ink; X.lineWidth = 5; X.beginPath(); X.roundRect(-50, 52, 100, 34, 14); X.stroke(); for (let i = -2; i <= 2; i++) { X.beginPath(); X.moveTo(i * 18, 54); X.lineTo(i * 18, 84); X.stroke(); } }
+  else if (e === 'wince') { X.beginPath(); X.moveTo(-34, 70); for (let i = 0; i < 6; i++) X.lineTo(-34 + (i + 1) * 11.3, 70 + (i % 2 ? -10 : 10)); X.stroke(); }
+  else if (o.chew) { X.beginPath(); X.moveTo(-20, 68); X.quadraticCurveTo(0, 62 + 8 * Math.sin(t * 16), 26, 70); X.stroke(); }
+  else { X.beginPath(); X.arc(0, 50, 30, .2 * Math.PI, .8 * Math.PI); X.stroke(); }
+  if (o.sweat) { X.save(); X.globalAlpha *= o.sweat; X.translate(112, -64); X.beginPath(); X.moveTo(0, -26); X.quadraticCurveTo(18, 4, 0, 14); X.quadraticCurveTo(-18, 4, 0, -26); X.fillStyle = '#8FD8FF'; X.fill(); X.restore(); }
+  X.restore();
+}
+function kulfi(x, y, s, o = {}) {   // origin = top of the stick (bottom of the kulfi). o: angry 0..1, bite 0..1, rot
+  X.save(); X.translate(x, y); X.rotate(o.rot || 0); X.scale(s, s);
+  rr(-11, -10, 22, 130, 8, P.stick);
+  X.save();
+  if (o.bite) { X.beginPath(); X.rect(-200, -400, 400, 420); X.arc(52, -238, 58 * o.bite, 0, 6.29, true); X.clip('evenodd'); }
+  X.beginPath(); X.moveTo(-58, 0); X.lineTo(-64, -200); X.quadraticCurveTo(-64, -262, 0, -264); X.quadraticCurveTo(64, -262, 64, -200); X.lineTo(58, 0); X.quadraticCurveTo(0, 14, -58, 0); X.closePath();
+  X.fillStyle = grad(-264, 0, [[0, P.kulfi1], [1, P.kulfi2]]); X.fill();
+  X.globalAlpha = .9; for (let i = 0; i < 14; i++) { ell(-44 + rnd(i) * 88, -230 + rnd(i + 40) * 210, 7, 4.5, rnd(i + 9) > .5 ? P.pista : '#C77A3A', rnd(i + 3) * 3); }
+  X.globalAlpha = 1; X.beginPath(); X.moveTo(-60, -190); X.bezierCurveTo(-30, -170, -10, -205, 20, -180); X.bezierCurveTo(40, -165, 50, -190, 62, -182); X.lineTo(62, -200); X.quadraticCurveTo(62, -262, 0, -262); X.quadraticCurveTo(-62, -262, -62, -200); X.closePath(); X.fillStyle = 'rgba(255,255,255,.35)'; X.fill();
+  X.restore();
+  const a = o.angry || 0;
+  if (a > 0) { X.save(); X.globalAlpha *= clamp(a * 2); X.strokeStyle = P.ink; X.lineCap = 'round'; X.lineWidth = 9;
+    X.beginPath(); X.moveTo(-40, -150 - 6 * a); X.lineTo(-8, -136 + 6 * a); X.moveTo(40, -150 - 6 * a); X.lineTo(8, -136 + 6 * a); X.stroke();
+    ell(-24, -116, 7, 9, P.ink); ell(24, -116, 7, 9, P.ink);
+    X.beginPath(); X.arc(0, -66, 22, 1.15 * Math.PI, 1.85 * Math.PI); X.stroke(); X.restore(); }
+  else if (o.cute) { ell(-22, -120, 7, 9, P.ink); ell(22, -120, 7, 9, P.ink); X.strokeStyle = P.ink; X.lineWidth = 7; X.lineCap = 'round'; X.beginPath(); X.arc(0, -98, 14, .2 * Math.PI, .8 * Math.PI); X.stroke(); circle(-38, -100, 9, P.blush); circle(38, -100, 9, P.blush); }
+  X.restore();
+}
+function doctor(x, y, s, t) {   // a friendly clinician (generic, no real likeness), origin head centre
+  X.save(); X.translate(x, y); X.scale(s, s);
+  circle(0, -22, 126, '#3B2433'); ell(0, -150, 56, 46, '#3B2433');            // bun
+  rr(-30, 90, 60, 70, 20, '#A8714F');
+  X.beginPath(); X.moveTo(-170, 150); X.quadraticCurveTo(0, 105, 170, 150); X.quadraticCurveTo(205, 400, 185, 600); X.lineTo(-185, 600); X.quadraticCurveTo(-205, 400, -170, 150); X.closePath(); X.fillStyle = '#FFFFFF'; X.fill();
+  X.beginPath(); X.moveTo(-60, 128); X.lineTo(0, 260); X.lineTo(60, 128); X.closePath(); X.fillStyle = '#2E9CCB'; X.fill();
+  X.strokeStyle = '#DCE6F0'; X.lineWidth = 6; X.beginPath(); X.moveTo(-70, 140); X.lineTo(-20, 330); X.moveTo(70, 140); X.lineTo(20, 330); X.stroke();
+  rr(70, 300, 56, 60, 10, '#E8EEF5');                                             // pocket
+  circle(-120, 14, 24, '#A8714F'); circle(120, 14, 24, '#A8714F'); circle(0, 0, 116, '#B97B55');
+  X.beginPath(); X.moveTo(-120, -10); X.bezierCurveTo(-120, -120, -30, -140, 0, -128); X.bezierCurveTo(40, -140, 120, -110, 120, -10); X.bezierCurveTo(90, -80, 30, -90, 0, -80); X.bezierCurveTo(-30, -90, -90, -80, -120, -10); X.fillStyle = '#3B2433'; X.fill();
+  const bl = (Math.floor(t * 1.3) % 4 === 0 && (t * 1.3) % 1 < .12) ? .15 : 1;
+  ell(-42, 16, 11, 15 * bl, P.ink); ell(42, 16, 11, 15 * bl, P.ink);
+  circle(-70, 50, 18, P.blush); circle(70, 50, 18, P.blush);
+  X.strokeStyle = P.ink; X.lineWidth = 8; X.lineCap = 'round'; X.beginPath(); X.arc(0, 48, 32, .2 * Math.PI, .8 * Math.PI); X.stroke();
+  X.restore();
+}
+// ---------- the tooth (cross-section), local units, origin at the neck ----------
+const TOOTH = new Path2D('M -255,-260 C -265,-430 -170,-520 -95,-480 C -50,-455 -25,-470 0,-490 C 25,-470 50,-455 95,-480 C 170,-520 265,-430 255,-260 C 248,-160 200,-90 172,-40 C 160,40 175,200 150,380 C 140,470 105,520 80,520 C 55,520 45,470 40,380 C 30,250 20,160 0,140 C -20,160 -30,250 -40,380 C -45,470 -55,520 -80,520 C -105,520 -140,470 -150,380 C -175,200 -160,40 -172,-40 C -200,-90 -248,-160 -255,-260 Z');
+const PULP = new Path2D('M -118,-250 C -122,-330 -62,-338 -40,-292 C -16,-312 16,-312 40,-292 C 62,-338 122,-330 118,-250 C 116,-150 96,-70 88,10 C 82,160 98,330 84,470 C 82,486 70,486 68,470 C 60,340 52,170 40,60 C 30,20 -30,20 -40,60 C -52,170 -60,340 -68,470 C -70,486 -82,486 -84,470 C -98,330 -82,160 -88,10 C -96,-70 -116,-150 -118,-250 Z');
+function toothXS(st, t) {   // st: thin 0..1, gumY, seal 0..1, tubes 0..1, nerveHot 0..1, glowRoot 0..1
+  // bone
+  X.save(); X.beginPath(); X.rect(-560, st.boneY, 1120, 900); X.fillStyle = grad(st.boneY, st.boneY + 700, [[0, P.bone], [1, P.boneD]]); X.fill();
+  for (let i = 0; i < 70; i++) circle(-540 + rnd(i) * 1080, st.boneY + 30 + rnd(i + 70) * 640, 6 + rnd(i + 140) * 10, 'rgba(214,186,140,.45)');
+  X.fillStyle = P.bone; X.fillRect(-70, 110, 140, st.boneY - 110 + 4);   // bone between the roots
+  X.restore();
+  // tooth: dentin + root
+  X.save(); X.fillStyle = grad(-500, 520, [[0, P.dentin], [.55, P.dentin], [1, P.root]]); X.fill(TOOTH); X.restore();
+  // enamel cap (crown above the neck), its inner edge moves out as it wears thin
+  X.save(); X.beginPath(); X.rect(-400, -700, 800, 660); X.clip(); X.fillStyle = grad(-520, -40, [[0, '#FFFFFF'], [1, P.enamelEdge]]); X.fill(TOOTH);
+  const sc = lerp(.84, .93, st.thin); X.translate(0, -250 + 250 * sc); X.translate(0, -250 * (1 - sc) * .2);
+  X.save(); X.translate(0, -250); X.scale(sc, sc); X.translate(0, 250); X.fillStyle = grad(-500, -40, [[0, P.dentin], [1, P.dentinD]]); X.fill(TOOTH); X.restore();
+  X.restore();
+  if (st.thin > 0) { X.save(); X.globalAlpha = st.thin * .8; X.strokeStyle = 'rgba(120,150,180,.7)'; X.lineWidth = 4; X.lineCap = 'round';
+    for (let i = 0; i < 9; i++) { const x0 = -200 + i * 50, y0 = -430 + Math.abs(i - 4) * 26; X.beginPath(); X.moveTo(x0, y0); X.lineTo(x0 + 22, y0 + 10); X.stroke(); } X.restore(); }
+  // pulp + nerve
+  X.save(); X.fillStyle = grad(-330, 480, [[0, P.pulp], [1, P.pulpD]]); X.fill(PULP);
+  X.clip(PULP); const hot = st.nerveHot || 0;
+  X.strokeStyle = hot > 0 ? `rgba(255,${Math.round(lerp(224, 80, hot))},${Math.round(lerp(102, 60, hot))},1)` : P.nerve; X.lineWidth = 7 + 4 * hot; X.lineCap = 'round';
+  if (hot > 0) { X.shadowColor = '#FFE45C'; X.shadowBlur = 30 * hot; }
+  for (const sx of [-1, 1]) { X.beginPath(); X.moveTo(sx * 76, 470); X.bezierCurveTo(sx * 70, 200, sx * 60, 40, sx * 30, -60); X.bezierCurveTo(sx * 10, -150, sx * 70, -200, sx * 80, -280); X.stroke();
+    X.beginPath(); X.moveTo(sx * 40, -150); X.lineTo(sx * 90, -230); X.moveTo(sx * 50, -100); X.lineTo(sx * 96, -150); X.stroke(); }
+  X.restore();
+  // tubules on the exposed root (both sides), between the neck and the gum line
+  if (st.tubes > 0) {
+    const yTop = -30, yBot = Math.min(st.gumY - 10, 150);
+    for (const sx of [-1, 1]) for (let i = 0; i < 7; i++) {
+      const k = clamp(st.tubes * 1.4 - i * .06), y = lerp(yTop, yBot, (i + .5) / 7); if (k <= 0 || y > yBot) continue;
+      const xo = sx * (168 + (y - yTop) * .03), xi = sx * 86;
+      X.save(); X.globalAlpha = k; X.strokeStyle = 'rgba(150,95,60,.55)'; X.lineWidth = 9; X.lineCap = 'round';
+      X.beginPath(); X.moveTo(xo, y); X.bezierCurveTo(lerp(xo, xi, .35), y - 14, lerp(xo, xi, .65), y + 14, lerp(xo, xi, eo(k)), y); X.stroke();
+      X.strokeStyle = 'rgba(255,240,215,.85)'; X.lineWidth = 3.5; X.stroke(); X.restore();
+    }
+  }
+  // gums (the soft tissue at the neck, both sides) and the exposed root band
+  const gy = st.gumY;
+  if (st.glowRoot > 0 && gy > -30) { X.save(); X.globalAlpha = st.glowRoot * (.55 + .35 * Math.sin(t * 7)); X.strokeStyle = '#FFB347'; X.lineWidth = 16; X.shadowColor = '#FFB347'; X.shadowBlur = 30;
+    for (const sx of [-1, 1]) { X.beginPath(); X.moveTo(sx * 172, -36); X.bezierCurveTo(sx * 166, 0, sx * 165, gy * .6, sx * 166, gy); X.stroke(); } X.restore(); }
+  for (const sx of [-1, 1]) {
+    X.beginPath(); X.moveTo(sx * 560, gy + 70); X.bezierCurveTo(sx * 400, gy + 40, sx * 230, gy - 30, sx * 172, gy - 8);
+    X.bezierCurveTo(sx * 160, gy + 60, sx * 162, gy + 140, sx * 168, gy + 240); X.lineTo(sx * 560, gy + 260); X.closePath();
+    X.fillStyle = grad(gy - 30, gy + 260, [[0, P.gum], [1, P.gumD]]); X.fill();
+  }
+  // seal coat
+  if (st.seal > 0) { X.save(); X.strokeStyle = P.seal; X.lineWidth = 22; X.lineCap = 'round'; X.shadowColor = P.seal; X.shadowBlur = 24; X.globalAlpha = .92;
+    for (const sx of [-1, 1]) { X.beginPath(); X.moveTo(sx * 182, -44); X.bezierCurveTo(sx * 176, 0, sx * 175, gy * .6, sx * 176, lerp(-44, gy + 4, st.seal)); X.stroke(); }
+    X.shadowBlur = 0; X.strokeStyle = 'rgba(255,255,255,.7)'; X.lineWidth = 5; for (const sx of [-1, 1]) { X.beginPath(); X.moveTo(sx * 186, -40); X.lineTo(sx * 184, lerp(-40, gy - 10, st.seal) * .9); X.stroke(); } X.restore(); }
+}
+// ---------- toothbrushes ----------
+function brush(x, y, s, rot, soft) {
+  X.save(); X.translate(x, y); X.rotate(rot); X.scale(s, s);
+  rr(-40, -16, 520, 32, 16, soft ? '#7C5CFF' : '#FF6B4A'); rr(330, -12, 150, 24, 12, soft ? '#A28BFF' : '#FF9A80');
+  rr(-60, -24, 120, 26, 8, soft ? '#E9E3FF' : '#FFE1D8');
+  if (soft) for (let i = 0; i < 6; i++) { ell(-48 + i * 19, -50, 12, 28, '#B9A6FF'); ell(-48 + i * 19, -66, 9, 12, '#DCD2FF'); }
+  else for (let i = 0; i < 12; i++) { rr(-57 + i * 9.6, -72, 7, 50, 2, '#9FB0C4'); rr(-57 + i * 9.6, -72, 7, 8, 2, '#5E6E82'); }
+  X.restore();
+}
+// ---------- scenes ----------
+function sceneRiya(t, mode) {   // hook / zap / happy ending
+  const happy = mode === 'happy';
+  bg(happy ? [[0, '#FFB86B'], [.55, '#FF7E8A'], [1, '#B84BA8']] : [[0, '#FFC58A'], [.5, '#FF8F8F'], [1, '#C34E9A']]);
+  X.save(); X.globalAlpha = .18; X.translate(540, 760); X.rotate(t * .05);
+  for (let i = 0; i < 14; i++) { X.rotate(Math.PI / 7); X.beginPath(); X.moveTo(0, 0); X.lineTo(1400, -120); X.lineTo(1400, 120); X.closePath(); X.fillStyle = '#FFFFFF'; X.fill(); } X.restore();
+  particles(t, 18, 3, 'rgba(255,255,255,.8)', 10, .8);
+  let cx = 540, cy = 760, z = 1;
+  let expr = 'happy', hand = [190, 260], biteK = 0, kulfiAngry = 0, mouth = null, hairUp = 0, shake = 0, look = null;
+  if (!happy) {
+    kulfiAngry = sm(seg(t, K.hating - .1, K.hating + .25));
+    const bt = seg(t, K.bite - .35, K.bite + .05), bk = seg(t, K.bite + .05, K.bite + .35);
+    hand = [lerp(190, 60, eio(bt)) + lerp(0, 120, eio(bk)), lerp(260, 120, eio(bt)) + lerp(0, 120, eio(bk))];
+    biteK = t > K.bite ? 1 : 0;
+    if (t > K.hating && t < K.bite - .35) expr = 'neutral';
+    if (t >= K.bite - .35 && t < K.zap - .05) { expr = 'neutral'; mouth = clamp(seg(t, K.bite - .3, K.bite - .05) * (1 - seg(t, K.bite + .02, K.bite + .12))); }
+    if (t >= K.zap - .05) { expr = 'shock'; hairUp = back(seg(t, K.zap - .05, K.zap + .2)); shake = Math.max(0, 1 - (t - K.zap) * 1.6); look = [Math.sin(t * 40) * 3 * shake, 0]; }
+    z = lerp(1, 1.22, eio(seg(t, K.bite - .6, K.zap)));
+    cy = lerp(760, 800, eio(seg(t, K.bite - .6, K.zap)));
+  } else {
+    biteK = t > K.kulfi + .1 ? 1 : 0; const bt = seg(t, K.kulfi - .3, K.kulfi + .05), bk = seg(t, K.kulfi + .1, K.kulfi + .4);
+    hand = [lerp(190, 60, eio(bt)) + lerp(0, 130, eio(bk)), lerp(260, 120, eio(bt)) + lerp(0, 140, eio(bk))];
+    expr = (t > K.kulfi - .3 && t < K.kulfi + .1) ? 'neutral' : 'happy'; if (t > K.kulfi - .3 && t < K.kulfi + .1) mouth = .8;
+  }
+  const sx = shake ? Math.sin(t * 90) * 16 * shake : 0, sy = shake ? Math.cos(t * 77) * 12 * shake : 0;
+  X.save(); X.translate(cx + sx, cy + sy); X.scale(z, z); X.translate(-540, -760);
+  const bob = Math.sin(t * 2.4) * 6;
+  riya(540, 600 + bob, 1.18, { t, expr, hand, sweat: 0, hairUp, mouthOpen: mouth, look });
+  // kulfi in the right hand (local hand -> world)
+  const kx = 540 + hand[0] * 1.18, ky = 600 + bob + hand[1] * 1.18;
+  kulfi(kx, ky - 6, .95, { angry: happy ? 0 : kulfiAngry, cute: (happy || kulfiAngry <= 0), bite: biteK, rot: -.12 });
+  X.restore();
+  // hearts on "loved"; sparkles at the happy bite
+  if (!happy) for (let i = 0; i < 6; i++) { const k = seg(t, K.love + i * .12, K.love + 1.6 + i * .12); if (k > 0 && k < 1 && t < K.hating) heart(540 + (rnd(i) - .5) * 520, 470 - k * 260 - i * 18, .9 + rnd(i + 5) * .8, '#FF4F7A', Math.sin(k * Math.PI)); }
+  if (happy) { const k0 = K.kulfi + .12; for (let i = 0; i < 14; i++) { const k = seg(t, k0 + i * .02, k0 + .9 + i * .02); if (k > 0 && k < 1) { const an = i / 14 * 6.28 + .3, r = 120 + 300 * eo(k);
+      sparkle(740 + Math.cos(an) * r, 640 + Math.sin(an) * r * .8, (1 - k) * 1.5 + .2, i % 2 ? '#FFFFFF' : '#FFE45C', 1 - k * k, k * 3); } }
+    for (let i = 0; i < 5; i++) { const k = seg(t, k0 + .3 + i * .15, k0 + 1.8 + i * .15); if (k > 0 && k < 1) heart(300 + i * 120, 520 - k * 240, 1 + rnd(i) * .6, '#FF4F7A', Math.sin(k * Math.PI)); } }
+  // the ZAP
+  if (!happy && t > K.zap - .04) { const k = t - (K.zap - .04);
+    X.save(); X.globalAlpha = clamp(1 - k * 2.2) * .55; X.fillStyle = '#E6FBFF'; X.fillRect(0, 0, W, H); X.restore();
+    for (let i = 0; i < 3; i++) bolt(700 + i * 40, 520 - i * 30, 560 - i * 30, 900 + i * 40, 22 - i * 5, Math.floor(t * 18) * 7 + i * 31, clamp(1.6 - k * 1.1));
+    const zk = back(seg(t, K.zap - .04, K.zap + .2));
+    X.save(); X.translate(820, 380); X.rotate(-.12); X.scale(zk, zk); text('ZAP!', 0, 0, 150, P.zap, 800, 'center', clamp(2 - k), [P.ink, 22]); X.restore(); }
+}
+function sceneHabits(t) {
+  bg([[0, '#FFD3A5'], [1, '#FD9F9F']]);
+  particles(t, 14, 21, 'rgba(255,255,255,.9)', 8, .6);
+  const cards = [[K.warm, 'Warm water only', 'warm'], [K.chew, 'Chewing on one side', 'chew'], [K.fake, 'Fake smiles at parties', 'fake']];
+  cards.forEach(([t0, txt, kind], i) => {
+    const k = eo(seg(t, t0 - .12, t0 + .3)); if (k <= 0) return;
+    const y = 360 + i * 300, x = lerp(1180, 110, k);
+    X.save(); X.shadowColor = 'rgba(120,30,60,.25)'; X.shadowBlur = 30; X.shadowOffsetY = 12; rr(x, y, 860, 260, 46, '#FFFFFF'); X.restore();
+    X.save(); X.beginPath(); X.roundRect(x, y, 860, 260, 46); X.clip();
+    const ix = x + 150, iy = y + 130;
+    circle(ix, iy, 100, i === 0 ? '#FFE2CC' : i === 1 ? '#E3F6F3' : '#FFE0EA');
+    if (kind === 'warm') { rr(ix - 46, iy - 50, 92, 120, 18, 'rgba(160,215,255,.55)'); rr(ix - 40, iy - 6, 80, 70, 12, 'rgba(255,170,110,.75)');
+      X.strokeStyle = 'rgba(160,160,170,.8)'; X.lineWidth = 7; X.lineCap = 'round';
+      for (let j = 0; j < 3; j++) { X.beginPath(); const sx = ix - 24 + j * 24, ph = t * 5 + j; X.moveTo(sx, iy - 64); X.bezierCurveTo(sx + 14 * Math.sin(ph), iy - 84, sx - 14 * Math.sin(ph), iy - 100, sx, iy - 118); X.stroke(); } }
+    if (kind === 'chew') riya(ix, iy - 6, .52, { t, expr: 'neutral', cheek: 1, chew: 1 });
+    if (kind === 'fake') { riya(ix, iy - 6, .52, { t, expr: 'fake', sweat: 1 }); }
+    if (kind === 'fake') { X.globalAlpha = .55; for (let j = 0; j < 10; j++) { const cx = x + 280 + rnd(j) * 560, cy = y + ((t * 140 + rnd(j + 4) * 260) % 260); rr(cx, cy, 12, 22, 3, ['#FF5A5F', '#FFD54A', '#3DDC84', '#7C5CFF'][j % 4]); } X.globalAlpha = 1; }
+    X.restore();
+    text(txt, x + 285, y + 130, 48, P.ink, 800, 'left');
+  });
+}
+function sceneDive(t) {   // "what was really happening inside?": push into the smile, then into one tooth
+  const k = eio(seg(t, K.what + .2, K.inside + .75));
+  bg([[0, '#FFB59A'], [1, '#C85A9C']]);
+  X.save(); const z = lerp(1, 9, ei(k)); X.translate(540, 760); X.scale(z, z); X.translate(-540, -(600 + 66 * 1.18));
+  riya(540, 600, 1.18, { t, expr: 'neutral', mouthOpen: lerp(.4, 1, sm(seg(t, K.what, K.what + .4))) });
+  X.restore();
+  // the inside view arrives through a bright iris
+  const ir = seg(t, K.inside + .35, K.inside + .75);
+  if (ir > 0) { X.save(); X.beginPath(); X.arc(540, 760, 1400 * eo(ir) + 1, 0, 6.29); X.clip(); sceneInside(t, true); X.restore();
+    X.save(); X.globalAlpha = Math.sin(ir * Math.PI) * .8; X.fillStyle = '#FFFFFF'; X.fillRect(0, 0, W, H); X.restore(); }
+}
+function insideState(t) {
+  const st = { thin: sm(seg(t, K.thin - .1, K.thin + .6)), gumY: lerp(-70, 115, eio(seg(t, K.gums - .05, K.gums + .8))), boneY: 60, seal: 0, tubes: 0, nerveHot: 0, glowRoot: 0 };
+  st.boneY = lerp(60, 175, eio(seg(t, K.gums - .05, K.gums + .8)));
+  st.glowRoot = seg(t, K.exposed - .1, K.exposed + .3) * (1 - seg(t, K.tubes + .4, K.tubes + .9) * .6);
+  st.tubes = seg(t, K.tubes - .15, K.tubes + .6);
+  if (t > K.sealed - .2) { st.seal = eio(seg(t, K.sealed, K.sealed + 1.0)); st.glowRoot = 0; }
+  return st;
+}
+function coldFlow(t, st, t0, blocked) {   // snowflakes drift in from the right, ride the tubules toward the nerve (or bounce off the seal)
+  let hits = 0;
+  for (let i = 0; i < 16; i++) {
+    const life = 1.5, ph = ((t - t0) - i * .17); if (ph < 0) continue; const k = (ph % life) / life, cycle = Math.floor(ph / life); if (cycle > 2) continue;
+    const lane = i % 6, y = lerp(-20, Math.min(st.gumY - 14, 140), (lane + .5) / 6);
+    let x, yy = y, a = 1, s = .9 + rnd(i) * .5;
+    if (!blocked) { if (k < .45) { x = lerp(520, 172, eo(k / .45)); yy = y + Math.sin(k * 20 + i) * 10; } else { const q = (k - .45) / .55; x = lerp(172, 80, q); a = 1 - q * .6; s *= 1 - q * .5; if (q > .9) hits++; } }
+    else { if (k < .45) x = lerp(520, 196, eo(k / .45)); else { const q = (k - .45) / .55; x = lerp(196, 430, eo(q)); yy = y - 120 * q + 160 * q * q; a = 1 - q; } }
+    snow(x, yy, s, a, t * 2 + i);
+  }
+  return hits;
+}
+function sceneInside(t, fromDive) {
+  bg([[0, '#1A1B4B'], [.6, '#2B2466'], [1, '#3E2B73']]);
+  glow(540, 760, 820, 'rgba(110,140,255,.28)'); particles(t, 26, 9, 'rgba(160,200,255,.9)', 9, .55);
+  const st = insideState(t);
+  // camera: wide on the tooth; push to the right root for the tubes and the cold; back out for "brushed"
+  const zIn = eio(seg(t, K.exposed - .2, K.tubes + .2)), zOut = eio(seg(t, K.cold + 2.4, K.cold + 3.0));
+  let fx = lerp(0, 132, zIn), fy = lerp(-60, 40, zIn), z = lerp(.86, 1.95, zIn);
+  if (fromDive) z *= lerp(1.6, 1, eo(seg(t, K.inside + .35, K.enamel + .3)));
+  const nIn = seg(t, K.nerve - .3, K.nerve + .3); fx = lerp(fx, 110, nIn * (1 - seg(t, K.cold - .1, K.cold + .4)) * .5);
+  X.save(); X.translate(540, 760); X.scale(z, z); X.translate(-fx, -fy);
+  X.save(); X.globalAlpha = .9; glow(0, -100, 700, 'rgba(255,255,255,.10)'); X.restore();
+  // hard brushing
+  const bk = seg(t, K.brushed - .25, K.thin + .5);
+  st.nerveHot = Math.max(seg(t, K.nerve - .1, K.nerve + .2) * (1 - seg(t, K.nerve + .5, K.cold)) * .6, 0);
+  let hot = 0;
+  toothXS(st, t);
+  if (t > K.cold - .1 && t < K.clinic) { hot = coldFlow(t, st, K.cold - .1, false); st.nerveHot = clamp(.55 + .45 * Math.sin(t * 30)) * seg(t, K.cold + .35, K.cold + .6); }
+  if (st.nerveHot > 0 && t > K.cold + .3 && t < K.clinic) { X.save(); X.globalAlpha = st.nerveHot; for (let i = 0; i < 2; i++) bolt(40, -60 + i * 40, 90, 280 + i * 40, 10, Math.floor(t * 16) * 5 + i * 9, .9); X.restore(); }
+  if (bk > 0 && bk < 1) { const ox = Math.sin(t * 32) * 70, e = Math.sin(bk * Math.PI);
+    X.save(); X.globalAlpha = clamp(e * 3); brush(330 + ox, -120, 1.15, -1.1, false); X.restore();
+    for (let i = 0; i < 12; i++) { const q = ((t * 2.2 + rnd(i)) % 1); circle(230 + q * 260 * rnd(i + 3), -180 + (rnd(i + 7) - .5) * 200 + q * 120, 6 * (1 - q), `rgba(255,255,255,${(1 - q) * e})`); }
+    for (let i = 0; i < 3; i++) { X.save(); X.globalAlpha = .5 * e; X.strokeStyle = '#FFFFFF'; X.lineWidth = 6; X.lineCap = 'round'; X.beginPath(); X.moveTo(470, -260 + i * 50); X.lineTo(560, -260 + i * 50); X.stroke(); X.restore(); } }
+  X.restore();
+  // labels (screen space)
+  const ws = (lx, ly) => [540 + (lx - fx) * z, 760 + (ly - fy) * z];
+  const tEn = seg(t, K.enamel, K.enamel + .35) * (1 - seg(t, K.thin + .1, K.thin + .4));
+  if (tEn > 0) { const [px, py] = ws(-150, -420); label('ENAMEL · the shield', 360, 270, tEn, '#FFFFFF', '#2F6BFF', 44, px, py); }
+  const tB = seg(t, K.brushed, K.brushed + .3) * (1 - seg(t, K.thin + .2, K.thin + .5)); if (tB > 0) label('brushing too hard!', 690, 1110, tB, '#FFFFFF', P.red, 46);
+  const tT = seg(t, K.thin, K.thin + .3) * (1 - seg(t, K.gums + .1, K.gums + .4)); if (tT > 0) { const [px, py] = ws(-120, -440); label('enamel wears thin', 380, 270, tT, P.ink, '#FFFFFF', 46, px, py); }
+  const tG = seg(t, K.gums, K.gums + .3) * (1 - seg(t, K.exposed + .2, K.exposed + .5)); if (tG > 0) { const [px, py] = ws(330, st.gumY + 20); label('gums pull back', 700, 1110, tG, P.ink, '#FFC2CD', 46, px, py); }
+  const tR = seg(t, K.exposed + .1, K.exposed + .4) * (1 - seg(t, K.tubes - .3, K.tubes - .05)); if (tR > 0) { const [px, py] = ws(172, 40); label('ROOT exposed', 560, 300, tR, P.ink, '#FFB347', 50, px, py); }
+  const tU = seg(t, K.tubes, K.tubes + .3) * (1 - seg(t, K.nerve - .3, K.nerve - .05)); if (tU > 0) { const [px, py] = ws(130, 30); label('tiny tubes', 560, 300, tU, P.ink, '#FFF1D6', 52, px, py); }
+  const tN = seg(t, K.nerve, K.nerve + .3) * (1 - seg(t, K.cold - .3, K.cold - .05)); if (tN > 0) { const [px, py] = ws(60, 100); label('NERVE', 560, 300, tN, P.ink, P.nerve, 54, px, py); }
+  const tC = seg(t, K.cold + .1, K.cold + .4) * (1 - seg(t, K.door - .2, K.door)); if (tC > 0) label('cold rushes in', 560, 300, tC, P.ink, P.cold, 52);
+  // "like opening a door in winter"
+  const dk = seg(t, K.door - .45, K.door - .05) * (1 - seg(t, K.clinic - .55, K.clinic - .25));
+  if (dk > 0) { X.save(); const e = back(dk, 1.4); X.translate(540, 470); X.scale(e, e); X.globalAlpha = clamp(dk * 3);
+    X.shadowColor = 'rgba(0,0,0,.35)'; X.shadowBlur = 30; circle(0, 0, 250, '#EAF7FF'); X.shadowColor = 'transparent';
+    X.save(); X.beginPath(); X.arc(0, 0, 250, 0, 6.29); X.clip(); X.fillStyle = grad(-250, 250, [[0, '#BFE7FF'], [1, '#EAF7FF']]); X.fillRect(-250, -250, 500, 500);
+    rr(-120, -170, 240, 340, 10, '#7A4B2A'); rr(-104, -154, 208, 324, 6, '#1E2B4A');
+    const op = eio(seg(t, K.door - .2, K.door + .4));
+    for (let i = 0; i < 22; i++) { const q = ((t * .9 + rnd(i)) % 1); if (op > 0) snow(lerp(-80, 260, q) + rnd(i + 2) * 60, -140 + rnd(i + 9) * 290 + Math.sin(q * 9 + i) * 14, .8 + rnd(i) * .6, op * (1 - q)); }
+    X.save(); X.translate(-104, -154); X.scale(Math.cos(op * 1.2), 1); rr(0, 0, 208, 324, 6, '#C98552'); circle(180, 170, 12, '#F6D365'); X.restore();
+    X.restore(); X.lineWidth = 12; X.strokeStyle = '#FFFFFF'; X.beginPath(); X.arc(0, 0, 250, 0, 6.29); X.stroke(); X.restore(); }
+}
+function sceneClinic(t) {
+  bg([[0, '#E6F6FF'], [1, '#BFE3F7']]);
+  rr(0, 1180, W, 740, 0, '#A9D3EA');
+  X.save(); X.globalAlpha = .5; for (let i = 0; i < 5; i++) rr(40 + i * 210, 180, 170, 260, 24, '#FFFFFF'); X.restore();
+  // dental chair + lamp
+  rr(60, 1020, 360, 70, 34, '#2E9CCB'); rr(320, 820, 80, 260, 36, '#2E9CCB'); rr(180, 1090, 60, 140, 12, '#8FA9BC'); rr(100, 1220, 220, 28, 14, '#8FA9BC');
+  X.strokeStyle = '#8FA9BC'; X.lineWidth = 14; X.lineCap = 'round'; X.beginPath(); X.moveTo(150, 520); X.quadraticCurveTo(160, 680, 260, 760); X.stroke(); ell(140, 510, 80, 36, '#FFFFFF');
+  const ek = eo(seg(t, K.clinic - .2, K.clinic + .4));
+  doctor(lerp(-200, 330, ek), 760, 1.0, t);
+  // magnifier: the real cause
+  const mk = back(seg(t, K.clinic + .5, K.clinic + .95), 1.3);
+  if (mk > 0) { X.save(); X.translate(700, 640); X.scale(mk, mk);
+    X.strokeStyle = '#4B5563'; X.lineWidth = 34; X.lineCap = 'round'; X.beginPath(); X.moveTo(150, 170); X.lineTo(290, 330); X.stroke();
+    X.save(); X.beginPath(); X.arc(0, 0, 230, 0, 6.29); X.clip(); X.fillStyle = '#2B2466'; X.fillRect(-240, -240, 480, 480);
+    X.save(); X.translate(-60, 20); X.scale(.62, .62); toothXS({ thin: 1, gumY: 115, boneY: 175, seal: 0, tubes: 1, nerveHot: 0, glowRoot: .8 + .2 * Math.sin(t * 6) }, t); X.restore();
+    X.restore(); X.lineWidth = 22; X.strokeStyle = '#4B5563'; X.beginPath(); X.arc(0, 0, 230, 0, 6.29); X.stroke(); X.restore(); }
+  const ck = seg(t, K.cause - .1, K.cause + .25);
+  if (ck > 0) { label('REAL CAUSE', 700, 330, ck, '#FFFFFF', P.ink, 50); label('hard brushing', 560, 1010, seg(t, K.cause + .05, K.cause + .35), '#FFFFFF', P.red, 40); label('gums pulled back', 830, 1090, seg(t, K.cause + .2, K.cause + .5), P.ink, '#FFC2CD', 40); }
+}
+function sceneFix(t) {
+  bg([[0, '#13304A'], [.6, '#1D4A63'], [1, '#226B73']]);
+  glow(540, 760, 820, 'rgba(80,230,210,.22)'); particles(t, 22, 41, 'rgba(170,255,240,.9)', 8, .5);
+  const st = { thin: 1, gumY: 115, boneY: 175, seal: eio(seg(t, K.sealed, K.sealed + 1.0)), tubes: 1, nerveHot: 0, glowRoot: 0 };
+  const zo = eio(seg(t, K.soft - .5, K.soft)), z = lerp(1.95, 1.5, zo), fx = 132, fy = 40;
+  const panel = eio(seg(t, K.soft - .35, K.soft + .1));
+  X.save(); X.translate(540, 760); X.scale(z, z); X.translate(-fx, -fy);
+  toothXS(st, t);
+  // the applicator paints the coat on
+  const ak = seg(t, K.sealed - .2, K.sealed + 1.1);
+  if (ak > 0 && ak < 1) { const y = lerp(-60, st.gumY + 10, eio(seg(t, K.sealed, K.sealed + 1.0))); X.save(); X.globalAlpha = Math.sin(ak * Math.PI) * 1.5;
+    X.translate(250, y - 40); X.rotate(-.6); rr(0, -14, 260, 28, 14, '#E8EEF5'); rr(-34, -10, 44, 20, 10, P.seal); X.restore(); }
+  if (t > K.sealed + .9 && t < K.soft) coldFlow(t, st, K.sealed + .9, true);
+  X.restore();
+  const tS = seg(t, K.sealed + .3, K.sealed + .6) * (1 - panel); if (tS > 0) label('sealed & protected', 540, 300, tS, P.ink, '#9FF3E9', 52);
+  // soft brush, gentle circles: a panel over the dimmed scene (the brief: darken behind graphics)
+  if (panel > 0) { X.save(); X.globalAlpha = panel * .55; X.fillStyle = '#0B1424'; X.fillRect(0, 0, W, H); X.restore();
+    X.save(); const e = back(clamp(panel), 1.3); X.translate(540, 720); X.scale(e, e);
+    X.shadowColor = 'rgba(0,0,0,.35)'; X.shadowBlur = 40; rr(-450, -400, 900, 800, 60, '#FFFFFF'); X.shadowColor = 'transparent';
+    // row 1: the hard brush, crossed out
+    X.save(); X.translate(-300, -190); brush(0, 0, 1.0, 0, false); X.restore();
+    text('HARD', 300, -205, 46, '#9AA3AF', 800);
+    const xk = seg(t, K.soft - .15, K.soft + .15); if (xk > 0) { X.save(); X.strokeStyle = P.red; X.lineWidth = 20; X.lineCap = 'round'; X.globalAlpha = clamp(xk * 3);
+      const q1 = eo(clamp(xk * 1.6)), q2 = eo(clamp(xk * 1.6 - .6));
+      X.beginPath(); X.moveTo(-380, -320); X.lineTo(lerp(-380, 160, q1), lerp(-320, -110, q1)); if (q2 > 0) { X.moveTo(160, -320); X.lineTo(lerp(160, -380, q2), lerp(-320, -110, q2)); } X.stroke(); X.restore(); }
+    X.save(); X.globalAlpha = .25; X.fillStyle = '#9AA3AF'; X.fillRect(-380, -40, 760, 4); X.restore();
+    // row 2: the soft brush in gentle circles
+    const sk = seg(t, K.soft, K.soft + .3);
+    if (sk > 0) { const an = t * 4.2; X.save(); X.globalAlpha = clamp(sk * 3); X.translate(-300 + Math.cos(an) * 26, 170 + Math.sin(an) * 26); brush(0, 0, 1.0, 0, true); X.restore();
+      const ck = seg(t, K.circles - .1, K.circles + .4); X.save(); X.globalAlpha = clamp(ck * 2); X.strokeStyle = '#7C5CFF'; X.lineWidth = 10; X.lineCap = 'round';
+      for (let i = 0; i < 3; i++) { const a0 = t * 3 + i * 2.09; X.beginPath(); X.arc(-300, 120, 100, a0, a0 + 1.3); X.stroke(); const ax = -300 + Math.cos(a0 + 1.3) * 100, ay = 120 + Math.sin(a0 + 1.3) * 100;
+        X.save(); X.translate(ax, ay); X.rotate(a0 + 1.3 + Math.PI / 2); X.beginPath(); X.moveTo(0, -18); X.lineTo(18, 0); X.lineTo(0, 18); X.fillStyle = '#7C5CFF'; X.fill(); X.restore(); } X.restore();
+      text('SOFT', 300, 155, 46, '#7C5CFF', 800, 'center', clamp(sk * 3));
+      X.save(); X.globalAlpha = clamp(sk * 3); circle(300, 75, 40, P.green); X.strokeStyle = '#FFFFFF'; X.lineWidth = 12; X.lineCap = 'round'; X.lineJoin = 'round'; X.beginPath(); X.moveTo(280, 75); X.lineTo(295, 91); X.lineTo(322, 59); X.stroke(); X.restore(); }
+    text('Soft brush · gentle circles', 0, 330, 50, P.ink, 800, 'center', seg(t, K.circles, K.circles + .3));
+    X.restore(); }
+}
+// ---------- captions (word by word; lines 4 and 13 carry their own text on screen) ----------
+const CHUNKS = [];
+LINES.forEach(L => { if (L.i === 4 || L.i === 13) return; let cur = [];
+  L.words.forEach((w, j) => { cur.push(w); const end = /[.,?!]$/.test(w.w) || cur.length >= 4 || j === L.words.length - 1; if (end) { CHUNKS.push(cur); cur = []; } }); });
+CHUNKS.forEach((c, i) => { c.t0 = c[0].s - .05; c.t1 = i + 1 < CHUNKS.length ? Math.min(CHUNKS[i + 1][0].s - .05, c[c.length - 1].e + .6) : c[c.length - 1].e + .6; });
+const HOT = /^(zap|cold|enamel|shield|thin|gums|root|tubes|nerve|sealed|soft|kulfi|ice|hating|cause|winter|hard|inside)/i;
+function captions(t) {
+  const c = CHUNKS.find(c => t >= c.t0 && t < c.t1); if (!c) return;
+  const k = seg(t, c.t0, c.t0 + .14); X.save(); X.font = '800 70px P'; X.textBaseline = 'middle';
+  const parts = c.map(w => w.w.toUpperCase()), widths = parts.map(p => X.measureText(p).width), gap = 22, tw = widths.reduce((a, b) => a + b, 0) + gap * (parts.length - 1);
+  let x = 540 - tw / 2; const y = 1240, sc = lerp(.9, 1, eo(k));
+  X.translate(540, y); X.scale(sc, sc); X.translate(-540, -y); X.globalAlpha = clamp(k * 3);
+  parts.forEach((p, i) => { const w = c[i], on = t >= w.s - .03, hot = HOT.test(w.w);
+    X.lineJoin = 'round'; X.lineWidth = 16; X.strokeStyle = 'rgba(20,14,45,.92)'; X.strokeText(p, x, y);
+    X.fillStyle = on ? (hot ? P.yellow : '#FFFFFF') : 'rgba(255,255,255,.55)'; X.fillText(p, x, y); x += widths[i] + gap; });
+  X.restore();
+}
+// ---------- timeline ----------
+function seek(t) {
+  X.setTransform(1, 0, 0, 1, 0, 0); X.globalAlpha = 1; X.clearRect(0, 0, W, H);
+  const xf = (t0, d) => seg(t, t0, t0 + d);                       // crossfade helper
+  if (t < K.warm - .1) sceneRiya(t, 'hook');
+  else if (t < K.what) { sceneHabits(t); const a = 1 - xf(K.warm - .1, .25); if (a > 0) { X.save(); X.globalAlpha = a; sceneRiya(t, 'hook'); X.restore(); } }
+  else if (t < K.inside + .75) { sceneDive(t); const a = 1 - xf(K.what, .3); if (a > 0) { X.save(); X.globalAlpha = a; sceneHabits(t); X.restore(); } }
+  else if (t < K.clinic - .2) sceneInside(t, true);
+  else if (t < K.sealed - .25) { sceneClinic(t); const a = 1 - xf(K.clinic - .2, .3); if (a > 0) { X.save(); X.globalAlpha = a; sceneInside(t, true); X.restore(); } }
+  else if (t < K.now - .15) { sceneFix(t); const a = 1 - xf(K.sealed - .25, .3); if (a > 0) { X.save(); X.globalAlpha = a; sceneClinic(t); X.restore(); } }
+  else { sceneRiya(t, 'happy'); const a = 1 - xf(K.now - .15, .3); if (a > 0) { X.save(); X.globalAlpha = a; sceneFix(t); X.restore(); }
+    const ck = seg(t, K.cta, K.cta + .3); if (ck > 0) { X.save(); X.globalAlpha = .55 * ck; X.fillStyle = '#2A1240'; X.fillRect(0, 230, W, 300); X.restore();
+      text('Sensitive teeth?', 540, 320, 84, '#FFFFFF', 800, 'center', ck, [P.ink, 10]); text("Don't live with it.", 540, 430, 76, P.yellow, 800, 'center', seg(t, K.cta + .5, K.cta + .75), [P.ink, 10]); } }
+  captions(t);
+}
+window.seek = seek;
+window.ready = Promise.all(['500 40px P', '600 40px P', '700 40px P', '800 40px P'].map(f => document.fonts.load(f))).then(() => document.fonts.ready);
+</script></body></html>
