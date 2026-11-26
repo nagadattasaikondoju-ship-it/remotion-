@@ -2,7 +2,7 @@
 import json, numpy as np, soundfile as sf
 from faster_whisper import WhisperModel
 STARTS = [0.25, 1.85, 4.15, 7.15, 11.15, 13.55, 16.85, 19.30, 22.90, 26.00, 28.60, 33.15, 34.85]
-DUR = 39.8; SR = 48000
+DUR = 40.4; SR = 48000
 texts = [l.rstrip("\n").split("\t")[2] for l in open("vo/lines.tsv")]
 m = WhisperModel("small.en", device="cpu", compute_type="int8")
 out = np.zeros(int(DUR * SR), np.float32); lines = []

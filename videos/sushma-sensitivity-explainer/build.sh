@@ -6,7 +6,7 @@
 # + critique; no music under animation, per the sound playbook) -> two-pass loudnorm -14 LUFS / -1.5 dBTP -> MASTER + share.
 set -euo pipefail
 HERE=$(cd "$(dirname "$0")" && pwd); REPO=$(cd "$HERE/../.." && pwd); cd "$HERE"
-N=DrSriSushma_IceCreamBetrayal_Sensitivity_Explainer; FPS=60; TEND=36.5; CARD=3.3; DUR=39.8
+N=DrSriSushma_IceCreamBetrayal_Sensitivity_Explainer; FPS=60; TEND=37.55; CARD=2.85; DUR=40.4
 ffmpeg -nostdin -v error -y -sseof -0.03 -i out/explainer.mp4 -frames:v 1 -update 1 endcard/out/last_frame.png
 (cd endcard && FPS=$FPS CARD_DUR=$CARD NODE_PATH=$(npm root -g) node render.cjs | tail -1)
 ffmpeg -nostdin -v error -y -i out/explainer.mp4 -i endcard/out/card.mp4 -filter_complex "[0:v]trim=0:$TEND,setpts=PTS-STARTPTS[a];[a][1:v]concat=n=2:v=1:a=0,format=yuv420p[v]" -map "[v]" \
@@ -25,7 +25,7 @@ def wt(li, w, nth=0):
             n += 1
     return L[li - 1]["start"]
 ls = lambda li: L[li - 1]["start"]
-TE = 36.5
+TE = 37.55
 C = [(wt(1, "loved") + .05, "pop", .3, "hearts float up: Riya loves ice cream"),
      (wt(2, "hating") + .05, "boing", .35, "the kulfi turns angry"),
      (wt(3, "bite") + .02, "crunch", .4, "the bite"),

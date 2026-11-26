@@ -16,8 +16,8 @@ const run = a => new Promise(r => spawn('ffmpeg', a, { stdio: 'inherit' }).on('c
       await run(['-v', 'error', '-y', '-i', p + '.png', '-vf', 'scale=540:960:flags=lanczos', p + '.jpg']); fs.unlinkSync(p + '.png'); }
     await browser.close(); return; }
   const enc = spawn('ffmpeg', ['-v', 'error', '-y', '-f', 'image2pipe', '-framerate', String(FPS), '-i', '-', '-vf', 'scale=1080:1920:flags=lanczos,format=yuv420p',
-    '-c:v', 'libx264', '-preset', 'medium', '-crf', '8', '-tune', 'animation', '-r', String(FPS), path.join(HERE, 'out', 'explainer.mp4')], { stdio: ['pipe', 'inherit', 'inherit'] });
-  const N = Math.round(TEND * FPS);
-  for (let f = 0; f < N; f++) { const b = await grab(f / FPS); if (!enc.stdin.write(b)) await new Promise(r => enc.stdin.once('drain', r)); if (f % 90 === 0) console.log(`frame ${f}/${N}`); }
+    '-c:v', 'libx264', '-preset', 'medium', '-crf', '8', '-tune', 'animation', '-r', String(FPS), process.env.OUT || path.join(HERE, 'out', 'explainer.mp4')], { stdio: ['pipe', 'inherit', 'inherit'] });
+  const N = Math.round(TEND * FPS), F0 = Math.round(Number(process.env.FROM || 0) * FPS);   // FROM=<s> OUT=<file>: render only the tail
+  for (let f = F0; f < N; f++) { const b = await grab(f / FPS); if (!enc.stdin.write(b)) await new Promise(r => enc.stdin.once('drain', r)); if (f % 90 === 0) console.log(`frame ${f}/${N}`); }
   enc.stdin.end(); await new Promise(r => enc.on('close', r)); await browser.close(); console.log(`out/explainer.mp4: ${N} frames`);
 })();

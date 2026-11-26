@@ -18,7 +18,7 @@ canvas { display: block; }
 <script src="timeline.js"></script>
 <script>
 const C = document.getElementById('c'), X = C.getContext('2d'), W = 1080, H = 1920;
-const TEND = 36.5;
+const TEND = 37.55;
 window.TIMING = { TEND };
 // ---------- maths ----------
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), lerp = (a, b, k) => a + (b - a) * k, seg = (t, a, b) => clamp((t - a) / (b - a));
