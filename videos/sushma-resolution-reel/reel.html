@@ -2,12 +2,12 @@
 <html><head><meta charset="utf-8">
 <!-- "Making a resolution to fix your…": Dr. Sri Sushma Multispeciality Dental Clinic, rebuilt beat for beat from the user's reference
      (a dental-brand ad measured frame by frame, 27 Nov 2026) in the clinic's logo blues. Pure function of time: seek(t).
-       0.00-3.00  "bleeding gums."  3D model: red swollen gums, droplets -> calm, healthy pink
+     The 3D model follows the reference's: a monochrome white "clay" typodont (sculpted gums, root bulges, lattice-gridded bases, soft AO).
+       0.00-3.00  "bleeding gums."  the gums glow red, droplets -> clean again
        3.00-3.25  whip pan          3.25-6.20 "missing tooth."  a gap -> implant screw rises in, the crown seats
        6.20-6.45  whip pan          6.45-8.30 "stained teeth."  yellow, tartar -> a cleaning sweep turns them white
-       8.20-8.55  corner wipe to white       8.55-10.0 "Happy smile year" (brush script zoom) + confetti
-      10.00-10.50 "Dr. Sri Sushma is"        10.6-11.9 "unleashing confident smiles in Moula Ali." (the logo's own tagline)
-      11.90-12.40 push-in + blue gradient wipe; the clinic end card (endcard/) follows.
+       8.20-8.55  corner wipe to white       8.55-10.6 "Dr. Sri Sushma is / unleashing / confident smiles / across Hyderabad."
+      10.60-11.15 push-in + blue gradient wipe; the clinic end card (endcard/, unchanged from the earlier reels) follows.
      Only problems the clinic is on record for (gum specialist + implantologist) are shown; no statistics. -->
 <style>
 @font-face { font-family: I; font-weight: 100 900; src: url(fonts/Inter-var.ttf); }
@@ -22,7 +22,7 @@ html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; backgro
 import * as THREE from 'three';
 import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 const C = document.getElementById('c'), X = C.getContext('2d'), W = 1080, H = 1920;
-const TEND = 12.4; window.TIMING = { TEND };
+const TEND = 11.15; window.TIMING = { TEND };
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), lerp = (a, b, k) => a + (b - a) * k, seg = (t, a, b) => clamp((t - a) / (b - a));
 const eo = k => 1 - Math.pow(1 - k, 3), eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2, ei = k => k * k * k;
 const back = (k, s = 1.6) => k <= 0 ? 0 : 1 + (s + 1) * Math.pow(k - 1, 3) + s * Math.pow(k - 1, 2);
@@ -31,104 +31,113 @@ const B = { b1: '#2373A1', b2: '#3283CC', b3: '#66B7FC', b4: '#9AD4FF', navy: '#
 const MARK = new Image(); MARK.src = 'img/mark.png';
 // ---------- timeline keys ----------
 const K = { a0: 0, aFix: 1.0, aEnd: 3.0, b0: 3.25, bScrew: 4.0, bCrown: 4.85, bEnd: 6.2, c0: 6.45, cSweep: 6.95, cEnd: 8.3,
-  wipe: 8.2, smile: 8.5, happy: 8.75, conf: 9.3, name: 10.0, is: 10.25, l2: 10.6, l3: 11.25, push: 11.85, grad: 12.0 };
-// ================= 3D dental model =================
+  wipe: 8.2, name: 8.5, is: 8.8, l2: 9.2, push: 10.6, grad: 10.72 };
+// ================= 3D dental model: a monochrome white "clay" typodont, like the reference =================
 const GL = document.getElementById('g');
 const R = new THREE.WebGLRenderer({ canvas: GL, antialias: true, alpha: true, preserveDrawingBuffer: true });
-R.setSize(1080, 1080, false); R.setPixelRatio(1); R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap;
-R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1.05;
-const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(19, 1, .1, 100); cam.position.set(0, 1.6, 21); cam.lookAt(0, -.05, -.9);
-scene.add(new THREE.HemisphereLight('#EAF4FF', '#5A6F8C', 1.35));
-const key = new THREE.DirectionalLight('#FFFFFF', 2.1); key.position.set(-4, 7, 9); key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.radius = 6;
+R.setSize(1080, 1080, false); R.setPixelRatio(1); R.setClearColor(0x000000, 0); R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap;
+R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = 1.0;
+const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(17, 1, .1, 100); cam.position.set(0, 7.2, 28.5); cam.lookAt(0, -.05, -1.3);
+scene.add(new THREE.HemisphereLight('#F4F8FF', '#7D8796', 1.55));
+const key = new THREE.DirectionalLight('#FFFFFF', 1.9); key.position.set(-3, 9, 8); key.castShadow = true; key.shadow.mapSize.set(2048, 2048); key.shadow.radius = 5; key.shadow.bias = -.0004;
 Object.assign(key.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: 1, far: 30 }); scene.add(key);
-const rim = new THREE.DirectionalLight('#9AD4FF', 1.1); rim.position.set(6, 3, -6); scene.add(rim);
-const fill = new THREE.DirectionalLight('#FFFFFF', .5); fill.position.set(5, -2, 8); scene.add(fill);
+const key2 = new THREE.DirectionalLight('#FFFFFF', .7); key2.position.set(5, 6, 7); key2.castShadow = true; key2.shadow.mapSize.set(1024, 1024); key2.shadow.radius = 6;
+Object.assign(key2.shadow.camera, { left: -5, right: 5, top: 5, bottom: -5, near: 1, far: 30 }); scene.add(key2);
+const rim = new THREE.DirectionalLight('#D6ECFF', .8); rim.position.set(0, 4, -8); scene.add(rim);
 const model = new THREE.Group(); scene.add(model);
-const ENAMEL = new THREE.Color('#F5F2EC'), STAIN = new THREE.Color('#D8B064');
-const GUM_OK = new THREE.Color('#EC8C98'), GUM_RED = new THREE.Color('#C42B45');
-const gumMat = new THREE.MeshPhysicalMaterial({ color: GUM_OK.clone(), roughness: .48, clearcoat: .35, clearcoatRoughness: .5, sheen: .4, sheenColor: new THREE.Color('#FFC2CC') });
+// materials: clay white for everything (teeth a touch brighter and smoother), a lattice grid on the bases
+const CLAY = new THREE.Color('#E9EAED'), ENAMEL = new THREE.Color('#F3F3F1'), STAIN = new THREE.Color('#DCC58E'), GUM_RED = new THREE.Color('#D4475E');
+const gridTex = (() => { const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d'); g.fillStyle = '#ECEDF0'; g.fillRect(0, 0, 256, 256);
+  g.strokeStyle = '#A3AAB4'; g.lineWidth = 3; for (let i = 0; i <= 256; i += 16) { g.beginPath(); g.moveTo(i, 0); g.lineTo(i, 256); g.stroke(); g.beginPath(); g.moveTo(0, i); g.lineTo(256, i); g.stroke(); }
+  const t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(44, 7); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; })();
+const baseMat = new THREE.MeshStandardMaterial({ color: '#FFFFFF', map: gridTex, roughness: .85 });
+const gumMat = new THREE.MeshStandardMaterial({ color: CLAY.clone(), roughness: .8 });
 // arch: teeth laid along an ellipse by arc length (centre outwards: incisor, lateral, canine, premolars, molars)
-const DIM = [[.88, 1.05, .40], [.70, .92, .40], [.78, 1.06, .58], [.72, .86, .70], [.72, .84, .72], [1.0, .80, .95], [.96, .76, .95]];
+const DIM = [[.92, 1.06, .44], [.74, .95, .42], [.8, 1.04, .6], [.76, .9, .72], [.76, .88, .74], [1.04, .82, .96], [1.0, .8, .96]];
 const ARCH_A = 2.55, ARCH_B = 2.3;
-function archPoint(s) { // s = arc length from the front centre (+ to the viewer's right)
+function archPoint(s) {
   let phi = 0, acc = 0; const step = .002, dir = Math.sign(s);
   while (acc < Math.abs(s) && phi < 1.6) { const p0 = [ARCH_A * Math.sin(phi), ARCH_B * Math.cos(phi)]; phi += step; const p1 = [ARCH_A * Math.sin(phi), ARCH_B * Math.cos(phi)]; acc += Math.hypot(p1[0] - p0[0], p1[1] - p0[1]); }
   return { x: dir * ARCH_A * Math.sin(phi), z: ARCH_B * (Math.cos(phi) - 1), rot: dir * phi };
 }
-function toothGeo(w, h, d, upper) {
-  const g = new RoundedBoxGeometry(w, h, d, 5, Math.min(w, d) * .38), p = g.attributes.position;
-  for (let i = 0; i < p.count; i++) { let x = p.getX(i), y = p.getY(i), z = p.getZ(i); const v = (y / h + .5);   // 0 bottom .. 1 top
-    const toGum = upper ? v : 1 - v; x *= lerp(1.0, .78, toGum); z *= lerp(1.0, .86, toGum);
-    if (z > 0) z += .06 * Math.cos(x / w * Math.PI) * (1 - Math.abs(v - .5));   // a gently convex face
+function toothGeo(w, h, d, upper, k = 0) {   // a soft, rounded crown: tapered to the neck, convex face, rounded incisal corners, a cusp on the canine
+  const g = new RoundedBoxGeometry(w, h, d, 7, Math.min(w, d) * .36), p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) { let x = p.getX(i), y = p.getY(i), z = p.getZ(i); const v = clamp(y / h + .5);
+    const toGum = upper ? v : 1 - v; x *= lerp(1.0, .8, Math.pow(toGum, 1.6)); z *= lerp(1.0, .86, toGum);
+    if (z > 0) z += .07 * Math.cos(clamp(x / w, -.5, .5) * Math.PI) * (1 - Math.abs(v - .5));
+    const edge = 1 - toGum; if (edge > .72) { const q = (edge - .72) / .28, cx = Math.min(1, Math.abs(x) / (w / 2));
+      const tip = k === 2 ? .17 * (1 - Math.min(1, cx * 1.4)) : -.07 * cx * cx * cx; y += (upper ? -1 : 1) * tip * q; }
     p.setXYZ(i, x, y, z); }
   g.computeVertexNormals(); return g;
 }
-const teeth = [];   // {mesh, upper, side, k, mat}
+const teeth = [];
 function buildArch(upper) {
-  const yGum = upper ? 1.02 : -1.02; let s = 0;
+  const yGum = upper ? .95 : -1.02, sgn = upper ? 1 : -1, zOff = upper ? 0 : -.22; let s = 0; const sculpt = [];
   for (const side of [-1, 1]) { s = 0;
     DIM.forEach(([w, h, d], k) => { const scaleL = upper ? 1 : (k < 2 ? .78 : .95), ww = w * scaleL, hh = h * (upper ? 1 : .94);
-      const c = s + ww / 2 + .015; s += ww + .03; const ap = archPoint(side * c);
-      const mat = new THREE.MeshPhysicalMaterial({ color: ENAMEL.clone(), roughness: .26, clearcoat: .7, clearcoatRoughness: .25, sheen: .2 });
-      const m = new THREE.Mesh(toothGeo(ww, hh, d, upper), mat); m.castShadow = true; m.receiveShadow = true;
-      m.position.set(ap.x, upper ? yGum - hh / 2 : yGum + hh / 2, ap.z - (upper ? 0 : .16)); m.rotation.y = ap.rot;
-      m.userData = { base: m.position.clone(), upper, side, k, h: hh }; model.add(m); teeth.push(m); });
+      const c = s + ww / 2 + .004; s += ww + .008; const ap = archPoint(side * c);
+      const mat = new THREE.MeshStandardMaterial({ color: ENAMEL.clone(), roughness: .5 });
+      const m = new THREE.Mesh(toothGeo(ww, hh, d, upper, k), mat); m.castShadow = true; m.receiveShadow = true;
+      m.position.set(ap.x, yGum - sgn * hh / 2, ap.z + zOff); m.rotation.y = ap.rot;
+      m.userData = { base: m.position.clone(), upper, side, k, h: hh }; model.add(m); teeth.push(m);
+      // root bulge above the crown + a cap hugging the neck (the scalloped gum)
+      const bulge = new THREE.Mesh(new THREE.SphereGeometry(.5, 28, 20), gumMat); bulge.scale.set(ww * 1.04, .7, d * .84 + .12);
+      bulge.position.set(ap.x, yGum + sgn * .3, ap.z + zOff - .01); bulge.rotation.y = ap.rot; bulge.castShadow = bulge.receiveShadow = true; model.add(bulge); sculpt.push(bulge);
+      const cap = new THREE.Mesh(new THREE.SphereGeometry(.5, 28, 16, 0, Math.PI * 2, 0, Math.PI / 2), gumMat); cap.scale.set(ww * .96, sgn * -.3, d * 1.04);
+      cap.position.set(ap.x, yGum + sgn * .03, ap.z + zOff); cap.rotation.y = ap.rot; cap.receiveShadow = true; model.add(cap); sculpt.push(cap);
+      if (false) { const pap = new THREE.Mesh(new THREE.SphereGeometry(.5, 20, 14), gumMat); pap.scale.set(.18, .3, .3); const ap2 = archPoint(side * (s - .012));
+        pap.position.set(ap2.x, yGum - sgn * .05, ap2.z + zOff + .05); pap.receiveShadow = true; model.add(pap); sculpt.push(pap); pap.userData.pap = true; } });
   }
-  // gum: a soft horseshoe above (or below) the teeth, scalloped with papillae between the teeth
-  const shape = new THREE.Shape(), N = 64, a1 = ARCH_A + .5, b1 = ARCH_B + .5, a0 = ARCH_A - .55, b0 = ARCH_B - .55, PH = 1.62;
-  for (let i = 0; i <= N; i++) { const ph = -PH + 2 * PH * i / N; const x = a1 * Math.sin(ph), z = b1 * (Math.cos(ph) - 1) - .05; i ? shape.lineTo(x, z) : shape.moveTo(x, z); }
-  for (let i = N; i >= 0; i--) { const ph = -PH + 2 * PH * i / N; shape.lineTo(a0 * Math.sin(ph) * 1.0, b0 * (Math.cos(ph) - 1) - .55); }
-  const gg = new THREE.ExtrudeGeometry(shape, { depth: .78, bevelEnabled: true, bevelThickness: .22, bevelSize: .2, bevelSegments: 6, curveSegments: 48 });
-  gg.rotateX(Math.PI / 2); const gum = new THREE.Mesh(gg, gumMat); gum.position.y = upper ? yGum + .9 : yGum - .12; gum.receiveShadow = true; gum.castShadow = true; model.add(gum);
-  const pap = []; for (const side of [-1, 1]) { s = 0; DIM.forEach(([w], k) => { const ww = w * (upper ? 1 : (k < 2 ? .78 : .95)); s += ww + .03; if (k > 4) return;
-    const ap = archPoint(side * (s - .015)), sp = new THREE.Mesh(new THREE.SphereGeometry(.2, 20, 14), gumMat); sp.scale.set(1, 1.5, .9);
-    sp.position.set(ap.x, upper ? yGum - .06 : yGum + .06, ap.z + .02 - (upper ? 0 : .16)); sp.userData = { base: sp.position.clone(), upper }; model.add(sp); pap.push(sp); }); }
-  // a gum band hugging every tooth neck, so the scallop reads
-  for (const side of [-1, 1]) { s = 0; DIM.forEach(([w, h, d], k) => { const ww = w * (upper ? 1 : (k < 2 ? .78 : .95)); const c = s + ww / 2 + .015; s += ww + .03; const ap = archPoint(side * c);
-    const cap = new THREE.Mesh(new THREE.SphereGeometry(.5, 24, 16, 0, Math.PI * 2, 0, Math.PI / 2), gumMat); cap.scale.set(ww * .95, upper ? -.34 : .34, d * 1.05);
-    cap.position.set(ap.x, upper ? yGum + .02 : yGum - .02, ap.z - (upper ? 0 : .16)); cap.rotation.y = ap.rot; model.add(cap); pap.push(cap); }); }
-  return { gum, pap };
+  // the alveolar band behind the bulges and the gridded base disc (a rounded slab, like the reference model's)
+  const shape = new THREE.Shape(), N = 64, a1 = ARCH_A + .04, b1 = ARCH_B + .04, a0 = ARCH_A - .8, b0 = ARCH_B - .8, PH = 1.58;
+  for (let i = 0; i <= N; i++) { const ph = -PH + 2 * PH * i / N; const x = a1 * Math.sin(ph), z = b1 * (Math.cos(ph) - 1); i ? shape.lineTo(x, z) : shape.moveTo(x, z); }
+  shape.closePath();   // solid behind the arch (no hollow to see into from above)
+  const bg = new THREE.ExtrudeGeometry(shape, { depth: .4, bevelEnabled: true, bevelThickness: .25, bevelSize: .22, bevelSegments: 10, curveSegments: 64 }); bg.rotateX(Math.PI / 2);
+  const band = new THREE.Mesh(bg, gumMat); band.position.set(0, upper ? yGum + .95 : yGum - .25, zOff); band.castShadow = band.receiveShadow = true; model.add(band);
+  const prof = []; const RR = .3, Hh = 1.0; for (let i = 0; i <= 10; i++) { const a = -Math.PI / 2 + i / 10 * Math.PI / 2; prof.push(new THREE.Vector2(1 - RR + RR * Math.cos(a), -Hh / 2 + RR + RR * Math.sin(a))); }
+  for (let i = 0; i <= 10; i++) { const a = i / 10 * Math.PI / 2; prof.push(new THREE.Vector2(1 - RR + RR * Math.cos(a), Hh / 2 - RR + RR * Math.sin(a))); }
+  prof.unshift(new THREE.Vector2(0, -Hh / 2)); prof.push(new THREE.Vector2(0, Hh / 2));
+  const disc = new THREE.Mesh(new THREE.LatheGeometry(prof, 120), baseMat); disc.scale.set(ARCH_A + .72, 1, ARCH_B * .86);
+  disc.position.set(0, upper ? yGum + 1.42 : yGum - .98, -ARCH_B * .74 + zOff); disc.castShadow = disc.receiveShadow = true; model.add(disc);
+  return sculpt;
 }
-const UP = buildArch(true), LO = buildArch(false);
-const PAP = [...UP.pap, ...LO.pap];
+const SCULPT = [...buildArch(true), ...buildArch(false)];
 const gap = teeth.find(m => m.userData.upper && m.userData.side === 1 && m.userData.k === 1);   // the missing tooth: upper lateral incisor (viewer's right)
-// implant screw + crown
-const metal = new THREE.MeshStandardMaterial({ color: '#C3CCD6', metalness: .92, roughness: .28 });
+const metal = new THREE.MeshStandardMaterial({ color: '#B9C3CE', metalness: .9, roughness: .3, envMapIntensity: 1 });
 const screw = new THREE.Group(); { const core = new THREE.Mesh(new THREE.CylinderGeometry(.13, .1, .95, 32), metal); screw.add(core);
   for (let i = 0; i < 8; i++) { const th = new THREE.Mesh(new THREE.TorusGeometry(.15 - i * .004, .035, 10, 32), metal); th.rotation.x = Math.PI / 2; th.position.y = .38 - i * .11; screw.add(th); }
   const head = new THREE.Mesh(new THREE.CylinderGeometry(.16, .16, .12, 6), metal); head.position.y = -.53; screw.add(head); }
-screw.position.copy(gap.userData.base); scene.add(screw); model.add(screw);
-// droplets and tartar
-const blood = new THREE.MeshPhysicalMaterial({ color: '#B0122E', roughness: .12, clearcoat: 1, transmission: 0 });
+model.add(screw);
+const blood = new THREE.MeshStandardMaterial({ color: '#B0122E', roughness: .15, metalness: .1 });
 const drops = []; [[-1, 0], [1, 0], [-1, 1], [1, 2]].forEach(([side, k], i) => { const m = teeth.find(t => t.userData.upper && t.userData.side === side && t.userData.k === k);
-  const d = new THREE.Mesh(new THREE.SphereGeometry(.075, 16, 12), blood); d.scale.set(1, 1.35, 1); d.userData = { m, i }; model.add(d); drops.push(d); });
-const tartarMat = new THREE.MeshStandardMaterial({ color: '#8A6A2E', roughness: .85 });
+  const d = new THREE.Mesh(new THREE.SphereGeometry(.06, 16, 12), blood); d.scale.set(1, 1.35, 1); d.userData = { m, i }; model.add(d); drops.push(d); });
+const tartarMat = new THREE.MeshStandardMaterial({ color: '#9C7C3E', roughness: .9 });
 const tartar = []; teeth.forEach((m, i) => { if (m.userData.k > 3) return; for (let j = 0; j < 3; j++) { const b = new THREE.Mesh(new THREE.SphereGeometry(.07 + rnd(i * 3 + j) * .05, 10, 8), tartarMat);
   b.scale.set(1.5, .7, .6); b.userData = { m, j }; model.add(b); tartar.push(b); } });
+// soft ambient occlusion (the reference's clay render has deep contact shadows between the teeth)
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { GTAOPass } from 'three/addons/postprocessing/GTAOPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+const composer = new EffectComposer(R); composer.addPass(new RenderPass(scene, cam));
+const ao = new GTAOPass(scene, cam, 1080, 1080); ao.blendIntensity = 1.0; ao.updateGtaoMaterial({ radius: .35, distanceExponent: 1.4, thickness: 1.5, scale: 1.2, samples: 16 }); ao.updatePdMaterial({ lumaPhi: 10, depthPhi: 2, normalPhi: 3, radius: 6, rings: 2, samples: 16 });
+composer.addPass(ao); composer.addPass(new OutputPass());
+window.AO = ao;
 // ---------- per-frame state ----------
-let mode = 'gums';
 function setModel(t) {
-  const ca = seg(t, K.aFix, K.aFix + 1.4), inflamed = 1 - eio(ca);
-  const scene3 = t < K.aEnd + .12 ? 'A' : t < K.bEnd + .12 ? 'B' : 'C';
-  // gums
-  const inf = scene3 === 'A' ? inflamed : 0; gumMat.color.copy(GUM_OK).lerp(GUM_RED, inf);
-  PAP.forEach(p => p.scale.multiplyScalar(1));
-  UP.pap.concat(LO.pap).forEach(p => { if (!p.userData.base) return; const s = 1 + .35 * inf; p.scale.set(s, 1.5 * s, .9 * s); });
+  const ca = seg(t, K.aFix, K.aFix + 1.4), scene3 = t < K.aEnd + .12 ? 'A' : t < K.bEnd + .12 ? 'B' : 'C';
+  const inf = scene3 === 'A' ? 1 - eio(ca) : 0; gumMat.color.copy(CLAY).lerp(GUM_RED, inf * .85);
+  SCULPT.forEach(p => { if (p.userData.pap) { const s = 1 + .5 * inf; p.scale.set(.18 * s, .3 * s, .3 * s); } });
   drops.forEach(d => { const m = d.userData.m, f = scene3 === 'A' ? clamp(1 - ca * 1.6) : 0, fall = (t * .18 + d.userData.i * .07) % .5; d.visible = f > .02;
-    d.position.set(m.position.x + (d.userData.i % 2 ? .12 : -.1), m.userData.base.y + m.userData.h / 2 - .14 - fall * f, m.position.z + .24); d.scale.set(f, 1.35 * f, f); });
-  // missing tooth -> implant -> crown
-  const sB = scene3 === 'B';
-  const sk = seg(t, K.bScrew, K.bScrew + .8), ck = seg(t, K.bCrown, K.bCrown + .6);
+    d.position.set(m.position.x + (d.userData.i % 2 ? .2 : -.18), m.userData.base.y + m.userData.h / 2 - .06 - fall * f * .6, m.position.z + .2); d.scale.set(f, 1.35 * f, f); });
+  const sB = scene3 === 'B', sk = seg(t, K.bScrew, K.bScrew + .8), ck = seg(t, K.bCrown, K.bCrown + .6);
   screw.visible = sB && sk > 0; screw.position.set(gap.userData.base.x, lerp(-1.6, gap.userData.base.y + gap.userData.h / 2 + .38, eio(sk)), gap.userData.base.z); screw.rotation.y = sk * 9;
-  gap.visible = !sB || ck > 0; const cy = lerp(-1.9, gap.userData.base.y, back(ck, 1.2));
-  gap.position.set(gap.userData.base.x, sB ? cy : gap.userData.base.y, gap.userData.base.z);
-  // stains + tartar -> clean (a sweep from left to right)
+  gap.visible = !sB || ck > 0; gap.position.set(gap.userData.base.x, sB ? lerp(-1.9, gap.userData.base.y, back(ck, 1.2)) : gap.userData.base.y, gap.userData.base.z);
   const sC = scene3 === 'C', sw = lerp(-3.6, 3.6, eio(seg(t, K.cSweep, K.cSweep + 1.0)));
-  teeth.forEach(m => { const clean = sC ? clamp((sw - m.position.x) / .6 + .5) : 1; m.material.color.copy(ENAMEL).lerp(STAIN, 1 - clean); m.material.clearcoat = lerp(.15, .7, clean); m.userData.clean = clean; });
-  tartar.forEach(b => { const m = b.userData.m, c = m.userData.clean, show = sC ? 1 - clamp(c * 1.4) : 0; b.visible = show > .02; const sgn = m.userData.upper ? 1 : -1;
-    b.position.set(m.position.x + (b.userData.j - 1) * .18, m.userData.base.y + sgn * (m.userData.h / 2 - .1), m.position.z + .2 + Math.cos(m.rotation.y) * .02); b.rotation.y = m.rotation.y; b.scale.set(1.5 * show, .7 * show, .6 * show); });
-  // gentle turntable + float
-  model.rotation.y = Math.sin(t * .55) * .14; model.rotation.x = -.06; model.position.y = Math.sin(t * 1.3) * .06;
+  teeth.forEach(m => { const clean = sC ? clamp((sw - m.position.x) / .6 + .5) : 1; m.material.color.copy(ENAMEL).lerp(STAIN, 1 - clean); m.userData.clean = clean; });
+  tartar.forEach(b => { const m = b.userData.m, c = m.userData.clean, show = sC ? 1 - clamp(c * 1.4) : 0; b.visible = show > .02; const sg = m.userData.upper ? 1 : -1;
+    b.position.set(m.position.x + (b.userData.j - 1) * .18, m.userData.base.y + sg * (m.userData.h / 2 - .1), m.position.z + .2 + Math.cos(m.rotation.y) * .02); b.rotation.y = m.rotation.y; b.scale.set(1.5 * show, .7 * show, .6 * show); });
+  model.rotation.y = Math.sin(t * .55) * .12; model.rotation.x = -.04; model.position.y = Math.sin(t * 1.3) * .05;
 }
 // ================= 2D layers =================
 function rr(x, y, w, h, r) { X.beginPath(); X.roundRect(x, y, w, h, r); }
@@ -146,16 +155,16 @@ function sceneProblems(t) {
   // soft floor shadow
   X.save(); X.translate(off, 0); X.globalAlpha = .55; const sh = X.createRadialGradient(540, 1585, 10, 540, 1585, 380); sh.addColorStop(0, 'rgba(10,40,90,.55)'); sh.addColorStop(1, 'rgba(10,40,90,0)'); X.fillStyle = sh; X.save(); X.scale(1, .18); X.fillRect(0, 1585 / .18 - 400, W, 800); X.restore(); X.restore();
   // the 3D model (rendered square, 1080x1080, centred at y 1250)
-  setModel(t); R.render(scene, cam);
+  setModel(t); composer.render();
   const n = blur > .05 ? 7 : 1;
-  for (let i = 0; i < n; i++) { X.save(); X.globalAlpha = n > 1 ? 1 / n * 1.6 : 1; X.drawImage(GL, off + (i - (n - 1) / 2) * 34 * blur, 710, 1080, 1080); X.restore(); }
+  for (let i = 0; i < n; i++) { X.save(); X.globalAlpha = n > 1 ? 1 / n * 1.6 : 1; X.drawImage(GL, off + (i - (n - 1) / 2) * 34 * blur, 760, 1080, 1080); X.restore(); }
   // label + headline (headline stays still, like the reference)
   for (let i = 0; i < (blur > .05 ? 5 : 1); i++) { X.save(); X.globalAlpha = blur > .05 ? .3 : 1; X.shadowColor = 'rgba(8,40,90,.35)'; X.shadowBlur = 18; X.shadowOffsetY = 5;
     txt(LABELS[li][0], 540 + off + (i - 2) * 26 * blur, 750, 104, '#FFFFFF', 800, 'I', 'center', 1, -1.5); X.restore(); }
   X.save(); X.shadowColor = 'rgba(8,40,90,.3)'; X.shadowBlur = 14; X.shadowOffsetY = 4;
   txt('Dr. Sri Sushma is', 540, 330, 58, '#FFFFFF', 800); txt('making a resolution', 540, 402, 58, '#FFFFFF', 500); txt('to fix your…', 540, 474, 58, '#FFFFFF', 500); X.restore();
   // bottom lockup (the reference's logo line)
-  markAt(392, 1712, 44); txt('DR. SRI SUSHMA', 424, 1714, 30, '#FFFFFF', 800, 'I', 'left', 1, 1); txt('Multispeciality Dental Clinic · Moula Ali', 540, 1760, 25, 'rgba(255,255,255,.85)', 600);
+  markAt(392, 1712, 44); txt('DR. SRI SUSHMA', 424, 1714, 30, '#FFFFFF', 800, 'I', 'left', 1, 1); txt('Multispeciality Dental Clinic · Hyderabad', 540, 1760, 25, 'rgba(255,255,255,.85)', 600);
   // sparkle on each fix
   [[K.aFix + 1.2, 540, 1180], [K.bCrown + .5, 640, 1180], [K.cSweep + 1.0, 760, 1170]].forEach(([t0, x, y]) => { const k = seg(t, t0, t0 + .7); if (k > 0 && k < 1) for (let i = 0; i < 6; i++) {
     const a = i * 1.05 + .3, r = 40 + 160 * eo(k); star(x + Math.cos(a) * r, y + Math.sin(a) * r * .6, (1 - k) * 1.2, '#FFFFFF', 1 - k); } });
@@ -165,32 +174,16 @@ function star(x, y, s, col, a) { if (s <= 0 || a <= 0) return; X.save(); X.globa
 function sceneType(t) {
   X.fillStyle = '#FFFFFF'; X.fillRect(0, 0, W, H);
   const fl = X.createLinearGradient(0, 1500, 0, H); fl.addColorStop(0, 'rgba(225,232,240,0)'); fl.addColorStop(1, 'rgba(205,215,228,.9)'); X.fillStyle = fl; X.fillRect(0, 1500, W, 420);
-  if (t < K.name - .05) {   // Happy smile year
-    const zk = eio(seg(t, K.smile - .25, K.smile + .55)), sc = lerp(9, 1, zk);
-    const hk = eo(seg(t, K.happy, K.happy + .35)), yk = eo(seg(t, K.happy + .1, K.happy + .45));
-    txt('Happy', lerp(-260, 470, hk), 900, 124, B.grey, 700, 'I', 'center', clamp(hk * 2), -2);
-    txt('year', lerp(1340, 640, yk), 1120, 124, B.grey, 700, 'I', 'center', clamp(yk * 2), -2);
-    X.save(); X.translate(560, 1010); X.scale(sc, sc); X.rotate(-.06); X.font = '170px S'; X.textAlign = 'center'; X.textBaseline = 'middle'; X.fillStyle = B.b2; X.fillText('smile', 0, 0); X.restore();
-    const ck = seg(t, K.conf, K.conf + 1.1);   // confetti burst
-    if (ck > 0 && ck < 1) for (let i = 0; i < 46; i++) { const a = -Math.PI / 2 + (rnd(i) - .5) * 2.6, v = 600 + rnd(i + 9) * 700, x = 540 + Math.cos(a) * v * ck, y = 820 + Math.sin(a) * v * ck + 900 * ck * ck;
-      X.save(); X.globalAlpha = 1 - ck * ck; X.translate(x, y); X.rotate(rnd(i + 3) * 6 + ck * 8 * (rnd(i + 5) - .5)); X.fillStyle = [B.b1, B.b2, B.b3, '#0A2557', '#9AD4FF'][i % 5]; X.fillRect(-4, -18, 8, 36); X.restore(); }
-    return;
-  }
-  // "Dr. Sri Sushma is" -> the tagline
-  const up = eio(seg(t, K.l2 - .1, K.l2 + .35)), s1 = lerp(1, .62, up), y1 = lerp(960, 800, up);
-  X.save(); X.translate(540, y1); X.scale(s1, s1); X.font = '800 112px I'; X.letterSpacing = '-3px'; const w1 = X.measureText('Dr. Sri Sushma').width, w2 = X.measureText(' is').width;
+  // "Dr. Sri Sushma" lands big, "is" slams in from the right, then it rises and the tagline builds word by word
+  const up = eio(seg(t, K.l2 - .1, K.l2 + .35)), s1 = lerp(1, .62, up), y1 = lerp(960, 720, up);
+  X.save(); X.translate(540, y1); X.scale(s1, s1); X.font = '800 128px I'; X.letterSpacing = '-4px'; const w1 = X.measureText('Dr. Sri Sushma').width, w2 = X.measureText(' is').width;
   const ik = eo(seg(t, K.is, K.is + .25)); X.textBaseline = 'middle'; X.textAlign = 'left'; X.fillStyle = B.grey;
   const nk = eo(seg(t, K.name - .05, K.name + .25)); X.globalAlpha = nk; X.fillText('Dr. Sri Sushma', -(w1 + w2 * ik) / 2, 0);
   X.globalAlpha = clamp(ik * 2); X.fillText(' is', -(w1 + w2 * ik) / 2 + w1 + lerp(420, 0, ik), 0); X.restore();
-  const words = [['unleashing', B.b1, K.l2 + .1], ['confident', B.b2, K.l2 + .35], ['smiles', '#1C6FC2', K.l2 + .6]];
-  X.save(); X.font = '800 88px I'; X.letterSpacing = '-2px'; const ws = words.map(w => X.measureText(w[0]).width); X.restore();
-  // two lines: "unleashing confident" / "smiles in Moula Ali."
-  let x = 540 - (ws[0] + 26 + ws[1]) / 2;
-  words.slice(0, 2).forEach(([w, col, t0], i) => { const k = eo(seg(t, t0, t0 + .25)); X.save(); X.globalAlpha = k; X.translate(0, (1 - k) * 24); txt(w, x, 905, 88, col, 800, 'I', 'left', 1, -2); X.restore(); x += ws[i] + 26; });
-  X.save(); X.font = '800 88px I'; X.letterSpacing = '-2px'; const wIn = X.measureText(' in Moula Ali.').width; X.restore();
-  x = 540 - (ws[2] + wIn) / 2; const k3 = eo(seg(t, words[2][2], words[2][2] + .25)), k4 = eo(seg(t, K.l3, K.l3 + .3));
-  X.save(); X.globalAlpha = k3; X.translate(0, (1 - k3) * 24); txt('smiles', x, 1010, 88, words[2][1], 800, 'I', 'left', 1, -2); X.restore();
-  X.save(); X.globalAlpha = k4; X.translate(0, (1 - k4) * 24); txt(' in Moula Ali.', x + ws[2], 1010, 88, B.grey, 800, 'I', 'left', 1, -2); X.restore();
+  const rows = [[['unleashing', B.b1, K.l2 + .1]], [['confident', B.b2, K.l2 + .35], ['smiles', '#1C6FC2', K.l2 + .6]], [['across', B.grey, K.l2 + .85], ['Hyderabad.', B.grey, K.l2 + 1.05]]];
+  rows.forEach((row, ri) => { X.save(); X.font = '800 96px I'; X.letterSpacing = '-2px'; const ws = row.map(w => X.measureText(w[0]).width); X.restore();
+    let x = 540 - (ws.reduce((a, b) => a + b, 0) + 26 * (row.length - 1)) / 2; const y = 860 + ri * 112;
+    row.forEach(([w, col, t0], i) => { const k = eo(seg(t, t0, t0 + .25)); X.save(); X.globalAlpha = k; X.translate(0, (1 - k) * 26); txt(w, x, y, 96, col, 800, 'I', 'left', 1, -2); X.restore(); x += ws[i] + 26; }); });
 }
 // ---------- timeline ----------
 function seek(t) {
@@ -209,6 +202,6 @@ function seek(t) {
       X.fillStyle = '#0A2557'; X.fillRect(0, 0, Math.max(0, x), H); X.restore(); } }
 }
 window.seek = seek;
-window.ready = (async () => { await document.fonts.load('800 40px I'); await document.fonts.load('500 40px I'); await document.fonts.load('700 40px I'); await document.fonts.load('40px S'); await document.fonts.ready;
+window.ready = (async () => { await document.fonts.load('800 40px I'); await document.fonts.load('500 40px I'); await document.fonts.load('700 40px I'); await document.fonts.ready;
   await new Promise(r => MARK.complete ? r() : (MARK.onload = r)); })();
 </script></body></html>
