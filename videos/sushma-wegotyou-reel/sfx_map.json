@@ -1,0 +1,32 @@
+{
+ "tick": {
+  "ids": [
+   24
+  ],
+  "role": "click"
+ },
+ "tock": {
+  "ids": [
+   23
+  ],
+  "role": "click"
+ },
+ "whoosh": {
+  "ids": [
+   56
+  ],
+  "role": "whoosh"
+ },
+ "pop": {
+  "ids": [
+   65
+  ],
+  "role": "ui"
+ },
+ "chime": {
+  "ids": [
+   61
+  ],
+  "role": "ui"
+ }
+}
