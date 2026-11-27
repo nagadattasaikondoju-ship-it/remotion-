@@ -1,0 +1,122 @@
+[
+ {
+  "t": 2.2,
+  "type": "sparkle",
+  "g": 0.4,
+  "note": "gums clean again"
+ },
+ {
+  "t": 3.0,
+  "type": "swipe",
+  "g": 0.42,
+  "note": "whip pan"
+ },
+ {
+  "t": 4.0,
+  "type": "drill",
+  "g": 0.28,
+  "note": "the implant screws in"
+ },
+ {
+  "t": 5.28,
+  "type": "seat",
+  "g": 0.4,
+  "note": "the crown seats"
+ },
+ {
+  "t": 5.35,
+  "type": "sparkle",
+  "g": 0.35,
+  "note": "gap filled"
+ },
+ {
+  "t": 6.2,
+  "type": "swipe",
+  "g": 0.42,
+  "note": "whip pan"
+ },
+ {
+  "t": 6.95,
+  "type": "softwhoosh",
+  "g": 0.35,
+  "note": "the cleaning sweep"
+ },
+ {
+  "t": 7.95,
+  "type": "sparkle",
+  "g": 0.4,
+  "note": "white again"
+ },
+ {
+  "t": 8.2,
+  "type": "whoosh",
+  "g": 0.42,
+  "note": "the page sweeps in"
+ },
+ {
+  "t": 8.5,
+  "type": "pop",
+  "g": 0.38,
+  "note": "Dr. Sri Sushma"
+ },
+ {
+  "t": 8.82,
+  "type": "slam",
+  "g": 0.42,
+  "note": "'is' slams in"
+ },
+ {
+  "t": 9.3,
+  "type": "pop",
+  "g": 0.28,
+  "note": "unleashing"
+ },
+ {
+  "t": 9.55,
+  "type": "pop",
+  "g": 0.28,
+  "note": "confident"
+ },
+ {
+  "t": 9.8,
+  "type": "pop",
+  "g": 0.28,
+  "note": "smiles"
+ },
+ {
+  "t": 10.05,
+  "type": "pop",
+  "g": 0.26,
+  "note": "across"
+ },
+ {
+  "t": 10.25,
+  "type": "pop",
+  "g": 0.3,
+  "note": "Hyderabad."
+ },
+ {
+  "t": 10.6,
+  "type": "whoosh",
+  "g": 0.4,
+  "note": "push-in and the blue sweep"
+ },
+ {
+  "t": 11.17,
+  "type": "whoosh",
+  "g": 0.45,
+  "note": "the clinic card pops up"
+ },
+ {
+  "t": 11.47,
+  "type": "pop",
+  "g": 0.5,
+  "note": "the logo lands"
+ },
+ {
+  "t": 12.27,
+  "type": "chime",
+  "g": 0.45,
+  "note": "BOOK AN APPOINTMENT lands"
+ }
+]
