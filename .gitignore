@@ -56,3 +56,6 @@ tools/models/
 
 # Downloaded third-party content for research (other brands own it): keep out of git
 research/
+
+# local voice-cloning venv (Chatterbox, re-create per container)
+tools/voice-clone/.venv/
