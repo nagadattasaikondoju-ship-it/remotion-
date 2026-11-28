@@ -62,3 +62,6 @@ tools/voice-clone/.venv/
 
 # user voice samples and clones (private, never commit)
 voice-test/
+tools/voice-clone/voices/**/*.wav
+tools/voice-clone/voices/**/*.ogg
+tools/voice-clone/voices/**/*.mp3

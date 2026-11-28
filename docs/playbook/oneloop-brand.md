@@ -36,6 +36,8 @@ borrow their facts or visuals.
   - Loop ends are cut on 45° lines, leaving an even channel around the X.
   - The user flagged a hand-drawn approximation as "doesn't feel the same", so always use the traced artwork.
 
+- **Voice:** Naga Datta's cloned voice (approved by them) is saved for One Loop voiceovers. See CLAUDE.md, "Naga Datta's cloned voice".
+
 ## Palette (sampled from the logo + used in every One Loop edit)
 Website palette: black #000 / #161616 ground, cream text #E1E0CC, copper #E59C69 accent.
 

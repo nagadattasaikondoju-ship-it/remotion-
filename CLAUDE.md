@@ -19,6 +19,10 @@ Video editing workspace: Remotion app (`src/`, `pipeline/`) plus HyperFrames pro
   but still deliver the cue sheet/breakdown alongside the result.
 - Always send the finished video as a file (share copy + high-bitrate 1080×1920 master).
   They can't receive files on their desktop directly; they download from the app.
+- **Naga Datta's cloned voice (One Loop founder; approved by them 28 Nov 2026 for their own One Loop content).** Whenever a One Loop video needs Naga Datta's voice, use this clone. Don't use it for anyone else's words or brand without asking.
+  - Profile: `tools/voice-clone/voices/naga-datta/voice.json` (settings exaggeration 0.4, cfg 0.35, seed 2: the take Naga liked best). Speak with `tools/voice-clone/.venv/bin/python tools/voice-clone/say.py naga-datta OUT.wav "text"`, one sentence per call, numbers written as words.
+  - The audio (`ref.wav`, source note) is private and gitignored. In a fresh container, download `ref.wav` from the Drive folder "One Loop - Naga Datta voice (private)" (file id in `voice.json`) into that folder; check its sha256.
+  - Engine: Chatterbox 0.1.7 (MIT, local CPU). Fresh container: `python3.11 -m venv tools/voice-clone/.venv`, then `pip install torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cpu` and `pip install chatterbox-tts==0.1.7`. About 30 s per sentence. English works best; it adds an inaudible AI watermark.
 - Never fabricate client identity, payment records or press. Blur personal and client details.
   Ask before adding name tags.
 - Project briefs override the house standard for that project (e.g. One Loop: no music bed, dialogue dominant).
