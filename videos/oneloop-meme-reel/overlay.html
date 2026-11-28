@@ -46,10 +46,10 @@ const at = (l, word) => { const i = l.text.indexOf(word); return l.t0 + (l.t1 - 
 
 function caption(t) {                              // reference style: white bold sans, centred, under the picture
   for (const l of TL.lines) for (const [txt, a, b] of l.caps) if (t >= a && t < b) {
-    ctx.save(); ctx.font = '700 44px Mont'; ctx.textAlign = 'center'; ctx.fillStyle = WHT; ctx.textBaseline = 'alphabetic';
+    ctx.save(); ctx.font = '700 60px Mont'; ctx.textAlign = 'center'; ctx.fillStyle = WHT; ctx.textBaseline = 'alphabetic';
     const words = txt.split(' '), lines = []; let cur = '';
-    for (const w of words) { const n = cur ? cur + ' ' + w : w; if (ctx.measureText(n).width > 860 && cur) { lines.push(cur); cur = w; } else cur = n; }
-    lines.push(cur); lines.forEach((s, i) => ctx.fillText(s, W / 2, 1510 + i * 54 - (lines.length - 1) * 27)); ctx.restore(); return;
+    for (const w of words) { const n = cur ? cur + ' ' + w : w; if (ctx.measureText(n).width > 900 && cur) { lines.push(cur); cur = w; } else cur = n; }
+    lines.push(cur); lines.forEach((s, i) => ctx.fillText(s, W / 2, 1535 + i * 68 - (lines.length - 1) * 34)); ctx.restore(); return;
   }
 }
 const SCENES = {
