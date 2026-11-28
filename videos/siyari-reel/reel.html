@@ -14,7 +14,8 @@ html,body{margin:0;background:#000}#c{width:1080px;height:1920px;display:block}
 // Rings are 3D models of designs from Siyari's own catalogue (siyari.com/products.json). The logo is Siyari's artwork, never redrawn.
 import * as THREE from 'three';
 const W = 1080, H = 1920, S = 2;
-const T = { A0: 0, B0: 4.6, C0: 8.2, D0: 12.2, END: 16.0 };
+// One pass, cut to the reference ad's music (its loop unit: rings 5.9 s, cut on the beat, logo to 8.933 s)
+const T = { A0: 0, B0: 5.9, END: 8.933 };
 window.TIMING = { TEND: T.END };
 const INK = '#FAFCF9', GREEN = '#263A26';
 const cv = document.getElementById('c'), ctx = cv.getContext('2d');
@@ -308,10 +309,9 @@ function renderChain(S_, tl, t) {
 }
 function vignette(g, a) { const rg = g.createRadialGradient(W / 2, H / 2, H * .3, W / 2, H / 2, H * .75); rg.addColorStop(0, 'rgba(0,0,0,0)'); rg.addColorStop(1, `rgba(0,10,4,${a})`); g.fillStyle = rg; g.fillRect(0, 0, W, H); }
 const LOCK_B = lockupPlan(W / 2, 905, 4.7), LOCK_D = lockupPlan(W / 2, 770, 4.2);
-function renderSting(tl, P, cta) {
+function renderSting(tl, P, cta, FALL = .62) {
   drawStingBg(ctx);
   // 1) the diamond falls in, spinning, and lands as the crown on the swan's head
-  const FALL = .62;
   if (tl < FALL + .1) {
     const sub = 7, out = [];
     for (let k = sub - 1; k >= 0; k--) {
@@ -357,10 +357,7 @@ window.seek = t => {
   ctx.setTransform(S, 0, 0, S, 0, 0); ctx.clearRect(0, 0, W, H);
   if (t < T.B0) { renderChain(A, t - T.A0, t); vignette(ctx, .45); drawCorner();
     copyBlock(ctx, ['YOUR', 'DESIGN'], 112, 430, 'left', .25, t); copyBlock(ctx, ['MADE', 'REAL'], 905, 1330, 'right', 1.05, t); }
-  else if (t < T.C0) renderSting(t - T.B0, LOCK_B, false);
-  else if (t < T.D0) { const tl = t - T.C0; renderChain(C, tl, t); vignette(ctx, .45); drawCorner();
-    copyBlock(ctx, ['IGI', 'CERTIFIED'], 112, 430, 'left', .25, tl); copyBlock(ctx, ['BIS', 'HALLMARKED'], 905, 1330, 'right', 1.05, tl); }
-  else renderSting(t - T.D0, LOCK_D, true);
+  else renderSting(t - T.B0, LOCK_B, false, .71);   // diamond lands on the music hit at 6.61 s
 };
 window.ready = true;
 </script></body></html>

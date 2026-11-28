@@ -1,0 +1,105 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Siyari design your ring</title>
+<style>
+@font-face{font-family:Jost;src:url(fonts/Jost-var.ttf);font-weight:100 900}
+@font-face{font-family:Montserrat;src:url(fonts/Montserrat-var.ttf);font-weight:100 900}
+html,body{margin:0;background:#000}#c{width:1080px;height:1920px;display:block}
+</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body><canvas id="c" width="2160" height="3840"></canvas>
+<script type="module">
+// Siyari "Imagine it. Design it. Wear it." Follows reference r3 (macro: the diamond lifts out of its prongs -> pull back to the exploded
+// ring with three hand-drawn callouts and a title -> the finished ring resting against a prop -> logo sting), cut to that reference's own
+// music (rebuilt to its full 15.06 s: the screen recording muted its first 2.3 s, so the opening comes from the recording's second loop).
+// The ring is Siyari's round 6-prong solitaire (siyari.com 'paramount-solitaire-lab-grown-diamond-ring') in rose gold.
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { THREE, W, H, S, ctx, INK, clamp, lerp, ss, eio, eout, velvet, renderer, glc, ENV, GENV, gemGeo, METAL, renderSting, drawCorner, star, project, LOCK_B } from './lib.js';
+const T = { S2: 4.97, S3: 9.36, LOGO: 12.43, END: 15.06 };
+window.TIMING = { TEND: T.END };
+await document.fonts.load('500 40px Jost');
+const BG = new THREE.Color('#163a26');
+const sc = new THREE.Scene(); sc.environment = ENV; sc.background = BG; sc.fog = new THREE.Fog(BG, 9, 26);
+sc.add(new THREE.HemisphereLight(0xe8f0ea, 0x0b2014, .5));
+const key = new THREE.SpotLight(0xfff1e0, 60, 0, .5, .8, 2); key.position.set(-3, 7, 6); sc.add(key);
+const cam = new THREE.PerspectiveCamera(30, W / H, .05, 100);
+// ---------- the ring in three parts (shank, head, stone) so it can come apart
+const Rb = 1, TH = .13, BWd = .2, RO = Rb + TH / 2;
+const lat = (() => { const p = [], r0 = Rb - TH / 2, r1 = Rb + TH / 2, cr = .04, N = 6; const arc = (cx, cy, a0, a1) => { for (let i = 0; i <= N; i++) { const a = a0 + (a1 - a0) * i / N; p.push(new THREE.Vector2(cx + Math.cos(a) * cr, cy + Math.sin(a) * cr)); } };
+  arc(r1 - cr, -BWd / 2 + cr, -Math.PI / 2, 0); arc(r1 - cr, BWd / 2 - cr, 0, Math.PI / 2); arc(r0 + cr, BWd / 2 - cr, Math.PI / 2, Math.PI); arc(r0 + cr, -BWd / 2 + cr, Math.PI, Math.PI * 1.5); p.push(p[0].clone());
+  const g = new THREE.LatheGeometry(p, 160); g.rotateX(Math.PI / 2); return g; })();
+const M = METAL.rose.clone(); M.roughness = .12; M.envMapIntensity = 1.6;
+function buildRing() {
+  const ring = new THREE.Group(), shank = new THREE.Group(), head = new THREE.Group(), stone = new THREE.Group();
+  shank.add(new THREE.Mesh(lat, M));
+  // cathedral shoulders: two arms rising from the shank to the head
+  [-1, 1].forEach(sd => { const c = new THREE.CatmullRomCurve3([new THREE.Vector3(sd * .55, RO - .2, 0), new THREE.Vector3(sd * .34, RO + .02, 0), new THREE.Vector3(sd * .2, RO + .18, 0)]);
+    shank.add(new THREE.Mesh(new THREE.TubeGeometry(c, 24, .045, 10), M)); });
+  const s = .42, prong = new THREE.CylinderGeometry(.03, .036, .52, 12), tip = new THREE.SphereGeometry(.038, 14, 10);
+  for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3 + Math.PI / 6, x = Math.cos(a) * s * .98, z = Math.sin(a) * s * .98;
+    const pr = new THREE.Mesh(prong, M); pr.position.set(x * .86, .26, z * .86); pr.rotation.set(Math.sin(a) * .18, 0, -Math.cos(a) * .18); head.add(pr);
+    const tp = new THREE.Mesh(tip, M); tp.position.set(x * 1.0, .5, z * 1.0); head.add(tp); }
+  const rail = new THREE.Mesh(new THREE.TorusGeometry(s * .78, .035, 10, 64), M); rail.rotation.x = Math.PI / 2; rail.position.y = .16; head.add(rail);
+  const base = new THREE.Mesh(new THREE.CylinderGeometry(.16, .2, .14, 24), M); base.position.y = .02; head.add(base);
+  const gem = new THREE.Mesh(gemGeo('round', 7, null, 32), new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: 0, vertexColors: true, envMap: GENV, envMapIntensity: 2.1 }));
+  gem.scale.setScalar(s); stone.add(gem);
+  head.position.y = RO; stone.position.y = RO + .42;
+  ring.add(shank, head, stone); ring.userData = { shank, head, stone }; return ring;
+}
+const ring = buildRing(); sc.add(ring);
+const mirror = buildRing(); mirror.scale.y = -1; sc.add(mirror);           // reflection in the glossy floor
+const FLOOR_Y = -RO;
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshPhysicalMaterial({ color: '#173c27', roughness: .35, metalness: 0, clearcoat: .6, transparent: true, opacity: .86 }));
+floor.rotation.x = -Math.PI / 2; floor.position.y = FLOOR_Y; sc.add(floor);
+const cube = new THREE.Mesh(new RoundedBoxGeometry(1.7, 1.7, 1.7, 6, .16), new THREE.MeshPhysicalMaterial({ map: (() => { const t = new THREE.CanvasTexture(velvet(512, '#1f5236', 4, 9000)); t.colorSpace = THREE.SRGBColorSpace; return t; })(), roughness: .9, sheen: 1, sheenRoughness: .4, sheenColor: new THREE.Color('#6fbf8c') }));
+cube.position.set(-.95, FLOOR_Y + .85, -1.0); cube.rotation.y = .5; sc.add(cube);
+function pose(t) {                                  // explode amounts + ring/camera per shot
+  const P = { lift: 0, hlift: 0, ry: 0, rx: 0, cube: false, cam: null, look: null, fov: 30 };
+  if (t < T.S2) { const k = eio(clamp((t - .9) / 3.6)); P.lift = 1.25 * k; P.hlift = .38 * eio(clamp((t - 1.9) / 2.6));
+    P.cam = new THREE.Vector3(.0, RO + .55 + .9 * k, lerp(2.4, 4.2, eio(clamp(t / 4.97)))); P.look = new THREE.Vector3(0, RO + .45 + .65 * k, 0); P.ry = .25 - .12 * t / 5; P.fov = 32; }
+  else if (t < T.S3) { const u = t - T.S2, back = eio(clamp((u - 3.35) / .8));      // hold exploded, then everything clicks back together
+    P.lift = 1.25 * (1 - back); P.hlift = .38 * (1 - back); P.ry = .12 + .05 * u;
+    P.cam = new THREE.Vector3(0, 1.45, lerp(13.4, 12.8, u / 4.4)); P.look = new THREE.Vector3(0, 1.12, 0); P.fov = 30; }
+  else { const u = t - T.S3; P.cube = true; P.ry = .55 + .06 * u; P.rx = -.12;
+    P.cam = new THREE.Vector3(lerp(2.2, 1.4, u / 3.1), .75, lerp(8.8, 8.2, u / 3.1)); P.look = new THREE.Vector3(-.25, .35, -.2); P.fov = 30; }
+  return P;
+}
+function apply(P) {
+  for (const [r, sgn] of [[ring, 1], [mirror, -1]]) { const { head, stone } = r.userData;
+    head.position.y = RO + P.hlift; stone.position.y = RO + .42 + P.lift + P.hlift * .6; stone.rotation.set(.5 * P.lift / 1.25 * sgn, P.lift * 1.2, 0);
+    r.rotation.set(P.rx * sgn, P.ry, 0); r.position.y = sgn > 0 ? 0 : 2 * FLOOR_Y; }
+  cube.visible = P.cube; cam.fov = P.fov; cam.updateProjectionMatrix(); cam.position.copy(P.cam); cam.lookAt(P.look); cam.updateMatrixWorld();
+}
+// ---------- hand-drawn callouts (curved arrows) like the reference
+function arrow(g, x0, y0, cx, cy, x1, y1, k) {
+  k = Math.min(1, k); if (k <= 0) return; g.save(); g.strokeStyle = 'rgba(250,252,249,.85)'; g.lineWidth = 2.2; g.lineCap = 'round';
+  const N = 40, pts = []; for (let i = 0; i <= N * k; i++) { const u = i / N; pts.push([(1 - u) * (1 - u) * x0 + 2 * (1 - u) * u * cx + u * u * x1, (1 - u) * (1 - u) * y0 + 2 * (1 - u) * u * cy + u * u * y1]); }
+  g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke();
+  if (k > .98) { const [xa, ya] = pts[pts.length - 2], a = Math.atan2(y1 - ya, x1 - xa); g.beginPath(); g.moveTo(x1 - 16 * Math.cos(a - .45), y1 - 16 * Math.sin(a - .45)); g.lineTo(x1, y1); g.lineTo(x1 - 16 * Math.cos(a + .45), y1 - 16 * Math.sin(a + .45)); g.stroke(); }
+  g.restore();
+}
+function label(g, lines, x, y, align, k) { if (k <= 0) return; g.save(); g.globalAlpha = eout(k); g.font = '500 25px Jost'; g.letterSpacing = '2px'; g.fillStyle = INK; g.textAlign = align;
+  lines.forEach((l, i) => g.fillText(l, x, y + i * 33 + (1 - eout(k)) * 10)); g.restore(); }
+function title(g, lines, y, t0, t, size = 50) { const k = eout((t - t0) / .5); if (k <= 0) return; g.save(); g.globalAlpha = k; g.font = `500 ${size}px Jost`; g.letterSpacing = '3px'; g.textAlign = 'center'; g.fillStyle = INK;
+  g.shadowColor = 'rgba(0,12,5,.5)'; g.shadowBlur = 16; lines.forEach((l, i) => g.fillText(l, W / 2 + 1.5, y + i * size * 1.15 + (1 - k) * 14)); g.restore(); }
+window.seek = t => {
+  ctx.setTransform(S, 0, 0, S, 0, 0); ctx.clearRect(0, 0, W, H);
+  if (t >= T.LOGO) { renderSting(t - T.LOGO, LOCK_B, false, .5); return; }
+  const P = pose(t); apply(P); renderer.setClearColor(BG, 1); renderer.render(sc, cam); ctx.drawImage(glc, 0, 0, W, H);
+  const vg = ctx.createRadialGradient(W / 2, H * .45, H * .25, W / 2, H * .5, H * .78); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,10,4,.6)'); ctx.fillStyle = vg; ctx.fillRect(0, 0, W, H);
+  const { stone, head, shank } = ring.userData, wp = o => project(cam, o.getWorldPosition(new THREE.Vector3()));
+  if (t < T.S2) { const sp = wp(stone); const a = Math.exp(-Math.pow((t - 4.3) / .14, 2)); star(ctx, sp[0] + 40, sp[1] - 60, 120, a, .2); }
+  else if (t < T.S3) { const u = t - T.S2, d = clamp(1 - ss(3.3, 3.7, u)), sp = wp(stone), hp = wp(head), bp = project(cam, new THREE.Vector3(-RO, 0, 0).applyMatrix4(ring.matrixWorld));
+    ctx.save(); ctx.globalAlpha = d;
+    // labels sit in fixed safe columns; the arrows find the parts
+    label(ctx, ['CHOOSE THE DIAMOND', 'THAT MATCHES YOU'], 300, sp[1] - 120, 'center', (u - .35) / .4); arrow(ctx, 300, sp[1] - 60, 320, sp[1] + 10, sp[0] - 105, sp[1] + 5, (u - .55) / .45);
+    label(ctx, ['PERSONALISE IT WITH', 'DETAILS THAT MAKE', 'IT YOURS'], 820, hp[1] - 150, 'center', (u - .95) / .4); arrow(ctx, 820, hp[1] - 40, 820, hp[1] + 40, hp[0] + 80, hp[1] + 30, (u - 1.15) / .45);
+    label(ctx, ['CHOOSE THE SETTING', 'THAT FEELS TRUE', 'TO YOUR STYLE'], 230, bp[1] - 170, 'center', (u - 1.55) / .4); arrow(ctx, 230, bp[1] - 60, 230, bp[1] + 40, bp[0] - 20, bp[1] + 20, (u - 1.75) / .45);
+    ctx.restore();
+    title(ctx, ['IMAGINE IT. DESIGN IT.', 'WEAR IT.'], 1540, T.S2 + 2.1, t);
+    const a = Math.exp(-Math.pow((u - 4.05) / .1, 2)); star(ctx, sp[0], sp[1] - 20, 110, a, .3); }
+  else { title(ctx, ['YOUR DREAM JEWELLERY,', 'CRAFTED BY SIYARI'], 1520, T.S3 + .35, t, 46);
+    const sp = wp(stone), a = Math.exp(-Math.pow((t - T.S3 - 1.6) / .12, 2)); star(ctx, sp[0] + 10, sp[1] - 25, 90, a, .5); }
+  drawCorner();
+};
+window.ready = true;
+</script></body></html>

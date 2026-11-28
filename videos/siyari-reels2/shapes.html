@@ -1,0 +1,80 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Siyari next shape</title>
+<style>
+@font-face{font-family:Jost;src:url(fonts/Jost-var.ttf);font-weight:100 900}
+@font-face{font-family:Montserrat;src:url(fonts/Montserrat-var.ttf);font-weight:100 900}
+@font-face{font-family:Cormorant;src:url(fonts/CormorantGaramond-var.ttf);font-weight:300 700}
+html,body{margin:0;background:#000}#c{width:1080px;height:1920px;display:block}
+</style>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js","three/addons/":"./node_modules/three/examples/jsm/"}}</script>
+</head><body><canvas id="c" width="2160" height="3840"></canvas>
+<script type="module">
+// Siyari "What is your BEST / NEXT shape?". Follows reference r2 (a dial of diamond cuts turns one step per beat; a solitaire band crosses
+// the frame and its centre stone becomes whichever cut sits in the slot), cut to that reference's own music. Ends on the Siyari swan sting.
+import { THREE, W, H, S, ctx, INK, GREEN, clamp, lerp, ss, eio, eout, renderer, glc, GENV, gemGeo, drawStingBg, renderSting, drawCorner, star, LOCK_D } from './lib.js';
+const STEPS = [0.37, 1.35, 2.3, 3.08, 3.65, 4.45, 5.11];       // music hits (reference audio from 1.0 s)
+const T = { LOGO: 5.82, END: 9.3 };
+window.TIMING = { TEND: T.END };
+const CREAM = '#EDDAC2', DEEP = '#16301f';
+const CUTS = ['round', 'oval', 'pear', 'marquise', 'emerald', 'cushion'], NAMES = { round: 'ROUND', oval: 'OVAL', pear: 'PEAR', marquise: 'MARQUISE', emerald: 'EMERALD', cushion: 'CUSHION' };
+await document.fonts.load('600 160px Cormorant'); await document.fonts.load('italic 500 60px Cormorant'); await document.fonts.load('600 20px Montserrat');
+// ---------- top-view diamond sprites, rendered once with the shared gem model + sparkle environment
+const SPR = {};
+{ const sc = new THREE.Scene(); sc.environment = GENV; const cam = new THREE.OrthographicCamera(-1.15, 1.15, 1.15, -1.15, .1, 20); cam.position.set(0, 10, 0); cam.up.set(0, 0, -1); cam.lookAt(0, 0, 0);
+  const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: 0, vertexColors: true, envMap: GENV, envMapIntensity: 1.45 });
+  renderer.setScissorTest(true);
+  CUTS.forEach((c, i) => { const m = new THREE.Mesh(gemGeo(c, 61 + i), mat); m.rotation.y = c === 'round' ? .2 : 0; sc.add(m);
+    renderer.setViewport(0, 0, 512, 512); renderer.setScissor(0, 0, 512, 512); renderer.setClearColor(0, 0); renderer.render(sc, cam);
+    const cv = document.createElement('canvas'); cv.width = cv.height = 512; cv.getContext('2d').drawImage(glc, 0, glc.height - 512, 512, 512, 0, 0, 512, 512); SPR[c] = cv; sc.remove(m); });
+  renderer.setScissorTest(false); renderer.setViewport(0, 0, W * S, H * S); }
+// ---------- layout
+const DC = { x: 935, y: 960 }, RO_ = 470, RI = 300, RM = (RO_ + RI) / 2, N = 12;   // dial: 12 slots (6 cuts twice), slot = 9 o'clock
+const SLOT = { x: DC.x - RM, y: DC.y };
+function stepK(t) { let k = 0; STEPS.forEach(s => { k += eio(clamp((t - s) / .38)) + .06 * Math.sin(Math.PI * clamp((t - s) / .38)); }); return k; }
+const nSteps = t => STEPS.filter(s => t >= s + .19).length;
+function band(g) {                                 // white-gold shank seen from the front
+  const gr = g.createLinearGradient(0, DC.y - 11, 0, DC.y + 11);
+  gr.addColorStop(0, '#8d8f93'); gr.addColorStop(.35, '#f4f5f7'); gr.addColorStop(.55, '#c9cbcf'); gr.addColorStop(1, '#6d6f73'); g.fillStyle = gr;
+  g.fillRect(372, DC.y - 9, SLOT.x - 372 - 70, 18); g.fillRect(SLOT.x + 70, DC.y - 9, 640 - SLOT.x - 70, 18);
+}
+function prongs(g, x, y, r) { g.save(); g.fillStyle = '#e9eaed'; g.strokeStyle = 'rgba(80,80,85,.6)'; g.lineWidth = 1.5;
+  [45, 135, 225, 315].forEach(a => { const ax = x + Math.cos(a * Math.PI / 180) * r, ay = y + Math.sin(a * Math.PI / 180) * r; g.beginPath(); g.ellipse(ax, ay, 11, 9, a * Math.PI / 180, 0, 7); g.fill(); g.stroke(); }); g.restore(); }
+window.seek = t => {
+  ctx.setTransform(S, 0, 0, S, 0, 0); ctx.clearRect(0, 0, W, H);
+  if (t >= T.LOGO) { renderSting(t - T.LOGO, LOCK_D, true, .67); return; }         // crown lands on the hit at 6.49 s
+  drawStingBg(ctx);
+  const intro = eout(t / .45), k = stepK(t), ang = Math.PI + k * (2 * Math.PI / N);
+  // dial
+  ctx.save(); ctx.globalAlpha = intro; ctx.translate(lerp(160, 0, intro), 0);
+  ctx.shadowColor = 'rgba(0,10,4,.55)'; ctx.shadowBlur = 50; ctx.shadowOffsetY = 18;
+  ctx.fillStyle = CREAM; ctx.beginPath(); ctx.arc(DC.x, DC.y, RO_, 0, Math.PI * 2); ctx.arc(DC.x, DC.y, RI, 0, Math.PI * 2, true); ctx.fill(); ctx.shadowColor = 'transparent';
+  const rim = ctx.createRadialGradient(DC.x, DC.y, RI, DC.x, DC.y, RO_); rim.addColorStop(0, 'rgba(120,95,60,.18)'); rim.addColorStop(.12, 'rgba(0,0,0,0)'); rim.addColorStop(.9, 'rgba(0,0,0,0)'); rim.addColorStop(1, 'rgba(120,95,60,.2)');
+  ctx.fillStyle = rim; ctx.beginPath(); ctx.arc(DC.x, DC.y, RO_, 0, Math.PI * 2); ctx.arc(DC.x, DC.y, RI, 0, Math.PI * 2, true); ctx.fill();
+  for (let i = 0; i < N; i++) { const a = ang - i * 2 * Math.PI / N, x = DC.x + Math.cos(a) * RM, y = DC.y + Math.sin(a) * RM;
+    if (Math.abs(((a - Math.PI) % (2 * Math.PI) + 3 * Math.PI) % (2 * Math.PI) - Math.PI) < .2) continue;     // the slot shows the ring's stone instead
+    const c = CUTS[i % CUTS.length], sz = 138; ctx.save(); ctx.translate(x, y); ctx.rotate(a); ctx.filter = 'saturate(0.2) contrast(1.15)';
+    ctx.shadowColor = 'rgba(60,45,25,.35)'; ctx.shadowBlur = 12; ctx.drawImage(SPR[c], -sz / 2, -sz / 2, sz, sz); ctx.restore(); }
+  ctx.restore();
+  // the ring: shank + head with the slot's cut
+  ctx.save(); ctx.globalAlpha = intro; band(ctx);
+  const n = nSteps(t), cut = CUTS[n % CUTS.length], pop = 1 + .16 * Math.exp(-Math.pow(((t - (STEPS[n - 1] ?? -9)) - .22) / .1, 2));
+  const sz = 190 * pop; ctx.shadowColor = 'rgba(40,30,15,.45)'; ctx.shadowBlur = 22; ctx.shadowOffsetY = 8;
+  ctx.drawImage(SPR[cut], SLOT.x - sz / 2, SLOT.y - sz / 2, sz, sz); ctx.shadowColor = 'transparent';
+  prongs(ctx, SLOT.x, SLOT.y, 72 * pop);
+  ctx.font = '600 19px Montserrat'; ctx.letterSpacing = '4px'; ctx.textAlign = 'center'; ctx.fillStyle = DEEP; ctx.fillText(NAMES[cut], SLOT.x + 40, SLOT.y + 140);
+  ctx.restore();
+  if (n > 0) { const st = STEPS[n - 1], a = Math.exp(-Math.pow((t - st - .24) / .08, 2)); star(ctx, SLOT.x + 30, SLOT.y - 40, 70, a, .4); }
+  // type: What is your  BEST —◆— NEXT  SHAPE?
+  const ty = eout((t - .05) / .45);
+  ctx.save(); ctx.globalAlpha = ty; ctx.fillStyle = INK; ctx.textAlign = 'left';
+  ctx.font = 'italic 500 58px Cormorant'; ctx.fillText('What is your', 46, DC.y - 110);
+  ctx.font = '600 150px Cormorant'; ctx.letterSpacing = '2px'; ctx.textBaseline = 'middle'; ctx.fillText('BEST', 40, DC.y + 6);
+  ctx.textAlign = 'left'; ctx.fillText('NEXT', 648, DC.y + 6);
+  ctx.textBaseline = 'alphabetic'; ctx.font = '600 30px Montserrat'; ctx.letterSpacing = '10px'; ctx.fillText('SHAPE?', 664, DC.y + 112);
+  ctx.restore();
+  drawCorner();
+  ctx.save(); ctx.textAlign = 'center'; ctx.font = '400 26px Jost'; ctx.letterSpacing = '2px'; ctx.fillStyle = 'rgba(250,252,249,.62)';
+  ctx.fillText('Lab-grown diamonds in every cut  ·  siyari.com', W / 2, 1700); ctx.restore();
+};
+window.ready = true;
+</script></body></html>

@@ -1,0 +1,56 @@
+{
+ "shimmer": {
+  "ids": [
+   60
+  ],
+  "role": "chime"
+ },
+ "sparkle": {
+  "ids": [
+   68
+  ],
+  "role": "chime"
+ },
+ "riser": {
+  "ids": [
+   43
+  ],
+  "role": "riser"
+ },
+ "whoosh": {
+  "ids": [
+   56
+  ],
+  "role": "whoosh"
+ },
+ "softwhoosh": {
+  "ids": [
+   57
+  ],
+  "role": "whoosh"
+ },
+ "swipe": {
+  "ids": [
+   53
+  ],
+  "role": "whoosh"
+ },
+ "chime": {
+  "ids": [
+   61
+  ],
+  "role": "ui"
+ },
+ "tick": {
+  "ids": [
+   58
+  ],
+  "role": "ui"
+ },
+ "pop": {
+  "ids": [
+   65
+  ],
+  "role": "ui"
+ }
+}

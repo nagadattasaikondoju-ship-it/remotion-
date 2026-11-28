@@ -1,0 +1,128 @@
+[
+ {
+  "t": 0.05,
+  "type": "shimmer",
+  "g": 0.2,
+  "note": "rings + velvet open"
+ },
+ {
+  "t": 1.6,
+  "type": "sparkle",
+  "g": 0.2,
+  "note": "a centre stone glints"
+ },
+ {
+  "t": 2.6,
+  "type": "riser",
+  "g": 0.26,
+  "note": "riser ends on the cut to the logo (4.6)"
+ },
+ {
+  "t": 3.4,
+  "type": "sparkle",
+  "g": 0.2,
+  "note": "a centre stone glints"
+ },
+ {
+  "t": 4.72,
+  "type": "whoosh",
+  "g": 0.4,
+  "note": "the diamond falls (peak on the fastest frames)"
+ },
+ {
+  "t": 5.22,
+  "type": "chime",
+  "g": 0.42,
+  "note": "the diamond lands as the swan's crown"
+ },
+ {
+  "t": 5.24,
+  "type": "sparkle",
+  "g": 0.32,
+  "note": "crown flash"
+ },
+ {
+  "t": 5.3,
+  "type": "softwhoosh",
+  "g": 0.24,
+  "note": "the swan draws itself"
+ },
+ {
+  "t": 6.0,
+  "type": "tick",
+  "g": 0.2,
+  "note": "SIYARI letters open"
+ },
+ {
+  "t": 7.4,
+  "type": "sparkle",
+  "g": 0.28,
+  "note": "sheen across the logo"
+ },
+ {
+  "t": 8.2,
+  "type": "swipe",
+  "g": 0.34,
+  "note": "cut back to the rings"
+ },
+ {
+  "t": 8.3,
+  "type": "shimmer",
+  "g": 0.17,
+  "note": "rings again"
+ },
+ {
+  "t": 10.2,
+  "type": "riser",
+  "g": 0.24,
+  "note": "riser ends on the cut to the end card (12.2)"
+ },
+ {
+  "t": 10.2,
+  "type": "sparkle",
+  "g": 0.2,
+  "note": "a centre stone glints"
+ },
+ {
+  "t": 12.32,
+  "type": "whoosh",
+  "g": 0.4,
+  "note": "the diamond falls"
+ },
+ {
+  "t": 12.82,
+  "type": "chime",
+  "g": 0.42,
+  "note": "crown lands"
+ },
+ {
+  "t": 12.84,
+  "type": "sparkle",
+  "g": 0.32,
+  "note": "crown flash"
+ },
+ {
+  "t": 12.9,
+  "type": "softwhoosh",
+  "g": 0.22,
+  "note": "swan draws"
+ },
+ {
+  "t": 13.6,
+  "type": "tick",
+  "g": 0.2,
+  "note": "letters open"
+ },
+ {
+  "t": 14.57,
+  "type": "pop",
+  "g": 0.26,
+  "note": "DM CUSTOM pill"
+ },
+ {
+  "t": 15.0,
+  "type": "sparkle",
+  "g": 0.28,
+  "note": "final sheen"
+ }
+]
