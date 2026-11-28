@@ -9,7 +9,10 @@ music() { local n=$1
   case $n in
     earrings) ffmpeg -nostdin -v error -y -ss 0 -t 30.0 -i ref/r1.mp4 -vn -af aresample=48000 -c:a pcm_f32le out/audio/_$n.wav; D=30.0;;
     shapes)   ffmpeg -nostdin -v error -y -ss 1.0 -t 9.3 -i ref/r2.mp4 -vn -af aresample=48000 -c:a pcm_f32le out/audio/_$n.wav; D=9.3;;
-    ring)     ffmpeg -nostdin -v error -y -i ref/r3.mp4 -filter_complex "[0:a]atrim=14.87:17.46,asetpts=PTS-STARTPTS,aresample=48000[a];[0:a]atrim=2.23:14.76,asetpts=PTS-STARTPTS,aresample=48000[b];[a][b]acrossfade=d=0.03:c1=tri:c2=tri" -c:a pcm_f32le out/audio/_$n.wav; D=15.06;;
+    ring)     ffmpeg -nostdin -v error -y -ss 14.87 -t 2.59 -i ref/r3.mp4 -vn -af aresample=48000 -c:a pcm_f32le out/audio/_ra.wav
+              ffmpeg -nostdin -v error -y -ss 2.23 -t 12.53 -i ref/r3.mp4 -vn -af aresample=48000 -c:a pcm_f32le out/audio/_rb.wav
+              ffmpeg -nostdin -v error -y -i out/audio/_ra.wav -i out/audio/_rb.wav -filter_complex "[0][1]acrossfade=d=0.03:c1=tri:c2=tri" -c:a pcm_f32le out/audio/_$n.wav
+              rm -f out/audio/_ra.wav out/audio/_rb.wav; D=15.06;;
   esac
   ffmpeg -nostdin -v error -y -i out/audio/_$n.wav -af "apad,atrim=0:$D,afade=t=out:st=$(echo "$D-0.15" | bc):d=0.15" -c:a pcm_f32le out/audio/__$n.wav
   J=$(ffmpeg -nostdin -hide_banner -i out/audio/__$n.wav -af loudnorm=I=-14:TP=-1:LRA=11:print_format=json -f null - 2>&1 | sed -n '/^{/,/^}/p')
