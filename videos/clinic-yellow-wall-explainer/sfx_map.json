@@ -1,0 +1,80 @@
+{
+ "pop": {
+  "ids": [
+   65
+  ],
+  "role": "ui"
+ },
+ "boing": {
+  "ids": [
+   70
+  ],
+  "role": "misc"
+ },
+ "crunch": {
+  "ids": [
+   67
+  ],
+  "role": "hit"
+ },
+ "zap": {
+  "ids": [
+   62
+  ],
+  "role": "glitch"
+ },
+ "swipe": {
+  "ids": [
+   53
+  ],
+  "role": "whoosh"
+ },
+ "whoosh": {
+  "ids": [
+   56
+  ],
+  "role": "whoosh"
+ },
+ "softwhoosh": {
+  "ids": [
+   57
+  ],
+  "role": "whoosh"
+ },
+ "tick": {
+  "ids": [
+   58
+  ],
+  "role": "ui"
+ },
+ "squish": {
+  "ids": [
+   10
+  ],
+  "role": "misc"
+ },
+ "crumble": {
+  "ids": [
+   67
+  ],
+  "role": "hit"
+ },
+ "scaler": {
+  "ids": [
+   69
+  ],
+  "role": "misc"
+ },
+ "chime": {
+  "ids": [
+   61
+  ],
+  "role": "ui"
+ },
+ "sparkle": {
+  "ids": [
+   68
+  ],
+  "role": "chime"
+ }
+}

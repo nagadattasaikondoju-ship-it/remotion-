@@ -1,0 +1,20 @@
+{
+ "swipe": {
+  "ids": [
+   53
+  ],
+  "role": "whoosh"
+ },
+ "glitch": {
+  "ids": [
+   62
+  ],
+  "role": "glitch"
+ },
+ "softwhoosh": {
+  "ids": [
+   57
+  ],
+  "role": "whoosh"
+ }
+}

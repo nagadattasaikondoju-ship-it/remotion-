@@ -1,0 +1,152 @@
+[
+ {
+  "t": 0.6,
+  "type": "pop",
+  "g": 0.3,
+  "note": "hearts float up: Riya loves ice cream"
+ },
+ {
+  "t": 3.12,
+  "type": "boing",
+  "g": 0.35,
+  "note": "the kulfi turns angry"
+ },
+ {
+  "t": 4.69,
+  "type": "crunch",
+  "g": 0.4,
+  "note": "the bite"
+ },
+ {
+  "t": 5.45,
+  "type": "zap",
+  "g": 0.6,
+  "note": "ZAP through the tooth"
+ },
+ {
+  "t": 7.1,
+  "type": "swipe",
+  "g": 0.35,
+  "note": "card: warm water only"
+ },
+ {
+  "t": 8.32,
+  "type": "swipe",
+  "g": 0.32,
+  "note": "card: chewing on one side"
+ },
+ {
+  "t": 9.32,
+  "type": "swipe",
+  "g": 0.32,
+  "note": "card: fake smiles"
+ },
+ {
+  "t": 12.74,
+  "type": "whoosh",
+  "g": 0.45,
+  "note": "dive into the tooth (iris)"
+ },
+ {
+  "t": 13.6,
+  "type": "pop",
+  "g": 0.35,
+  "note": "ENAMEL label"
+ },
+ {
+  "t": 15.57,
+  "type": "scrub",
+  "g": 0.45,
+  "note": "hard brushing"
+ },
+ {
+  "t": 18.33,
+  "type": "softwhoosh",
+  "g": 0.3,
+  "note": "gums pull back"
+ },
+ {
+  "t": 19.59,
+  "type": "pop",
+  "g": 0.32,
+  "note": "ROOT exposed"
+ },
+ {
+  "t": 23.11,
+  "type": "softwhoosh",
+  "g": 0.4,
+  "note": "cold rushes in"
+ },
+ {
+  "t": 23.51,
+  "type": "zap",
+  "g": 0.38,
+  "note": "cold hits the nerve"
+ },
+ {
+  "t": 24.52,
+  "type": "whoosh",
+  "g": 0.3,
+  "note": "the door in winter opens"
+ },
+ {
+  "t": 25.85,
+  "type": "swipe",
+  "g": 0.35,
+  "note": "cut to the clinic"
+ },
+ {
+  "t": 27.54,
+  "type": "chime",
+  "g": 0.4,
+  "note": "REAL CAUSE"
+ },
+ {
+  "t": 28.79,
+  "type": "sparkle",
+  "g": 0.4,
+  "note": "the seal goes on"
+ },
+ {
+  "t": 30.96,
+  "type": "pop",
+  "g": 0.35,
+  "note": "hard brush crossed out"
+ },
+ {
+  "t": 31.11,
+  "type": "chime",
+  "g": 0.35,
+  "note": "soft brush tick"
+ },
+ {
+  "t": 33.03,
+  "type": "swipe",
+  "g": 0.35,
+  "note": "back to Riya"
+ },
+ {
+  "t": 33.67,
+  "type": "sparkle",
+  "g": 0.55,
+  "note": "sparkles instead of lightning"
+ },
+ {
+  "t": 37.57,
+  "type": "whoosh",
+  "g": 0.45,
+  "note": "clinic card pops up"
+ },
+ {
+  "t": 37.87,
+  "type": "pop",
+  "g": 0.5,
+  "note": "the logo lands"
+ },
+ {
+  "t": 38.67,
+  "type": "chime",
+  "g": 0.45,
+  "note": "BOOK AN APPOINTMENT lands"
+ }
+]

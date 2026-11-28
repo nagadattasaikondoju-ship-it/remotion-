@@ -1,0 +1,10 @@
+out/
+node_modules
+research/
+ref/*.mp4
+ref/f/
+ref/*.png
+!ref/logo_mark.png
+!ref/logo_full.png
+ref/*.jpg
+ref2/

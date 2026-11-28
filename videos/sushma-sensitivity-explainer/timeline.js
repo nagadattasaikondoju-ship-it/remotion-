@@ -1,0 +1,757 @@
+window.TL = {
+ "dur": 39.0,
+ "lines": [
+  {
+   "i": 1,
+   "start": 0.25,
+   "end": 1.606,
+   "text": "Riya loved ice cream.",
+   "words": [
+    {
+     "w": "Riya",
+     "s": 0.25,
+     "e": 0.55
+    },
+    {
+     "w": "loved",
+     "s": 0.55,
+     "e": 0.85
+    },
+    {
+     "w": "ice",
+     "s": 0.85,
+     "e": 1.11
+    },
+    {
+     "w": "cream.",
+     "s": 1.11,
+     "e": 1.39
+    }
+   ],
+   "heard": "Riya loved ice cream."
+  },
+  {
+   "i": 2,
+   "start": 1.85,
+   "end": 3.829,
+   "text": "Until ice cream started hating her back.",
+   "words": [
+    {
+     "w": "Until",
+     "s": 1.85,
+     "e": 2.13
+    },
+    {
+     "w": "ice",
+     "s": 2.13,
+     "e": 2.39
+    },
+    {
+     "w": "cream",
+     "s": 2.39,
+     "e": 2.73
+    },
+    {
+     "w": "started",
+     "s": 2.73,
+     "e": 3.07
+    },
+    {
+     "w": "hating",
+     "s": 3.07,
+     "e": 3.35
+    },
+    {
+     "w": "her",
+     "s": 3.35,
+     "e": 3.57
+    },
+    {
+     "w": "back.",
+     "s": 3.57,
+     "e": 3.79
+    }
+   ],
+   "heard": "Until ice cream started hating her back."
+  },
+  {
+   "i": 3,
+   "start": 4.15,
+   "end": 6.77,
+   "text": "One cold bite, and a sharp zap shot through her tooth.",
+   "words": [
+    {
+     "w": "One",
+     "s": 4.15,
+     "e": 4.35
+    },
+    {
+     "w": "cold",
+     "s": 4.35,
+     "e": 4.67
+    },
+    {
+     "w": "bite,",
+     "s": 4.67,
+     "e": 4.95
+    },
+    {
+     "w": "and",
+     "s": 5.13,
+     "e": 5.15
+    },
+    {
+     "w": "a",
+     "s": 5.15,
+     "e": 5.27
+    },
+    {
+     "w": "sharp",
+     "s": 5.27,
+     "e": 5.49
+    },
+    {
+     "w": "zap",
+     "s": 5.49,
+     "e": 5.81
+    },
+    {
+     "w": "shot",
+     "s": 5.81,
+     "e": 6.07
+    },
+    {
+     "w": "through",
+     "s": 6.07,
+     "e": 6.31
+    },
+    {
+     "w": "her",
+     "s": 6.31,
+     "e": 6.47
+    },
+    {
+     "w": "tooth.",
+     "s": 6.47,
+     "e": 6.63
+    }
+   ],
+   "heard": "One cold bite, and a sharp zap shot through her tooth."
+  },
+  {
+   "i": 4,
+   "start": 7.15,
+   "end": 10.797,
+   "text": "Warm water only. Chewing on one side. Fake smiles at every party.",
+   "words": [
+    {
+     "w": "Warm",
+     "s": 7.15,
+     "e": 7.41
+    },
+    {
+     "w": "water",
+     "s": 7.41,
+     "e": 7.73
+    },
+    {
+     "w": "only.",
+     "s": 7.73,
+     "e": 8.15
+    },
+    {
+     "w": "Chewing",
+     "s": 8.37,
+     "e": 8.51
+    },
+    {
+     "w": "on",
+     "s": 8.51,
+     "e": 8.67
+    },
+    {
+     "w": "one",
+     "s": 8.67,
+     "e": 8.89
+    },
+    {
+     "w": "side.",
+     "s": 8.89,
+     "e": 9.15
+    },
+    {
+     "w": "Fake",
+     "s": 9.37,
+     "e": 9.43
+    },
+    {
+     "w": "smiles",
+     "s": 9.43,
+     "e": 9.79
+    },
+    {
+     "w": "at",
+     "s": 9.79,
+     "e": 10.07
+    },
+    {
+     "w": "every",
+     "s": 10.07,
+     "e": 10.35
+    },
+    {
+     "w": "party.",
+     "s": 10.35,
+     "e": 10.65
+    }
+   ],
+   "heard": "Warm water only. Chewing on one side. Fake smiles at every party."
+  },
+  {
+   "i": 5,
+   "start": 11.15,
+   "end": 13.203,
+   "text": "But what was really happening inside her tooth?",
+   "words": [
+    {
+     "w": "But",
+     "s": 11.15,
+     "e": 11.27
+    },
+    {
+     "w": "what",
+     "s": 11.27,
+     "e": 11.37
+    },
+    {
+     "w": "was",
+     "s": 11.37,
+     "e": 11.49
+    },
+    {
+     "w": "really",
+     "s": 11.49,
+     "e": 11.77
+    },
+    {
+     "w": "happening",
+     "s": 11.77,
+     "e": 12.19
+    },
+    {
+     "w": "inside",
+     "s": 12.19,
+     "e": 12.65
+    },
+    {
+     "w": "her",
+     "s": 12.65,
+     "e": 12.85
+    },
+    {
+     "w": "tooth?",
+     "s": 12.85,
+     "e": 13.03
+    }
+   ],
+   "heard": "But what was really happening inside her tooth?"
+  },
+  {
+   "i": 6,
+   "start": 13.55,
+   "end": 16.633,
+   "text": "Enamel is your tooth's hard shield. But Riya brushed too hard.",
+   "words": [
+    {
+     "w": "Enamel",
+     "s": 13.55,
+     "e": 13.93
+    },
+    {
+     "w": "is",
+     "s": 13.93,
+     "e": 14.11
+    },
+    {
+     "w": "your",
+     "s": 14.11,
+     "e": 14.27
+    },
+    {
+     "w": "tooth's",
+     "s": 14.27,
+     "e": 14.71
+    },
+    {
+     "w": "hard",
+     "s": 14.71,
+     "e": 14.79
+    },
+    {
+     "w": "shield.",
+     "s": 14.79,
+     "e": 15.13
+    },
+    {
+     "w": "But",
+     "s": 15.37,
+     "e": 15.45
+    },
+    {
+     "w": "Riya",
+     "s": 15.45,
+     "e": 15.67
+    },
+    {
+     "w": "brushed",
+     "s": 15.67,
+     "e": 15.95
+    },
+    {
+     "w": "too",
+     "s": 15.95,
+     "e": 16.21
+    },
+    {
+     "w": "hard.",
+     "s": 16.21,
+     "e": 16.49
+    }
+   ],
+   "heard": "Enamel is your tooth's hard shield. But Riya brushed too hard."
+  },
+  {
+   "i": 7,
+   "start": 16.85,
+   "end": 19.05,
+   "text": "Her enamel wore thin, and her gums pulled back.",
+   "words": [
+    {
+     "w": "Her",
+     "s": 16.85,
+     "e": 16.99
+    },
+    {
+     "w": "enamel",
+     "s": 16.99,
+     "e": 17.35
+    },
+    {
+     "w": "wore",
+     "s": 17.35,
+     "e": 17.57
+    },
+    {
+     "w": "thin,",
+     "s": 17.57,
+     "e": 17.81
+    },
+    {
+     "w": "and",
+     "s": 17.97,
+     "e": 18.03
+    },
+    {
+     "w": "her",
+     "s": 18.03,
+     "e": 18.13
+    },
+    {
+     "w": "gums",
+     "s": 18.13,
+     "e": 18.41
+    },
+    {
+     "w": "pulled",
+     "s": 18.41,
+     "e": 18.65
+    },
+    {
+     "w": "back.",
+     "s": 18.65,
+     "e": 18.99
+    }
+   ],
+   "heard": "Her enamel wore thin, and her gums pulled back."
+  },
+  {
+   "i": 8,
+   "start": 19.3,
+   "end": 22.655,
+   "text": "That exposed the root, full of tiny tubes that lead straight to the nerve.",
+   "words": [
+    {
+     "w": "That",
+     "s": 19.3,
+     "e": 19.44
+    },
+    {
+     "w": "exposed",
+     "s": 19.44,
+     "e": 19.84
+    },
+    {
+     "w": "the",
+     "s": 19.84,
+     "e": 20.08
+    },
+    {
+     "w": "root,",
+     "s": 20.08,
+     "e": 20.26
+    },
+    {
+     "w": "full",
+     "s": 20.44,
+     "e": 20.48
+    },
+    {
+     "w": "of",
+     "s": 20.48,
+     "e": 20.66
+    },
+    {
+     "w": "tiny",
+     "s": 20.66,
+     "e": 20.96
+    },
+    {
+     "w": "tubes",
+     "s": 20.96,
+     "e": 21.26
+    },
+    {
+     "w": "that",
+     "s": 21.26,
+     "e": 21.52
+    },
+    {
+     "w": "lead",
+     "s": 21.52,
+     "e": 21.72
+    },
+    {
+     "w": "straight",
+     "s": 21.72,
+     "e": 22.04
+    },
+    {
+     "w": "to",
+     "s": 22.04,
+     "e": 22.26
+    },
+    {
+     "w": "the",
+     "s": 22.26,
+     "e": 22.36
+    },
+    {
+     "w": "nerve.",
+     "s": 22.36,
+     "e": 22.52
+    }
+   ],
+   "heard": "That exposed the root, full of tiny tubes that lead straight to the nerve."
+  },
+  {
+   "i": 9,
+   "start": 22.9,
+   "end": 25.608,
+   "text": "So cold rushes in, like opening a door in winter.",
+   "words": [
+    {
+     "w": "So",
+     "s": 22.9,
+     "e": 23.06
+    },
+    {
+     "w": "cold",
+     "s": 23.06,
+     "e": 23.4
+    },
+    {
+     "w": "rushes",
+     "s": 23.4,
+     "e": 23.8
+    },
+    {
+     "w": "in,",
+     "s": 23.8,
+     "e": 24.04
+    },
+    {
+     "w": "like",
+     "s": 24.08,
+     "e": 24.16
+    },
+    {
+     "w": "opening",
+     "s": 24.16,
+     "e": 24.5
+    },
+    {
+     "w": "a",
+     "s": 24.5,
+     "e": 24.72
+    },
+    {
+     "w": "door",
+     "s": 24.72,
+     "e": 24.88
+    },
+    {
+     "w": "in",
+     "s": 24.88,
+     "e": 25.14
+    },
+    {
+     "w": "winter.",
+     "s": 25.14,
+     "e": 25.36
+    }
+   ],
+   "heard": "So cold rushes in, like opening a door in winter."
+  },
+  {
+   "i": 10,
+   "start": 26.0,
+   "end": 28.335,
+   "text": "At the clinic, the doctor found the real cause.",
+   "words": [
+    {
+     "w": "At",
+     "s": 26.0,
+     "e": 26.14
+    },
+    {
+     "w": "the",
+     "s": 26.14,
+     "e": 26.26
+    },
+    {
+     "w": "clinic,",
+     "s": 26.26,
+     "e": 26.42
+    },
+    {
+     "w": "the",
+     "s": 26.58,
+     "e": 26.68
+    },
+    {
+     "w": "doctor",
+     "s": 26.68,
+     "e": 26.96
+    },
+    {
+     "w": "found",
+     "s": 26.96,
+     "e": 27.32
+    },
+    {
+     "w": "the",
+     "s": 27.32,
+     "e": 27.52
+    },
+    {
+     "w": "real",
+     "s": 27.52,
+     "e": 27.74
+    },
+    {
+     "w": "cause.",
+     "s": 27.74,
+     "e": 28.1
+    }
+   ],
+   "heard": "At the clinic, the doctor found the real cause."
+  },
+  {
+   "i": 11,
+   "start": 28.6,
+   "end": 32.834,
+   "text": "They sealed the exposed spots, and switched her to a soft brush, with gentle circles.",
+   "words": [
+    {
+     "w": "They",
+     "s": 28.6,
+     "e": 28.74
+    },
+    {
+     "w": "sealed",
+     "s": 28.74,
+     "e": 29.0
+    },
+    {
+     "w": "the",
+     "s": 29.0,
+     "e": 29.16
+    },
+    {
+     "w": "exposed",
+     "s": 29.16,
+     "e": 29.56
+    },
+    {
+     "w": "spots,",
+     "s": 29.56,
+     "e": 29.94
+    },
+    {
+     "w": "and",
+     "s": 30.28,
+     "e": 30.38
+    },
+    {
+     "w": "switched",
+     "s": 30.38,
+     "e": 30.58
+    },
+    {
+     "w": "her",
+     "s": 30.58,
+     "e": 30.8
+    },
+    {
+     "w": "to",
+     "s": 30.8,
+     "e": 30.92
+    },
+    {
+     "w": "a",
+     "s": 30.92,
+     "e": 31.06
+    },
+    {
+     "w": "soft",
+     "s": 31.06,
+     "e": 31.28
+    },
+    {
+     "w": "brush,",
+     "s": 31.28,
+     "e": 31.6
+    },
+    {
+     "w": "with",
+     "s": 31.76,
+     "e": 31.9
+    },
+    {
+     "w": "gentle",
+     "s": 31.9,
+     "e": 32.2
+    },
+    {
+     "w": "circles.",
+     "s": 32.2,
+     "e": 32.52
+    }
+   ],
+   "heard": "They sealed the exposed spots, and switched her to a soft brush, with gentle circles."
+  },
+  {
+   "i": 12,
+   "start": 33.15,
+   "end": 34.505,
+   "text": "Now? The kulfi is back.",
+   "words": [
+    {
+     "w": "Now?",
+     "s": 33.15,
+     "e": 33.37
+    },
+    {
+     "w": "The",
+     "s": 33.37,
+     "e": 33.55
+    },
+    {
+     "w": "kulfi",
+     "s": 33.55,
+     "e": 33.91
+    },
+    {
+     "w": "is",
+     "s": 33.91,
+     "e": 34.05
+    },
+    {
+     "w": "back.",
+     "s": 34.05,
+     "e": 34.31
+    }
+   ],
+   "heard": "Now the kulfi is back."
+  },
+  {
+   "i": 13,
+   "start": 34.85,
+   "end": 38.497,
+   "text": "Sensitive teeth are not something to live with. Book your appointment today.",
+   "words": [
+    {
+     "w": "Sensitive",
+     "s": 34.85,
+     "e": 35.39
+    },
+    {
+     "w": "teeth",
+     "s": 35.39,
+     "e": 35.65
+    },
+    {
+     "w": "are",
+     "s": 35.65,
+     "e": 36.01
+    },
+    {
+     "w": "not",
+     "s": 36.01,
+     "e": 36.21
+    },
+    {
+     "w": "something",
+     "s": 36.21,
+     "e": 36.51
+    },
+    {
+     "w": "to",
+     "s": 36.51,
+     "e": 36.77
+    },
+    {
+     "w": "live",
+     "s": 36.77,
+     "e": 36.93
+    },
+    {
+     "w": "with.",
+     "s": 36.93,
+     "e": 37.17
+    },
+    {
+     "w": "Book",
+     "s": 37.37,
+     "e": 37.37
+    },
+    {
+     "w": "your",
+     "s": 37.37,
+     "e": 37.55
+    },
+    {
+     "w": "appointment",
+     "s": 37.55,
+     "e": 37.93
+    },
+    {
+     "w": "today.",
+     "s": 37.93,
+     "e": 38.33
+    }
+   ],
+   "heard": "Sensitive teeth are not something to live with. Book your appointment today."
+  }
+ ]
+};

@@ -1,0 +1,104 @@
+{
+ "glitch": {
+  "ids": [
+   62
+  ],
+  "role": "glitch"
+ },
+ "lowhit": {
+  "ids": [
+   29
+  ],
+  "role": "hit"
+ },
+ "scratch": {
+  "ids": [
+   64
+  ],
+  "role": "hit"
+ },
+ "beep": {
+  "ids": [
+   63
+  ],
+  "role": "ui"
+ },
+ "swoosh": {
+  "ids": [
+   56
+  ],
+  "role": "whoosh"
+ },
+ "swoosh2": {
+  "ids": [
+   53
+  ],
+  "role": "whoosh"
+ },
+ "fastwhoosh": {
+  "ids": [
+   50
+  ],
+  "role": "whoosh"
+ },
+ "softwhoosh": {
+  "ids": [
+   57
+  ],
+  "role": "whoosh"
+ },
+ "tick": {
+  "ids": [
+   24
+  ],
+  "role": "ui"
+ },
+ "punch": {
+  "ids": [
+   55
+  ],
+  "role": "hit"
+ },
+ "pops": {
+  "ids": [
+   10
+  ],
+  "role": "ui"
+ },
+ "impact": {
+  "ids": [
+   28
+  ],
+  "role": "hit"
+ },
+ "bigimpact": {
+  "ids": [
+   32
+  ],
+  "role": "hit"
+ },
+ "chime": {
+  "ids": [
+   61
+  ],
+  "role": "ui"
+ },
+ "key1": {
+  "ids": [
+   33
+  ],
+  "role": "ui"
+ },
+ "key2": {
+  "ids": [
+   34
+  ],
+  "role": "ui"
+ },
+ "key3": {
+  "ids": [
+   37
+  ],
+  "role": "ui"
+ }
+}

@@ -1,0 +1,56 @@
+{
+ "sparkle": {
+  "ids": [
+   68
+  ],
+  "role": "chime"
+ },
+ "swipe": {
+  "ids": [
+   53
+  ],
+  "role": "whoosh"
+ },
+ "drill": {
+  "ids": [
+   69
+  ],
+  "role": "misc"
+ },
+ "seat": {
+  "ids": [
+   21
+  ],
+  "role": "click"
+ },
+ "softwhoosh": {
+  "ids": [
+   57
+  ],
+  "role": "whoosh"
+ },
+ "whoosh": {
+  "ids": [
+   56
+  ],
+  "role": "whoosh"
+ },
+ "pop": {
+  "ids": [
+   65
+  ],
+  "role": "ui"
+ },
+ "slam": {
+  "ids": [
+   24
+  ],
+  "role": "hit"
+ },
+ "chime": {
+  "ids": [
+   61
+  ],
+  "role": "ui"
+ }
+}

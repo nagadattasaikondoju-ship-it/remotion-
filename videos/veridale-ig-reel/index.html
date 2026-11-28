@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Veridale — profile build</title>
+<style>
+  @font-face { font-family: "Inter"; src: url("fonts/inter-400.woff2"); font-weight: 400; }
+  @font-face { font-family: "Inter"; src: url("fonts/inter-500.woff2"); font-weight: 500; }
+  @font-face { font-family: "Inter"; src: url("fonts/inter-600.woff2"); font-weight: 600; }
+  @font-face { font-family: "Inter"; src: url("fonts/inter-700.woff2"); font-weight: 700; }
+  @font-face { font-family: "FR"; src: url("fonts/Fraunces-VF.ttf"); font-weight: 100 900; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
+  /* laid out in the Veridale screenshot's own 941×1671 coordinates, scaled to 1080×1920.
+     The screenshot (Lanczos-upscaled to 1080 wide, so it lands 1:1 on output pixels) is the finished profile;
+     wireframe patches sit on top and give way step by step, while the matching crop of the screenshot pops in. */
+  #ui { position: absolute; left: 0; top: 0; width: 941px; height: 1672px; transform: scale(1.147715); transform-origin: 0 0;
+        background: #fff; font-family: "Inter", sans-serif; color: #111; overflow: hidden; }
+  #ui * { position: absolute; box-sizing: border-box; }
+  .spr { background-image: url("img/profile.png"); background-size: 941px 1671px; background-repeat: no-repeat; }
+  .wf { background: #fff; }
+  .t { white-space: nowrap; }
+  .ph { background: #D4D5D1; display: flex; align-items: center; justify-content: center; text-align: center;
+        font-size: 24px; letter-spacing: 0.02em; line-height: 1.22; color: #1C1C1C; font-weight: 600; }
+  svg { overflow: visible; }
+  #cap { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; display: none; }
+  /* series style (ep. 01/02): chunky soft serif in lemon yellow, top and bottom lines bent on arcs,
+     dark outline + shadow + soft darkening behind the letters so they read on the bright window light. */
+  #cap svg text { font-family: "FR"; font-weight: 900; font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 72; fill: #FFE81A;
+                  letter-spacing: -1px; paint-order: stroke fill; stroke: #1A0B08; stroke-width: 11px; stroke-linejoin: round;
+                  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); }
+</style>
+</head>
+<body>
+<div id="ui"><img src="img/profile.png" style="left:0;top:0;width:941px;height:1671px;" /></div>
+<div id="cap">
+  <svg width="1080" height="1920" viewBox="0 0 1080 1920" style="position:absolute;left:0;top:0;">
+    <defs>
+      <path id="arcTop" d="M 250 1080 Q 540 970 830 1080" fill="none"/>
+      <path id="arcBot" d="M 95 1455 Q 540 1575 985 1455" fill="none"/>
+      <linearGradient id="dim" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#000" stop-opacity="0"/><stop offset="0.3" stop-color="#000" stop-opacity="0.34"/>
+        <stop offset="0.75" stop-color="#000" stop-opacity="0.34"/><stop offset="1" stop-color="#000" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <rect x="0" y="910" width="1080" height="860" fill="url(#dim)"/>
+    <text font-size="98" text-anchor="middle"><textPath href="#arcTop" startOffset="50%">if i handled</textPath></text>
+    <text x="540" y="1240" font-size="118" text-anchor="middle">your real estate</text>
+    <text x="540" y="1368" font-size="128" text-anchor="middle">brand's</text>
+    <text font-size="146" text-anchor="middle"><textPath href="#arcBot" startOffset="50%">instagram...</textPath></text>
+    <text x="540" y="1668" font-size="76" text-anchor="middle">ep. 03</text>
+  </svg>
+</div>
+<script>
+/* Veridale Properties — "if I handled your real estate brand's Instagram… ep. 03" profile build.
+   Same edit as ep. 01: pure function of time, window.seek(t) sets every element for video time t.
+   Locked to the song (113 BPM, beat = 0.531 s): the beat drops on the cut to the wireframe, every step lands two beats later. */
+const BEAT = 60 / 113, DROP = 2.38;
+const STEP = (n) => DROP + 2 * n * BEAT;
+const S1 = STEP(1), S2 = STEP(2), S3 = STEP(3), R = [STEP(4), STEP(5), STEP(6)], END = DROP + 14.5 * BEAT;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, b) => clamp((t - a) / (b - a));
+const eOut = (x) => (x >= 1 ? 1 : 1 - Math.pow(2, -10 * x));
+const pop = (t, t0, len = 0.16) => eOut(P(t, t0, t0 + len));
+
+const ui = document.getElementById("ui");
+const el = (html) => { const d = document.createElement("div"); d.innerHTML = html.trim(); const n = d.firstChild; ui.appendChild(n); return n; };
+const at = (x, y, w, h) => `left:${x}px;top:${y}px;` + (w ? `width:${w}px;` : "") + (h ? `height:${h}px;` : "");
+const spr = (x, y, w, h, extra = "") => el(`<div class="spr" style="${at(x, y, w, h)}background-position:${-x}px ${-y}px;${extra}"></div>`);
+
+/* ---------- stats: live numbers over the screenshot's (labels stay) ---------- */
+const STAT = [[382, 340, 86], [588, 528, 120], [792, 760, 66]];          // centre x, patch x, patch width
+STAT.forEach(([, x, w]) => el(`<div class="wf" style="${at(x, 124, w, 40)}"></div>`));
+const statN = STAT.map(([cx]) => el(`<div class="t" style="left:${cx}px;top:124px;transform:translateX(-50%);font-size:37px;line-height:40px;font-weight:700;letter-spacing:-0.3px;">0</div>`));
+
+/* ---------- regions: wireframe patch + the screenshot crop that pops in over it ---------- */
+const regions = [];
+function region(x, y, w, h, wfInner, t0, scale, len = 0.16, sprExtra = "", wfStyle = "") {
+  const wf = el(`<div class="wf" style="${at(x, y, w, h)}${wfStyle}">${wfInner}</div>`);
+  const s = spr(x, y, w, h, sprExtra);
+  regions.push({ wf, s, t0, scale, len });
+}
+// step 1 — name, logo, link, Follow button, nav avatar
+region(284, 20, 372, 50, `<div class="t" style="left:186px;top:6px;transform:translateX(-50%);font-size:31px;font-weight:700;">username</div>`, S1, 0.92);
+region(44, 56, 214, 228, `<svg style="left:0;top:0;width:214px;height:228px;" viewBox="0 0 214 228">
+    <defs><linearGradient id="rg" x1="0" y1="1" x2="1" y2="0"><stop offset="0" stop-color="#FEC053"/><stop offset="0.35" stop-color="#F2203E"/>
+    <stop offset="0.7" stop-color="#B729A8"/><stop offset="1" stop-color="#5342D6"/></linearGradient></defs>
+    <circle cx="106.5" cy="113.5" r="98" fill="none" stroke="url(#rg)" stroke-width="7"/>
+    <circle cx="106.5" cy="113.5" r="88" fill="#D9D9DB"/><circle cx="106.5" cy="94" r="31" fill="#fff"/>
+    <path d="M48 175 Q56 133 106.5 133 Q157 133 165 175 Q139 200 106.5 200 Q74 200 48 175 Z" fill="#fff"/></svg>`, S1, 0.92);
+region(54, 446, 250, 40, `<div class="t" style="left:8px;top:4px;font-size:25px;font-weight:600;">www.link.com</div>`, S1, 0.95);
+region(48, 490, 266, 60, `<div style="left:4px;top:4px;width:258px;height:52px;border-radius:12px;background:#EFEFF1;display:flex;align-items:center;justify-content:center;font-size:25px;font-weight:600;">Follow</div>`, S1, 0.95);
+region(798, 1580, 84, 80, `<svg style="left:18px;top:16px;width:48px;height:48px;" viewBox="0 0 48 48" fill="none" stroke="#111" stroke-width="3"><circle cx="24" cy="24" r="21"/><circle cx="24" cy="19" r="7"/><path d="M11 38 Q14 29 24 29 Q34 29 37 38"/></svg>`, S1, 0.9);
+// step 2 — bio
+region(50, 272, 520, 174, `<div class="t" style="left:8px;top:6px;font-size:25px;line-height:32px;"><b style="position:static;font-weight:700;">Account Name</b><br/>IG profile copy<br/>goes here</div>`, S2, 0.98);
+// step 3 — highlights (labels stay)
+const HL = [116, 263, 409.5, 556, 702, 849];
+HL.forEach((cx, i) => region(cx - 58, 567, 116, 116,
+  `<div style="left:3px;top:3px;width:110px;height:110px;border-radius:50%;background:#D9D9DB;box-shadow:0 0 0 3px #fff, 0 0 0 5px #E3E3E5;"></div>`,
+  S3 + 0.04 * i, 0.7, 0.2, "border-radius:50%;", "border-radius:50%;"));
+// steps 4–6 — the grid, row by row
+const COLS = [[14, 309], [325, 293], [620, 310]], ROWS = [[807, 270], [1077, 248], [1327, 244]];
+const LABELS = ["NEW<br/>LAUNCH", "BRAND<br/>PROMISE", "AMENITIES", "INTERIOR<br/>WALKTHROUGH", "BRAND<br/>IDENTITY",
+  "MILESTONES", "OUR<br/>PROCESS", "MASTER<br/>PLAN", "SUSTAINABILITY"];
+el(`<div style="${at(12, 805, 919, 768)}background:#fff;"></div>`);                 // grid gutters during the wireframe
+const tiles = LABELS.map((s, i) => {
+  const [x, w] = COLS[i % 3], [y, h] = ROWS[Math.floor(i / 3)];
+  el(`<div class="ph" style="${at(x, y, w, h)}">${s}</div>`);
+  return { s: spr(x, y, w, h), t0: R[Math.floor(i / 3)] + 0.05 * (i % 3) };
+});
+
+/* ---------- state ---------- */
+const STATS = [[0, 0, 0], [161, 18800, 16], [322, 37500, 31], [482, 56300, 47]];      // ends on the profile's own numbers
+const fmt = (v, i) => { v = Math.round(v); if (i === 1 && v >= 10000) return (Math.round(v / 100) / 10).toFixed(1).replace(/\.0$/, "") + "K"; return v.toLocaleString("en-US"); };
+function seek(t) {
+  document.getElementById("cap").style.display = "none";
+  ui.style.display = "block";
+  for (const r of regions) {
+    const p = t < r.t0 ? 0 : pop(t, r.t0, r.len);
+    r.s.style.opacity = p; r.s.style.transform = `scale(${r.scale + (1 - r.scale) * p})`;
+    r.wf.style.opacity = 1 - p;
+  }
+  for (const k of tiles) {
+    const p = t < k.t0 ? 0 : pop(t, k.t0, 0.18);
+    k.s.style.opacity = p; k.s.style.transform = `scale(${0.9 + 0.1 * p})`;
+  }
+  let row = 0; for (let k = 0; k < 3; k++) if (t >= R[k]) row = k + 1;
+  const prev = STATS[Math.max(0, row - 1)], cur = STATS[row], u = row ? eOut(P(t, R[row - 1], R[row - 1] + 0.4)) : 1;
+  statN.forEach((n, i) => (n.textContent = fmt(prev[i] + (cur[i] - prev[i]) * u, i)));
+}
+function caption() { ui.style.display = "none"; document.getElementById("cap").style.display = "block"; }
+function finished() { seek(END + 1); statN.forEach((n) => (n.style.visibility = "visible")); }
+window.seek = seek; window.caption = caption; window.TIMING = { DROP, S1, S2, S3, R, END, BEAT };
+window.ready = (async () => {
+  for (const w of [400, 500, 600, 700]) await document.fonts.load(`${w} 30px Inter`);
+  await document.fonts.load("900 80px FR");
+  await Promise.all([...document.images].map((im) => (im.complete ? 0 : new Promise((r) => { im.onload = im.onerror = r; }))));
+  await new Promise((r) => { const i = new Image(); i.onload = i.onerror = r; i.src = "img/profile.png"; });
+  seek(DROP); return true;
+})();
+</script>
+</body>
+</html>

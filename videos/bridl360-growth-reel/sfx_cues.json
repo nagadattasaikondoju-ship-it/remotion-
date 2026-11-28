@@ -1,0 +1,56 @@
+[
+ {
+  "t": 14.14,
+  "type": "pop",
+  "g": 0.4,
+  "note": "Hyderabad pops in"
+ },
+ {
+  "t": 26.88,
+  "type": "pop",
+  "g": 0.35,
+  "note": "BRIDL360 project in the map pin"
+ },
+ {
+  "t": 28.323,
+  "type": "pop",
+  "g": 0.45,
+  "note": "Kompally"
+ },
+ {
+  "t": 29.022,
+  "type": "pop",
+  "g": 0.45,
+  "note": "Gachibowli"
+ },
+ {
+  "t": 29.802,
+  "type": "pop",
+  "g": 0.45,
+  "note": "Sadashivpet"
+ },
+ {
+  "t": 30.44,
+  "type": "swipe",
+  "g": 0.4,
+  "note": "places slide out, projects slide in"
+ },
+ {
+  "t": 30.728,
+  "type": "pop",
+  "g": 0.5,
+  "note": "5 projects"
+ },
+ {
+  "t": 45.42,
+  "type": "softwhoosh",
+  "g": 0.35,
+  "note": "end card rises"
+ },
+ {
+  "t": 46.78,
+  "type": "chime",
+  "g": 0.45,
+  "note": "DM US OR CALL NOW lands"
+ }
+]

@@ -1,0 +1,457 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- "Chai, Gutkha and the Yellow Wall": a flat 2D explainer on tobacco, stains and gum disease for the dental clinic
+     (non-judgemental; no doctor's name is spoken). Pure function of time: seek(t). Beats follow the narration's word times (timeline.js).
+     Built by make_html.py from the shared engine of ../sushma-sensitivity-explainer + scenes.js. -->
+<style>
+@font-face { font-family: P; font-weight: 500; src: url(fonts/Poppins-Medium.ttf); }
+@font-face { font-family: P; font-weight: 600; src: url(fonts/Poppins-SemiBold.ttf); }
+@font-face { font-family: P; font-weight: 700; src: url(fonts/Poppins-Bold.ttf); }
+@font-face { font-family: P; font-weight: 800; src: url(fonts/Poppins-ExtraBold.ttf); }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+canvas { display: block; }
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script src="timeline.js"></script>
+<script>
+const C = document.getElementById('c'), X = C.getContext('2d'), W = 1080, H = 1920;
+const TEND = 33.7;
+window.TIMING = { TEND };
+// ---------- maths ----------
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), lerp = (a, b, k) => a + (b - a) * k, seg = (t, a, b) => clamp((t - a) / (b - a));
+const eo = k => 1 - Math.pow(1 - k, 3), ei = k => k * k * k, eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const back = (k, s = 1.7) => k <= 0 ? 0 : 1 + (s + 1) * Math.pow(k - 1, 3) + s * Math.pow(k - 1, 2);
+const sm = k => k * k * (3 - 2 * k);
+const rnd = i => { const x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+// ---------- narration word times ----------
+const LINES = window.TL.lines;
+function WT(li, word, nth = 0) {   // start time of a word in line li (1-based); prefix match
+  const L = LINES[li - 1]; let n = 0;
+  for (const w of L.words) if (w.w.toLowerCase().replace(/[^a-z']/g, '').startsWith(word)) { if (n++ === nth) return w.s; }
+  return L.start;
+}
+const LS = li => LINES[li - 1].start, LE = li => LINES[li - 1].end;
+const K = {
+  smile: WT(1, 'smile'), year: WT(1, 'year'), gums: WT(2, 'gums'),
+  chai: WT(3, 'chai'), cig: WT(3, 'cigarette'), gutka: WT(3, 'gutka'),
+  drew0: LS(4), drew: WT(4, 'drew'), brown: WT(4, 'brown'),
+  but: LS(5), worse: WT(5, 'worse'),
+  tartar: LS(6), germs: WT(6, 'germs'), tobacco: WT(6, 'tobacco'),
+  attack: WT(7, 'attack'), pull: WT(7, 'pull'),
+  bone: WT(8, 'bone'), away: WT(8, 'away'),
+  clinic0: LS(9), deep: WT(9, 'deep'), stains: WT(9, 'stains'),
+  gumcare: LS(10), heal: WT(10, 'heal'), team: WT(10, 'team'), quit: WT(10, 'quit'), step: WT(10, 'step'),
+  again0: LS(11), cta: LS(12)
+};
+window.KEYS = K;
+// ---------- palette ----------
+const P = {
+  skin: '#D69469', skinD: '#BF7C54', hair: '#2A1A2E', top: '#19B3A3', topD: '#11897C', blush: 'rgba(255,120,130,.45)',
+  kulfi1: '#F8DB92', kulfi2: '#EDB35E', pista: '#8CC152', stick: '#DDA466',
+  enamel: '#F4FAFF', enamelEdge: '#BFDDF2', dentin: '#F2DDB0', dentinD: '#E2C48C', root: '#E8C98E', pulp: '#F27A8A', pulpD: '#D9566E',
+  nerve: '#FFE066', gum: '#F3899B', gumD: '#D9687D', bone: '#F6E7CF', boneD: '#E8D3B0',
+  zap: '#FFE45C', cold: '#9FE7FF', seal: '#36D1C4', red: '#FF5A5F', green: '#3DDC84', ink: '#1B1638', yellow: '#FFD54A'
+};
+// ---------- drawing helpers ----------
+function grad(y0, y1, stops) { const g = X.createLinearGradient(0, y0, 0, y1); stops.forEach(([o, c]) => g.addColorStop(o, c)); return g; }
+function rgrad(x, y, r0, r1, stops) { const g = X.createRadialGradient(x, y, r0, x, y, r1); stops.forEach(([o, c]) => g.addColorStop(o, c)); return g; }
+function bg(stops) { X.fillStyle = grad(0, H, stops); X.fillRect(0, 0, W, H); }
+function circle(x, y, r, col) { X.beginPath(); X.arc(x, y, Math.max(0, r), 0, 6.2832); X.fillStyle = col; X.fill(); }
+function ell(x, y, rx, ry, col, rot = 0) { X.beginPath(); X.ellipse(x, y, Math.max(0, rx), Math.max(0, ry), rot, 0, 6.2832); X.fillStyle = col; X.fill(); }
+function rr(x, y, w, h, r, col) { X.beginPath(); X.roundRect(x, y, w, h, r); X.fillStyle = col; X.fill(); }
+function glow(x, y, r, col, a = 1) { X.save(); X.globalAlpha *= a; X.fillStyle = rgrad(x, y, 0, r, [[0, col], [1, 'rgba(0,0,0,0)']]); X.fillRect(x - r, y - r, r * 2, r * 2); X.restore(); }
+function heart(x, y, s, col, a = 1) { X.save(); X.globalAlpha *= a; X.translate(x, y); X.scale(s, s); X.beginPath(); X.moveTo(0, 10);
+  X.bezierCurveTo(-30, -12, -14, -40, 0, -20); X.bezierCurveTo(14, -40, 30, -12, 0, 10); X.fillStyle = col; X.fill(); X.restore(); }
+function sparkle(x, y, s, col, a = 1, rot = 0) { if (s <= 0) return; X.save(); X.globalAlpha *= a; X.translate(x, y); X.rotate(rot); X.scale(s, s); X.beginPath();
+  for (let i = 0; i < 8; i++) { const r = i % 2 ? 7 : 30, an = i * Math.PI / 4; X.lineTo(Math.cos(an) * r, Math.sin(an) * r); } X.closePath(); X.fillStyle = col; X.fill(); X.restore(); }
+function snow(x, y, s, a = 1, rot = 0) { X.save(); X.globalAlpha *= a; X.translate(x, y); X.rotate(rot); X.strokeStyle = '#EFFBFF'; X.lineWidth = 3.2 * s; X.lineCap = 'round';
+  for (let i = 0; i < 3; i++) { X.rotate(Math.PI / 3); X.beginPath(); X.moveTo(-11 * s, 0); X.lineTo(11 * s, 0); X.stroke(); }
+  X.restore(); }
+function bolt(x1, y1, x2, y2, w, seed, a = 1) {   // jagged lightning from (x1,y1) to (x2,y2)
+  if (a <= 0) return; const n = 7, pts = [];
+  for (let i = 0; i <= n; i++) { const k = i / n, j = (i === 0 || i === n) ? 0 : (rnd(seed + i) - .5) * w * 2.2; const dx = x2 - x1, dy = y2 - y1, L = Math.hypot(dx, dy);
+    pts.push([x1 + dx * k - dy / L * j, y1 + dy * k + dx / L * j]); }
+  X.save(); X.globalAlpha *= a; X.lineJoin = 'round'; X.lineCap = 'round';
+  X.shadowColor = P.zap; X.shadowBlur = 40; X.strokeStyle = P.zap; X.lineWidth = w; X.beginPath(); pts.forEach((p, i) => i ? X.lineTo(...p) : X.moveTo(...p)); X.stroke();
+  X.shadowBlur = 0; X.strokeStyle = '#FFFFFF'; X.lineWidth = w * .38; X.stroke(); X.restore();
+}
+function text(s, x, y, size, col, weight = 800, align = 'center', a = 1, stroke = null) {
+  X.save(); X.globalAlpha *= a; X.font = `${weight} ${size}px P`; X.textAlign = align; X.textBaseline = 'middle';
+  if (stroke) { X.lineJoin = 'round'; X.lineWidth = stroke[1]; X.strokeStyle = stroke[0]; X.strokeText(s, x, y); }
+  X.fillStyle = col; X.fillText(s, x, y); X.restore();
+}
+function label(s, x, y, k, col = '#FFFFFF', bgc = 'rgba(20,16,50,.82)', size = 40, lx = null, ly = null) {   // pill label with an optional leader line to (lx, ly)
+  if (k <= 0) return; X.save(); const e = back(k, 1.6);
+  if (lx !== null) { X.globalAlpha = clamp(k * 2); X.strokeStyle = bgc; X.lineWidth = 5; X.lineCap = 'round'; X.beginPath(); X.moveTo(x, y); X.lineTo(lerp(x, lx, eo(k)), lerp(y, ly, eo(k))); X.stroke(); circle(lerp(x, lx, eo(k)), lerp(y, ly, eo(k)), 9, bgc); }
+  X.translate(x, y); X.scale(e, e); X.globalAlpha = clamp(k * 3); X.font = `800 ${size}px P`; const w = X.measureText(s).width + size * 1.1;
+  X.shadowColor = 'rgba(0,0,0,.25)'; X.shadowBlur = 18; X.shadowOffsetY = 6; rr(-w / 2, -size * .78, w, size * 1.56, size * .78, bgc); X.shadowColor = 'transparent';
+  X.fillStyle = col; X.textAlign = 'center'; X.textBaseline = 'middle'; X.fillText(s, 0, 2); X.restore();
+}
+function particles(t, n, seed, col, rmax, a = 1) {   // slow drifting ambient dots (the explainer look)
+  for (let i = 0; i < n; i++) { const x = (rnd(seed + i) * W + t * (8 + rnd(seed + i * 3) * 14)) % W, y = (rnd(seed + i * 7) * H - t * (10 + rnd(seed + i * 5) * 22) + H * 4) % H;
+    glow(x, y, 6 + rnd(seed + i * 11) * rmax, col, a * (.35 + .5 * rnd(seed + i * 13))); }
+}
+// ---------- characters ----------
+function riya(x, y, s, o = {}) {   // origin = head centre. o: expr, hand [x,y] (right hand, local), lhand, sweat, hairUp, mouthOpen, look
+  X.save(); X.translate(x, y); X.scale(s, s);
+  const t = o.t || 0, sway = Math.sin(t * 2.2) * .06;
+  // ponytail + hair back
+  X.save(); X.translate(96, -30); X.rotate(.5 + sway); ell(30, 40, 52, 96, P.hair); X.restore();
+  circle(0, -8, 130, P.hair);
+  // body
+  rr(-30, 90, 60, 70, 20, P.skinD);
+  X.beginPath(); X.moveTo(-160, 150); X.quadraticCurveTo(0, 105, 160, 150); X.quadraticCurveTo(195, 400, 175, 560); X.lineTo(-175, 560); X.quadraticCurveTo(-195, 400, -160, 150); X.closePath();
+  X.fillStyle = grad(130, 560, [[0, P.top], [1, P.topD]]); X.fill();
+  X.beginPath(); X.moveTo(-46, 128); X.lineTo(0, 190); X.lineTo(46, 128); X.strokeStyle = P.topD; X.lineWidth = 10; X.lineCap = 'round'; X.stroke();
+  // arms (sleeve stroke + hand)
+  const arm = (sx, sy, hx, hy) => { X.strokeStyle = P.top; X.lineWidth = 58; X.lineCap = 'round'; X.beginPath(); X.moveTo(sx, sy);
+    X.quadraticCurveTo(sx + (hx - sx) * .2 + (sx > 0 ? 40 : -40), (sy + hy) / 2 + 60, hx, hy); X.stroke(); circle(hx, hy, 34, P.skin); };
+  if (o.lhand) arm(-140, 190, ...o.lhand); else arm(-140, 190, -170, 470);
+  if (o.hand) arm(140, 190, ...o.hand); else arm(140, 190, 170, 470);
+  // head
+  circle(-118, 14, 26, P.skinD); circle(118, 14, 26, P.skinD);
+  circle(0, 0, 120, P.skin);
+  if (o.cheek) circle(70, 55, 46 * o.cheek, P.skin);
+  // fringe
+  X.save(); X.translate(0, o.hairUp ? -14 * o.hairUp : 0);
+  X.beginPath(); X.moveTo(-126, -4); X.bezierCurveTo(-136, -130, -40, -158, 6, -144); X.bezierCurveTo(70, -156, 138, -112, 126, -4);
+  X.bezierCurveTo(104, -66, 64, -86, 22, -76); X.bezierCurveTo(-8, -102, -70, -84, -126, -4); X.closePath(); X.fillStyle = P.hair; X.fill();
+  if (o.hairUp) { X.strokeStyle = P.hair; X.lineWidth = 14; X.lineCap = 'round'; for (let i = -2; i <= 2; i++) { X.beginPath(); X.moveTo(i * 34, -132); X.lineTo(i * 46, -132 - 50 * o.hairUp); X.stroke(); } }
+  X.restore();
+  circle(-72, 48, 20, P.blush); circle(72, 48, 20, P.blush);
+  const ex = o.look ? o.look[0] : 0, ey = o.look ? o.look[1] : 0, e = o.expr || 'neutral';
+  X.strokeStyle = P.ink; X.lineCap = 'round'; X.lineWidth = 8; X.fillStyle = P.ink;
+  if (e === 'happy') { for (const sx of [-44, 44]) { X.beginPath(); X.arc(sx, 18, 17, Math.PI * 1.1, Math.PI * 1.9); X.stroke(); } }
+  else if (e === 'shock') { for (const sx of [-44, 44]) { circle(sx, 12, 30, '#FFFFFF'); circle(sx + ex, 14 + ey, 10, P.ink); } X.beginPath(); X.moveTo(-70, -36); X.lineTo(-24, -48); X.moveTo(70, -36); X.lineTo(24, -48); X.stroke(); }
+  else if (e === 'wince') { X.beginPath(); X.moveTo(-62, 0); X.lineTo(-30, 14); X.lineTo(-62, 28); X.moveTo(62, 0); X.lineTo(30, 14); X.lineTo(62, 28); X.stroke(); }
+  else if (e === 'fake') { ell(-44, 14, 12, 16, P.ink); X.beginPath(); X.moveTo(28, 14); X.lineTo(60, 10); X.stroke(); X.beginPath(); X.moveTo(-70, -34); X.lineTo(-22, -40); X.moveTo(22, -46); X.lineTo(70, -30); X.stroke(); }
+  else { for (const sx of [-44, 44]) { ell(sx + ex, 14 + ey, 12, 16, P.ink); circle(sx + ex + 4, 8 + ey, 4.5, '#FFFFFF'); } }
+  // mouth
+  X.lineWidth = 8;
+  if (e === 'shock' || o.mouthOpen) { const mo = o.mouthOpen ?? 1; ell(0, 66, 26, 30 * mo + 4, '#5A1E2E'); if (mo > .3) { X.save(); X.beginPath(); X.ellipse(0, 66, 26, 30 * mo + 4, 0, 0, 6.29); X.clip(); rr(-22, 66 - 30 * mo, 44, 16, 6, '#FFFFFF'); X.restore(); } }
+  else if (e === 'happy') { X.beginPath(); X.arc(0, 46, 40, .15 * Math.PI, .85 * Math.PI); X.fillStyle = '#5A1E2E'; X.fill(); X.save(); X.clip(); rr(-34, 48, 68, 16, 6, '#FFFFFF'); X.restore(); }
+  else if (e === 'fake') { rr(-50, 52, 100, 34, 14, '#FFFFFF'); X.strokeStyle = P.ink; X.lineWidth = 5; X.beginPath(); X.roundRect(-50, 52, 100, 34, 14); X.stroke(); for (let i = -2; i <= 2; i++) { X.beginPath(); X.moveTo(i * 18, 54); X.lineTo(i * 18, 84); X.stroke(); } }
+  else if (e === 'wince') { X.beginPath(); X.moveTo(-34, 70); for (let i = 0; i < 6; i++) X.lineTo(-34 + (i + 1) * 11.3, 70 + (i % 2 ? -10 : 10)); X.stroke(); }
+  else if (o.chew) { X.beginPath(); X.moveTo(-20, 68); X.quadraticCurveTo(0, 62 + 8 * Math.sin(t * 16), 26, 70); X.stroke(); }
+  else { X.beginPath(); X.arc(0, 50, 30, .2 * Math.PI, .8 * Math.PI); X.stroke(); }
+  if (o.sweat) { X.save(); X.globalAlpha *= o.sweat; X.translate(112, -64); X.beginPath(); X.moveTo(0, -26); X.quadraticCurveTo(18, 4, 0, 14); X.quadraticCurveTo(-18, 4, 0, -26); X.fillStyle = '#8FD8FF'; X.fill(); X.restore(); }
+  X.restore();
+}
+function kulfi(x, y, s, o = {}) {   // origin = top of the stick (bottom of the kulfi). o: angry 0..1, bite 0..1, rot
+  X.save(); X.translate(x, y); X.rotate(o.rot || 0); X.scale(s, s);
+  rr(-11, -10, 22, 130, 8, P.stick);
+  X.save();
+  if (o.bite) { X.beginPath(); X.rect(-200, -400, 400, 420); X.arc(52, -238, 58 * o.bite, 0, 6.29, true); X.clip('evenodd'); }
+  X.beginPath(); X.moveTo(-58, 0); X.lineTo(-64, -200); X.quadraticCurveTo(-64, -262, 0, -264); X.quadraticCurveTo(64, -262, 64, -200); X.lineTo(58, 0); X.quadraticCurveTo(0, 14, -58, 0); X.closePath();
+  X.fillStyle = grad(-264, 0, [[0, P.kulfi1], [1, P.kulfi2]]); X.fill();
+  X.globalAlpha = .9; for (let i = 0; i < 14; i++) { ell(-44 + rnd(i) * 88, -230 + rnd(i + 40) * 210, 7, 4.5, rnd(i + 9) > .5 ? P.pista : '#C77A3A', rnd(i + 3) * 3); }
+  X.globalAlpha = 1; X.beginPath(); X.moveTo(-60, -190); X.bezierCurveTo(-30, -170, -10, -205, 20, -180); X.bezierCurveTo(40, -165, 50, -190, 62, -182); X.lineTo(62, -200); X.quadraticCurveTo(62, -262, 0, -262); X.quadraticCurveTo(-62, -262, -62, -200); X.closePath(); X.fillStyle = 'rgba(255,255,255,.35)'; X.fill();
+  X.restore();
+  const a = o.angry || 0;
+  if (a > 0) { X.save(); X.globalAlpha *= clamp(a * 2); X.strokeStyle = P.ink; X.lineCap = 'round'; X.lineWidth = 9;
+    X.beginPath(); X.moveTo(-40, -150 - 6 * a); X.lineTo(-8, -136 + 6 * a); X.moveTo(40, -150 - 6 * a); X.lineTo(8, -136 + 6 * a); X.stroke();
+    ell(-24, -116, 7, 9, P.ink); ell(24, -116, 7, 9, P.ink);
+    X.beginPath(); X.arc(0, -66, 22, 1.15 * Math.PI, 1.85 * Math.PI); X.stroke(); X.restore(); }
+  else if (o.cute) { ell(-22, -120, 7, 9, P.ink); ell(22, -120, 7, 9, P.ink); X.strokeStyle = P.ink; X.lineWidth = 7; X.lineCap = 'round'; X.beginPath(); X.arc(0, -98, 14, .2 * Math.PI, .8 * Math.PI); X.stroke(); circle(-38, -100, 9, P.blush); circle(38, -100, 9, P.blush); }
+  X.restore();
+}
+function doctor(x, y, s, t) {   // a friendly clinician (generic, no real likeness), origin head centre
+  X.save(); X.translate(x, y); X.scale(s, s);
+  circle(0, -22, 126, '#3B2433'); ell(0, -150, 56, 46, '#3B2433');            // bun
+  rr(-30, 90, 60, 70, 20, '#A8714F');
+  X.beginPath(); X.moveTo(-170, 150); X.quadraticCurveTo(0, 105, 170, 150); X.quadraticCurveTo(205, 400, 185, 600); X.lineTo(-185, 600); X.quadraticCurveTo(-205, 400, -170, 150); X.closePath(); X.fillStyle = '#FFFFFF'; X.fill();
+  X.beginPath(); X.moveTo(-60, 128); X.lineTo(0, 260); X.lineTo(60, 128); X.closePath(); X.fillStyle = '#2E9CCB'; X.fill();
+  X.strokeStyle = '#DCE6F0'; X.lineWidth = 6; X.beginPath(); X.moveTo(-70, 140); X.lineTo(-20, 330); X.moveTo(70, 140); X.lineTo(20, 330); X.stroke();
+  rr(70, 300, 56, 60, 10, '#E8EEF5');                                             // pocket
+  circle(-120, 14, 24, '#A8714F'); circle(120, 14, 24, '#A8714F'); circle(0, 0, 116, '#B97B55');
+  X.beginPath(); X.moveTo(-120, -10); X.bezierCurveTo(-120, -120, -30, -140, 0, -128); X.bezierCurveTo(40, -140, 120, -110, 120, -10); X.bezierCurveTo(90, -80, 30, -90, 0, -80); X.bezierCurveTo(-30, -90, -90, -80, -120, -10); X.fillStyle = '#3B2433'; X.fill();
+  const bl = (Math.floor(t * 1.3) % 4 === 0 && (t * 1.3) % 1 < .12) ? .15 : 1;
+  ell(-42, 16, 11, 15 * bl, P.ink); ell(42, 16, 11, 15 * bl, P.ink);
+  circle(-70, 50, 18, P.blush); circle(70, 50, 18, P.blush);
+  X.strokeStyle = P.ink; X.lineWidth = 8; X.lineCap = 'round'; X.beginPath(); X.arc(0, 48, 32, .2 * Math.PI, .8 * Math.PI); X.stroke();
+  X.restore();
+}
+// ---------- the tooth (cross-section), local units, origin at the neck ----------
+const TOOTH = new Path2D('M -255,-260 C -265,-430 -170,-520 -95,-480 C -50,-455 -25,-470 0,-490 C 25,-470 50,-455 95,-480 C 170,-520 265,-430 255,-260 C 248,-160 200,-90 172,-40 C 160,40 175,200 150,380 C 140,470 105,520 80,520 C 55,520 45,470 40,380 C 30,250 20,160 0,140 C -20,160 -30,250 -40,380 C -45,470 -55,520 -80,520 C -105,520 -140,470 -150,380 C -175,200 -160,40 -172,-40 C -200,-90 -248,-160 -255,-260 Z');
+const PULP = new Path2D('M -118,-250 C -122,-330 -62,-338 -40,-292 C -16,-312 16,-312 40,-292 C 62,-338 122,-330 118,-250 C 116,-150 96,-70 88,10 C 82,160 98,330 84,470 C 82,486 70,486 68,470 C 60,340 52,170 40,60 C 30,20 -30,20 -40,60 C -52,170 -60,340 -68,470 C -70,486 -82,486 -84,470 C -98,330 -82,160 -88,10 C -96,-70 -116,-150 -118,-250 Z');
+function toothXS(st, t) {   // st: thin 0..1, gumY, seal 0..1, tubes 0..1, nerveHot 0..1, glowRoot 0..1
+  // bone
+  X.save(); X.beginPath(); X.rect(-560, st.boneY, 1120, 900); X.fillStyle = grad(st.boneY, st.boneY + 700, [[0, P.bone], [1, P.boneD]]); X.fill();
+  for (let i = 0; i < 70; i++) circle(-540 + rnd(i) * 1080, st.boneY + 30 + rnd(i + 70) * 640, 6 + rnd(i + 140) * 10, 'rgba(214,186,140,.45)');
+  X.fillStyle = P.bone; X.fillRect(-70, 110, 140, st.boneY - 110 + 4);   // bone between the roots
+  X.restore();
+  // tooth: dentin + root
+  X.save(); X.fillStyle = grad(-500, 520, [[0, P.dentin], [.55, P.dentin], [1, P.root]]); X.fill(TOOTH); X.restore();
+  // enamel cap (crown above the neck), its inner edge moves out as it wears thin
+  X.save(); X.beginPath(); X.rect(-400, -700, 800, 660); X.clip(); X.fillStyle = grad(-520, -40, [[0, '#FFFFFF'], [1, P.enamelEdge]]); X.fill(TOOTH);
+  const sc = lerp(.84, .93, st.thin); X.translate(0, -250 + 250 * sc); X.translate(0, -250 * (1 - sc) * .2);
+  X.save(); X.translate(0, -250); X.scale(sc, sc); X.translate(0, 250); X.fillStyle = grad(-500, -40, [[0, P.dentin], [1, P.dentinD]]); X.fill(TOOTH); X.restore();
+  X.restore();
+  if (st.thin > 0) { X.save(); X.globalAlpha = st.thin * .8; X.strokeStyle = 'rgba(120,150,180,.7)'; X.lineWidth = 4; X.lineCap = 'round';
+    for (let i = 0; i < 9; i++) { const x0 = -200 + i * 50, y0 = -430 + Math.abs(i - 4) * 26; X.beginPath(); X.moveTo(x0, y0); X.lineTo(x0 + 22, y0 + 10); X.stroke(); } X.restore(); }
+  // pulp + nerve
+  X.save(); X.fillStyle = grad(-330, 480, [[0, P.pulp], [1, P.pulpD]]); X.fill(PULP);
+  X.clip(PULP); const hot = st.nerveHot || 0;
+  X.strokeStyle = hot > 0 ? `rgba(255,${Math.round(lerp(224, 80, hot))},${Math.round(lerp(102, 60, hot))},1)` : P.nerve; X.lineWidth = 7 + 4 * hot; X.lineCap = 'round';
+  if (hot > 0) { X.shadowColor = '#FFE45C'; X.shadowBlur = 30 * hot; }
+  for (const sx of [-1, 1]) { X.beginPath(); X.moveTo(sx * 76, 470); X.bezierCurveTo(sx * 70, 200, sx * 60, 40, sx * 30, -60); X.bezierCurveTo(sx * 10, -150, sx * 70, -200, sx * 80, -280); X.stroke();
+    X.beginPath(); X.moveTo(sx * 40, -150); X.lineTo(sx * 90, -230); X.moveTo(sx * 50, -100); X.lineTo(sx * 96, -150); X.stroke(); }
+  X.restore();
+  // tubules on the exposed root (both sides), between the neck and the gum line
+  if (st.tubes > 0) {
+    const yTop = -30, yBot = Math.min(st.gumY - 10, 150);
+    for (const sx of [-1, 1]) for (let i = 0; i < 7; i++) {
+      const k = clamp(st.tubes * 1.4 - i * .06), y = lerp(yTop, yBot, (i + .5) / 7); if (k <= 0 || y > yBot) continue;
+      const xo = sx * (168 + (y - yTop) * .03), xi = sx * 86;
+      X.save(); X.globalAlpha = k; X.strokeStyle = 'rgba(150,95,60,.55)'; X.lineWidth = 9; X.lineCap = 'round';
+      X.beginPath(); X.moveTo(xo, y); X.bezierCurveTo(lerp(xo, xi, .35), y - 14, lerp(xo, xi, .65), y + 14, lerp(xo, xi, eo(k)), y); X.stroke();
+      X.strokeStyle = 'rgba(255,240,215,.85)'; X.lineWidth = 3.5; X.stroke(); X.restore();
+    }
+  }
+  // gums (the soft tissue at the neck, both sides) and the exposed root band
+  const gy = st.gumY;
+  if (st.glowRoot > 0 && gy > -30) { X.save(); X.globalAlpha = st.glowRoot * (.55 + .35 * Math.sin(t * 7)); X.strokeStyle = '#FFB347'; X.lineWidth = 16; X.shadowColor = '#FFB347'; X.shadowBlur = 30;
+    for (const sx of [-1, 1]) { X.beginPath(); X.moveTo(sx * 172, -36); X.bezierCurveTo(sx * 166, 0, sx * 165, gy * .6, sx * 166, gy); X.stroke(); } X.restore(); }
+  for (const sx of [-1, 1]) {
+    X.beginPath(); X.moveTo(sx * 560, gy + 70); X.bezierCurveTo(sx * 400, gy + 40, sx * 230, gy - 30, sx * 172, gy - 8);
+    X.bezierCurveTo(sx * 160, gy + 60, sx * 162, gy + 140, sx * 168, gy + 240); X.lineTo(sx * 560, gy + 260); X.closePath();
+    X.fillStyle = grad(gy - 30, gy + 260, [[0, st.gumA || P.gum], [1, st.gumB || P.gumD]]); X.fill();
+  }
+  // seal coat
+  if (st.seal > 0) { X.save(); X.strokeStyle = P.seal; X.lineWidth = 22; X.lineCap = 'round'; X.shadowColor = P.seal; X.shadowBlur = 24; X.globalAlpha = .92;
+    for (const sx of [-1, 1]) { X.beginPath(); X.moveTo(sx * 182, -44); X.bezierCurveTo(sx * 176, 0, sx * 175, gy * .6, sx * 176, lerp(-44, gy + 4, st.seal)); X.stroke(); }
+    X.shadowBlur = 0; X.strokeStyle = 'rgba(255,255,255,.7)'; X.lineWidth = 5; for (const sx of [-1, 1]) { X.beginPath(); X.moveTo(sx * 186, -40); X.lineTo(sx * 184, lerp(-40, gy - 10, st.seal) * .9); X.stroke(); } X.restore(); }
+}
+// ---------- toothbrushes ----------
+function brush(x, y, s, rot, soft) {
+  X.save(); X.translate(x, y); X.rotate(rot); X.scale(s, s);
+  rr(-40, -16, 520, 32, 16, soft ? '#7C5CFF' : '#FF6B4A'); rr(330, -12, 150, 24, 12, soft ? '#A28BFF' : '#FF9A80');
+  rr(-60, -24, 120, 26, 8, soft ? '#E9E3FF' : '#FFE1D8');
+  if (soft) for (let i = 0; i < 6; i++) { ell(-48 + i * 19, -50, 12, 28, '#B9A6FF'); ell(-48 + i * 19, -66, 9, 12, '#DCD2FF'); }
+  else for (let i = 0; i < 12; i++) { rr(-57 + i * 9.6, -72, 7, 50, 2, '#9FB0C4'); rr(-57 + i * 9.6, -72, 7, 8, 2, '#5E6E82'); }
+  X.restore();
+}
+// ---------- "Chai, Gutkha and the Yellow Wall": characters + scenes (appended to the shared flat-2D engine by make_html.py) ----------
+const mixC = (a, b, k) => { const p = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)); const A = p(a), B = p(b); return '#' + A.map((v, i) => Math.round(lerp(v, B[i], clamp(k))).toString(16).padStart(2, '0')).join(''); };
+const TEETH = ['#FAF8F0', '#F2E4AE', '#E2C46E', '#C99A4A', '#9E6C3A'];
+const teethAt = q => { q = clamp(q) * (TEETH.length - 1); const i = Math.min(TEETH.length - 2, Math.floor(q)); return mixC(TEETH[i], TEETH[i + 1], q - i); };
+function ramesh(x, y, s, o = {}) {   // origin = head centre. o: teeth colour, gum colour, recede 0..1, expr ('smile'|'sad'|'touched'), t
+  X.save(); X.translate(x, y); X.scale(s, s);
+  const sk = '#B9784F', skD = '#A0653F', hair = '#2B2228', grey = '#9B9BA3';
+  rr(-34, 92, 68, 70, 20, skD);
+  X.beginPath(); X.moveTo(-190, 160); X.quadraticCurveTo(0, 110, 190, 160); X.quadraticCurveTo(225, 420, 205, 620); X.lineTo(-205, 620); X.quadraticCurveTo(-225, 420, -190, 160); X.closePath();
+  X.fillStyle = grad(140, 620, [[0, '#8FC6E8'], [1, '#5E9FC9']]); X.fill();
+  X.fillStyle = '#E8F4FC'; X.beginPath(); X.moveTo(-60, 132); X.lineTo(-8, 210); X.lineTo(-90, 190); X.closePath(); X.fill(); X.beginPath(); X.moveTo(60, 132); X.lineTo(8, 210); X.lineTo(90, 190); X.closePath(); X.fill();
+  circle(-120, 12, 27, skD); circle(120, 12, 27, skD); circle(0, 0, 122, sk);
+  X.beginPath(); X.moveTo(-124, -6); X.bezierCurveTo(-130, -110, -60, -150, -20, -132); X.quadraticCurveTo(0, -112, 20, -132); X.bezierCurveTo(60, -150, 130, -110, 124, -6);
+  X.bezierCurveTo(112, -60, 96, -84, 70, -96); X.quadraticCurveTo(0, -78, -70, -96); X.bezierCurveTo(-96, -84, -112, -60, -124, -6); X.closePath(); X.fillStyle = hair; X.fill();
+  ell(-118, -24, 12, 30, grey); ell(118, -24, 12, 30, grey);
+  X.strokeStyle = hair; X.lineWidth = 12; X.lineCap = 'round'; const sad = o.expr === 'sad' || o.expr === 'touched';
+  X.beginPath(); X.moveTo(-74, sad ? -40 : -46); X.lineTo(-24, sad ? -50 : -44); X.moveTo(74, sad ? -40 : -46); X.lineTo(24, sad ? -50 : -44); X.stroke();
+  if (o.expr === 'smile') { X.strokeStyle = '#1B1638'; X.lineWidth = 8; for (const sx of [-48, 48]) { X.beginPath(); X.arc(sx, 4, 15, Math.PI * 1.1, Math.PI * 1.9); X.stroke(); } }
+  else { for (const sx of [-48, 48]) { ell(sx, 2, 12, 15, '#1B1638'); circle(sx + 4, -4, 4.5, '#FFFFFF'); }
+    if (o.expr === 'touched') { X.save(); X.globalAlpha = .8; ell(-48, 24, 9, 6, '#9FE3FF'); ell(48, 24, 9, 6, '#9FE3FF'); X.restore(); } }
+  X.beginPath(); X.moveTo(-10, 20); X.quadraticCurveTo(0, 46, 14, 34); X.strokeStyle = skD; X.lineWidth = 7; X.stroke();
+  circle(-76, 40, 18, 'rgba(255,120,120,.3)'); circle(76, 40, 18, 'rgba(255,120,120,.3)');
+  if (o.expr === 'smile') {   // a big open smile: gums on top, teeth below (longer as the gums recede)
+    X.save(); X.beginPath(); X.moveTo(-62, 58); X.quadraticCurveTo(0, 150, 62, 58); X.quadraticCurveTo(0, 70, -62, 58); X.closePath(); X.fillStyle = '#5A1E2E'; X.fill(); X.clip();
+    const gTop = 58, gH = lerp(16, 6, o.recede || 0), tH = lerp(22, 32, o.recede || 0);
+    X.fillStyle = o.gum || '#E77C8F'; X.fillRect(-70, gTop - 6, 140, gH + 10);
+    for (let i = -3; i <= 2; i++) { rr(i * 20 + 1, gTop + gH, 18, tH, 5, o.teeth || TEETH[0]); }
+    X.restore();
+  } else { X.strokeStyle = '#5A1E2E'; X.lineWidth = 7; X.beginPath(); X.moveTo(-30, 82); X.quadraticCurveTo(0, o.expr === 'sad' ? 72 : 90, 30, 82); X.stroke(); }
+  X.beginPath(); X.moveTo(-58, 60); X.bezierCurveTo(-40, 36, -10, 44, 0, 52); X.bezierCurveTo(10, 44, 40, 36, 58, 60); X.bezierCurveTo(30, 66, 10, 60, 0, 64); X.bezierCurveTo(-10, 60, -30, 66, -58, 60); X.fillStyle = hair; X.fill();
+  X.restore();
+}
+function girl(x, y, s, o = {}) {   // the daughter; origin = head centre
+  X.save(); X.translate(x, y); X.scale(s, s);
+  const sk = '#C98A5E', hair = '#2A1A2E', t = o.t || 0;
+  for (const sx of [-1, 1]) { X.save(); X.translate(sx * 92, -10); X.rotate(sx * (.35 + Math.sin(t * 3 + sx) * .06)); ell(0, 46, 26, 54, hair); circle(0, 4, 13, '#FF6B9A'); X.restore(); }
+  circle(0, -6, 96, hair);
+  X.beginPath(); X.moveTo(-110, 110); X.quadraticCurveTo(0, 80, 110, 110); X.lineTo(170, 420); X.lineTo(-170, 420); X.closePath(); X.fillStyle = grad(100, 420, [[0, '#FFD54A'], [1, '#FFB627']]); X.fill();
+  circle(0, 0, 86, sk);
+  X.beginPath(); X.moveTo(-90, -6); X.bezierCurveTo(-90, -96, 90, -96, 90, -6); X.quadraticCurveTo(40, -46, 0, -40); X.quadraticCurveTo(-40, -46, -90, -6); X.fillStyle = hair; X.fill();
+  for (const sx of [-34, 34]) { if (o.happy) { X.strokeStyle = '#1B1638'; X.lineWidth = 7; X.lineCap = 'round'; X.beginPath(); X.arc(sx, 10, 12, Math.PI * 1.1, Math.PI * 1.9); X.stroke(); } else { ell(sx, 8, 10, 13, '#1B1638'); circle(sx + 3, 3, 4, '#FFFFFF'); } }
+  circle(-56, 36, 14, 'rgba(255,110,130,.45)'); circle(56, 36, 14, 'rgba(255,110,130,.45)');
+  X.strokeStyle = '#5A1E2E'; X.lineWidth = 7; X.lineCap = 'round'; X.beginPath(); X.arc(0, 30, 22, .2 * Math.PI, .8 * Math.PI); X.stroke();
+  X.restore();
+}
+function crayon(pathFn, col, w) { for (let i = 0; i < 3; i++) { X.save(); X.translate((rnd(i * 7) - .5) * 3, (rnd(i * 13) - .5) * 3); X.globalAlpha *= .55; X.strokeStyle = col; X.lineWidth = w; X.lineCap = 'round'; X.lineJoin = 'round'; X.beginPath(); pathFn(); X.stroke(); X.restore(); } }
+function drawing(x, y, s, rot, teeth, happy, t, k = 1) {   // the daughter's crayon drawing of Papa
+  if (k <= 0) return; X.save(); X.translate(x, y); X.rotate(rot); X.scale(s * back(k, 1.3), s * back(k, 1.3)); X.globalAlpha = clamp(k * 3);
+  X.shadowColor = 'rgba(0,0,0,.25)'; X.shadowBlur = 30; X.shadowOffsetY = 10; rr(-300, -360, 600, 720, 14, '#FFFDF6'); X.shadowColor = 'transparent';
+  X.strokeStyle = 'rgba(120,170,220,.35)'; X.lineWidth = 3; for (let i = 0; i < 9; i++) { X.beginPath(); X.moveTo(-280, -260 + i * 70); X.lineTo(280, -260 + i * 70); X.stroke(); }
+  if (happy) { crayon(() => X.arc(200, -250, 46, 0, 6.29), '#FFB627', 14); for (let i = 0; i < 8; i++) { const a = i * .785; crayon(() => { X.moveTo(200 + Math.cos(a) * 64, -250 + Math.sin(a) * 64); X.lineTo(200 + Math.cos(a) * 92, -250 + Math.sin(a) * 92); }, '#FFB627', 9); }
+    heart(-210, -230, 1.6, 'rgba(255,79,122,.85)'); heart(-150, 250, 1.2, 'rgba(255,79,122,.85)'); heart(220, 200, 1.4, 'rgba(255,79,122,.85)'); }
+  crayon(() => X.arc(0, -110, 120, 0, 6.29), '#8A5A3B', 10);
+  crayon(() => { X.moveTo(-100, -150); X.quadraticCurveTo(0, -270, 100, -150); }, '#2B2228', 16);
+  crayon(() => { X.arc(-42, -130, 6, 0, 6.29); X.moveTo(48, -130); X.arc(42, -130, 6, 0, 6.29); }, '#2B2228', 10);
+  crayon(() => { X.moveTo(-50, -88); X.quadraticCurveTo(0, -112, 50, -88); }, '#2B2228', 14);
+  X.save(); X.beginPath(); X.moveTo(-62, -68); X.quadraticCurveTo(0, -4, 62, -68); X.closePath(); X.fillStyle = teeth; X.globalAlpha *= .9; X.fill(); X.restore();
+  crayon(() => { X.moveTo(-62, -68); X.quadraticCurveTo(0, -4, 62, -68); X.closePath(); for (let i = -2; i <= 2; i++) { X.moveTo(i * 22, -66); X.lineTo(i * 22, -44 + Math.abs(i) * -6); } }, '#5A3A2A', 6);
+  crayon(() => { X.moveTo(0, 10); X.lineTo(0, 200); X.moveTo(0, 60); X.lineTo(-110, happy ? -10 : 130); X.moveTo(0, 60); X.lineTo(110, happy ? -10 : 130); X.moveTo(0, 200); X.lineTo(-80, 320); X.moveTo(0, 200); X.lineTo(80, 320); }, '#4A90D9', 12);
+  X.font = '800 64px P'; X.textAlign = 'center'; X.textBaseline = 'middle'; ['P', 'A', 'P', 'A'].forEach((c, i) => { X.fillStyle = ['#FF5A5F', '#FFB627', '#3DDC84', '#7C5CFF'][i]; X.fillText(c, -150 + i * 32 + (i > 1 ? 210 : 0), 300 + (i % 2) * 8); });
+  X.restore();
+}
+function habitIcon(kind, x, y, k, t) {
+  if (k <= 0) return; X.save(); X.translate(x, y); const e = back(k, 1.6); X.scale(e, e); X.globalAlpha = clamp(k * 3);
+  X.shadowColor = 'rgba(0,0,0,.2)'; X.shadowBlur = 24; X.shadowOffsetY = 8; circle(0, 0, 118, '#FFFFFF'); X.shadowColor = 'transparent';
+  if (kind === 'chai') { X.beginPath(); X.moveTo(-50, -40); X.lineTo(50, -40); X.lineTo(36, 60); X.lineTo(-36, 60); X.closePath(); X.fillStyle = '#C9773E'; X.fill(); ell(0, -40, 50, 12, '#9A5528'); ell(0, -40, 42, 8, '#D7A06A');
+    X.strokeStyle = 'rgba(150,150,160,.8)'; X.lineWidth = 7; X.lineCap = 'round'; for (let j = 0; j < 3; j++) { const sx = -24 + j * 24, ph = t * 5 + j; X.beginPath(); X.moveTo(sx, -58); X.bezierCurveTo(sx + 12 * Math.sin(ph), -76, sx - 12 * Math.sin(ph), -92, sx, -108); X.stroke(); } }
+  if (kind === 'cig') { X.save(); X.rotate(-.5); rr(-80, -12, 120, 24, 6, '#F5F5F5'); rr(40, -12, 40, 24, 6, '#E9A04B'); circle(-80, 0, 12, '#FF7A3D'); X.restore();
+    X.strokeStyle = 'rgba(170,170,180,.7)'; X.lineWidth = 8; X.lineCap = 'round'; X.beginPath(); X.moveTo(-70, 40); X.bezierCurveTo(-90 + 10 * Math.sin(t * 4), 0, -60, -30, -80, -80); X.stroke(); }
+  if (kind === 'gutka') { X.save(); X.rotate(.15); rr(-62, -78, 124, 156, 12, '#2E8B57'); rr(-62, -78, 124, 26, 8, '#C9D6DF'); rr(-62, 52, 124, 26, 8, '#C9D6DF');
+    for (let j = 0; j < 7; j++) { X.fillStyle = '#B6C4CE'; X.fillRect(-58 + j * 18, -76, 6, 22); X.fillRect(-58 + j * 18, 54, 6, 22); }
+    X.fillStyle = '#FFE38A'; X.font = '800 30px P'; X.textAlign = 'center'; X.textBaseline = 'middle'; X.fillText('gutka', 0, 0); X.restore(); }
+  X.restore();
+}
+function tartar(amount, darkness, t, popT) {   // deposits along the crown near the gum line (both sides) + germs
+  if (amount <= 0) return;
+  for (const sx of [-1, 1]) for (let i = 0; i < 9; i++) {
+    const y = lerp(-170, -30, i / 8), base = sx * (242 - (y + 170) * .45), r = (22 + rnd(i + (sx > 0 ? 20 : 0)) * 18) * clamp(amount * 1.6 - i * .05);
+    if (r <= 1) continue; X.save(); X.globalAlpha = clamp(amount * 2);
+    ell(base + sx * r * .35, y, r * .9, r * .65, mixC('#E5C76B', '#7A5226', darkness), rnd(i) * 2);
+    circle(base + sx * r * .5, y - r * .2, r * .28, 'rgba(255,255,255,.25)'); X.restore();
+  }
+}
+function germs(n, k, t, cx, cy, spread) {
+  for (let i = 0; i < n; i++) { const q = clamp(k * 1.5 - i / n * .5); if (q <= 0) continue; const a = rnd(i) * 6.28 + t * (.6 + rnd(i + 3)), r = spread * (.4 + rnd(i + 9) * .6);
+    const x = cx + Math.cos(a) * r * (rnd(i + 2) > .5 ? 1 : -1) * 1.4, y = cy + Math.sin(a) * r * .6;
+    X.save(); X.translate(x, y); X.scale(q, q); circle(0, 0, 18, '#6BD36B'); for (let j = 0; j < 6; j++) { const b = j * 1.05 + t * 2; circle(Math.cos(b) * 20, Math.sin(b) * 20, 5, '#4FB84F'); }
+    circle(-6, -3, 5, '#FFFFFF'); circle(6, -3, 5, '#FFFFFF'); circle(-6, -2, 2.5, '#1B1638'); circle(6, -2, 2.5, '#1B1638'); X.restore(); }
+}
+// ---------- scenes ----------
+function scenePortrait(t) {   // hook: the years go by, the smile changes colour, then the gums
+  bg([[0, '#FFE0B0'], [.6, '#F7B48A'], [1, '#D9807A']]);
+  X.save(); X.globalAlpha = .16; X.translate(540, 820); X.rotate(t * .04); for (let i = 0; i < 14; i++) { X.rotate(Math.PI / 7); X.beginPath(); X.moveTo(0, 0); X.lineTo(1400, -110); X.lineTo(1400, 110); X.closePath(); X.fillStyle = '#FFFFFF'; X.fill(); } X.restore();
+  particles(t, 16, 5, 'rgba(255,255,255,.8)', 9, .7);
+  const yk = seg(t, K.smile, K.year + .3), yr = Math.round(lerp(2015, 2025, eio(yk)));
+  const habits = [K.chai, K.cig, K.gutka].filter(h => t > h + .05).length;
+  const tq = .25 * eio(yk) + habits * .25;
+  const recede = eio(seg(t, K.gums, K.gums + .5)), gumC = mixC('#E77C8F', '#B4405A', recede);
+  const z = lerp(1.0, 1.18, eio(seg(t, K.gums - .2, K.gums + .6)));
+  X.save(); X.translate(540, 820); X.scale(z, z); X.translate(-540, -820);
+  ramesh(540, 680 + Math.sin(t * 2.2) * 5, 1.75, { expr: 'smile', teeth: teethAt(tq), gum: gumC, recede, t });
+  X.restore();
+  // year counter
+  if (t < K.chai) { const k = seg(t, .1, .4); X.save(); X.globalAlpha = k; rr(390, 260, 300, 110, 55, 'rgba(27,22,56,.85)'); text(String(yr), 540, 316, 64, '#FFFFFF', 800); X.restore(); }
+  // the three habits, each one darkens the smile a little more (no judgement, just the timeline)
+  [['chai', K.chai, 180, 470], ['cig', K.cig, 900, 470], ['gutka', K.gutka, 540, 300]].forEach(([kind, t0, x, y]) => habitIcon(kind, x, y, seg(t, t0 - .1, t0 + .25) * (1 - seg(t, K.drew - .9, K.drew - .6)), t));
+  if (t > K.gums - .1 && t < K.chai) label('gums pulling back', 540, 1110 - 0, seg(t, K.gums, K.gums + .3), '#FFFFFF', '#B4405A', 46);
+}
+function sceneDrawing(t, again) {
+  bg(again ? [[0, '#FFF1C9'], [1, '#FFC7A8']] : [[0, '#E9E4F7'], [1, '#C9C1E6']]);
+  particles(t, 12, again ? 61 : 51, 'rgba(255,255,255,.9)', 8, .6);
+  const t0 = again ? K.again0 : K.drew0;
+  drawing(540, 660, 1.08, -.04, again ? '#FFFFFF' : '#8E5E2E', again, t, seg(t, t0 - .1, t0 + .4));
+  girl(250, 1470, .95, { t, happy: true });
+  const rk = eo(seg(t, again ? K.again0 + .5 : K.brown - .2, again ? K.again0 + 1.1 : K.brown + .4));
+  if (rk > 0) ramesh(lerp(1180, 820, rk), 1470, .9, { expr: again ? 'smile' : 'touched', teeth: again ? TEETH[0] : TEETH[4], gum: again ? '#E77C8F' : '#B4405A', recede: again ? .55 : 1, t });
+  if (again) { for (let i = 0; i < 6; i++) { const k = seg(t, K.again0 + .9 + i * .14, K.again0 + 2.4 + i * .14); if (k > 0 && k < 1) heart(560 + (rnd(i) - .5) * 300, 1420 - k * 220, 1 + rnd(i + 2) * .6, '#FF4F7A', Math.sin(k * Math.PI)); } }
+}
+function sceneDiveR(t) {
+  const k = eio(seg(t, K.but + .1, K.worse + .45));
+  bg([[0, '#F7B48A'], [1, '#C86A7A']]);
+  X.save(); const z = lerp(1, 10, ei(k)); X.translate(540, 760); X.scale(z, z); X.translate(-540, -(640 + 95 * 1.75));
+  ramesh(540, 640, 1.75, { expr: 'smile', teeth: TEETH[4], gum: '#B4405A', recede: 1, t }); X.restore();
+  const ir = seg(t, K.worse, K.worse + .45);
+  if (ir > 0) { X.save(); X.beginPath(); X.arc(540, 760, 1400 * eo(ir) + 1, 0, 6.29); X.clip(); sceneGum(t); X.restore(); X.save(); X.globalAlpha = Math.sin(ir * Math.PI) * .8; X.fillStyle = '#FFFFFF'; X.fillRect(0, 0, W, H); X.restore(); }
+}
+function gumState(t) {
+  const clean = seg(t, K.deep, K.stains + .4), heal = eio(seg(t, K.gumcare, K.heal + .5));
+  return { tartar: seg(t, K.tartar - .1, K.tartar + .9) * (1 - clean), dark: seg(t, K.tobacco - .1, K.tobacco + .6),
+    inflame: eio(seg(t, K.attack - .1, K.attack + .6)) * (1 - heal * .85), gumY: lerp(-70, 90, eio(seg(t, K.pull - .2, K.pull + .7))),
+    boneY: lerp(60, 230, eio(seg(t, K.bone, K.away + .4))), germ: seg(t, K.germs - .2, K.germs + .4) * (1 - seg(t, K.deep, K.stains)) };
+}
+function sceneGum(t) {
+  bg([[0, '#1A1B4B'], [.6, '#2B2466'], [1, '#3E2B73']]);
+  glow(540, 760, 820, 'rgba(110,140,255,.26)'); particles(t, 24, 19, 'rgba(160,200,255,.9)', 9, .5);
+  const g = gumState(t), wob = Math.sin(t * 9) * .02 * seg(t, K.away - .3, K.away + .2) * (1 - seg(t, K.away + .8, K.away + 1.3));
+  const z = lerp(.92, .8, eio(seg(t, K.bone - .4, K.bone + .2)));
+  X.save(); X.translate(540, 780); X.scale(z, z); X.rotate(wob);
+  const st = { thin: 0, gumY: g.gumY, boneY: g.boneY, seal: 0, tubes: 0, nerveHot: 0, glowRoot: 0, gumA: mixC('#F3899B', '#D9455E', g.inflame), gumB: mixC('#D9687D', '#A82F48', g.inflame), swell: g.inflame };
+  toothXS(st, t);
+  tartar(g.tartar, g.dark, t);
+  if (g.germ > 0) { germs(10, g.germ, t, 250, g.gumY - 20, 70); germs(8, g.germ, t + 3, -250, g.gumY - 20, 70); }
+  // smoke wisps darken the deposits on "tobacco"
+  const sk = seg(t, K.tobacco - .2, K.tobacco + 1.0); if (sk > 0 && sk < 1) for (let i = 0; i < 6; i++) { const q = (sk + i * .12) % 1; X.save(); X.globalAlpha = Math.sin(sk * Math.PI) * .5 * (1 - q);
+    X.strokeStyle = '#9A9AA8'; X.lineWidth = 22 - q * 10; X.lineCap = 'round'; X.beginPath(); X.moveTo(480 - q * 200, -300 + i * 30); X.bezierCurveTo(400 - q * 220, -260 + i * 20, 360 - q * 260, -200, 300 - q * 120, -140 + i * 10); X.stroke(); X.restore(); }
+  // the clean: scaler chips the tartar, a polish cup spins, the enamel shines
+  const ck = seg(t, K.deep - .1, K.stains + .5);
+  if (ck > 0 && ck < 1) { const y = lerp(-180, -40, (Math.sin(t * 9) + 1) / 2);
+    X.save(); X.globalAlpha = Math.sin(ck * Math.PI) * 1.4; X.translate(300, y); X.rotate(-.5); rr(0, -9, 320, 18, 9, '#C9D3DD'); X.strokeStyle = '#C9D3DD'; X.lineWidth = 10; X.lineCap = 'round'; X.beginPath(); X.moveTo(0, 0); X.quadraticCurveTo(-40, 0, -46, 28); X.stroke(); X.restore();
+    for (let i = 0; i < 10; i++) { const q = ((t * 2.4 + rnd(i)) % 1); circle(250 + q * 200 * rnd(i + 4), y + (rnd(i + 8) - .5) * 80 - q * 90, 9 * (1 - q), `rgba(229,199,107,${(1 - q)})`); } }
+  const pk = seg(t, K.stains - .3, K.stains + .9);
+  if (pk > 0) { if (pk < 1) { X.save(); X.globalAlpha = Math.sin(pk * Math.PI) * 1.3; X.translate(0, -560); X.rotate(t * 14); ell(0, 0, 60, 60, '#7AD3F0'); X.strokeStyle = '#4BA9CC'; X.lineWidth = 8; for (let i = 0; i < 4; i++) { X.rotate(1.57); X.beginPath(); X.moveTo(0, 0); X.lineTo(52, 0); X.stroke(); } X.restore(); }
+    X.save(); X.globalAlpha = clamp(pk * 2) * (.6 + .4 * Math.sin(t * 5)); for (let i = 0; i < 5; i++) sparkle(-200 + i * 100, -470 + Math.abs(i - 2) * 20, .8 + .4 * Math.sin(t * 6 + i), '#FFFFFF', 1, t * 2 + i); X.restore(); }
+  X.restore();
+  const ws = (lx, ly) => [540 + lx * z, 780 + ly * z];
+  const tT = seg(t, K.tartar, K.tartar + .3) * (1 - seg(t, K.attack - .3, K.attack - .05)); if (tT > 0) { const [px, py] = ws(250, -110); label('TARTAR', 760, 280, tT, P.ink, '#F1D27A', 54, px, py); }
+  const tG = seg(t, K.germs, K.germs + .3) * (1 - seg(t, K.attack - .3, K.attack - .05)); if (tG > 0) label('full of germs', 330, 1110, tG, P.ink, '#A8F0A8', 46);
+  const tA = seg(t, K.attack, K.attack + .3) * (1 - seg(t, K.pull + .5, K.pull + .8)); if (tA > 0) { const [px, py] = ws(-330, g.gumY + 30); label('gums inflamed', 320, 280, tA, '#FFFFFF', '#C2334F', 48, px, py); }
+  const tP = seg(t, K.pull, K.pull + .3) * (1 - seg(t, K.bone - .3, K.bone - .05)); if (tP > 0) { const [px, py] = ws(330, g.gumY + 20); label('pulling back', 760, 1110, tP, P.ink, '#FFC2CD', 46, px, py); }
+  const tB = seg(t, K.bone, K.bone + .3) * (1 - seg(t, K.clinic0 - .5, K.clinic0 - .2)); if (tB > 0) { const [px, py] = ws(380, g.boneY + 60); label('bone wears away', 540, 1110, tB, P.ink, '#F6E7CF', 50, px, py); }
+  const tC = seg(t, K.deep + .1, K.deep + .4) * (1 - seg(t, K.gumcare - .3, K.gumcare - .05)); if (tC > 0) label('deep cleaning + polish', 540, 280, tC, P.ink, '#9FF3E9', 50);
+  const tH = seg(t, K.heal - .1, K.heal + .2) * (1 - seg(t, K.team - .3, K.team - .05)); if (tH > 0) label('gums heal', 540, 280, tH, P.ink, '#FFC2CD', 52);
+}
+function sceneClinicR(t) {
+  bg([[0, '#E6F6FF'], [1, '#BFE3F7']]); rr(0, 1180, W, 740, 0, '#A9D3EA');
+  X.save(); X.globalAlpha = .5; for (let i = 0; i < 5; i++) rr(40 + i * 210, 180, 170, 260, 24, '#FFFFFF'); X.restore();
+  rr(560, 1020, 380, 70, 34, '#2E9CCB'); rr(560, 820, 80, 260, 36, '#2E9CCB'); rr(720, 1090, 60, 140, 12, '#8FA9BC');
+  X.strokeStyle = '#8FA9BC'; X.lineWidth = 14; X.lineCap = 'round'; X.beginPath(); X.moveTo(930, 520); X.quadraticCurveTo(920, 680, 820, 760); X.stroke(); ell(940, 510, 80, 36, '#FFFFFF');
+  const ek = eo(seg(t, K.clinic0 - .2, K.clinic0 + .4)); doctor(lerp(-200, 300, ek), 760, 1.0, t);
+  ramesh(lerp(1300, 790, eo(seg(t, K.clinic0, K.clinic0 + .5))), 720, .85, { expr: 'smile', teeth: TEETH[4], gum: '#B4405A', recede: 1, t });
+  label('dental clinic', 540, 300, seg(t, K.clinic0 + .2, K.clinic0 + .5), '#FFFFFF', '#2E9CCB', 52);
+}
+function sceneQuit(t) {   // "the team helps him quit, step by step": a streak, the packets fade, the clinician cheers him on
+  bg([[0, '#1D4A63'], [1, '#226B73']]); particles(t, 20, 71, 'rgba(170,255,240,.9)', 8, .5);
+  const k = eio(seg(t, K.team - .25, K.team + .2));
+  X.save(); const e = back(clamp(k), 1.3); X.translate(540, 700); X.scale(e, e);
+  X.shadowColor = 'rgba(0,0,0,.35)'; X.shadowBlur = 40; rr(-460, -420, 920, 840, 60, '#FFFFFF'); X.shadowColor = 'transparent';
+  text('Quit plan', 0, -320, 70, P.ink, 800);
+  const days = [1, 7, 14, 30], dk = seg(t, K.quit - .2, K.step + 1.2);
+  days.forEach((d, i) => { const on = dk * 4 > i + .3, x = -330 + i * 220; circle(x, -160, 84, on ? P.green : '#E6EBF0'); text(`Day ${d}`, x, -160, 38, on ? '#FFFFFF' : '#9AA3AF', 800);
+    if (i < 3) { X.fillStyle = on ? P.green : '#E6EBF0'; X.fillRect(x + 84, -166, 52, 12); } });
+  const fade = seg(t, K.quit, K.step + 1.0);
+  X.save(); X.globalAlpha = 1 - fade * .85; X.translate(-170, 90); X.scale(1.3 * (1 - fade * .4), 1.3 * (1 - fade * .4)); habitIcon('cig', 0, 0, 1, t); X.restore();
+  X.save(); X.globalAlpha = 1 - fade * .85; X.translate(170, 90); X.scale(1.3 * (1 - fade * .4), 1.3 * (1 - fade * .4)); habitIcon('gutka', 0, 0, 1, t); X.restore();
+  text('one step at a time', 0, 320, 58, '#2E9CCB', 800, 'center', seg(t, K.step, K.step + .3));
+  X.restore();
+}
+// ---------- captions ----------
+const CHUNKS = [];
+LINES.forEach(L => { if (L.i === 12) return; let cur = [];
+  L.words.forEach((w, j) => { cur.push(w); const end = /[.,?!]$/.test(w.w) || cur.length >= 4 || j === L.words.length - 1; if (end) { CHUNKS.push(cur); cur = []; } }); });
+CHUNKS.forEach((c, i) => { c.t0 = c[0].s - .05; c.t1 = i + 1 < CHUNKS.length ? Math.min(CHUNKS[i + 1][0].s - .05, c[c.length - 1].e + .6) : c[c.length - 1].e + .6; });
+const HOT = /^(colour|gums|chai|cigarette|gutka|papa|brown|worse|tartar|germs|tobacco|bone|clinic|cleaning|heal|quit|again)/i;
+function captions(t) {
+  const c = CHUNKS.find(c => t >= c.t0 && t < c.t1); if (!c) return;
+  const k = seg(t, c.t0, c.t0 + .14); X.save(); X.font = '800 70px P'; X.textBaseline = 'middle';
+  const parts = c.map(w => w.w.toUpperCase()), widths = parts.map(p => X.measureText(p).width), gap = 22, tw = widths.reduce((a, b) => a + b, 0) + gap * (parts.length - 1);
+  let x = 540 - tw / 2; const y = 1240, sc = lerp(.9, 1, eo(k)) * Math.min(1, 980 / tw);
+  X.translate(540, y); X.scale(sc, sc); X.translate(-540, -y); X.globalAlpha = clamp(k * 3);
+  parts.forEach((p, i) => { const w = c[i], on = t >= w.s - .03, hot = HOT.test(w.w);
+    X.lineJoin = 'round'; X.lineWidth = 16; X.strokeStyle = 'rgba(20,14,45,.92)'; X.strokeText(p, x, y);
+    X.fillStyle = on ? (hot ? P.yellow : '#FFFFFF') : 'rgba(255,255,255,.55)'; X.fillText(p, x, y); x += widths[i] + gap; });
+  X.restore();
+}
+// ---------- timeline ----------
+function seek(t) {
+  X.setTransform(1, 0, 0, 1, 0, 0); X.globalAlpha = 1; X.clearRect(0, 0, W, H);
+  const xf = (t0, d) => seg(t, t0, t0 + d);
+  const over = (fn, a) => { if (a > 0) { X.save(); X.globalAlpha = a; fn(t); X.restore(); } };
+  if (t < K.drew0 - .2) scenePortrait(t);
+  else if (t < K.but) { sceneDrawing(t, false); over(scenePortrait, 1 - xf(K.drew0 - .2, .3)); }
+  else if (t < K.worse + .45) { sceneDiveR(t); over(t => sceneDrawing(t, false), 1 - xf(K.but, .3)); }
+  else if (t < K.clinic0 - .2) sceneGum(t);
+  else if (t < K.deep - .25) { sceneClinicR(t); over(sceneGum, 1 - xf(K.clinic0 - .2, .3)); }
+  else if (t < K.team - .3) { sceneGum(t); over(sceneClinicR, 1 - xf(K.deep - .25, .3)); }
+  else if (t < K.again0 - .2) { sceneQuit(t); over(sceneGum, 1 - xf(K.team - .3, .3)); }
+  else { sceneDrawing(t, true); over(sceneQuit, 1 - xf(K.again0 - .2, .3));
+    const ck = seg(t, K.cta, K.cta + .3); if (ck > 0) { X.save(); X.globalAlpha = .55 * ck; X.fillStyle = '#2A1240'; X.fillRect(0, 1160, W, 170); X.restore();
+      text("It's never too late.", 540, 1246, 80, '#FFFFFF', 800, 'center', ck, [P.ink, 10]); } }
+  captions(t);
+}
+window.seek = seek;
+window.ready = Promise.all(['500 40px P', '600 40px P', '700 40px P', '800 40px P'].map(f => document.fonts.load(f))).then(() => document.fonts.ready);
+</script></body></html>

@@ -1,0 +1,7 @@
+[
+ {"t": 1.9333, "type": "paper", "g": 0.42, "note": "Contract lands"},
+ {"t": 2.8667, "type": "paper2", "g": 0.38, "note": "Invoice lands"},
+ {"t": 3.9, "type": "paper", "g": 0.38, "note": "Welcome pack lands"},
+ {"t": 4.9667, "type": "paper2", "g": 0.38, "note": "Questionnaire lands"},
+ {"t": 6.0333, "type": "paper", "g": 0.42, "note": "Brand strategy lands"}
+]

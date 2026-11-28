@@ -1,0 +1,74 @@
+{
+ "crack": {
+  "ids": [
+   67
+  ],
+  "role": "hit"
+ },
+ "whoosh": {
+  "ids": [
+   56
+  ],
+  "role": "whoosh"
+ },
+ "pop": {
+  "ids": [
+   65
+  ],
+  "role": "ui"
+ },
+ "swipe": {
+  "ids": [
+   53
+  ],
+  "role": "whoosh"
+ },
+ "tick": {
+  "ids": [
+   0
+  ],
+  "role": "misc"
+ },
+ "boing": {
+  "ids": [
+   70
+  ],
+  "role": "misc"
+ },
+ "rewind": {
+  "ids": [
+   52
+  ],
+  "role": "whoosh"
+ },
+ "scaler": {
+  "ids": [
+   69
+  ],
+  "role": "misc"
+ },
+ "click": {
+  "ids": [
+   38
+  ],
+  "role": "click"
+ },
+ "sparkle": {
+  "ids": [
+   68
+  ],
+  "role": "chime"
+ },
+ "coin": {
+  "ids": [
+   71
+  ],
+  "role": "misc"
+ },
+ "chime": {
+  "ids": [
+   61
+  ],
+  "role": "ui"
+ }
+}

@@ -1,0 +1,208 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- "We got you." brand loop for Dr. Sri Sushma Multispeciality Dental Clinic, rebuilt shot for shot from the user's reference reel
+     (a pendulum brand film, measured frame by frame, 27 Nov 2026) in the clinic's own logo blues. Pure function of time: seek(t).
+       0.0-12.6  PENDULUM: the logo tile hangs on a string from the top lockup and swings (1.2 s per half swing, +/-19.5 deg). The string is
+                 the wipe: on the side it has passed, the dark question flips to the white answer and back (5 questions), then a damped settle.
+      12.6-13.0  the bright scene drops to dark; the tile slides to centre and collapses into a glowing point
+      13.0-17.0  LOGO BUILD: ring pulse, nodes, light comets trace the mark's real outline (img/mark_paths.json), the mark fills
+      17.0-22.3  LOCKUP: mark slides left, the name draws in letter by letter, the website pill rises, contact line, shine; cut back to 0 (loop) -->
+<style>
+@font-face { font-family: I; font-weight: 100 900; src: url(fonts/Inter-var.ttf); }
+html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+canvas { display: block; }
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+const C = document.getElementById('c'), X = C.getContext('2d'), W = 1080, H = 1920;
+const TEND = 12.6; window.TIMING = { TEND };   // the pendulum; the clinic end card (endcard/) follows (user, 27 Nov: keep the same card as the earlier videos, no logo build)
+const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v)), lerp = (a, b, k) => a + (b - a) * k, seg = (t, a, b) => clamp((t - a) / (b - a));
+const eo = k => 1 - Math.pow(1 - k, 3), eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2, ei = k => k * k * k;
+const back = (k, s = 1.6) => k <= 0 ? 0 : 1 + (s + 1) * Math.pow(k - 1, 3) + s * Math.pow(k - 1, 2);
+// ---------- brand (sampled from the clinic logo) ----------
+const B = { deep: '#0A2557', navy: '#06142E', ink: '#06142E', b1: '#2373A1', b2: '#3283CC', b3: '#66B7FC', b4: '#9AD4FF', white: '#FFFFFF' };
+const img = s => { const i = new Image(); i.src = s; return i; };
+const MARK = img('img/mark.png'); let PATHS = null;
+// ---------- copy ----------
+const QS = [['TOOTH', 'PAIN?'], ['BLEEDING', 'GUMS?'], ['MISSING', 'A TOOTH?'], ['STAINED', 'TEETH?'], ['LOOSE', 'TEETH?']];
+const ANS = ['WE GOT', 'YOU.'];
+const SEQ = []; QS.forEach(q => { SEQ.push({ l: q, dark: true }); SEQ.push({ l: ANS, dark: false }); });   // text shown after each half swing
+// ---------- pendulum (measured on the reference: pivot at the top lockup, +/-19.5 deg, 1.2 s per half swing) ----------
+const PIV = [540, 96], LEN = 1105, AMP = 19.5 * Math.PI / 180, HALF = 1.2, NSW = 9, PEND_END = 12.6;
+function theta(t) {   // + = tile to the right
+  if (t <= NSW * HALF) return AMP * Math.cos(Math.PI * t / HALF);
+  const s = t - NSW * HALF; return -AMP * Math.exp(-1.7 * s) * Math.cos(Math.PI * s / .82);   // damped settle after the last swing (ends on the left)
+}
+const tilePos = th => [PIV[0] + LEN * Math.sin(th), PIV[1] + LEN * Math.cos(th)];
+// ---------- helpers ----------
+function rr(x, y, w, h, r) { X.beginPath(); X.roundRect(x, y, w, h, r); }
+function glow(x, y, r, col, a = 1) { if (a <= 0) return; X.save(); X.globalAlpha *= a; const g = X.createRadialGradient(x, y, 0, x, y, r); g.addColorStop(0, col); g.addColorStop(1, 'rgba(0,0,0,0)'); X.fillStyle = g; X.fillRect(x - r, y - r, r * 2, r * 2); X.restore(); }
+let FS = 96;   // headline size, fitted once so every line clears the string at the swing's extremes
+function fitHeadline() {
+  const yT = 920, reach = (yT - PIV[1]) * Math.tan(AMP) - 26; let s = 110;
+  X.font = `900 100px I`; let wmax = 0; [...QS, ANS].forEach(q => q.forEach(l => { X.letterSpacing = '-2px'; wmax = Math.max(wmax, X.measureText(l).width); }));
+  FS = Math.min(s, Math.floor(100 * (2 * reach) / wmax)); X.letterSpacing = '0px';
+}
+function headline(entry, a = 1) {
+  X.save(); X.globalAlpha *= a; X.font = `900 ${FS}px I`; X.letterSpacing = `${-FS * .02}px`; X.textAlign = 'center'; X.textBaseline = 'middle';
+  if (!entry.dark) { X.shadowColor = 'rgba(4,22,60,.38)'; X.shadowBlur = 26; X.shadowOffsetY = 8; }
+  X.fillStyle = entry.dark ? B.ink : B.white;
+  X.fillText(entry.l[0], 540, 920 - FS * .5); X.fillText(entry.l[1], 540, 920 + FS * .52);
+  X.restore();
+}
+function lineX(th, y) { return PIV[0] + (y - PIV[1]) * Math.tan(th); }
+function clipSide(th, left) {   // half-plane left/right of the string line
+  X.beginPath(); const xa = lineX(th, -200), xb = lineX(th, H + 200);
+  if (left) { X.moveTo(-50, -200); X.lineTo(xa, -200); X.lineTo(xb, H + 200); X.lineTo(-50, H + 200); }
+  else { X.moveTo(W + 50, -200); X.lineTo(xa, -200); X.lineTo(xb, H + 200); X.lineTo(W + 50, H + 200); }
+  X.closePath(); X.clip();
+}
+function markAt(cx, cy, h, a = 1) { if (!MARK.complete || a <= 0) return; const w = h * MARK.naturalWidth / MARK.naturalHeight; X.save(); X.globalAlpha *= a; X.drawImage(MARK, cx - w / 2, cy - h / 2, w, h); X.restore(); }
+function tile(x, y, rot, s = 1, glowA = 0) {
+  X.save(); X.translate(x, y); X.rotate(rot); X.scale(s, s);
+  if (glowA > 0) glow(0, 0, 260, 'rgba(102,183,252,.55)', glowA);
+  X.save(); X.shadowColor = 'rgba(3,16,45,.5)'; X.shadowBlur = 44; X.shadowOffsetX = 16 * Math.cos(rot) + 0; X.shadowOffsetY = 28;
+  rr(-100, -100, 200, 200, 46); const g = X.createLinearGradient(-100, -100, 100, 100); g.addColorStop(0, '#13305A'); g.addColorStop(1, '#050F24'); X.fillStyle = g; X.fill(); X.restore();
+  rr(-100, -100, 200, 200, 46); X.strokeStyle = 'rgba(140,200,255,.38)'; X.lineWidth = 2.5; X.stroke();
+  rr(-92, -92, 184, 90, 40); X.fillStyle = 'rgba(255,255,255,.045)'; X.fill();
+  markAt(0, 4, 132);
+  X.restore();
+}
+function topLockup(a = 1) {
+  X.save(); X.globalAlpha *= a; X.font = '800 38px I'; X.letterSpacing = '0.5px'; const tw = X.measureText('DR. SRI SUSHMA').width, mh = 54, mw = mh * .92, gap = 14, w = mw + gap + tw, x0 = 540 - w / 2;
+  markAt(x0 + mw / 2, 96, mh); X.fillStyle = B.white; X.textBaseline = 'middle'; X.textAlign = 'left'; X.shadowColor = 'rgba(4,22,60,.3)'; X.shadowBlur = 10; X.fillText('DR. SRI SUSHMA', x0 + mw + gap, 98); X.restore();
+}
+function bottomCopy(a = 1) {
+  X.save(); X.globalAlpha *= a; X.fillStyle = B.white; X.textAlign = 'center'; X.textBaseline = 'middle';
+  X.font = '800 25px I'; X.letterSpacing = '5px'; X.fillText('GUM SPECIALIST · DENTAL IMPLANTS', 540, 1702);
+  X.globalAlpha *= .85; X.font = '600 25px I'; X.letterSpacing = '0.5px'; X.fillText('Moula Ali, Hyderabad', 540, 1744); X.restore();
+}
+// ---------- scene 1: pendulum ----------
+function bgBright() {
+  const g = X.createRadialGradient(540, 700, 40, 540, 820, 1450); g.addColorStop(0, '#8FCBFF'); g.addColorStop(.28, '#4C9CF0'); g.addColorStop(.62, '#1F64C2'); g.addColorStop(1, '#0B2F72');
+  X.fillStyle = g; X.fillRect(0, 0, W, H);
+  const v = X.createLinearGradient(0, 1100, 0, H); v.addColorStop(0, 'rgba(4,18,52,0)'); v.addColorStop(1, 'rgba(4,18,52,.45)'); X.fillStyle = v; X.fillRect(0, 1100, W, H - 1100);
+  const s = X.createLinearGradient(0, 0, W, 0); s.addColorStop(0, 'rgba(4,18,52,.28)'); s.addColorStop(.25, 'rgba(4,18,52,0)'); s.addColorStop(.75, 'rgba(4,18,52,0)'); s.addColorStop(1, 'rgba(4,18,52,.28)'); X.fillStyle = s; X.fillRect(0, 0, W, H);
+}
+function scenePendulum(t, fadeDark = 0) {
+  bgBright();
+  const th = theta(t), [tx, ty] = tilePos(th);
+  // headline wipe: the string divides old text from new text; the side it has passed shows the new one
+  const i = Math.floor(t / HALF);
+  if (t < NSW * HALF) {
+    const prev = i === 0 ? Q1 : SEQ[i - 1], next = SEQ[i];
+    const movingLeft = i % 2 === 0;   // swing 0 starts at the right extreme
+    X.save(); clipSide(th, movingLeft); headline(prev); X.restore();                            // not yet passed: old text
+    X.save(); clipSide(th, !movingLeft); headline(next); X.restore();                           // passed: new text
+  } else headline(SEQ[NSW - 1]);
+  // string + tile
+  X.save(); X.strokeStyle = 'rgba(6,20,46,.9)'; X.lineWidth = 2.6; X.beginPath(); X.moveTo(PIV[0], PIV[1]); X.lineTo(tx - 100 * Math.sin(th), ty - 100 * Math.cos(th)); X.stroke(); X.restore();
+  topLockup(); bottomCopy();
+  if (fadeDark > 0) { X.save(); X.globalAlpha = fadeDark; X.fillStyle = '#030A18'; X.fillRect(0, 0, W, H); X.restore(); }
+  return [tx, ty, th];
+}
+// swing i reveals SEQ[i] = [A, Q2, A, Q3, A, Q4, A, Q5, A]; the hook frame (before swing 0) shows question 1
+SEQ.splice(0, SEQ.length, ...(() => { const s = []; QS.forEach((q, k) => { s.push({ l: ANS, dark: false }); if (k + 1 < QS.length) s.push({ l: QS[k + 1], dark: true }); }); return s; })());
+const Q1 = { l: QS[0], dark: true };
+// ---------- scene 2: logo build ----------
+const LC = [540, 950], LH = 380;
+function bgDark(k) {
+  X.fillStyle = '#030A18'; X.fillRect(0, 0, W, H);
+  glow(540, 960, 1100, 'rgba(22,70,150,.75)', .25 + .75 * k); glow(540, 960, 520, 'rgba(60,140,240,.35)', k);
+  const v = X.createRadialGradient(540, 960, 600, 540, 960, 1300); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.55)'); X.fillStyle = v; X.fillRect(0, 0, W, H);
+}
+function prepPaths() {
+  if (PATHS || !window.MARKPATHS) return; const M = window.MARKPATHS, s = LH / M.h;
+  PATHS = M.paths.map(p => { const pts = p.map(([x, y]) => [(x - M.w / 2) * s, (y - M.h / 2) * s]); pts.push(pts[0]); let L = 0; const cum = [0];
+    for (let i = 1; i < pts.length; i++) { L += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]); cum.push(L); } return { pts, cum, L }; });
+}
+function drawPath(P, p, ox, oy, sc) {   // stroke the first p of the path, return the head point
+  const target = p * P.L; X.beginPath(); X.moveTo(ox + P.pts[0][0] * sc, oy + P.pts[0][1] * sc); let hx = P.pts[0][0], hy = P.pts[0][1];
+  for (let i = 1; i < P.pts.length; i++) { if (P.cum[i] <= target) { X.lineTo(ox + P.pts[i][0] * sc, oy + P.pts[i][1] * sc); hx = P.pts[i][0]; hy = P.pts[i][1]; }
+    else { const k = (target - P.cum[i - 1]) / (P.cum[i] - P.cum[i - 1]); hx = lerp(P.pts[i - 1][0], P.pts[i][0], k); hy = lerp(P.pts[i - 1][1], P.pts[i][1], k); X.lineTo(ox + hx * sc, oy + hy * sc); break; } }
+  X.stroke(); return [ox + hx * sc, oy + hy * sc];
+}
+const T0 = PEND_END + .4;   // 13.0: logo section starts
+const LG = { ring: T0 + .3, nodes: T0 + 1.35, draw: T0 + 1.75, fill: T0 + 3.15, slide: T0 + 4.25, word: T0 + 4.55, line2: T0 + 5.45, pill: T0 + 6.15, info: T0 + 6.6, shine: T0 + 7.6 };
+const NAME = 'DR. SRI SUSHMA', SUB = 'MULTISPECIALITY DENTAL CLINIC';
+function sceneLogo(t) {
+  prepPaths();
+  const build = seg(t, LG.draw, LG.fill + .8);
+  bgDark(.15 + .85 * build);
+  // ring pulse + point (the tile has collapsed into it)
+  const rk = seg(t, LG.ring - .05, LG.ring + .75);
+  if (rk > 0 && rk < 1) { X.save(); X.globalAlpha = (1 - rk) * .8; X.strokeStyle = 'rgba(190,225,255,.9)'; X.lineWidth = 2; X.beginPath(); X.arc(540, 950, lerp(60, 250, eo(rk)), 0, 6.29); X.stroke(); X.restore(); }
+  const dk = seg(t, T0 - .05, T0 + .25) * (1 - seg(t, LG.ring + .5, LG.ring + 1.0));
+  if (dk > 0) { glow(540, 950, 140, 'rgba(150,210,255,.9)', dk); X.save(); X.globalAlpha = dk; X.beginPath(); X.arc(540, 950, 11, 0, 6.29); X.fillStyle = '#FFFFFF'; X.fill(); X.restore(); }
+  // lockup geometry: the mark travels from the centre to the left of the name
+  X.save(); X.font = '900 70px I'; X.letterSpacing = '-1px'; const nameW = X.measureText(NAME).width; X.restore();
+  const markWfinal = 190 * MARK.naturalWidth / MARK.naturalHeight, groupW = markWfinal + 40 + nameW, gx0 = 540 - groupW / 2;
+  const sl = eio(seg(t, LG.slide, LG.slide + .6));
+  const mx = lerp(LC[0], gx0 + markWfinal / 2, sl), my = lerp(LC[1], 930, sl), msc = lerp(1, 190 / LH, sl);
+  // outline comets
+  if (PATHS && t > LG.nodes - .1) {
+    const n = PATHS.length, maxL = Math.max(...PATHS.map(P => P.L));
+    X.save(); X.lineCap = 'round'; X.lineJoin = 'round';
+    const fade = 1 - seg(t, LG.fill + .2, LG.fill + .9);
+    PATHS.forEach((P, k) => {
+      const st = LG.draw + k * .1, du = 1.0 + .6 * P.L / maxL, p = eio(seg(t, st, st + du));
+      const node = seg(t, LG.nodes + k * .06, LG.nodes + k * .06 + .25);
+      if (fade <= 0) return;
+      X.globalAlpha = fade; X.strokeStyle = B.b4; X.lineWidth = 3.2; X.shadowColor = '#4FA8FF'; X.shadowBlur = 16;
+      let head = [mx + P.pts[0][0] * msc, my + P.pts[0][1] * msc];
+      if (p > 0) head = drawPath(P, p, mx, my, msc);
+      const ha = p < 1 ? Math.max(node, p > 0 ? 1 : 0) : 1 - seg(t, st + du, st + du + .4);
+      if (ha > 0) { X.shadowBlur = 0; glow(head[0], head[1], 34, 'rgba(160,215,255,.9)', ha * fade); X.globalAlpha = ha * fade; X.beginPath(); X.arc(head[0], head[1], 6, 0, 6.29); X.fillStyle = '#FFFFFF'; X.fill(); X.globalAlpha = fade; }
+    });
+    X.restore();
+  }
+  // fill: the real 3D mark blooms in
+  const fk = seg(t, LG.fill, LG.fill + .7);
+  if (fk > 0) { glow(mx, my, 380 * msc + 120, 'rgba(80,160,255,.45)', fk * (1 - .5 * sl)); markAt(mx, my, LH * msc * lerp(.97, 1, eo(fk)), eo(fk)); }
+  // name: each letter draws as an outline, then fills
+  if (t > LG.word - .05) {
+    X.save(); X.font = '900 70px I'; X.letterSpacing = '-1px'; X.textBaseline = 'middle'; X.textAlign = 'left';
+    let x = gx0 + markWfinal + 40; const y = 905;
+    [...NAME].forEach((ch, i) => { const cw = X.measureText(ch).width + -1, lt = LG.word + i * .055, ok = seg(t, lt, lt + .18), fl = seg(t, lt + .2, lt + .45);
+      if (ok > 0) { X.save(); X.globalAlpha = ok; X.translate(0, (1 - eo(ok)) * 16); X.lineWidth = 2.4; X.strokeStyle = '#DCEFFF'; X.shadowColor = '#5DB2FF'; X.shadowBlur = 18 * (1 - fl * .7); X.strokeText(ch, x, y);
+        if (fl > 0) { X.globalAlpha = fl; X.shadowBlur = 0; X.fillStyle = '#FFFFFF'; X.fillText(ch, x, y); } X.restore(); }
+      x += cw; });
+    X.restore();
+    const l2 = seg(t, LG.line2, LG.line2 + .45);
+    if (l2 > 0) { X.save(); X.font = '800 29px I'; X.letterSpacing = `${lerp(12, 2.6, eo(l2))}px`; X.textBaseline = 'middle'; X.textAlign = 'left'; X.globalAlpha = l2; X.fillStyle = B.b3; X.shadowColor = 'rgba(102,183,252,.6)'; X.shadowBlur = 14;
+      X.fillText(SUB, gx0 + markWfinal + 44, 972); X.restore(); }
+  }
+  // website pill
+  const pk = seg(t, LG.pill, LG.pill + .5);
+  if (pk > 0) { const e = back(pk, 1.5), y = lerp(1150, 1095, eo(pk));
+    X.save(); X.font = '700 36px I'; X.letterSpacing = '0px'; const txt = 'drsrisushmadentalclinic.com', tw = X.measureText(txt).width, pw = tw + 190, ph = 100, px = 540 - pw / 2;
+    X.translate(540, y + ph / 2); X.scale(lerp(.9, 1, e), lerp(.9, 1, e)); X.translate(-540, -(y + ph / 2)); X.globalAlpha = clamp(pk * 2.5);
+    X.shadowColor = 'rgba(102,183,252,.55)'; X.shadowBlur = 50; rr(px, y, pw, ph, 50); X.fillStyle = '#F4F9FF'; X.fill(); X.shadowBlur = 0;
+    // globe
+    X.strokeStyle = '#7A93B3'; X.lineWidth = 3; X.beginPath(); X.arc(px + 56, y + 50, 15, 0, 6.29); X.stroke(); X.beginPath(); X.ellipse(px + 56, y + 50, 6.5, 15, 0, 0, 6.29); X.stroke(); X.beginPath(); X.moveTo(px + 41, y + 50); X.lineTo(px + 71, y + 50); X.stroke();
+    X.fillStyle = B.ink; X.textBaseline = 'middle'; X.textAlign = 'left'; X.fillText(txt, px + 88, y + 52);
+    X.beginPath(); X.arc(px + pw - 52, y + 50, 34, 0, 6.29); X.fillStyle = '#0A2557'; X.fill();
+    X.strokeStyle = '#FFFFFF'; X.lineWidth = 4.5; X.lineCap = 'round'; X.beginPath(); X.moveTo(px + pw - 62, y + 60); X.lineTo(px + pw - 42, y + 40); X.moveTo(px + pw - 58, y + 40); X.lineTo(px + pw - 42, y + 40); X.lineTo(px + pw - 42, y + 56); X.stroke();
+    const sh = seg(t, LG.shine, LG.shine + .7); if (sh > 0 && sh < 1) { X.save(); rr(px, y, pw, ph, 50); X.clip(); const sx = lerp(px - 120, px + pw + 120, eio(sh)); const g = X.createLinearGradient(sx - 60, 0, sx + 60, 0); g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(.5, 'rgba(160,210,255,.55)'); g.addColorStop(1, 'rgba(255,255,255,0)'); X.fillStyle = g; X.fillRect(px, y, pw, ph); X.restore(); }
+    X.restore(); }
+  const ik = seg(t, LG.info, LG.info + .4);
+  if (ik > 0) { X.save(); X.globalAlpha = ik; X.font = '600 30px I'; X.letterSpacing = '0.3px'; X.textAlign = 'center'; X.textBaseline = 'middle'; X.fillStyle = '#CFE6FF';
+    X.fillText('Moula Ali, Hyderabad  ·  +91 79958 15454', 540, 1258 + (1 - eo(ik)) * 10); X.restore(); }
+}
+// ---------- timeline ----------
+function seek(t) {
+  X.setTransform(1, 0, 0, 1, 0, 0); X.globalAlpha = 1; X.clearRect(0, 0, W, H);
+  if (t < PEND_END) { const [tx, ty, th] = scenePendulum(t); tile(tx, ty, -th); return; }
+  if (t < T0) {   // the scene drops to dark; the tile glides to the centre and collapses into a point
+    const k = seg(t, PEND_END, T0), th = theta(PEND_END), [tx, ty] = tilePos(th);
+    scenePendulum(PEND_END, eio(clamp(k * 1.6)));
+    const mk = eio(seg(t, PEND_END + .1, T0)); tile(lerp(tx, 540, mk), lerp(ty, 950, mk), lerp(-th, 0, mk), lerp(1, .06, ei(mk)), clamp(k * 2));
+    return; }
+  sceneLogo(t);
+}
+window.seek = seek;
+window.ready = (async () => { await document.fonts.load('900 40px I'); await document.fonts.load('800 40px I'); await document.fonts.load('700 40px I'); await document.fonts.load('600 40px I'); await document.fonts.ready;
+  await new Promise(r => MARK.complete ? r() : (MARK.onload = r)); fitHeadline(); })();
+</script>
+<script src="img/mark_paths.js"></script>
+</body></html>

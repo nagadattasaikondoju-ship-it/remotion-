@@ -1,0 +1,172 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<!-- Dr. Sri Sushma end card (1080x1920). Layout rebuilt from the clinic's own card (user's screenshot, 432x767, x2.5,
+     moved down 40 px to clear Instagram's top bar). Deterministic: render.cjs calls seek(t) for every frame. -->
+<style>
+@font-face { font-family: Poppins; font-weight: 500; src: url(fonts/Poppins-Medium.ttf); }
+@font-face { font-family: Poppins; font-weight: 600; src: url(fonts/Poppins-SemiBold.ttf); }
+@font-face { font-family: Poppins; font-weight: 700; src: url(fonts/Poppins-Bold.ttf); }
+@font-face { font-family: Poppins; font-weight: 800; src: url(fonts/Poppins-ExtraBold.ttf); }
+@font-face { font-family: Oswald; font-weight: 200 700; src: url(fonts/Oswald-var.ttf); }
+:root { --navy: #054a8e; --blue: #1f74c8; --ink: #15181c; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1080px; height: 1920px; overflow: hidden; background: #000; }
+#frame { position: absolute; inset: 0; background: center/cover no-repeat url(out/last_frame.png); }
+#card { position: absolute; inset: 0; overflow: hidden; transform-origin: 540px 1150px;
+  background:
+    radial-gradient(ellipse 620px 260px at 0% 0%, rgba(140,194,240,.95), rgba(140,194,240,0) 100%),
+    radial-gradient(ellipse 620px 260px at 100% 0%, rgba(140,194,240,.95), rgba(140,194,240,0) 100%),
+    linear-gradient(180deg, #bcd9f3 0%, #eaf4fc 5%, #ffffff 11%, #ffffff 79%, #f2f8fd 84%, #d6e8f8 91%, #a7ccee 100%); }
+.blob { position: absolute; border-radius: 50%; filter: blur(60px); opacity: .55; }
+#b1 { width: 520px; height: 520px; background: #cfe5fa; }
+#b2 { width: 460px; height: 460px; background: #dcecfb; }
+.abs { position: absolute; left: 0; width: 1080px; text-align: center; }
+#glow { position: absolute; left: 540px; top: 340px; width: 560px; height: 560px; margin: -280px 0 0 -280px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(76,171,254,.55) 0%, rgba(76,171,254,.18) 45%, rgba(76,171,254,0) 70%); }
+#logo { position: absolute; left: 240px; top: 58px; width: 600px; mix-blend-mode: multiply; }
+#pill { position: absolute; left: 167px; top: 552px; width: 746px; height: 80px; border-radius: 40px; background: #fff; overflow: hidden;
+  border: 3px solid #1e5a9c; box-shadow: 0 8px 22px rgba(16,74,140,.16); display: flex; align-items: center; justify-content: center; }
+#pill span { font-family: Oswald; font-weight: 600; font-size: 38px; color: #0b3f7f; white-space: nowrap; display: inline-block; }
+.hl { font-family: Poppins; font-weight: 700; font-size: 76px; line-height: 1; color: var(--navy); letter-spacing: -0.5px; }
+.hl .w { display: inline-block; }
+#btn { position: absolute; left: 222px; top: 835px; width: 636px; height: 86px; border-radius: 43px; overflow: hidden;
+  background: linear-gradient(90deg, #156fc3 0%, #2a87da 50%, #4cabfe 100%); box-shadow: 0 12px 26px rgba(21,111,195,.34), inset 0 2px 0 rgba(255,255,255,.25); }
+#btn .txt { position: absolute; left: 88px; right: 22px; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center;
+  font-family: Poppins; font-weight: 600; font-size: 30.5px; color: #fff; white-space: nowrap; letter-spacing: .2px; }
+#play { position: absolute; left: 18px; top: 15px; width: 56px; height: 56px; border-radius: 50%; background: #fff; box-shadow: 0 2px 6px rgba(0,40,90,.25); }
+#play svg { position: absolute; left: 0; top: 0; }
+#ring { position: absolute; left: 18px; top: 15px; width: 56px; height: 56px; border-radius: 50%; border: 3px solid rgba(255,255,255,.9); }
+#shine { position: absolute; top: -20px; width: 90px; height: 130px; transform: skewX(-22deg);
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.75), rgba(255,255,255,0)); }
+#doc { font-family: Poppins; font-weight: 600; font-size: 47px; color: var(--blue); }
+#title { font-family: Poppins; font-weight: 500; font-size: 34px; color: var(--ink); }
+.row { position: absolute; left: 0; width: 1080px; display: flex; align-items: center; justify-content: center; gap: 22px; }
+.ico { position: relative; width: 66px; height: 66px; border-radius: 50%; flex: none;
+  background: linear-gradient(145deg, #2a7fd6 0%, #5aaef6 100%); box-shadow: 0 6px 14px rgba(31,116,200,.32); }
+.ico svg { position: absolute; left: 15px; top: 15px; width: 36px; height: 36px; }
+.ico .pulse { position: absolute; inset: 0; border-radius: 50%; border: 3px solid #3d93e6; opacity: 0; }
+#phone .t { font-family: Poppins; font-weight: 700; font-size: 52px; color: var(--ink); letter-spacing: .3px; }
+#web .t { font-family: Poppins; font-weight: 500; font-size: 40px; color: var(--ink); }
+.addr { font-family: Poppins; font-weight: 600; font-size: 33px; color: var(--ink); line-height: 1; }
+#follow { font-family: Poppins; font-weight: 500; font-size: 24.5px; color: #3a4452; }
+.soc { position: absolute; top: 1487px; width: 64px; height: 64px; border-radius: 15px; box-shadow: 0 6px 14px rgba(0,0,0,.16); }
+.soc svg { position: absolute; left: 14px; top: 14px; width: 36px; height: 36px; fill: #fff; }
+#fb { left: 422px; background: linear-gradient(180deg, #2a8cff 0%, #1466e0 100%); }
+#fb span { position: absolute; left: 0; right: 0; top: 2px; text-align: center; font-family: Poppins; font-weight: 700; font-size: 50px; line-height: 64px; color: #fff; }
+#ig { left: 508px; background: radial-gradient(circle at 25% 105%, #ffd776 0%, #f3a554 18%, #f15245 38%, #d92e7f 60%, #9b36b7 80%, #515ecf 100%); }
+#wa { left: 594px; background: linear-gradient(180deg, #4be37a 0%, #21b356 100%); }
+</style></head>
+<body>
+<div id="frame"></div>
+<div id="card">
+  <div class="blob" id="b1"></div><div class="blob" id="b2"></div>
+  <div id="glow"></div>
+  <img id="logo" src="out/logo.png">
+  <div id="pill"><span id="pilltxt">Dr. SRI SUSHMA MULTISPECIALITY DENTAL CLINIC</span></div>
+  <div class="abs hl" id="h1" style="top:646px"><span class="w">Cold</span> <span class="w">Hurts?</span></div>
+  <div class="abs hl" id="h2" style="top:724px"><span class="w">Get</span> <span class="w">It</span> <span class="w">Checked!</span></div>
+  <div id="btn">
+    <div id="shine"></div>
+    <div id="ring"></div>
+    <div id="play"><svg width="56" height="56" viewBox="0 0 56 56"><path d="M23 18.5 L37.5 28 L23 37.5 Z" fill="#1c74cc" stroke="#1c74cc" stroke-width="3" stroke-linejoin="round"/></svg></div>
+    <div class="txt">BOOK AN APPOINTMENT WITH US</div>
+  </div>
+  <div class="abs" id="doc" style="top:962px">Dr. Sri Sushma, MDS</div>
+  <div class="abs" id="title" style="top:1022px">Periodontist and Implantologist</div>
+  <div class="row" id="phone" style="top:1087px">
+    <div class="ico"><div class="pulse"></div><svg viewBox="0 0 24 24"><path fill="#fff" d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg></div>
+    <div class="t">+91 79958 15454</div>
+  </div>
+  <div class="row" id="web" style="top:1159px">
+    <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3.5 9h17M3.5 15h17"/></svg></div>
+    <div class="t">drsrisushmadentalclinic.com</div>
+  </div>
+  <div class="row" id="pin" style="top:1239px">
+    <div class="ico"><svg viewBox="0 0 24 24"><path fill="#fff" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg></div>
+  </div>
+  <div class="abs addr" id="a1" style="top:1313px">Sanjay Apartment, beside Canara Bank,</div>
+  <div class="abs addr" id="a2" style="top:1358px">Anandbagh, Moula Ali, Hyderabad,</div>
+  <div class="abs addr" id="a3" style="top:1403px">Secunderabad, Telangana 500047</div>
+  <div class="abs" id="follow" style="top:1455px">Follow us on social media</div>
+  <div class="soc" id="fb"><span>f</span></div>
+  <div class="soc" id="ig"><svg viewBox="0 0 24 24"><path id="igp"/></svg></div>
+  <div class="soc" id="wa"><svg viewBox="0 0 24 24"><path id="wap"/></svg></div>
+</div>
+<script>
+// Simple Icons paths (CC0), filled in by render.cjs from icons/*.svg
+window.setIcons = (ig, wa) => { document.getElementById('igp').setAttribute('d', ig); document.getElementById('wap').setAttribute('d', wa); };
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, t0, d) => clamp((t - t0) / d);
+const outCubic = p => 1 - Math.pow(1 - p, 3);
+const inOutCubic = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+const outBack = (p, s = 1.70158) => 1 + (s + 1) * Math.pow(p - 1, 3) + s * Math.pow(p - 1, 2);
+function set(el, o) { if (typeof el === 'string') el = $(el); el.style.opacity = o.op ?? 1; el.style.transform = o.tf ?? 'none'; }
+// pop: scale from s0 with overshoot, fade in quickly
+function pop(el, t, t0, d, s0 = 0, back = 2.0, extra = '') {
+  const p = prog(t, t0, d); const s = s0 + (1 - s0) * outBack(p, back);
+  set(el, { op: clamp(p * 4), tf: `${extra} scale(${p <= 0 ? s0 : s})` });
+}
+function rise(el, t, t0, d, dy = 30, dx = 0) {
+  const p = prog(t, t0, d), e = outCubic(p);
+  set(el, { op: clamp(p * 1.6), tf: `translate(${dx * (1 - e)}px, ${dy * (1 - e)}px)` });
+}
+let fitted = false;
+window.seek = (t) => {
+  if (!fitted) {  // before any transform: size the pill text to its measured width on the clinic's card (275 px x2.5)
+    fitted = true;
+    const pt = $('pilltxt'); pt.style.fontSize = (38 * 688 / pt.getBoundingClientRect().width).toFixed(2) + 'px';
+  }
+  // the card pops up over the last cartoon frame
+  const pc = prog(t, 0, .42), sc = .12 + .88 * outBack(pc, 1.25);
+  $('frame').style.filter = `blur(${8 * outCubic(pc)}px) brightness(${1 - .35 * outCubic(pc)})`;
+  set('card', { op: clamp(pc * 6), tf: `scale(${sc})` });
+  $('card').style.borderRadius = `${160 * (1 - outCubic(pc))}px`;
+  // drifting light
+  $('b1').style.transform = `translate(${-120 + 60 * Math.sin(t * .9)}px, ${380 + 40 * Math.cos(t * .7)}px)`;
+  $('b2').style.transform = `translate(${700 + 50 * Math.cos(t * .8)}px, ${1240 + 50 * Math.sin(t * .6)}px)`;
+  // logo: pops with a small twist, a soft blue glow bursts behind it, then it keeps growing slowly
+  const pl = prog(t, .18, .55), grow = 1 + .035 * prog(t, .75, 4.25);
+  const sl = (.25 + .75 * outBack(pl, 2.2)) * grow;
+  set('logo', { op: clamp(pl * 5), tf: `translateY(${4 * Math.sin(Math.max(0, t - .75) * 1.6)}px) rotate(${-10 * (1 - outCubic(pl))}deg) scale(${pl <= 0 ? .25 : sl})` });
+  const pg = prog(t, .3, .9);
+  set('glow', { op: pg <= 0 ? 0 : .9 * (1 - pg), tf: `scale(${.5 + 1.1 * outCubic(pg)})` });
+  // clinic name pill stretches open, then its letters settle
+  const pp = prog(t, .5, .42);
+  set('pill', { op: clamp(pp * 4), tf: `scaleX(${pp <= 0 ? .15 : .15 + .85 * outBack(pp, 1.5)})` });
+  const ptx = prog(t, .66, .4);
+  $('pilltxt').style.opacity = clamp(ptx * 1.5); $('pilltxt').style.letterSpacing = `${1.5 * (1 - outCubic(ptx))}px`;
+  // headline, word by word
+  document.querySelectorAll('#h1 .w, #h2 .w').forEach((w, i) => {
+    const p = prog(t, .66 + i * .085, .42), e = outBack(p, 1.8);
+    set(w, { op: clamp(p * 3), tf: `translateY(${40 * (1 - outCubic(p))}px) scale(${p <= 0 ? .6 : .6 + .4 * e})` });
+  });
+  // the CTA button pops, breathes, and a light streak runs across it
+  const pb = prog(t, 1.0, .5), breath = t > 1.55 ? 1 + .016 * Math.sin((t - 1.55) * 2 * Math.PI / 1.5) : 1;
+  set('btn', { op: clamp(pb * 4), tf: `scale(${(pb <= 0 ? .4 : .4 + .6 * outBack(pb, 2.0)) * breath})` });
+  let sx = -200;
+  for (const s0 of [1.5, 3.0, 4.4]) { const q = prog(t, s0, .7); if (q > 0 && q < 1) sx = -140 + 900 * inOutCubic(q); }
+  $('shine').style.left = sx + 'px';
+  const rr = ((t - 1.5) % 1.5) / 1.5, ron = t > 1.5;
+  set('ring', { op: ron ? .9 * (1 - rr) : 0, tf: `scale(${ron ? 1 + .55 * outCubic(rr) : 1})` });
+  // doctor
+  rise('doc', t, 1.24, .42, 34); rise('title', t, 1.33, .42, 34);
+  // contact rows: icon pops, text slides in
+  const rows = [['phone', 1.48], ['web', 1.63]];
+  for (const [id, t0] of rows) {
+    pop(document.querySelector(`#${id} .ico`), t, t0, .45, 0, 2.4);
+    rise(document.querySelector(`#${id} .t`), t, t0 + .07, .42, 0, -46);
+  }
+  // pin drops in with a bounce
+  const pn = prog(t, 1.78, .5), bn = outBack(pn, 2.6);
+  set(document.querySelector('#pin .ico'), { op: clamp(pn * 4), tf: `translateY(${-60 * (1 - bn)}px) scale(${pn <= 0 ? .3 : .3 + .7 * clamp(pn * 2.2)})` });
+  ['a1', 'a2', 'a3'].forEach((id, i) => rise(id, t, 1.9 + i * .07, .42, 26));
+  rise('follow', t, 2.14, .4, 20);
+  ['fb', 'ig', 'wa'].forEach((id, i) => pop(id, t, 2.24 + i * .1, .5, 0, 2.6, `rotate(${-14 * (1 - outCubic(prog(t, 2.24 + i * .1, .5)))}deg)`));
+  // during the hold: a ring pulses off the phone icon to point at the number
+  const ph = document.querySelector('#phone .pulse'); let po = 0, ps = 1;
+  for (const s0 of [2.75, 3.85]) { const q = prog(t, s0, .9); if (q > 0 && q < 1) { po = .85 * (1 - q); ps = 1 + .7 * outCubic(q); } }
+  set(ph, { op: po, tf: `scale(${ps})` });
+};
+</script>
+</body></html>

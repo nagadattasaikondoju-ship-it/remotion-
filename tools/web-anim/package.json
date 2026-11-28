@@ -1,0 +1,10 @@
+{
+  "name": "web-anim",
+  "private": true,
+  "description": "Theatre.js (keyframed motion for the web, with a timeline editor) and SVG.js (SVG drawing and animation). Used in HyperFrames/Remotion pages and in Playwright-rendered films.",
+  "dependencies": {
+    "@svgdotjs/svg.js": "^3.2.8",
+    "@theatre/core": "^0.7.2",
+    "@theatre/studio": "^0.7.2"
+  }
+}

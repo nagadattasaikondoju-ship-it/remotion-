@@ -1,0 +1,20 @@
+[
+ {
+  "t": 6.093,
+  "type": "whoosh",
+  "g": 0.5,
+  "note": "the card pops up over the cartoon (fastest frames 0-4)"
+ },
+ {
+  "t": 6.393,
+  "type": "pop",
+  "g": 0.55,
+  "note": "the logo lands (scale passes 100 %)"
+ },
+ {
+  "t": 7.203,
+  "type": "chime",
+  "g": 0.5,
+  "note": "the BOOK AN APPOINTMENT button lands"
+ }
+]

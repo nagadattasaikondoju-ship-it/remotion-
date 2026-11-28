@@ -1,0 +1,20 @@
+{
+  "name": "Naga Datta",
+  "role": "Founder, One Loop (oneloop.in)",
+  "consent": "Naga Datta recorded this sample and approved using the clone for their own One Loop content (28 Nov 2026). Don't use it for anyone else's words or brand without asking.",
+  "engine": "Chatterbox 0.1.7 (MIT), local CPU, tools/voice-clone/.venv",
+  "reference": "ref.wav: 10.75 s cut from source_whatsapp_note.ogg at 27.0-37.75 s, high-pass 70 Hz, loudnorm -20 LUFS, 24 kHz mono",
+  "settings": {
+    "exaggeration": 0.4,
+    "cfg_weight": 0.35,
+    "seed": 2
+  },
+  "notes": "Settings of 3_CLONE_your_paragraph.mp3, the version Naga liked best. Speaker similarity 0.94-0.95 vs the real voice (WavLM-SV; real-vs-real 0.99, generic voice 0.53). English works best. Write numbers as words.",
+  "backup": {
+    "drive_folder": "One Loop - Naga Datta voice (private)",
+    "folder_id": "1Q1TqvrrTkfSPmC4HNZxTYFsJwpKn9OUV",
+    "ref_wav_id": "1sqE-7lk9xHFGn9HX-zHLXL31Q07hqbYz",
+    "source_note_id": "1YyLyC9AiJ91mVj4TUoan2IaEA8ydwE-z",
+    "ref_wav_sha256": "84a6c3c9b99cfb5a8bdb2e39d0755b64a95e06e375af197a182b0763113c035a"
+  }
+}

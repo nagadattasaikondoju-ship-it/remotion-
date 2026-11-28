@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>HAT Fellows reel overlay</title>
+<style>
+  @font-face { font-family: "SG"; src: url("fonts/SpaceGrotesk-VF.ttf"); font-weight: 300 700; }
+  @font-face { font-family: "MR"; src: url("fonts/Manrope-VF.ttf"); font-weight: 200 800; }
+  @font-face { font-family: "DM"; src: url("fonts/DMMono-Medium.ttf"); font-weight: 500; }
+  :root { --cream: #F4F1E8; --ink: #111418; --lime: #C9FF52; --sand: #D9D0B8; }
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; background: transparent; }
+  * { box-sizing: border-box; }
+  .abs { position: absolute; }
+  /* ---------- captions over the talking head (reference DNA: small lead line + big keyword, keyword sometimes boxed) ---------- */
+  #shade { left: 0; top: 0; width: 1080px; height: 1920px;
+           background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 50%, rgba(10,10,12,0.42) 72%, rgba(10,10,12,0.55) 100%); }
+  #cap { left: 60px; width: 960px; top: 1235px; text-align: center; }
+  #lead { font-family: "MR"; font-weight: 600; font-size: 46px; line-height: 1.1; color: #fff; letter-spacing: -0.3px;
+          text-shadow: 0 2px 12px rgba(0,0,0,0.55), 0 1px 2px rgba(0,0,0,0.6); white-space: nowrap; }
+  #key { display: inline-block; margin-top: 10px; font-family: "SG"; font-weight: 700; font-size: 96px; line-height: 1.02; color: #fff;
+         letter-spacing: -2.5px; text-shadow: 0 3px 16px rgba(0,0,0,0.5); white-space: nowrap; position: relative; transform-origin: 50% 70%; }
+  #key.hl { color: var(--ink); background: var(--lime); padding: 2px 22px 8px; border-radius: 10px; text-shadow: none;
+            box-shadow: 7px 8px 0 var(--ink); }
+  #strike { position: absolute; left: -6px; right: -6px; top: 54%; height: 12px; background: var(--lime); border-radius: 6px;
+            transform-origin: 0 50%; box-shadow: 0 2px 8px rgba(0,0,0,0.35); }
+  /* ---------- full-screen cards: HAT's cream paper, ink type, lime accent, hard offset shadows ---------- */
+  .card { left: 0; top: 0; width: 1080px; height: 1920px; background: var(--cream); overflow: hidden; display: none; }
+  .grid { left: -40px; top: -40px; width: 1160px; height: 2000px; opacity: 0.55;
+          background-image: linear-gradient(rgba(17,20,24,0.07) 1.5px, transparent 1.5px), linear-gradient(90deg, rgba(17,20,24,0.07) 1.5px, transparent 1.5px);
+          background-size: 90px 90px; }
+  .grain { left: 0; top: 0; width: 1080px; height: 1920px; opacity: 0.35; mix-blend-mode: multiply; }
+  .label { font-family: "DM"; font-size: 30px; letter-spacing: 4px; color: var(--ink); text-transform: uppercase; white-space: nowrap; }
+  .big { font-family: "SG"; font-weight: 700; color: var(--ink); letter-spacing: -6px; line-height: 0.95; white-space: nowrap; }
+  .box { background: var(--lime); padding: 0 24px 10px; border-radius: 14px; box-shadow: 9px 10px 0 var(--ink); }
+  .outline { color: transparent; -webkit-text-stroke: 3px var(--ink); }
+  .c { left: 540px; transform: translateX(-50%); text-align: center; }
+  .dot { display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: #3BD16F; margin-right: 18px; vertical-align: 1px; }
+  .pill { display: inline-flex; align-items: center; padding: 18px 34px; border: 2.5px solid var(--ink); border-radius: 60px; background: #fff;
+          font-family: "DM"; font-size: 32px; letter-spacing: 3px; color: var(--ink); white-space: nowrap; }
+  .btn { display: inline-block; padding: 30px 54px; background: var(--lime); border: 3px solid var(--ink); border-radius: 18px; box-shadow: 10px 11px 0 var(--ink);
+         font-family: "MR"; font-weight: 800; font-size: 58px; color: var(--ink); white-space: nowrap; letter-spacing: -1px; }
+  .logo { border-radius: 50%; -webkit-mask-image: radial-gradient(circle, #000 58%, transparent 71%); mask-image: radial-gradient(circle, #000 58%, transparent 71%); }
+  .acr { font-family: "SG"; font-weight: 700; font-size: 104px; letter-spacing: -3px; color: var(--ink); white-space: nowrap; line-height: 1; }
+  .acr b { display: inline-block; background: var(--lime); border-radius: 10px; padding: 0 12px 6px; margin-right: 6px; box-shadow: 6px 7px 0 var(--ink); font-weight: 700; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 0.45  0 0 0 0 0.42  0 0 0 0 0.36  0 0 0 0.55 0"/></filter></svg>
+
+<div id="shade" class="abs"></div>
+<div id="cap" class="abs"><div id="lead"></div><div id="key"><span id="keyt"></span><div id="strike"></div></div></div>
+
+<!-- K1 · HAT Fellows: the letterpress logo, then the acronym the speaker spells out -->
+<div id="k1" class="card abs">
+  <div class="grid abs"></div><svg class="grain abs"><rect width="100%" height="100%" filter="url(#noise)"/></svg>
+  <div id="k1lab" class="label abs c" style="top:250px;">Build · Ship · Belong</div>
+  <img id="k1logo" class="logo abs" src="img/hat_logo_letterpress.png" style="left:180px;top:360px;width:720px;height:720px;" />
+  <div id="k1a" class="acr abs c" style="top:1150px;"><b>H</b>uman</div>
+  <div id="k1b" class="acr abs c" style="top:1290px;"><b>A</b>ccelerator</div>
+  <div id="k1c" class="acr abs c" style="top:1430px;"><b>T</b>ank</div>
+</div>
+<!-- K2 · the rooms -->
+<div id="k2" class="card abs">
+  <div class="grid abs"></div><svg class="grain abs"><rect width="100%" height="100%" filter="url(#noise)"/></svg>
+  <div id="k2lab" class="label abs c" style="top:470px;">It is about meeting</div>
+  <div id="k2a" class="big abs c" style="top:600px;font-size:200px;"><span>CXOs</span></div>
+  <div id="k2b" class="big abs c" style="top:850px;font-size:200px;"><span>CFOs</span></div>
+  <div id="k2c" class="big abs c" style="top:1100px;font-size:200px;"><span>CMOs</span></div>
+</div>
+<!-- K3 · early access -->
+<div id="k3" class="card abs">
+  <div class="grid abs"></div><svg class="grain abs"><rect width="100%" height="100%" filter="url(#noise)"/></svg>
+  <div id="k3pill" class="abs c" style="top:520px;"><span class="pill"><span class="dot"></span>APPLICATIONS OPEN</span></div>
+  <div id="k3hat" class="big abs c" style="top:700px;font-size:120px;letter-spacing:-3px;">HAT</div>
+  <div id="k3a" class="big abs c" style="top:830px;font-size:196px;">Early</div>
+  <div id="k3b" class="big abs c outline" style="top:1020px;font-size:196px;letter-spacing:2px;">Access</div>
+  <div id="k3c" class="big abs c" style="top:1260px;font-size:124px;letter-spacing:-3px;"><span class="box">is live now.</span></div>
+</div>
+<!-- K4 · selection -->
+<div id="k4" class="card abs">
+  <div class="grid abs"></div><svg class="grain abs"><rect width="100%" height="100%" filter="url(#noise)"/></svg>
+  <div id="k4lab" class="label abs c" style="top:470px;font-size:27px;letter-spacing:3px;">Invite only · selection by application</div>
+  <div id="k4lead" class="abs c" style="top:640px;font-family:MR;font-weight:600;font-size:60px;color:#111418;white-space:nowrap;">you need to be</div>
+  <div id="k4a" class="big abs c" style="top:760px;font-size:176px;">selected<span style="color:#9a9486">.</span></div>
+  <svg id="k4tick" class="abs" style="left:915px;top:735px;width:120px;height:120px;" viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="#C9FF52" stroke="#111418" stroke-width="5"/><path id="k4path" d="M36 62 L54 79 L86 43" fill="none" stroke="#111418" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>
+  <div id="k4b" class="big abs c" style="top:1010px;font-size:150px;letter-spacing:-5px;"><span class="box">shortlisted.</span></div>
+</div>
+<!-- K5 · end card -->
+<div id="k5" class="card abs">
+  <div class="grid abs"></div><svg class="grain abs"><rect width="100%" height="100%" filter="url(#noise)"/></svg>
+  <img id="k5logo" class="logo abs" src="img/hat_logo_letterpress.png" style="left:260px;top:300px;width:560px;height:560px;" />
+  <div id="k5pill" class="abs c" style="top:900px;"><span class="pill" style="font-size:28px;"><span class="dot"></span>FOUNDING COHORT · APPLICATIONS OPEN</span></div>
+  <div id="k5url" class="big abs c" style="top:1040px;font-size:104px;letter-spacing:-3px;">hatfellows.com</div>
+  <div id="k5btn" class="abs c" style="top:1240px;"><span class="btn">Comment “LINK” ↓</span></div>
+</div>
+
+<script>
+/* Pure function of time: seek(t) sets every element for cut time t (s). Word times come from Whisper on the cut. */
+const G = [  // [lead in, key in, lead, key, style]
+  [0.00, 1.68, "What if you can find", "a room", ""],
+  [2.10, 2.56, "full of", "people", ""],
+  [2.90, 3.80, "who are just as", "curious as you?", "hl"],
+  [5.30, 5.94, "People are", "building something,", ""],
+  [6.78, 7.18, "exploring", "different paths,", ""],
+  [8.00, 9.24, "and want to do", "something in their life.", ""],
+  [10.08, 11.18, "and that's where", "I found…", ""],
+  [14.40, 15.22, "a community", "bringing together", ""],
+  [16.20, 16.48, "", "international students,", ""],
+  [17.40, 17.78, "", "networking.", "hl"],
+  [18.62, 20.30, "it is not about", "meeting people.", "strike"],
+  [24.10, 24.50, "learning", "new things", ""],
+  [25.04, 25.42, "and getting", "AI credits.", "hl"],
+  [28.74, 29.90, "go to my bio and", "see the link", ""],
+  [30.44, 31.08, "or comment", "“LINK”", "hl"],
+  [31.36, 31.88, "and I will", "share it with you.", ""],
+  [32.62, 33.40, "to join this", "community,", ""],
+  [36.40, 37.12, "we are not wasting", "your time and our time.", ""],
+  [38.28, 38.98, "if you really", "want to join in,", ""],
+  [40.66, 40.82, "please,", "drop a comment.", "hl"],
+  [42.06, 42.14, "", "See you.", ""],
+];
+const CARDS = { k1: [11.40, 14.40], k2: [20.96, 24.10], k3: [26.20, 28.72], k4: [33.90, 36.38], k5: [42.62, 99] };
+const STRIKE_AT = 20.62;
+const END = 44.6;
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const P = (t, a, d) => clamp((t - a) / d);
+const eOut = (x) => 1 - Math.pow(1 - x, 3);
+const back = (x) => { const c = 1.7; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };  // overshoot
+const $ = (id) => document.getElementById(id);
+function popIn(el, t, t0, from = 0.82, d = 0.22, y = 0) {
+  const p = t < t0 ? 0 : P(t, t0, d), s = from + (1 - from) * back(p);
+  el.style.opacity = clamp(p * 3); el.style.transform = (el.classList.contains("c") ? "translateX(-50%) " : "") + `translateY(${(1 - eOut(p)) * y}px) scale(${s})`;
+}
+function fit(el, max) { el.style.fontSize = ""; const w = el.scrollWidth; if (w > max) el.style.fontSize = (parseFloat(getComputedStyle(el).fontSize) * max / w) + "px"; }
+let lastG = -1;
+function seek(t) {
+  // which card (if any)
+  let card = null; for (const [k, [a, b]] of Object.entries(CARDS)) { const on = t >= a && t < b; $(k).style.display = on ? "block" : "none"; if (on) card = k; }
+  const capOn = !card;
+  $("shade").style.display = capOn ? "block" : "none"; $("cap").style.display = capOn ? "block" : "none";
+  if (capOn) {
+    let gi = -1; for (let i = 0; i < G.length; i++) if (t >= G[i][0]) gi = i;
+    const g = gi >= 0 ? G[gi] : null;
+    if (!g) { $("cap").style.display = "none"; }
+    else {
+      const [a, k, lead, key, st] = g;
+      if (gi !== lastG) { $("lead").textContent = lead; $("keyt").textContent = key; $("key").className = st === "hl" ? "hl" : ""; fit($("key"), 980); lastG = gi; }
+      const pl = P(t, a, 0.16); $("lead").style.opacity = lead ? eOut(pl) : 0; $("lead").style.transform = `translateY(${(1 - eOut(pl)) * 14}px)`;
+      const pk = t < k ? 0 : P(t, k, 0.2);
+      $("key").style.opacity = clamp(pk * 3); $("key").style.transform = `scale(${0.8 + 0.2 * back(pk)})`;
+      $("strike").style.display = st === "strike" ? "block" : "none";
+      $("strike").style.transform = `scaleX(${eOut(P(t, STRIKE_AT, 0.25))})`;
+    }
+  }
+  if (card === "k1") {
+    const a = CARDS.k1[0], pl = P(t, a, 0.45);
+    $("k1logo").style.opacity = eOut(pl); $("k1logo").style.transform = `scale(${1.14 - 0.14 * eOut(pl) + 0.03 * P(t, a, 3)})`; $("k1logo").style.filter = `blur(${(1 - eOut(pl)) * 14}px)`;
+    popIn($("k1lab"), t, a + 0.1, 1, 0.3, 16);
+    popIn($("k1a"), t, 12.58, 0.8, 0.22, 20); popIn($("k1b"), t, 12.98, 0.8, 0.22, 20); popIn($("k1c"), t, 13.76, 0.8, 0.22, 20);
+  }
+  if (card === "k2") {
+    popIn($("k2lab"), t, CARDS.k2[0] + 0.05, 1, 0.3, 16);
+    [["k2a", 21.60], ["k2b", 22.72], ["k2c", 23.54]].forEach(([id, t0], i, arr) => {
+      popIn($(id), t, t0, 0.75, 0.24, 30);
+      const cur = t >= t0 && (i === arr.length - 1 || t < arr[i + 1][1]);
+      $(id).firstChild.className = cur ? "box" : ""; $(id).style.color = cur || t < t0 ? "#111418" : "#9a9486";
+    });
+  }
+  if (card === "k3") {
+    popIn($("k3pill"), t, CARDS.k3[0] + 0.04, 0.9, 0.3, 16);
+    $("k3pill").querySelector(".dot").style.opacity = 0.55 + 0.45 * Math.cos(t * 7);
+    popIn($("k3hat"), t, 26.58, 0.8, 0.22, 20); popIn($("k3a"), t, 27.08, 0.8, 0.22, 26); popIn($("k3b"), t, 27.56, 0.8, 0.22, 26); popIn($("k3c"), t, 28.02, 0.7, 0.24, 20);
+  }
+  if (card === "k4") {
+    popIn($("k4lab"), t, CARDS.k4[0] + 0.04, 1, 0.3, 16); popIn($("k4lead"), t, CARDS.k4[0] + 0.06, 0.9, 0.25, 16);
+    popIn($("k4a"), t, 34.52, 0.8, 0.22, 24); popIn($("k4tick"), t, 34.78, 0.5, 0.22, 0);
+    $("k4path").style.strokeDashoffset = 1 - eOut(P(t, 34.86, 0.22));
+    popIn($("k4b"), t, 35.64, 0.7, 0.24, 24);
+  }
+  if (card === "k5") {
+    const a = CARDS.k5[0], pl = P(t, a, 0.4);
+    $("k5logo").style.opacity = eOut(pl); $("k5logo").style.transform = `scale(${1.1 - 0.1 * eOut(pl)}) rotate(${(1 - eOut(pl)) * -8}deg)`;
+    popIn($("k5pill"), t, a + 0.25, 0.9, 0.3, 16); popIn($("k5url"), t, a + 0.4, 0.85, 0.26, 20); popIn($("k5btn"), t, a + 0.7, 0.7, 0.28, 20);
+    const bp = clamp((t - a - 1.3) / 0.5); $("k5btn").firstChild.style.transform = `translate(${-4 * Math.sin(bp * Math.PI)}px, ${-4 * Math.sin(bp * Math.PI)}px)`;
+  }
+}
+window.seek = seek; window.TIMING = { END, CARDS };
+window.ready = (async () => {
+  await document.fonts.load("700 80px SG"); await document.fonts.load("600 40px MR"); await document.fonts.load("800 40px MR"); await document.fonts.load("30px DM");
+  await Promise.all([...document.images].map((im) => (im.complete ? 0 : new Promise((r) => { im.onload = im.onerror = r; }))));
+  seek(0); return true;
+})();
+</script>
+</body>
+</html>

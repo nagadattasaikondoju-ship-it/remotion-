@@ -1,0 +1,74 @@
+[
+ {
+  "t": 1.2,
+  "type": "tick",
+  "g": 0.3,
+  "note": "pendulum turns (1)"
+ },
+ {
+  "t": 2.4,
+  "type": "tock",
+  "g": 0.3,
+  "note": "pendulum turns (2)"
+ },
+ {
+  "t": 3.6,
+  "type": "tick",
+  "g": 0.3,
+  "note": "pendulum turns (3)"
+ },
+ {
+  "t": 4.8,
+  "type": "tock",
+  "g": 0.3,
+  "note": "pendulum turns (4)"
+ },
+ {
+  "t": 6.0,
+  "type": "tick",
+  "g": 0.3,
+  "note": "pendulum turns (5)"
+ },
+ {
+  "t": 7.2,
+  "type": "tock",
+  "g": 0.3,
+  "note": "pendulum turns (6)"
+ },
+ {
+  "t": 8.4,
+  "type": "tick",
+  "g": 0.3,
+  "note": "pendulum turns (7)"
+ },
+ {
+  "t": 9.6,
+  "type": "tock",
+  "g": 0.3,
+  "note": "pendulum turns (8)"
+ },
+ {
+  "t": 10.8,
+  "type": "tick",
+  "g": 0.3,
+  "note": "pendulum turns (9)"
+ },
+ {
+  "t": 12.62,
+  "type": "whoosh",
+  "g": 0.45,
+  "note": "the clinic card pops up"
+ },
+ {
+  "t": 12.92,
+  "type": "pop",
+  "g": 0.5,
+  "note": "the logo lands"
+ },
+ {
+  "t": 13.72,
+  "type": "chime",
+  "g": 0.45,
+  "note": "BOOK AN APPOINTMENT lands"
+ }
+]

@@ -1,0 +1,26 @@
+{
+ "pop": {
+  "ids": [
+   65
+  ],
+  "role": "ui"
+ },
+ "swipe": {
+  "ids": [
+   53
+  ],
+  "role": "whoosh"
+ },
+ "softwhoosh": {
+  "ids": [
+   57
+  ],
+  "role": "whoosh"
+ },
+ "chime": {
+  "ids": [
+   61
+  ],
+  "role": "ui"
+ }
+}

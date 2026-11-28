@@ -1,0 +1,64 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>html,body{margin:0;background:transparent}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+// Captions for the "bobbattu" reel, styled like the reference: the intro line in gold condensed caps (Bebas Neue), every
+// "bobbattu" line in hot-pink serif (Instrument Serif) with a thin white outline and an emoji sticker. Pure function of t.
+const E = window.EDIT, W = 1080, H = 1920, ctx = document.getElementById("c").getContext("2d");
+const PINK = "#F2179E";
+const cl = (u, a = 0, b = 1) => Math.min(b, Math.max(a, u)), P = (t, a, b) => cl((t - a) / (b - a));
+const back = u => { const c = 1.6; return 1 + (c + 1) * Math.pow(u - 1, 3) + c * Math.pow(u - 1, 2); };
+window.ready = Promise.all([["BB", "fonts/BebasNeue-Regular.ttf"], ["IS", "fonts/InstrumentSerif-Regular.ttf"]]
+  .map(([f, u]) => new FontFace(f, `url(${u})`).load().then(ff => document.fonts.add(ff)))).then(() => document.fonts.load("80px 'Noto Color Emoji'", "💗✨🥰"));
+
+// per shot: caption centre (x, y), emoji placement relative to the text box, and which side
+const LAY = {
+  s2: { x: 545, y: 1540, emo: [{ side: "right", dx: -14, dy: -104, size: 84 }] },
+  s3: { x: 560, y: 1413, emo: [{ side: "left", dx: -6, dy: -50, size: 96 }] },
+  s4: { x: 430, y: 1062, emo: [{ side: "right", dx: -6, dy: -66, size: 84 }] },   // full frame: above the Shih Tzu, over the stairs
+  s5: { x: 575, y: 1325, emo: [{ side: "left", dx: 8, dy: -62, size: 78 }] },
+  s6: { x: 540, y: 1222, lh: 88, emo: [{ abs: [222, 1372], size: 66, tw: 0 }, { abs: [304, 1418], size: 112, tw: 1.3 }, { abs: [402, 1392], size: 58, tw: 2.1 }, { abs: [452, 1450], size: 84, tw: 3.0 }] },
+};
+function pinkLine(s, x, y, size) {
+  ctx.font = `400 ${size}px IS`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.lineJoin = "round";
+  ctx.shadowColor = "rgba(0,0,0,.22)"; ctx.shadowBlur = 10; ctx.shadowOffsetY = 2;
+  ctx.lineWidth = 7; ctx.strokeStyle = "#fff"; ctx.strokeText(s, x, y);
+  ctx.shadowColor = "transparent"; ctx.fillStyle = PINK; ctx.fillText(s, x, y);
+  return ctx.measureText(s).width;
+}
+function emoji(ch, x, y, size, a, sc) {
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(x, y); ctx.scale(sc, sc);
+  ctx.font = `${size}px 'Noto Color Emoji'`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(ch, 0, 0); ctx.restore();
+}
+function maximus(t, sh) { // gold condensed caps across the bottom, like the reference's Doberman card
+  // the hook is the reference's screen recording: a dark band hides its burned-in caption and the Instagram UI (profile bubble, sound icon)
+  const band = ctx.createLinearGradient(0, 1500, 0, 1640); band.addColorStop(0, "rgba(10,6,6,0)"); band.addColorStop(1, "rgba(10,6,6,1)");
+  ctx.fillStyle = band; ctx.fillRect(0, 1500, W, 140); ctx.fillStyle = "rgb(10,6,6)"; ctx.fillRect(0, 1639, W, H - 1639);
+  const s = sh.caption, u = 1;
+  ctx.save(); ctx.globalAlpha = u; ctx.font = "64px BB"; let size = 64 * 940 / ctx.measureText(s).width; ctx.font = `${size}px BB`;
+  ctx.textAlign = "center"; ctx.textBaseline = "alphabetic"; const y = 1700;
+  const g = ctx.createLinearGradient(0, y - size * 0.72, 0, y); g.addColorStop(0, "#FFF5D2"); g.addColorStop(0.55, "#F6D27A"); g.addColorStop(1, "#E3A93E");
+  ctx.shadowColor = "rgba(0,0,0,.75)"; ctx.shadowBlur = 16; ctx.shadowOffsetY = 3; ctx.fillStyle = g; ctx.fillText(s, 540, y); ctx.restore();
+}
+function cute(t, sh) {
+  const L = LAY[sh.id], u = P(t, sh.start, sh.start + 0.14); if (u <= 0) return;
+  const k = back(u), lines = sh.caption.split("\n"), size = 96, lh = L.lh || 0;
+  ctx.save(); ctx.globalAlpha = cl(u * 2); ctx.translate(L.x, L.y); ctx.scale(0.9 + 0.1 * k, 0.9 + 0.1 * k);
+  const widths = lines.map((s, i) => pinkLine(s, 0, i * lh, size)); ctx.restore();
+  const w0 = widths[widths.length - 1];
+  L.emo.forEach((e, i) => {
+    const v = P(t, sh.start + 0.06 + 0.05 * i, sh.start + 0.24 + 0.05 * i); if (v <= 0) return;
+    let x, y;
+    if (e.abs) [x, y] = e.abs; else { x = L.x + (e.side === "right" ? w0 / 2 + e.size * 0.42 : -w0 / 2 - e.size * 0.42) + (e.side === "right" ? e.dx : -e.dx); y = L.y + e.dy; }
+    const tw = e.tw === undefined ? 1 : 1 + 0.12 * Math.sin((t - sh.start) * 9 + e.tw);   // sparkles twinkle, hearts breathe a little
+    emoji(sh.emoji, x, y, e.size, cl(v * 2), back(v) * (sh.emoji === "✨" ? tw : 1 + 0.04 * Math.sin((t - sh.start) * 6)));
+  });
+}
+window.seek = function (t) {
+  ctx.clearRect(0, 0, W, H); let sh = E.shots[0]; for (const s of E.shots) if (t >= s.start - 1e-6) sh = s;
+  if (sh.id === "s1") maximus(t, sh); else cute(t, sh);
+};
+</script>
+</body></html>

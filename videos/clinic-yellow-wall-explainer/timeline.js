@@ -1,0 +1,648 @@
+window.TL = {
+ "dur": 37.4,
+ "lines": [
+  {
+   "i": 1,
+   "start": 0.25,
+   "end": 2.374,
+   "text": "Ramesh's smile changed colour every year.",
+   "words": [
+    {
+     "w": "Ramesh's",
+     "s": 0.25,
+     "e": 0.79
+    },
+    {
+     "w": "smile",
+     "s": 0.79,
+     "e": 1.03
+    },
+    {
+     "w": "changed",
+     "s": 1.03,
+     "e": 1.39
+    },
+    {
+     "w": "colour",
+     "s": 1.39,
+     "e": 1.75
+    },
+    {
+     "w": "every",
+     "s": 1.75,
+     "e": 2.11
+    },
+    {
+     "w": "year.",
+     "s": 2.11,
+     "e": 2.31
+    }
+   ],
+   "heard": "Ramesh's smile changed colour every year."
+  },
+  {
+   "i": 2,
+   "start": 2.7,
+   "end": 3.799,
+   "text": "So did his gums.",
+   "words": [
+    {
+     "w": "So",
+     "s": 2.7,
+     "e": 2.86
+    },
+    {
+     "w": "did",
+     "s": 2.86,
+     "e": 3.06
+    },
+    {
+     "w": "his",
+     "s": 3.06,
+     "e": 3.24
+    },
+    {
+     "w": "gums.",
+     "s": 3.24,
+     "e": 3.58
+    }
+   ],
+   "heard": "So did his gums."
+  },
+  {
+   "i": 3,
+   "start": 4.3,
+   "end": 7.585,
+   "text": "Chai in the morning. A cigarette at tea break. Gutka after lunch.",
+   "words": [
+    {
+     "w": "Chai",
+     "s": 4.3,
+     "e": 4.58
+    },
+    {
+     "w": "in",
+     "s": 4.58,
+     "e": 4.7
+    },
+    {
+     "w": "the",
+     "s": 4.7,
+     "e": 4.8
+    },
+    {
+     "w": "morning.",
+     "s": 4.8,
+     "e": 5.08
+    },
+    {
+     "w": "A",
+     "s": 5.44,
+     "e": 5.5
+    },
+    {
+     "w": "cigarette",
+     "s": 5.5,
+     "e": 5.82
+    },
+    {
+     "w": "at",
+     "s": 5.82,
+     "e": 6.0
+    },
+    {
+     "w": "tea",
+     "s": 6.0,
+     "e": 6.18
+    },
+    {
+     "w": "break.",
+     "s": 6.18,
+     "e": 6.4
+    },
+    {
+     "w": "Gutka",
+     "s": 6.62,
+     "e": 6.86
+    },
+    {
+     "w": "after",
+     "s": 6.86,
+     "e": 7.12
+    },
+    {
+     "w": "lunch.",
+     "s": 7.12,
+     "e": 7.36
+    }
+   ],
+   "heard": "Chai in the morning. A cigarette at tea break. Gutka after lunch."
+  },
+  {
+   "i": 4,
+   "start": 8.0,
+   "end": 10.203,
+   "text": "Then his daughter drew Papa, with brown teeth.",
+   "words": [
+    {
+     "w": "Then",
+     "s": 8.0,
+     "e": 8.16
+    },
+    {
+     "w": "his",
+     "s": 8.16,
+     "e": 8.36
+    },
+    {
+     "w": "daughter",
+     "s": 8.36,
+     "e": 8.6
+    },
+    {
+     "w": "drew",
+     "s": 8.6,
+     "e": 8.84
+    },
+    {
+     "w": "Papa,",
+     "s": 8.84,
+     "e": 9.12
+    },
+    {
+     "w": "with",
+     "s": 9.3,
+     "e": 9.44
+    },
+    {
+     "w": "brown",
+     "s": 9.44,
+     "e": 9.72
+    },
+    {
+     "w": "teeth.",
+     "s": 9.72,
+     "e": 10.04
+    }
+   ],
+   "heard": "Then his daughter drew Papa, with brown teeth."
+  },
+  {
+   "i": 5,
+   "start": 10.9,
+   "end": 12.822,
+   "text": "But the colour was hiding something worse.",
+   "words": [
+    {
+     "w": "But",
+     "s": 10.9,
+     "e": 11.02
+    },
+    {
+     "w": "the",
+     "s": 11.02,
+     "e": 11.14
+    },
+    {
+     "w": "colour",
+     "s": 11.14,
+     "e": 11.34
+    },
+    {
+     "w": "was",
+     "s": 11.34,
+     "e": 11.6
+    },
+    {
+     "w": "hiding",
+     "s": 11.6,
+     "e": 11.92
+    },
+    {
+     "w": "something",
+     "s": 11.92,
+     "e": 12.28
+    },
+    {
+     "w": "worse.",
+     "s": 12.28,
+     "e": 12.62
+    }
+   ],
+   "heard": "But the colour was hiding something worse."
+  },
+  {
+   "i": 6,
+   "start": 13.2,
+   "end": 16.222,
+   "text": "Tartar builds up, full of germs, and tobacco makes it worse.",
+   "words": [
+    {
+     "w": "Tartar",
+     "s": 13.2,
+     "e": 13.54
+    },
+    {
+     "w": "builds",
+     "s": 13.54,
+     "e": 13.72
+    },
+    {
+     "w": "up,",
+     "s": 13.72,
+     "e": 13.96
+    },
+    {
+     "w": "full",
+     "s": 14.1,
+     "e": 14.12
+    },
+    {
+     "w": "of",
+     "s": 14.12,
+     "e": 14.3
+    },
+    {
+     "w": "germs,",
+     "s": 14.3,
+     "e": 14.76
+    },
+    {
+     "w": "and",
+     "s": 14.88,
+     "e": 15.02
+    },
+    {
+     "w": "tobacco",
+     "s": 15.02,
+     "e": 15.32
+    },
+    {
+     "w": "makes",
+     "s": 15.32,
+     "e": 15.64
+    },
+    {
+     "w": "it",
+     "s": 15.64,
+     "e": 15.82
+    },
+    {
+     "w": "worse.",
+     "s": 15.82,
+     "e": 16.0
+    }
+   ],
+   "heard": "Tartar builds up, full of germs, and tobacco makes it worse."
+  },
+  {
+   "i": 7,
+   "start": 16.5,
+   "end": 18.949,
+   "text": "The germs attack the gums, and they slowly pull back.",
+   "words": [
+    {
+     "w": "The",
+     "s": 16.5,
+     "e": 16.64
+    },
+    {
+     "w": "germs",
+     "s": 16.64,
+     "e": 16.96
+    },
+    {
+     "w": "attack",
+     "s": 16.96,
+     "e": 17.18
+    },
+    {
+     "w": "the",
+     "s": 17.18,
+     "e": 17.42
+    },
+    {
+     "w": "gums,",
+     "s": 17.42,
+     "e": 17.68
+    },
+    {
+     "w": "and",
+     "s": 17.8,
+     "e": 17.88
+    },
+    {
+     "w": "they",
+     "s": 17.88,
+     "e": 18.02
+    },
+    {
+     "w": "slowly",
+     "s": 18.02,
+     "e": 18.28
+    },
+    {
+     "w": "pull",
+     "s": 18.28,
+     "e": 18.58
+    },
+    {
+     "w": "back.",
+     "s": 18.58,
+     "e": 18.92
+    }
+   ],
+   "heard": "The germs attack the gums, and they slowly pull back."
+  },
+  {
+   "i": 8,
+   "start": 19.25,
+   "end": 21.369,
+   "text": "Even the bone holding each tooth wears away.",
+   "words": [
+    {
+     "w": "Even",
+     "s": 19.25,
+     "e": 19.47
+    },
+    {
+     "w": "the",
+     "s": 19.47,
+     "e": 19.61
+    },
+    {
+     "w": "bone",
+     "s": 19.61,
+     "e": 19.83
+    },
+    {
+     "w": "holding",
+     "s": 19.83,
+     "e": 20.17
+    },
+    {
+     "w": "each",
+     "s": 20.17,
+     "e": 20.45
+    },
+    {
+     "w": "tooth",
+     "s": 20.45,
+     "e": 20.79
+    },
+    {
+     "w": "wears",
+     "s": 20.79,
+     "e": 21.01
+    },
+    {
+     "w": "away.",
+     "s": 21.01,
+     "e": 21.29
+    }
+   ],
+   "heard": "Even the bone holding each tooth wears away."
+  },
+  {
+   "i": 9,
+   "start": 22.0,
+   "end": 25.278,
+   "text": "At the dental clinic, a deep cleaning clears the tartar and stains.",
+   "words": [
+    {
+     "w": "At",
+     "s": 22.0,
+     "e": 22.14
+    },
+    {
+     "w": "the",
+     "s": 22.14,
+     "e": 22.26
+    },
+    {
+     "w": "dental",
+     "s": 22.26,
+     "e": 22.5
+    },
+    {
+     "w": "clinic,",
+     "s": 22.5,
+     "e": 22.9
+    },
+    {
+     "w": "a",
+     "s": 23.1,
+     "e": 23.16
+    },
+    {
+     "w": "deep",
+     "s": 23.16,
+     "e": 23.36
+    },
+    {
+     "w": "cleaning",
+     "s": 23.36,
+     "e": 23.74
+    },
+    {
+     "w": "clears",
+     "s": 23.74,
+     "e": 24.1
+    },
+    {
+     "w": "the",
+     "s": 24.1,
+     "e": 24.3
+    },
+    {
+     "w": "tartar",
+     "s": 24.3,
+     "e": 24.58
+    },
+    {
+     "w": "and",
+     "s": 24.58,
+     "e": 24.7
+    },
+    {
+     "w": "stains.",
+     "s": 24.7,
+     "e": 25.0
+    }
+   ],
+   "heard": "At the dental clinic, a deep cleaning clears the tartar and stains."
+  },
+  {
+   "i": 10,
+   "start": 25.6,
+   "end": 29.153,
+   "text": "Gum care helps them heal, and the team helps him quit, step by step.",
+   "words": [
+    {
+     "w": "Gum",
+     "s": 25.6,
+     "e": 25.82
+    },
+    {
+     "w": "care",
+     "s": 25.82,
+     "e": 26.02
+    },
+    {
+     "w": "helps",
+     "s": 26.02,
+     "e": 26.36
+    },
+    {
+     "w": "them",
+     "s": 26.36,
+     "e": 26.56
+    },
+    {
+     "w": "heal,",
+     "s": 26.56,
+     "e": 26.86
+    },
+    {
+     "w": "and",
+     "s": 27.22,
+     "e": 27.26
+    },
+    {
+     "w": "the",
+     "s": 27.26,
+     "e": 27.38
+    },
+    {
+     "w": "team",
+     "s": 27.38,
+     "e": 27.58
+    },
+    {
+     "w": "helps",
+     "s": 27.58,
+     "e": 27.86
+    },
+    {
+     "w": "him",
+     "s": 27.86,
+     "e": 28.08
+    },
+    {
+     "w": "quit,",
+     "s": 28.08,
+     "e": 28.3
+    },
+    {
+     "w": "step",
+     "s": 28.42,
+     "e": 28.58
+    },
+    {
+     "w": "by",
+     "s": 28.58,
+     "e": 28.8
+    },
+    {
+     "w": "step.",
+     "s": 28.8,
+     "e": 29.08
+    }
+   ],
+   "heard": "Gum care helps them heal, and the team helps him quit, step by step."
+  },
+  {
+   "i": 11,
+   "start": 29.6,
+   "end": 31.23,
+   "text": "So his daughter drew Papa again.",
+   "words": [
+    {
+     "w": "So",
+     "s": 29.6,
+     "e": 29.74
+    },
+    {
+     "w": "his",
+     "s": 29.74,
+     "e": 29.92
+    },
+    {
+     "w": "daughter",
+     "s": 29.92,
+     "e": 30.16
+    },
+    {
+     "w": "drew",
+     "s": 30.16,
+     "e": 30.42
+    },
+    {
+     "w": "Papa",
+     "s": 30.42,
+     "e": 30.68
+    },
+    {
+     "w": "again.",
+     "s": 30.68,
+     "e": 31.06
+    }
+   ],
+   "heard": "So his daughter drew Papa again."
+  },
+  {
+   "i": 12,
+   "start": 32.6,
+   "end": 34.897,
+   "text": "It's never too late. Book your gum check today.",
+   "words": [
+    {
+     "w": "It's",
+     "s": 32.6,
+     "e": 32.84
+    },
+    {
+     "w": "never",
+     "s": 32.84,
+     "e": 33.0
+    },
+    {
+     "w": "too",
+     "s": 33.0,
+     "e": 33.28
+    },
+    {
+     "w": "late.",
+     "s": 33.28,
+     "e": 33.52
+    },
+    {
+     "w": "Book",
+     "s": 33.7,
+     "e": 33.74
+    },
+    {
+     "w": "your",
+     "s": 33.74,
+     "e": 33.94
+    },
+    {
+     "w": "gum",
+     "s": 33.94,
+     "e": 34.16
+    },
+    {
+     "w": "check",
+     "s": 34.16,
+     "e": 34.38
+    },
+    {
+     "w": "today.",
+     "s": 34.38,
+     "e": 34.68
+    }
+   ],
+   "heard": "It's never too late. Book your gum check today."
+  }
+ ]
+};

@@ -1,0 +1,134 @@
+[
+ {
+  "t": 2.21,
+  "type": "tick",
+  "g": 0.35,
+  "note": "the year counter lands on 2025"
+ },
+ {
+  "t": 3.29,
+  "type": "pop",
+  "g": 0.3,
+  "note": "gums pulling back"
+ },
+ {
+  "t": 4.25,
+  "type": "pop",
+  "g": 0.35,
+  "note": "chai icon"
+ },
+ {
+  "t": 5.45,
+  "type": "pop",
+  "g": 0.35,
+  "note": "cigarette icon"
+ },
+ {
+  "t": 6.57,
+  "type": "pop",
+  "g": 0.35,
+  "note": "gutka icon"
+ },
+ {
+  "t": 7.85,
+  "type": "swipe",
+  "g": 0.35,
+  "note": "the daughter's drawing"
+ },
+ {
+  "t": 12.68,
+  "type": "whoosh",
+  "g": 0.45,
+  "note": "dive into the gums (iris)"
+ },
+ {
+  "t": 13.25,
+  "type": "pop",
+  "g": 0.35,
+  "note": "TARTAR label"
+ },
+ {
+  "t": 14.35,
+  "type": "squish",
+  "g": 0.4,
+  "note": "germs appear"
+ },
+ {
+  "t": 17.01,
+  "type": "softwhoosh",
+  "g": 0.3,
+  "note": "gums inflame"
+ },
+ {
+  "t": 19.71,
+  "type": "crumble",
+  "g": 0.4,
+  "note": "bone wears away"
+ },
+ {
+  "t": 21.85,
+  "type": "swipe",
+  "g": 0.35,
+  "note": "cut to the clinic"
+ },
+ {
+  "t": 23.21,
+  "type": "scaler",
+  "g": 0.35,
+  "note": "the scaler cleans the tartar"
+ },
+ {
+  "t": 24.8,
+  "type": "sparkle",
+  "g": 0.45,
+  "note": "polish: the tooth shines"
+ },
+ {
+  "t": 26.61,
+  "type": "chime",
+  "g": 0.35,
+  "note": "gums heal"
+ },
+ {
+  "t": 27.13,
+  "type": "swipe",
+  "g": 0.32,
+  "note": "the quit plan"
+ },
+ {
+  "t": 28.62,
+  "type": "tick",
+  "g": 0.3,
+  "note": "streak fills"
+ },
+ {
+  "t": 29.45,
+  "type": "swipe",
+  "g": 0.35,
+  "note": "the new drawing"
+ },
+ {
+  "t": 30.6,
+  "type": "sparkle",
+  "g": 0.45,
+  "note": "white smile, hearts"
+ },
+ {
+  "t": 33.72,
+  "type": "whoosh",
+  "g": 0.45,
+  "note": "clinic card pops up"
+ },
+ {
+  "t": 34.02,
+  "type": "pop",
+  "g": 0.5,
+  "note": "the logo lands"
+ },
+ {
+  "t": 34.82,
+  "type": "chime",
+  "g": 0.45,
+  "note": "BOOK AN APPOINTMENT lands"
+ }
+]
