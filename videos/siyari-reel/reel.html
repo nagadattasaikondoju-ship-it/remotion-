@@ -189,7 +189,7 @@ function chainScene(cfg) {
     const L = N * cfg.sp;
     rings.forEach((r, i) => {
       let u = ((i * cfg.sp + cfg.v * t) % L + L) % L - L / 2;           // conveyor along the path
-      const p = cfg.path(u), q = cfg.path(u + .01), Tn = q.sub(p).normalize();
+      const p = cfg.path(u, t), q = cfg.path(u + .01, t), Tn = q.sub(p).normalize();
       const beta = cfg.tilt + .05 * Math.sin(i * 1.7);
       const X = Tn.clone().multiplyScalar(Math.cos(beta)).addScaledVector(Y, Math.sin(beta));
       const Yr = Tn.clone().multiplyScalar(-Math.sin(beta)).addScaledVector(Y, Math.cos(beta));
@@ -202,8 +202,10 @@ function chainScene(cfg) {
   }
   return { sc, cam, rings, place, cfg };
 }
-const A = chainScene({ velvet: '#123a22', sheen: '#4f9a6a', seed: 3, n: 15, sp: 1.08, v: -0.95, tilt: 1.0, offset: 0, fov: 24,
-  path: u => new THREE.Vector3(.3 * u + .65 * Math.sin(.43 * u), 0, -u), cam: t => [new THREE.Vector3(.15 * Math.sin(t * .4), 24.5 - .5 * t, 5.6), new THREE.Vector3(0, 0, .35)] });
+// v3 (user's note): the reference's chain is a real snake: it swings right at the top, sweeps left through the middle, curls back at
+// the bottom, and the curve itself sways while the rings flow, so the middle keeps changing. Denser: more, tighter rings in frame.
+const A = chainScene({ velvet: '#123a22', sheen: '#4f9a6a', seed: 3, n: 22, sp: .9, v: -0.95, tilt: 1.1, offset: 0, fov: 24,
+  path: (u, t = 0) => new THREE.Vector3(1.4 * Math.sin(.6 * u + .55 + .3 * Math.sin(.9 * t)) + .12 * Math.sin(1.2 * u + 1.5 * t) - .05, 0, -u), cam: t => [new THREE.Vector3(.12 * Math.sin(t * .4), 27 - .5 * t, 6.0), new THREE.Vector3(0, 0, .35)] });
 const C = chainScene({ velvet: '#123a22', sheen: '#4f9a6a', seed: 5, n: 13, sp: 1.08, v: 0.8, tilt: 1.05, offset: 4, fov: 24,
   path: u => new THREE.Vector3(.3 * u + .65 * Math.sin(.43 * u) - .45, 0, -u), cam: t => [new THREE.Vector3(.1 - .05 * t, 21.5 - .5 * t, 5.0), new THREE.Vector3(.1, 0, .3)] });
 

@@ -13,7 +13,9 @@ html,body{margin:0;background:#000}#c{width:1080px;height:1920px;display:block}
 // a leader line + label types in, price on the plinth), cut to that reference's own music (30 s, 100 bpm: products change every 8 beats).
 // Products and prices: siyari.com/products.json (lowest variant price = "From"), photos cut out by tools/cutout.py.
 import { W, H, S, ctx, INK, clamp, lerp, ss, eio, eout, rng, loadImg, velvet, renderSting, drawCorner, star, vignette, LOCK_D } from './lib.js';
-const T = { OPEN: 1.27, W: [1.27, 5.98, 10.78, 15.58, 20.38], LOGO: 25.18, END: 30.0 };
+// v2: no opener (the reference's logo intro is dropped; the music starts at its first product hit, 1.18 s), and products alternate
+// front row / back row / front / back / front with the focus pulling between rows, as in the reference.
+const T = { W: [0, 4.8, 9.6, 14.4, 19.2], LOGO: 24.0, END: 28.82 };
 window.TIMING = { TEND: T.END };
 const GOLD = '#D9B77C', CREAM = '#EDDAC2';
 const P = [
@@ -25,12 +27,14 @@ const P = [
 ];
 for (const p of P) p.im = await loadImg(`img/${p.img}.png`);
 await document.fonts.load('600 60px Jost'); await document.fonts.load('600 40px Cormorant'); await document.fonts.load('600 20px Montserrat');
-const SP = 720;                                    // world distance between front pedestals
+const SP = 430;                                    // world distance between consecutive featured products (front, back, front ...)
+const BACK = k => k % 2 === 1;                    // products 2 and 4 stand on the back row
 const camX = t => {                               // glide to the next product on each 8-beat downbeat, slow drift while holding
   let x = 0, cur = 0;
   for (let k = 1; k < T.W.length; k++) { x += SP * eio(clamp((t - T.W[k] + .05) / .9)); if (t >= T.W[k]) cur = k; }
-  return x + 12 * (t - T.W[cur]) - 25;
+  return x + 10 * (t - T.W[cur]) - 20;
 };
+const focusBack = t => { let f = 0; for (let k = 1; k < T.W.length; k++) { const e = eio(clamp((t - T.W[k] - .1) / .8)); f = BACK(k) ? lerp(f, 1, e) : lerp(f, 0, e); } return f; };
 // ---------- static layers, drawn once at 2x
 const mkc = (w, h) => { const c = document.createElement('canvas'); c.width = w * S; c.height = h * S; const g = c.getContext('2d'); g.scale(S, S); return [c, g]; };
 const vel = velvet(512, '#1d4a31', 9, 9000);
@@ -64,12 +68,12 @@ function typed(g, txt, x, y, t0, t, rate = .028) {   // letters appear one by on
 }
 function callout(g, p, top, t, tIn, tOut) {
   const o = 1 - ss(tOut - .25, tOut, t); if (t < tIn || o <= 0) return;
-  const lx = 540, dotY = top - 34, boxL = 150, boxB = 700;
-  g.save(); g.globalAlpha = o;
+  const lx = 540, dotY = top - 34, boxL = 150, boxB = Math.min(700, top - 70), dy = boxB - 700;
+  g.save(); g.globalAlpha = o; g.translate(0, dy); const dotYl = dotY - dy;
   const k1 = eout((t - tIn) / .35), k2 = eout((t - tIn - .25) / .4);
-  g.strokeStyle = CREAM; g.lineWidth = 2.5; g.beginPath(); g.arc(lx, dotY, 10 * k1, 0, Math.PI * 2); g.stroke();
-  g.lineWidth = 2; g.beginPath(); g.moveTo(lx, dotY - 10); g.lineTo(lx, lerp(dotY - 10, boxB, k1)); g.stroke();
-  g.setLineDash([6, 6]); g.globalAlpha = o * .7; g.beginPath(); g.moveTo(lx, boxB); g.lineTo(lerp(lx, boxL, k2), boxB); g.moveTo(boxL, boxB); g.lineTo(boxL, lerp(boxB, 360, k2 * (k2 > .02))); g.stroke(); g.setLineDash([]);
+  g.strokeStyle = CREAM; g.lineWidth = 2.5; g.beginPath(); g.arc(lx, dotYl, 10 * k1, 0, Math.PI * 2); g.stroke();
+  g.lineWidth = 2; g.beginPath(); g.moveTo(lx, dotYl - 10); g.lineTo(lx, lerp(dotYl - 10, 700, k1)); g.stroke();
+  g.setLineDash([6, 6]); g.globalAlpha = o * .7; g.beginPath(); g.moveTo(lx, 700); g.lineTo(lerp(lx, boxL, k2), 700); g.moveTo(boxL, 700); g.lineTo(boxL, lerp(700, 360, k2 * (k2 > .02))); g.stroke(); g.setLineDash([]);
   g.globalAlpha = o; const t2 = tIn + .45;
   if (t > t2) { const pw = (g.font = '600 21px Montserrat', g.letterSpacing = '2.5px', g.measureText(p.name).width + 34), kp = eout((t - t2) / .3);
     g.fillStyle = CREAM; g.beginPath(); g.roundRect(boxL + 22, 392, pw * kp, 42, 4); g.fill();
@@ -85,39 +89,35 @@ function stage(t, lightK) {
   ctx.drawImage(WALL, 0, 0, 2600 * S, 1300 * S, -((cx * .35) % 2600) + 2000, 0, 2600, 1300);
   const fl = ctx.createLinearGradient(0, 1180, 0, H); fl.addColorStop(0, '#12301f'); fl.addColorStop(.3, '#0b2015'); fl.addColorStop(1, '#06140c'); ctx.fillStyle = fl; ctx.fillRect(0, 1180, W, H - 1180);
   const pool = ctx.createRadialGradient(540, 820, 40, 540, 900, 900); pool.addColorStop(0, `rgba(150,220,175,${.17 * lightK})`); pool.addColorStop(1, 'rgba(0,0,0,0)'); ctx.fillStyle = pool; ctx.fillRect(0, 0, W, H);
-  // back row: smaller plinths between the front ones, products soft-focused
-  for (let k = -2; k < 7; k++) { const x = (k * SP + SP / 2 - cx) * .8 + 540; if (x < -300 || x > W + 300) continue;
-    podium(ctx, x, 1085, 165, 30, 1320, .62); product(ctx, P[((k % 5) + 7) % 5], x, 1088, 260, 250, 9, .55); }
-  // front row
-  let focus = null;
-  for (let k = -1; k < 6; k++) { const x = k * SP - cx + 540; if (x < -400 || x > W + 400) continue;
-    podium(ctx, x, 1268, 245, 46, 1640, 1);
-    // reflection of the plinth on the floor
-    if (k >= 0 && k < 5) { const p = P[k], blur = Math.min(12, Math.abs(x - 540) / 45);
-      const r = product(ctx, p, x, 1270, 560, 520, blur, 1);
-      if (Math.abs(x - 540) < 40) focus = { k, r, x };
-      ctx.save(); ctx.font = '500 34px Jost'; ctx.letterSpacing = '1px'; ctx.textAlign = 'center'; ctx.fillStyle = `rgba(250,252,249,${.9 * (1 - Math.min(1, Math.abs(x - 540) / 200))})`; ctx.fillText(p.price, x, 1395); ctx.restore(); }
-  }
-  ctx.fillStyle = 'rgba(0,8,3,.0)';
-  return focus;
+  const fb = focusBack(t);
+  // back row (odd slots): products 2 and 4 live here; the focus pulls back to them
+  for (let j = -3; j < 6; j++) { const wx = (2 * j + 1) * SP, x = (wx - cx) * .82 + 540; if (x < -300 || x > W + 300) continue;
+    const k = 2 * j + 1, feat = k === 1 || k === 3, p = feat ? P[k] : P[((j % 5) + 5 + 2) % 5];
+    const off = Math.min(10, Math.abs(x - 540) / 50), blur = off + 9 * (1 - fb), dim = lerp(.6, 1, fb * (feat ? 1 : .5));
+    podium(ctx, x, 1088, 205, 38, 1360, lerp(.62, .9, fb));
+    product(ctx, p, x, 1092, 430, 400, blur, dim);
+    if (feat) { ctx.save(); ctx.font = '500 30px Jost'; ctx.letterSpacing = '1px'; ctx.textAlign = 'center'; ctx.fillStyle = `rgba(250,252,249,${.9 * fb * (1 - Math.min(1, Math.abs(x - 540) / 200))})`; ctx.fillText(p.price, x, 1188); ctx.restore(); } }
+  // front row (even slots): products 1, 3, 5
+  for (let j = -2; j < 6; j++) { const wx = 2 * j * SP, x = wx - cx + 540; if (x < -400 || x > W + 400) continue;
+    const k = 2 * j, feat = k === 0 || k === 2 || k === 4, p = feat ? P[k] : P[((j % 5) + 5 + 1) % 5];
+    podium(ctx, x, 1300, 245, 46, 1680, 1);
+    const off = Math.min(12, Math.abs(x - 540) / 45), blur = off + 10 * fb;
+    product(ctx, p, x, 1302, 560, 520, blur, lerp(1, .8, fb));
+    if (feat) { ctx.save(); ctx.font = '500 34px Jost'; ctx.letterSpacing = '1px'; ctx.textAlign = 'center'; ctx.fillStyle = `rgba(250,252,249,${.9 * (1 - fb) * (1 - Math.min(1, Math.abs(x - 540) / 200))})`; ctx.fillText(p.price, x, 1425); ctx.restore(); } }
+  return null;
 }
 window.seek = t => {
   ctx.setTransform(S, 0, 0, S, 0, 0); ctx.clearRect(0, 0, W, H);
-  if (t >= T.LOGO) { renderSting(t - T.LOGO, LOCK_D, true, .6); return; }        // crown lands on the beat at 25.78 s
-  if (t < T.OPEN) {                                                                // opener: the dark stage, title on the intro hit
-    stage(T.OPEN, .4); ctx.fillStyle = 'rgba(4,14,8,.72)'; ctx.fillRect(0, 0, W, H);
-    const k = eout(t / .5); ctx.save(); ctx.textAlign = 'center'; ctx.fillStyle = INK; ctx.globalAlpha = k;
-    ctx.font = '500 92px Cormorant'; ctx.letterSpacing = '8px'; ctx.fillText('THE EARRING', W / 2 + 4, 900 + (1 - k) * 20); ctx.fillText('EDIT', W / 2 + 4, 1000 + (1 - k) * 20);
-    ctx.font = '500 24px Montserrat'; ctx.letterSpacing = '6px'; ctx.globalAlpha = k * .8; ctx.fillText('LAB-GROWN DIAMOND EARRINGS', W / 2 + 3, 1080);
-    ctx.restore(); drawCorner(); return; }
-  const f = stage(t, 1); vignette(ctx, .5);
+  if (t >= T.LOGO) { renderSting(t - T.LOGO, LOCK_D, true, .6); return; }        // crown lands on the beat (24.6 s)
+  stage(t, 1); vignette(ctx, .5);
   for (let k = 0; k < 5; k++) { const tIn = T.W[k] + (k ? .95 : .15), tOut = k < 4 ? T.W[k + 1] + .1 : T.LOGO + .05;
-    const x = k * SP - camX(t) + 540, p = P[k], im = p.im, s = Math.min(560 / im.width, 520 / im.height), top = 1270 - im.height * s;
+    const back = BACK(k), x = back ? (k * SP - camX(t)) * .82 + 540 : k * SP - camX(t) + 540, p = P[k], im = p.im;
+    const mw = back ? 430 : 560, mh = back ? 400 : 520, base = back ? 1092 : 1302, s2 = Math.min(mw / im.width, mh / im.height), top = base - im.height * s2;
     if (Math.abs(x - 540) < 60) callout(ctx, p, top, t, tIn, tOut);
-    if (Math.abs(x - 540) < 45) p.glint.forEach(([gx, gy], i) => { const ph = ((t - tIn) / 1.6 + i * .5) % 1, a = Math.exp(-Math.pow((ph - .5) / .07, 2));
-      star(ctx, x - im.width * s / 2 + gx * im.width * s, top + gy * im.height * s, 30 + 26 * a, a * .9, .3 + i); }); }
+    if (Math.abs(x - 540) < 45 && t > tIn) p.glint.forEach(([gx, gy], i) => { const ph = ((t - tIn) / 1.6 + i * .5) % 1, a = Math.exp(-Math.pow((ph - .5) / .07, 2));
+      star(ctx, x - im.width * s2 / 2 + gx * im.width * s2, top + gy * im.height * s2, 30 + 26 * a, a * .9, .3 + i); }); }
   drawCorner();
-  ctx.save(); ctx.textAlign = 'center'; ctx.font = '400 26px Jost'; ctx.letterSpacing = '2px'; ctx.fillStyle = 'rgba(250,252,249,.62)'; ctx.fillText('siyari.com  ·  Somajiguda, Hyderabad', W / 2, 1700); ctx.restore();
+  ctx.save(); ctx.textAlign = 'center'; ctx.font = '400 26px Jost'; ctx.letterSpacing = '2px'; ctx.fillStyle = 'rgba(250,252,249,.62)'; ctx.fillText('siyari.com  ·  Somajiguda, Hyderabad', W / 2, 1760); ctx.restore();
 };
 window.ready = true;
 </script></body></html>

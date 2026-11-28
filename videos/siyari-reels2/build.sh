@@ -7,12 +7,9 @@
 set -euo pipefail; cd "$(dirname "$0")"; mkdir -p out/audio
 music() { local n=$1
   case $n in
-    earrings) ffmpeg -nostdin -v error -y -ss 0 -t 30.0 -i ref/r1.mp4 -vn -af aresample=48000 -c:a pcm_f32le out/audio/_$n.wav; D=30.0;;
+    earrings) ffmpeg -nostdin -v error -y -ss 1.18 -t 28.82 -i ref/r1.mp4 -vn -af aresample=48000 -c:a pcm_f32le out/audio/_$n.wav; D=28.82;;   # v2: logo intro dropped
     shapes)   ffmpeg -nostdin -v error -y -ss 1.0 -t 9.3 -i ref/r2.mp4 -vn -af aresample=48000 -c:a pcm_f32le out/audio/_$n.wav; D=9.3;;
-    ring)     ffmpeg -nostdin -v error -y -ss 14.87 -t 2.59 -i ref/r3.mp4 -vn -af aresample=48000 -c:a pcm_f32le out/audio/_ra.wav
-              ffmpeg -nostdin -v error -y -ss 2.23 -t 12.53 -i ref/r3.mp4 -vn -af aresample=48000 -c:a pcm_f32le out/audio/_rb.wav
-              ffmpeg -nostdin -v error -y -i out/audio/_ra.wav -i out/audio/_rb.wav -filter_complex "[0][1]acrossfade=d=0.03:c1=tri:c2=tri" -c:a pcm_f32le out/audio/_$n.wav
-              rm -f out/audio/_ra.wav out/audio/_rb.wav; D=15.06;;
+    ring)     ffmpeg -nostdin -v error -y -ss 0 -t 12.24 -i ref/r3b.mp4 -vn -af aresample=48000 -c:a pcm_f32le out/audio/_$n.wav; D=12.5;;   # v2: the clean full recording (ref/r3b.mp4)
   esac
   ffmpeg -nostdin -v error -y -i out/audio/_$n.wav -af "apad,atrim=0:$D,afade=t=out:st=$(echo "$D-0.15" | bc):d=0.15" -c:a pcm_f32le out/audio/__$n.wav
   J=$(ffmpeg -nostdin -hide_banner -i out/audio/__$n.wav -af loudnorm=I=-14:TP=-1:LRA=11:print_format=json -f null - 2>&1 | sed -n '/^{/,/^}/p')
@@ -26,5 +23,5 @@ enc() { local n=$1 title=$2; music $n
   for f in out/${title}_*.mp4; do echo "$f $(ffprobe -v error -show_entries format=duration,size -of csv=p=0 "$f")"; done
   ffmpeg -nostdin -hide_banner -i out/${title}_1080x1920_30fps_share.mp4 -af ebur128=peak=true -f null - 2>&1 | grep -E "^\s+I:|Peak:"; }
 for n in ${@:-earrings shapes ring}; do
-  case $n in earrings) enc earrings Siyari_TheEarringEdit;; shapes) enc shapes Siyari_WhatIsYourNextShape;; ring) enc ring Siyari_ImagineItDesignItWearIt;; esac
+  case $n in earrings) enc earrings Siyari_TheEarringEdit_v2;; shapes) enc shapes Siyari_WhatIsYourNextShape_v2;; ring) enc ring Siyari_ImagineItDesignItWearIt;; ring2) cp out/ring2.mp4 out/ring.mp4; enc ring Siyari_ImagineItDesignItWearIt_v2;; esac
 done

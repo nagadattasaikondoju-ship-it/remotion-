@@ -11,22 +11,15 @@ html,body{margin:0;background:#000}#c{width:1080px;height:1920px;display:block}
 <script type="module">
 // Siyari "What is your BEST / NEXT shape?". Follows reference r2 (a dial of diamond cuts turns one step per beat; a solitaire band crosses
 // the frame and its centre stone becomes whichever cut sits in the slot), cut to that reference's own music. Ends on the Siyari swan sting.
-import { THREE, W, H, S, ctx, INK, GREEN, clamp, lerp, ss, eio, eout, renderer, glc, GENV, gemGeo, drawStingBg, renderSting, drawCorner, star, LOCK_D } from './lib.js';
+import { W, H, S, ctx, INK, GREEN, clamp, lerp, ss, eio, eout, loadImg, drawStingBg, renderSting, drawCorner, star, LOCK_D } from './lib.js';
 const STEPS = [0.37, 1.35, 2.3, 3.08, 3.65, 4.45, 5.11];       // music hits (reference audio from 1.0 s)
 const T = { LOGO: 5.82, END: 9.3 };
 window.TIMING = { TEND: T.END };
 const CREAM = '#EDDAC2', DEEP = '#16301f';
-const CUTS = ['round', 'oval', 'pear', 'marquise', 'emerald', 'cushion'], NAMES = { round: 'ROUND', oval: 'OVAL', pear: 'PEAR', marquise: 'MARQUISE', emerald: 'EMERALD', cushion: 'CUSHION' };
+const CUTS = ['round', 'oval', 'heart', 'marquise', 'emerald', 'cushion'], NAMES = { round: 'ROUND', oval: 'OVAL', heart: 'HEART', marquise: 'MARQUISE', emerald: 'EMERALD', cushion: 'CUSHION' };
 await document.fonts.load('600 160px Cormorant'); await document.fonts.load('italic 500 60px Cormorant'); await document.fonts.load('600 20px Montserrat');
-// ---------- top-view diamond sprites, rendered once with the shared gem model + sparkle environment
-const SPR = {};
-{ const sc = new THREE.Scene(); sc.environment = GENV; const cam = new THREE.OrthographicCamera(-1.15, 1.15, 1.15, -1.15, .1, 20); cam.position.set(0, 10, 0); cam.up.set(0, 0, -1); cam.lookAt(0, 0, 0);
-  const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: 0, vertexColors: true, envMap: GENV, envMapIntensity: 1.45 });
-  renderer.setScissorTest(true);
-  CUTS.forEach((c, i) => { const m = new THREE.Mesh(gemGeo(c, 61 + i), mat); m.rotation.y = c === 'round' ? .2 : 0; sc.add(m);
-    renderer.setViewport(0, 0, 512, 512); renderer.setScissor(0, 0, 512, 512); renderer.setClearColor(0, 0); renderer.render(sc, cam);
-    const cv = document.createElement('canvas'); cv.width = cv.height = 512; cv.getContext('2d').drawImage(glc, 0, glc.height - 512, 512, 512, 0, 0, 512, 512); SPR[c] = cv; sc.remove(m); });
-  renderer.setScissorTest(false); renderer.setViewport(0, 0, W * S, H * S); }
+// ---------- real diamonds: face-up stones cut from Siyari's own product photos (tools/stones.py), long axis vertical
+const SPR = {}; for (const c of CUTS) SPR[c] = await loadImg(`img/stone_${c}.png`);
 // ---------- layout
 const DC = { x: 935, y: 960 }, RO_ = 470, RI = 300, RM = (RO_ + RI) / 2, N = 12;   // dial: 12 slots (6 cuts twice), slot = 9 o'clock
 const SLOT = { x: DC.x - RM, y: DC.y };
@@ -52,7 +45,7 @@ window.seek = t => {
   ctx.fillStyle = rim; ctx.beginPath(); ctx.arc(DC.x, DC.y, RO_, 0, Math.PI * 2); ctx.arc(DC.x, DC.y, RI, 0, Math.PI * 2, true); ctx.fill();
   for (let i = 0; i < N; i++) { const a = ang - i * 2 * Math.PI / N, x = DC.x + Math.cos(a) * RM, y = DC.y + Math.sin(a) * RM;
     if (Math.abs(((a - Math.PI) % (2 * Math.PI) + 3 * Math.PI) % (2 * Math.PI) - Math.PI) < .2) continue;     // the slot shows the ring's stone instead
-    const c = CUTS[i % CUTS.length], sz = 138; ctx.save(); ctx.translate(x, y); ctx.rotate(a); ctx.filter = 'saturate(0.2) contrast(1.15)';
+    const c = CUTS[i % CUTS.length], sz = 138; ctx.save(); ctx.translate(x, y); ctx.rotate(a + Math.PI / 2);
     ctx.shadowColor = 'rgba(60,45,25,.35)'; ctx.shadowBlur = 12; ctx.drawImage(SPR[c], -sz / 2, -sz / 2, sz, sz); ctx.restore(); }
   ctx.restore();
   // the ring: shank + head with the slot's cut
