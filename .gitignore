@@ -59,3 +59,6 @@ research/
 
 # local voice-cloning venv (Chatterbox, re-create per container)
 tools/voice-clone/.venv/
+
+# user voice samples and clones (private, never commit)
+voice-test/
