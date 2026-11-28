@@ -1,0 +1,200 @@
+{
+ "lines": [
+  {
+   "id": "l01",
+   "text": "Okay, okay, don't shoot!",
+   "t0": 0.06,
+   "t1": 1.634,
+   "caps": [
+    [
+     "Okay, okay, don't shoot!",
+     0.06,
+     1.754
+    ]
+   ],
+   "s0": 0,
+   "s1": 1.714
+  },
+  {
+   "id": "l02",
+   "text": "It's One Loop, from Hyderabad!",
+   "t0": 1.754,
+   "t1": 3.729,
+   "caps": [
+    [
+     "It's One Loop,",
+     1.754,
+     2.708
+    ],
+    [
+     "from Hyderabad!",
+     2.708,
+     3.849
+    ]
+   ],
+   "s0": 1.714,
+   "s1": 3.809
+  },
+  {
+   "id": "l03",
+   "text": "They build websites, apps, CRMs, even complex software!",
+   "t0": 3.849,
+   "t1": 8.476,
+   "caps": [
+    [
+     "They build websites, apps,",
+     3.849,
+     6.119
+    ],
+    [
+     "CRMs,",
+     6.119,
+     6.556
+    ],
+    [
+     "even complex software!",
+     6.556,
+     8.596
+    ]
+   ],
+   "s0": 3.809,
+   "s1": 8.556000000000001
+  },
+  {
+   "id": "l04",
+   "text": "Google ads, Meta ads, SEO, from zero to real sales leads!",
+   "t0": 8.596,
+   "t1": 12.524,
+   "caps": [
+    [
+     "Google ads, Meta ads, SEO,",
+     8.596,
+     10.42
+    ],
+    [
+     "from zero to real sales leads!",
+     10.42,
+     12.644
+    ]
+   ],
+   "s0": 8.556000000000001,
+   "s1": 12.604000000000001
+  },
+  {
+   "id": "l05",
+   "text": "And they automate your whole business, so it runs on its own!",
+   "t0": 12.644,
+   "t1": 15.452,
+   "caps": [
+    [
+     "And they automate your whole business,",
+     12.644,
+     14.422
+    ],
+    [
+     "so it runs on its own!",
+     14.422,
+     15.572
+    ]
+   ],
+   "s0": 12.604000000000001,
+   "s1": 15.532
+  },
+  {
+   "id": "l06",
+   "text": "Larkin hired them! That's why his leads keep coming in!",
+   "t0": 15.572,
+   "t1": 19.167,
+   "caps": [
+    [
+     "Larkin hired them!",
+     15.572,
+     16.77
+    ],
+    [
+     "That's why his leads keep coming in!",
+     16.77,
+     19.287
+    ]
+   ],
+   "s0": 15.532,
+   "s1": 19.247
+  },
+  {
+   "id": "l07",
+   "text": "RMC Plumbing went from eleven to sixty-six leads a month!",
+   "t0": 19.287,
+   "t1": 23.323,
+   "caps": [
+    [
+     "RMC Plumbing went from eleven to sixty-six leads a month!",
+     19.287,
+     23.443
+    ]
+   ],
+   "s0": 19.247,
+   "s1": 23.403000000000002
+  },
+  {
+   "id": "l08",
+   "text": "Twenty-four brands, four countries!",
+   "t0": 23.443,
+   "t1": 25.237,
+   "caps": [
+    [
+     "Twenty-four brands,",
+     23.443,
+     24.446
+    ],
+    [
+     "four countries!",
+     24.446,
+     25.357
+    ]
+   ],
+   "s0": 23.403000000000002,
+   "s1": 25.317
+  },
+  {
+   "id": "l09",
+   "text": "If you want to grow, just WhatsApp them for a free audit!",
+   "t0": 25.357,
+   "t1": 28.182,
+   "caps": [
+    [
+     "If you want to grow,",
+     25.357,
+     26.366
+    ],
+    [
+     "just WhatsApp them for a free audit!",
+     26.366,
+     28.302
+    ]
+   ],
+   "s0": 25.317,
+   "s1": 28.262
+  },
+  {
+   "id": "l10",
+   "text": "I swear to God! Put the gun down!",
+   "t0": 28.302,
+   "t1": 30.235,
+   "caps": [
+    [
+     "I swear to God!",
+     28.302,
+     29.208
+    ],
+    [
+     "Put the gun down!",
+     29.208,
+     30.355
+    ]
+   ],
+   "s0": 28.262,
+   "s1": 31.955
+  }
+ ],
+ "end": 31.955
+}
