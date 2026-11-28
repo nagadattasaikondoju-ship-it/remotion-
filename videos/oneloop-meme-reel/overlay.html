@@ -1,0 +1,148 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>One Loop confession overlay</title>
+<style>
+@font-face{font-family:Almarai;src:url(fonts/Almarai-Bold.ttf);font-weight:700}
+@font-face{font-family:Almarai;src:url(fonts/Almarai-ExtraBold.ttf);font-weight:800}
+@font-face{font-family:Almarai;src:url(fonts/Almarai-Regular.ttf);font-weight:400}
+@font-face{font-family:Serif;src:url(fonts/InstrumentSerif-Italic.ttf);font-style:italic}
+@font-face{font-family:Mont;src:url(fonts/Montserrat-normal-700.ttf);font-weight:700}
+@font-face{font-family:Mont;src:url(fonts/Montserrat-normal-800.ttf);font-weight:800}
+html,body{margin:0;background:transparent}#c{width:1080px;height:1920px;display:block}
+</style>
+<script src="logo.js"></script>
+</head><body><canvas id="c" width="1080" height="1920"></canvas>
+<script>
+// Transparent overlay for the "confession" half of the One Loop meme reel (t = seconds since the pitch starts).
+// Graphics sit inside the reference's picture box; captions sit in the black band under it, in the reference's style.
+// Every number shown is from docs/playbook/oneloop-brand.md (verified data only).
+const W = 1080, H = 1920, cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const BOX = { x: 18, y: 544, w: 1043, h: 875 };
+const COP = '#E59C69', CREAM = '#F7E8DA', INK = '#161616', WHT = '#FFFFFF';
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x)), lerp = (a, b, k) => a + (b - a) * k;
+const eout = k => 1 - Math.pow(1 - clamp(k), 3), eback = k => { k = clamp(k); const c = 1.7; return 1 + (c + 1) * Math.pow(k - 1, 3) + c * Math.pow(k - 1, 2); };
+let TL = null;                       // timeline.json: { lines:[{id,text,t0,t1,caps:[[text,t0,t1]]}], end }
+const L = id => TL.lines.find(l => l.id === id);
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, r); }
+function chip(txt, x, y, k, opt = {}) {           // pill that pops in with a little overshoot
+  if (k <= 0) return 0; const s = eback(k), a = clamp(k * 3);
+  ctx.save(); ctx.font = `800 ${opt.size || 34}px Almarai`; ctx.letterSpacing = '2px';
+  const w = ctx.measureText(txt).width + 54, h = (opt.size || 34) + 32;
+  ctx.translate(x + w / 2, y + h / 2); ctx.scale(s, s); ctx.globalAlpha = a;
+  ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = 18; ctx.shadowOffsetY = 6;
+  rr(-w / 2, -h / 2, w, h, h / 2); ctx.fillStyle = opt.bg || COP; ctx.fill(); ctx.shadowColor = 'transparent';
+  ctx.fillStyle = opt.fg || INK; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(txt, 0, 3); ctx.restore(); return w;
+}
+function pathOf(polys, S) { ctx.beginPath(); for (const p of polys) { p.forEach(([x, y], i) => i ? ctx.lineTo(x * S, y * S) : ctx.moveTo(x * S, y * S)); ctx.closePath(); } }
+function logo(cx, cy, S, k = 1, parts = { word: true, tag: true }) {   // One Loop's traced logo (logo.js), never redrawn
+  if (k <= 0) return; ctx.save(); ctx.globalAlpha = clamp(k * 2); ctx.translate(cx, cy); const s = lerp(.85, 1, eout(k)); ctx.scale(s, s);
+  ctx.fillStyle = COP; pathOf(LOGO.CL, S); ctx.fill('evenodd'); pathOf(LOGO.CR, S); ctx.fill('evenodd'); pathOf(LOGO.X, S); ctx.fill('evenodd');
+  if (parts.word) { ctx.fillStyle = WHT; LOGO.WORD.forEach(w => { pathOf(w.paths || w, S); ctx.fill('evenodd'); }); }
+  if (parts.tag) { ctx.fillStyle = WHT; pathOf(LOGO.TAGW, S); ctx.fill('evenodd'); ctx.fillStyle = COP; pathOf(LOGO.TAGC, S); ctx.fill(); }
+  ctx.restore();
+}
+function scrim(a, y0 = BOX.y, y1 = BOX.y + BOX.h) { const g = ctx.createLinearGradient(0, y0, 0, y1); g.addColorStop(0, `rgba(0,0,0,${a * .15})`); g.addColorStop(1, `rgba(0,0,0,${a})`); ctx.fillStyle = g; ctx.fillRect(BOX.x, y0, BOX.w, y1 - y0); }
+// word time inside a line, by character position (the clone speaks evenly)
+const at = (l, word) => { const i = l.text.indexOf(word); return l.t0 + (l.t1 - l.t0) * Math.max(0, i) / l.text.length; };
+
+function caption(t) {                              // reference style: white bold sans, centred, under the picture
+  for (const l of TL.lines) for (const [txt, a, b] of l.caps) if (t >= a && t < b) {
+    ctx.save(); ctx.font = '700 44px Mont'; ctx.textAlign = 'center'; ctx.fillStyle = WHT; ctx.textBaseline = 'alphabetic';
+    const words = txt.split(' '), lines = []; let cur = '';
+    for (const w of words) { const n = cur ? cur + ' ' + w : w; if (ctx.measureText(n).width > 860 && cur) { lines.push(cur); cur = w; } else cur = n; }
+    lines.push(cur); lines.forEach((s, i) => ctx.fillText(s, W / 2, 1510 + i * 54 - (lines.length - 1) * 27)); ctx.restore(); return;
+  }
+}
+const SCENES = {
+  l01(t, l) { },                                   // just the panic, over the city
+  l02(t, l) {                                      // One Loop + Hyderabad
+    const k = (t - at(l, 'One Loop')) / .35; logo(BOX.x + BOX.w / 2, BOX.y + BOX.h * .42, 300, k);
+    chip('📍  HYDERABAD, INDIA', BOX.x + 40, BOX.y + BOX.h - 130, (t - at(l, 'Hyderabad')) / .3, { bg: WHT });
+    if (k > 0) scrim(.0);
+  },
+  l03(t, l) {                                      // what they build
+    scrim(clamp((t - l.t0) / .3) * .55, BOX.y + BOX.h * .35);
+    [['WEBSITES', 'websites'], ['APPS', 'apps'], ['CRMs', 'CRMs'], ['COMPLEX SOFTWARE', 'complex']].forEach(([s, w], i) =>
+      chip(s, BOX.x + 40 + (i % 2) * 330 * (i === 3 ? 0 : 1), BOX.y + BOX.h - 330 + Math.floor(i / 2) * 105 + (i === 3 ? 0 : 0), (t - at(l, w)) / .25, { bg: i === 3 ? COP : WHT }));
+  },
+  l04(t, l) {                                      // marketing: zero to leads
+    scrim(clamp((t - l.t0) / .3) * .6, BOX.y + BOX.h * .3);
+    [['GOOGLE ADS', 'Google'], ['META ADS', 'Meta'], ['SEO', 'SEO']].forEach(([s, w], i) => chip(s, BOX.x + 40 + i * 300 - (i === 2 ? 40 : 0), BOX.y + BOX.h - 360, (t - at(l, w)) / .25, { bg: WHT }));
+    const k = clamp((t - at(l, 'zero')) / (l.t1 - at(l, 'zero') + .3));
+    if (k > 0) { const x0 = BOX.x + 60, y0 = BOX.y + BOX.h - 60, gw = BOX.w - 120, gh = 190;
+      ctx.save(); ctx.strokeStyle = COP; ctx.lineWidth = 9; ctx.lineCap = 'round'; ctx.lineJoin = 'round'; ctx.beginPath();
+      const n = 60; for (let i = 0; i <= n * k; i++) { const u = i / n, y = y0 - gh * Math.pow(u, 2.2) - 8 * Math.sin(u * 19); i ? ctx.lineTo(x0 + gw * u, y) : ctx.moveTo(x0, y); } ctx.stroke();
+      ctx.font = '800 30px Almarai'; ctx.fillStyle = WHT; ctx.fillText('0', x0 - 6, y0 + 40); ctx.globalAlpha = clamp(k * 3 - 2);
+      ctx.fillStyle = COP; ctx.textAlign = 'right'; ctx.fillText('SALES LEADS ↑', x0 + gw, y0 - gh - 26); ctx.restore(); }
+  },
+  l05(t, l) {                                      // automation flow
+    scrim(clamp((t - l.t0) / .3) * .7, BOX.y + BOX.h * .25);
+    const nodes = ['LEAD', 'CRM', 'WHATSAPP', 'SALE'], y = BOX.y + BOX.h - 200, x0 = BOX.x + 120, dx = (BOX.w - 240) / 3;
+    const k0 = at(l, 'automate'), prog = clamp((t - k0) / (l.t1 - k0 + .2));
+    ctx.save(); ctx.strokeStyle = 'rgba(247,232,218,.5)'; ctx.lineWidth = 5; ctx.setLineDash([12, 12]); ctx.lineDashOffset = -t * 60;
+    ctx.beginPath(); ctx.moveTo(x0, y); ctx.lineTo(x0 + dx * 3 * clamp(prog * 1.3), y); ctx.stroke(); ctx.restore();
+    nodes.forEach((s, i) => { const k = (t - k0 - i * .22) / .28; if (k <= 0) return; const sc = eback(k);
+      ctx.save(); ctx.translate(x0 + dx * i, y); ctx.scale(sc, sc); ctx.fillStyle = i === 3 ? COP : WHT; ctx.beginPath(); ctx.arc(0, 0, 46, 0, 7); ctx.fill();
+      ctx.fillStyle = INK; ctx.font = '800 30px Almarai'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(['✉', '⚙', '💬', '₹'][i], 0, 2);
+      ctx.fillStyle = WHT; ctx.font = '800 26px Almarai'; ctx.fillText(s, 0, 84); ctx.restore(); });
+    if (prog > .1) { const u = ((t - k0) * .9) % 1; ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(x0 + dx * 3 * u, y - 70, 12, 0, 7); ctx.fill(); }
+    chip('RUNS ON ITS OWN', BOX.x + BOX.w / 2 - 190, BOX.y + BOX.h - 440, (t - at(l, 'runs')) / .25);
+  },
+  l06(t, l) {                                      // "Larkin hired them": leads keep pinging in
+    const k0 = at(l, 'leads');
+    for (let i = 0; i < 4; i++) { const k = (t - k0 - i * .28) / .25; if (k <= 0) continue; const y = BOX.y + 70 + i * 118;
+      ctx.save(); ctx.globalAlpha = clamp(k * 2); ctx.translate(lerp(BOX.x + BOX.w + 40, BOX.x + BOX.w - 520, eout(k)), y);
+      ctx.shadowColor = 'rgba(0,0,0,.4)'; ctx.shadowBlur = 16; rr(0, 0, 480, 96, 22); ctx.fillStyle = 'rgba(255,255,255,.96)'; ctx.fill(); ctx.shadowColor = 'transparent';
+      ctx.fillStyle = COP; ctx.beginPath(); ctx.arc(48, 48, 26, 0, 7); ctx.fill(); ctx.fillStyle = INK; ctx.font = '800 26px Almarai'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('🔔', 48, 50);
+      ctx.textAlign = 'left'; ctx.font = '800 28px Almarai'; ctx.fillText('New lead', 92, 36); ctx.font = '400 24px Almarai'; ctx.fillStyle = '#555'; ctx.fillText(['Website enquiry', 'WhatsApp: "Need a quote"', 'Google Ads call', 'Instagram DM'][i], 92, 68); ctx.restore(); }
+  },
+  l07(t, l) {                                      // verified case study: RMC Plumbing (AU) 11 -> 66 leads/mo
+    const k = (t - l.t0 + .1) / .35; if (k <= 0) return; scrim(.75 * clamp(k), BOX.y);
+    ctx.save(); ctx.globalAlpha = clamp(k * 2); ctx.textAlign = 'center'; const cx = BOX.x + BOX.w / 2;
+    ctx.fillStyle = CREAM; ctx.font = '800 34px Almarai'; ctx.letterSpacing = '4px'; ctx.fillText('RMC PLUMBING · AUSTRALIA', cx, BOX.y + 230);
+    const c = clamp((t - at(l, 'sixty')) / .6), n = Math.round(lerp(11, 66, eout(c)));
+    ctx.letterSpacing = '0px'; ctx.font = '800 190px Almarai'; ctx.fillStyle = WHT; ctx.fillText('11', cx - 230, BOX.y + 480);
+    ctx.fillStyle = COP; ctx.fillText('→', cx, BOX.y + 470); ctx.fillText(t >= at(l, 'sixty') ? String(n) : '?', cx + 235, BOX.y + 480);
+    ctx.font = 'italic 56px Serif'; ctx.fillStyle = CREAM; ctx.fillText('leads a month', cx, BOX.y + 580);
+    ctx.font = '400 26px Almarai'; ctx.globalAlpha *= .75; ctx.fillText('Google Ads · since Oct 2023 · cost per lead $92 → $19', cx, BOX.y + 650); ctx.restore();
+  },
+  l08(t, l) {                                      // 24 brands, 4 countries
+    scrim(.7 * clamp((t - l.t0) / .3), BOX.y);
+    const cx = BOX.x + BOX.w / 2, k = clamp((t - l.t0) / .55);
+    ctx.save(); ctx.textAlign = 'center'; ctx.fillStyle = WHT; ctx.font = '800 200px Almarai'; ctx.fillText(String(Math.round(24 * eout(k))), cx - 220, BOX.y + 400);
+    ctx.fillStyle = COP; ctx.fillText(t >= at(l, 'four') ? '4' : '', cx + 250, BOX.y + 400);
+    ctx.font = 'italic 54px Serif'; ctx.fillStyle = CREAM; ctx.fillText('brands', cx - 220, BOX.y + 470); if (t >= at(l, 'four')) ctx.fillText('countries', cx + 250, BOX.y + 470); ctx.restore();
+    ['INDIA', 'AUSTRALIA', 'NEW ZEALAND', 'UK'].forEach((s, i) => chip(s, BOX.x + 60 + (i % 2) * 470, BOX.y + 560 + Math.floor(i / 2) * 105, (t - at(l, 'four') - i * .12) / .25, { bg: i ? WHT : COP, size: 30 }));
+  },
+  l09(t, l) {                                      // CTA
+    scrim(.65 * clamp((t - l.t0) / .3), BOX.y + BOX.h * .3);
+    chip('FREE AUDIT', BOX.x + BOX.w / 2 - 170, BOX.y + BOX.h - 330, (t - at(l, 'free')) / .25, { size: 44 });
+    const k = (t - at(l, 'WhatsApp')) / .3; if (k > 0) { ctx.save(); ctx.globalAlpha = clamp(k * 2); const w = 640, x = BOX.x + (BOX.w - w) / 2, y = BOX.y + BOX.h - 190;
+      rr(x, y, w, 96, 48); ctx.fillStyle = '#25D366'; ctx.fill(); ctx.fillStyle = WHT; ctx.font = '800 38px Almarai'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('WhatsApp  +91 93927 53155', x + w / 2, y + 50); ctx.restore(); }
+  },
+  l10(t, l) {                                      // end card inside the box: the logo + promise
+    const k = clamp((t - l.t0 + .05) / .25); ctx.fillStyle = `rgba(0,0,0,${k})`; ctx.fillRect(BOX.x, BOX.y, BOX.w, BOX.h);
+    logo(BOX.x + BOX.w / 2, BOX.y + BOX.h * .42, 360, (t - l.t0) / .5);
+    const words = ['AUDIT.', 'BUILD.', 'MARKET.', 'AUTOMATE.']; ctx.save(); ctx.font = '800 40px Almarai'; ctx.letterSpacing = '3px'; ctx.textBaseline = 'middle';
+    const tot = words.reduce((s, w) => s + ctx.measureText(w + ' ').width, 0); let x = BOX.x + (BOX.w - tot) / 2;
+    words.forEach((w, i) => { const a = clamp((t - l.t0 - .35 - i * .12) / .2); ctx.globalAlpha = a; ctx.fillStyle = WHT; ctx.fillText(w.slice(0, -1), x, BOX.y + BOX.h - 170);
+      const ww = ctx.measureText(w.slice(0, -1)).width; ctx.fillStyle = COP; ctx.fillText('.', x + ww, BOX.y + BOX.h - 170); x += ctx.measureText(w + ' ').width; });
+    ctx.restore();
+  },
+};
+function tag() {                                    // keeps the concept cut from being posted by mistake
+  ctx.save(); ctx.font = '700 20px Mont'; ctx.letterSpacing = '2px'; ctx.textAlign = 'right'; ctx.fillStyle = 'rgba(255,255,255,.55)'; ctx.fillText('INTERNAL CONCEPT · NOT FOR POSTING', W - 30, 44); ctx.restore();
+}
+window.seek = t => {
+  ctx.clearRect(0, 0, W, H);
+  if (window.TAG_ONLY) { tag(); return; }
+  const cur = TL.lines.find((l, i) => t >= l.s0 && t < l.s1);
+  ctx.save(); ctx.beginPath(); ctx.rect(BOX.x, BOX.y, BOX.w, BOX.h); ctx.clip();
+  if (cur && SCENES[cur.id]) SCENES[cur.id](t, cur); ctx.restore();
+  // white flash on the cut into the confession, like the reference's hard switch
+  const f = Math.exp(-Math.pow(t / .06, 2)) * .9; if (f > .01) { ctx.fillStyle = `rgba(255,255,255,${f})`; ctx.fillRect(BOX.x, BOX.y, BOX.w, BOX.h); }
+  caption(t); tag();
+};
+(async () => { TL = await (await fetch('timeline.json')).json();
+  await document.fonts.load('800 40px Almarai'); await document.fonts.load('700 44px Mont'); await document.fonts.load('italic 50px Serif'); await document.fonts.load('400 20px Almarai');
+  window.TIMING = { TEND: TL.end }; window.ready = true; })();
+</script></body></html>

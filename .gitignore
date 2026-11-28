@@ -65,3 +65,7 @@ voice-test/
 tools/voice-clone/voices/**/*.wav
 tools/voice-clone/voices/**/*.ogg
 tools/voice-clone/voices/**/*.mp3
+videos/oneloop-meme-reel/ref/
+videos/oneloop-meme-reel/vo/
+videos/oneloop-meme-reel/broll/
+videos/oneloop-meme-reel/out/
