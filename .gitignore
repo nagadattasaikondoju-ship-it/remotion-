@@ -53,3 +53,6 @@ tools/models/
 .claude/skills/video-edit-pipeline/
 .claude/skills/video-qa/
 .claude/skills/video-review-canvas/
+
+# Downloaded third-party content for research (other brands own it): keep out of git
+research/
