@@ -55,9 +55,9 @@ function caption(t) {                              // reference style: white bol
 const SCENES = {
   l01(t, l) { },                                   // just the panic, over the city
   l02(t, l) {                                      // One Loop + Hyderabad
-    const k = (t - at(l, 'One Loop')) / .35; logo(BOX.x + BOX.w / 2, BOX.y + BOX.h * .42, 300, k);
+    const k = (t - at(l, 'One Loop')) / .35; if (k > 0) { ctx.fillStyle = `rgba(0,0,0,${.55 * clamp(k)})`; ctx.fillRect(BOX.x, BOX.y, BOX.w, BOX.h); }
+    logo(BOX.x + BOX.w / 2, BOX.y + BOX.h * .42, 300, k);
     chip('📍  HYDERABAD, INDIA', BOX.x + 40, BOX.y + BOX.h - 130, (t - at(l, 'Hyderabad')) / .3, { bg: WHT });
-    if (k > 0) scrim(.0);
   },
   l03(t, l) {                                      // what they build
     scrim(clamp((t - l.t0) / .3) * .55, BOX.y + BOX.h * .35);
@@ -122,11 +122,9 @@ const SCENES = {
   l10(t, l) {                                      // end card inside the box: the logo + promise
     const k = clamp((t - l.t0 + .05) / .25); ctx.fillStyle = `rgba(0,0,0,${k})`; ctx.fillRect(BOX.x, BOX.y, BOX.w, BOX.h);
     logo(BOX.x + BOX.w / 2, BOX.y + BOX.h * .42, 360, (t - l.t0) / .5);
-    const words = ['AUDIT.', 'BUILD.', 'MARKET.', 'AUTOMATE.']; ctx.save(); ctx.font = '800 40px Almarai'; ctx.letterSpacing = '3px'; ctx.textBaseline = 'middle';
-    const tot = words.reduce((s, w) => s + ctx.measureText(w + ' ').width, 0); let x = BOX.x + (BOX.w - tot) / 2;
-    words.forEach((w, i) => { const a = clamp((t - l.t0 - .35 - i * .12) / .2); ctx.globalAlpha = a; ctx.fillStyle = WHT; ctx.fillText(w.slice(0, -1), x, BOX.y + BOX.h - 170);
-      const ww = ctx.measureText(w.slice(0, -1)).width; ctx.fillStyle = COP; ctx.fillText('.', x + ww, BOX.y + BOX.h - 170); x += ctx.measureText(w + ' ').width; });
-    ctx.restore();
+    const c = (t - l.t0 - .45) / .3; if (c > 0) { ctx.save(); ctx.globalAlpha = clamp(c * 2); const w = 700, x = BOX.x + (BOX.w - w) / 2, y = BOX.y + BOX.h - 118;
+      rr(x, y, w, 84, 42); ctx.fillStyle = '#25D366'; ctx.fill(); ctx.fillStyle = WHT; ctx.font = '800 34px Almarai'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText('FREE AUDIT · WhatsApp +91 93927 53155', x + w / 2, y + 44); ctx.restore(); }
   },
 };
 function tag() {                                    // keeps the concept cut from being posted by mistake
