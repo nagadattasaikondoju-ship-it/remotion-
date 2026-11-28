@@ -64,13 +64,13 @@ function envTex() {
   for (let k = 0; k < 90; k++) box(R() * 2048, 90 + R() * 400, 5 + R() * 14, 5 + R() * 14, 1);
   const t = new THREE.CanvasTexture(c); t.mapping = THREE.EquirectangularReflectionMapping; t.colorSpace = THREE.SRGBColorSpace; return t;
 }
-function gemEnvTex() {
+function gemEnvTex() {                       // v4: darker room with many hard white softboxes -> crisp white/black facet pattern like real stones
   const c = document.createElement('canvas'); c.width = 2048; c.height = 1024; const g = c.getContext('2d'), R = rng(13);
-  const gr = g.createLinearGradient(0, 0, 0, 1024); gr.addColorStop(0, '#ffffff'); gr.addColorStop(.5, '#bdbdbd'); gr.addColorStop(1, '#8a8a8a');
+  const gr = g.createLinearGradient(0, 0, 0, 1024); gr.addColorStop(0, '#a4a4a4'); gr.addColorStop(.5, '#555555'); gr.addColorStop(1, '#2a2a2a');
   g.fillStyle = gr; g.fillRect(0, 0, 2048, 1024);
-  for (let k = 0; k < 420; k++) { const d = R() < .3, w = 20 + R() * 90, h = 20 + R() * 90;
-    g.fillStyle = d ? `rgba(20,22,26,${.55 + R() * .4})` : `rgba(255,255,255,1)`; g.fillRect(R() * 2048, R() * 1024, w, h); }
-  for (let k = 0; k < 40; k++) { g.fillStyle = R() < .5 ? 'rgba(200,225,255,.9)' : 'rgba(255,230,200,.9)'; g.fillRect(R() * 2048, R() * 1024, 30 + R() * 60, 30 + R() * 60); }
+  for (let k = 0; k < 520; k++) { const d = R() < .28, w = 14 + R() * 70, h = 14 + R() * 70;
+    g.fillStyle = d ? `rgba(6,6,8,${.7 + R() * .3})` : `rgba(255,255,255,1)`; g.fillRect(R() * 2048, R() * 1024, w, h); }
+  for (let k = 0; k < 50; k++) { g.fillStyle = R() < .5 ? 'rgba(190,220,255,.95)' : 'rgba(255,225,190,.95)'; g.fillRect(R() * 2048, R() * 1024, 24 + R() * 50, 24 + R() * 50); }
   const t = new THREE.CanvasTexture(c); t.mapping = THREE.EquirectangularReflectionMapping; t.colorSpace = THREE.SRGBColorSpace; return t;
 }
 const pmrem = new THREE.PMREMGenerator(renderer);
@@ -112,7 +112,7 @@ function gemGeo(cut, seed = 1, tint = null) {
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3)); g.computeVertexNormals(); return g;
 }
-const gemMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: .0, vertexColors: true, envMap: GENV, envMapIntensity: 1.35 });
+const gemMat = new THREE.MeshStandardMaterial({ color: 0xffffff, metalness: 1, roughness: .0, vertexColors: true, envMap: GENV, envMapIntensity: 2.1 });
 const METAL = {
   yellow: new THREE.MeshPhysicalMaterial({ color: new THREE.Color(1.0, .72, .32), metalness: 1, roughness: .085, envMap: ENV, envMapIntensity: 1.45, clearcoat: .35, clearcoatRoughness: .1 }),
   rose: new THREE.MeshPhysicalMaterial({ color: new THREE.Color(.98, .6, .47), metalness: 1, roughness: .085, envMap: ENV, envMapIntensity: 1.45, clearcoat: .35, clearcoatRoughness: .1 }),
@@ -186,10 +186,23 @@ function chainScene(cfg) {
   for (let i = 0; i < N; i++) { const r = makeRing(DESIGNS[(i + cfg.offset) % DESIGNS.length]); r.matrixAutoUpdate = false; sc.add(r); rings.push(r); }
   const Y = new THREE.Vector3(0, 1, 0);
   function place(t) {
+    if (cfg.curve) {                                                    // v4: conveyor along a fixed arc-length curve
+      const L = cfg.curve.getLength(), D = cfg.D(t);
+      rings.forEach((r, i) => {
+        const s = ((i * cfg.sp + D) % L + L) % L, k = s / L;
+        const p = cfg.curve.getPointAt(k), Tn = cfg.curve.getTangentAt(k).setY(0).normalize().negate();   // lean back up the chain, stones toward the top like the reference
+        orient(r, i, p, Tn); r.userData.u = s;
+      });
+      return;
+    }
     const L = N * cfg.sp;
     rings.forEach((r, i) => {
       let u = ((i * cfg.sp + cfg.v * t) % L + L) % L - L / 2;           // conveyor along the path
       const p = cfg.path(u, t), q = cfg.path(u + .01, t), Tn = q.sub(p).normalize();
+      orient(r, i, p, Tn); r.userData.u = u;
+    });
+  }
+  function orient(r, i, p, Tn) {
       const beta = cfg.tilt + .05 * Math.sin(i * 1.7);
       const X = Tn.clone().multiplyScalar(Math.cos(beta)).addScaledVector(Y, Math.sin(beta));
       const Yr = Tn.clone().multiplyScalar(-Math.sin(beta)).addScaledVector(Y, Math.cos(beta));
@@ -197,15 +210,31 @@ function chainScene(cfg) {
       const spin = .25 * Math.sin(i * 2.3);                              // each ring sits a little rotated, like a hand-set row
       const Xs = X.clone().multiplyScalar(Math.cos(spin)).addScaledVector(Z, Math.sin(spin)), Zs = new THREE.Vector3().crossVectors(Xs, Yr);
       const h = RO * Math.sin(beta) + BW / 2 * Math.cos(beta) + .005;
-      r.matrix.makeBasis(Xs, Yr, Zs).setPosition(p.x, h, p.z); r.matrixWorldNeedsUpdate = true; r.userData.u = u;
-    });
+      r.matrix.makeBasis(Xs, Yr, Zs).setPosition(p.x, h, p.z); r.matrixWorldNeedsUpdate = true;
   }
   return { sc, cam, rings, place, cfg };
 }
-// v3 (user's note): the reference's chain is a real snake: it swings right at the top, sweeps left through the middle, curls back at
-// the bottom, and the curve itself sways while the rings flow, so the middle keeps changing. Denser: more, tighter rings in frame.
-const A = chainScene({ velvet: '#123a22', sheen: '#4f9a6a', seed: 3, n: 22, sp: .9, v: -0.95, tilt: 1.1, offset: 0, fov: 24,
-  path: (u, t = 0) => new THREE.Vector3(1.4 * Math.sin(.6 * u + .55 + .3 * Math.sin(.9 * t)) + .12 * Math.sin(1.2 * u + 1.5 * t) - .05, 0, -u), cam: t => [new THREE.Vector3(.12 * Math.sin(t * .4), 27 - .5 * t, 6.0), new THREE.Vector3(0, 0, .35)] });
+// v4 (measured from the reference, frame by frame): the chain is one long diagonal, top-right to bottom-left, with only a small hook
+// at the top and a curl at the bottom. It never sways; the rings slide along it (fast for the first 0.6 s, then steady, then speeding into
+// the cut). The camera zooms out, pushes in ~18% at 2.7-3.4 s while new rings slide through, then eases out before the logo.
+const BASE = { pos: new THREE.Vector3(0, 26, 6), look: new THREE.Vector3(0, 0, .35), fov: 32 };
+function groundAt(px, py, hy) { const c = new THREE.PerspectiveCamera(BASE.fov, W / H, .5, 100); c.position.copy(BASE.pos); c.lookAt(BASE.look); c.updateMatrixWorld();
+  const v = new THREE.Vector3(px / W * 2 - 1, 1 - py / H * 2, .5).unproject(c), d = v.sub(c.position).normalize(); return c.position.clone().addScaledVector(d, (hy - c.position.y) / d.y).setY(0); }
+// centreline of the reference chain (bright-metal centroid per row, 6.8-9.3 s), scaled to 1080x1920, plus off-screen run-in / run-out
+const SCR = [[560, -560], [640, -260], [700, 40], [738, 300], [700, 520], [570, 730], [425, 930], [328, 1135], [296, 1340], [336, 1545], [462, 1745], [600, 1930], [700, 2140], [760, 2420]];
+const CURVE = new THREE.CatmullRomCurve3(SCR.map(([x, y]) => groundAt(x, y, .9)), false, 'centripetal');
+// world speed along the chain (rings/s ~ 1.3 at the steady rate), integrated once per frame time
+const vA = t => 1.8 * (1 + 2.2 * Math.exp(-t / .35) + 1.9 * ss(5.5, 5.9, t));
+const DA = t => { let d = 0; const h = 1 / 480; for (let x = 0; x < t; x += h) d += vA(x) * Math.min(h, t - x); return d; };
+// zoom (image magnification) keyed to the reference's measured scale curve, normalised so the wide state = 1
+const ZK = [[0, 1.06], [.13, 1], [.27, .906], [.4, .868], [.6, .833], [1, .814], [1.5, .795], [2, .783], [2.62, .773], [2.75, .79], [2.9, .83], [3, .875], [3.12, .906], [3.3, .931], [3.6, .946], [3.85, .95], [4.3, .946], [4.7, .935], [5.1, .922], [5.4, .909], [5.6, .893], [5.75, .866], [5.9, .81]];
+function zoomA(t) { const k = ZK, n = k.length; if (t <= k[0][0]) return k[0][1] / .8; if (t >= k[n - 1][0]) return k[n - 1][1] / .8;
+  let i = 0; while (k[i + 1][0] < t) i++; const p0 = k[Math.max(0, i - 1)], p1 = k[i], p2 = k[i + 1], p3 = k[Math.min(n - 1, i + 2)];
+  const u = (t - p1[0]) / (p2[0] - p1[0]), m1 = (p2[1] - p0[1]) / (p2[0] - p0[0] || 1) * (p2[0] - p1[0]), m2 = (p3[1] - p1[1]) / (p3[0] - p1[0] || 1) * (p2[0] - p1[0]);
+  const h00 = 2 * u ** 3 - 3 * u ** 2 + 1, h10 = u ** 3 - 2 * u ** 2 + u, h01 = -2 * u ** 3 + 3 * u ** 2, h11 = u ** 3 - u ** 2;
+  return (h00 * p1[1] + h10 * m1 + h01 * p2[1] + h11 * m2) / .8; }
+const A = chainScene({ velvet: '#123a22', sheen: '#4f9a6a', seed: 3, n: Math.ceil(CURVE.getLength() / 1.3), sp: 1.3, tilt: 1.1, offset: 0, fov: BASE.fov,
+  curve: CURVE, D: DA, zoom: zoomA, zoomAt: [330, 1000], cam: t => [BASE.pos, BASE.look] });
 const C = chainScene({ velvet: '#123a22', sheen: '#4f9a6a', seed: 5, n: 13, sp: 1.08, v: 0.8, tilt: 1.05, offset: 4, fov: 24,
   path: u => new THREE.Vector3(.3 * u + .65 * Math.sin(.43 * u) - .45, 0, -u), cam: t => [new THREE.Vector3(.1 - .05 * t, 21.5 - .5 * t, 5.0), new THREE.Vector3(.1, 0, .3)] });
 
@@ -299,6 +328,7 @@ function project(cam, p) { v3.copy(p).project(cam); return [(v3.x + 1) / 2 * W, 
 // ---------- scenes
 function renderChain(S_, tl, t) {
   const [pos, look] = S_.cfg.cam(tl); S_.cam.position.copy(pos); S_.cam.lookAt(look); S_.cam.updateMatrixWorld();
+  if (S_.cfg.zoom) { const z = S_.cfg.zoom(tl), [ax, ay] = S_.cfg.zoomAt; S_.cam.setViewOffset(W, H, ax * (1 - 1 / z), ay * (1 - 1 / z), W / z, H / z); }
   S_.place(tl); renderer.setClearColor(0x000000, 1); renderer.render(S_.sc, S_.cam);
   ctx.drawImage(glc, 0, 0, W, H);
   // glints on the centre stones (each ring flashes on its own rhythm)
